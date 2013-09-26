@@ -3,14 +3,14 @@ package main.java.com.mindscapehq.raygun4android.messages;
 public class RaygunClientMessage {
 
   private String version;
-  private String clientUrlString;
+  private String clientUrl;
   private String name;
 
   public RaygunClientMessage()
   {
     setName("Raygun4Android");
     setVersion("1.0.0.0");
-    setClientUrlString("https://github.com/MindscapeHQ/raygun4android");
+    setClientUrl("https://github.com/MindscapeHQ/raygun4android");
   }
 
   public String getVersion() {
@@ -19,11 +19,11 @@ public class RaygunClientMessage {
   public void setVersion(String version) {
     this.version = version;
   }
-  public String getClientUrlString() {
-    return clientUrlString;
+  public String getClientUrl() {
+    return clientUrl;
   }
-  public void setClientUrlString(String clientUrlString) {
-    this.clientUrlString = clientUrlString;
+  public void setClientUrl(String clientUrlString) {
+    this.clientUrl = clientUrlString;
   }
   public String getName() {
     return name;
