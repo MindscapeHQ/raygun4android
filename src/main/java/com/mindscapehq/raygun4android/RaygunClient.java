@@ -138,7 +138,7 @@ public class RaygunClient
 
         System.out.println(jsonPayload);
 
-        DefaultHttpClient client = new RaygunHttpClient(_context);
+        DefaultHttpClient client = new DefaultHttpClient(); // new RaygunHttpClient(_context);
         HttpPost post = new HttpPost(RaygunSettings.getSettings().getApiEndpoint());
         HttpResponse response;
 

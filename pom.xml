@@ -19,22 +19,6 @@
             <artifactId>gson</artifactId>
             <version>2.1</version>
         </dependency>
-        <dependency>
-            <groupId>com.madgag</groupId>
-            <artifactId>sc-light-jdk15on</artifactId>
-            <version>1.47.0.3</version>
-        </dependency>
-        <dependency>
-            <groupId>com.madgag</groupId>
-            <artifactId>scprov-jdk15on</artifactId>
-            <version>1.47.0.3</version>
-        </dependency>
-        <dependency>
-            <groupId>commons-io</groupId>
-            <artifactId>commons-io</artifactId>
-            <version>2.4</version>
-        </dependency>
-
     </dependencies>
     <build>
         <finalName>${project.artifactId}</finalName>
@@ -87,19 +71,6 @@
                     </sdk>
                 </configuration>
             </plugin>
-            <!--<plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-shade-plugin</artifactId>
-                <version>1.6</version>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>shade</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>-->
         </plugins>
     </build>
 </project>

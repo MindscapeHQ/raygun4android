@@ -3,7 +3,6 @@ package main.java.com.mindscapehq.raygun4android;
 import android.content.Context;
 import android.util.Log;
 import com.mindscapehq.raygun4android.R;
-import org.apache.commons.io.IOUtils;
 import org.apache.http.conn.ClientConnectionManager;
 import org.apache.http.conn.scheme.PlainSocketFactory;
 import org.apache.http.conn.scheme.Scheme;
@@ -13,6 +12,7 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.conn.SingleClientConnManager;
 
 import java.io.ByteArrayInputStream;
+import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.StringWriter;
 import java.security.KeyStore;
@@ -29,7 +29,6 @@ public class RaygunHttpClient extends DefaultHttpClient {
 
   @Override
   protected ClientConnectionManager createClientConnectionManager() {
-    Security.insertProviderAt(new org.spongycastle.jce.provider.BouncyCastleProvider(), 1);
     SchemeRegistry registry = new SchemeRegistry();
     registry.register(new Scheme("http", PlainSocketFactory.getSocketFactory(), 80));
     // Register for port 443 our SSLSocketFactory with our keystore
@@ -47,8 +46,6 @@ public class RaygunHttpClient extends DefaultHttpClient {
       // your trusted certificates (root and any intermediate certs)
       InputStream in = context.getResources().openRawResource(R.raw.rob3);
       //InputStream in = this.getClass().getClassLoader().getResourceAsStream("raw/rob3.mp3");
-
-      byte[] bytes = IOUtils.toByteArray(in);
 
       Log.i("SSL", in.toString());
       Log.d("SSL", "Loading");
