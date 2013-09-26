@@ -1,24 +1,62 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="AndroidDesignerProfile">
+    <option name="fullProfile">
+      <profile>
+        <option name="device" value="2.7in QVGA" />
+        <option name="deviceConfiguration" value="Portrait" />
+        <option name="targetHashString" value="android-4" />
+        <option name="theme" value="Theme" />
+      </profile>
+    </option>
+    <option name="selection" value="[Full]" />
+  </component>
   <component name="ChangeListManager">
     <list default="true" id="b9cb1dd0-6592-44a0-bd94-cc57fee26900" name="Default" comment="" />
     <ignored path="raygun4android.iws" />
     <ignored path=".idea/workspace.xml" />
-    <file path="/Dummy.txt" changelist="b9cb1dd0-6592-44a0-bd94-cc57fee26900" time="1379899254299" ignored="false" />
-    <file path="$PROJECT_DIR$/res/layout/main.xml" changelist="b9cb1dd0-6592-44a0-bd94-cc57fee26900" time="1379899255111" ignored="false" />
-    <file path="/RaygunClient.java" changelist="b9cb1dd0-6592-44a0-bd94-cc57fee26900" time="1379909705756" ignored="false" />
+    <file path="/Dummy.txt" changelist="b9cb1dd0-6592-44a0-bd94-cc57fee26900" time="1380083264770" ignored="false" />
+    <file path="/RaygunClient.java" changelist="b9cb1dd0-6592-44a0-bd94-cc57fee26900" time="1380072570061" ignored="false" />
     <file path="/a.java" changelist="b9cb1dd0-6592-44a0-bd94-cc57fee26900" time="1379904143555" ignored="false" />
     <file path="/sample.java" changelist="b9cb1dd0-6592-44a0-bd94-cc57fee26900" time="1379901848432" ignored="false" />
-    <file path="/RaygunMessageBuilder.java" changelist="b9cb1dd0-6592-44a0-bd94-cc57fee26900" time="1379905551879" ignored="false" />
+    <file path="/RaygunMessageBuilder.java" changelist="b9cb1dd0-6592-44a0-bd94-cc57fee26900" time="1380065568042" ignored="false" />
     <file path="/RaygunSettings.java" changelist="b9cb1dd0-6592-44a0-bd94-cc57fee26900" time="1379904096688" ignored="false" />
-    <file path="/fragment.java" changelist="b9cb1dd0-6592-44a0-bd94-cc57fee26900" time="1379905201895" ignored="false" />
-    <file path="/IRaygunMessageBuilder.java" changelist="b9cb1dd0-6592-44a0-bd94-cc57fee26900" time="1379904624334" ignored="false" />
+    <file path="/fragment.java" changelist="b9cb1dd0-6592-44a0-bd94-cc57fee26900" time="1380085655875" ignored="false" />
+    <file path="/IRaygunMessageBuilder.java" changelist="b9cb1dd0-6592-44a0-bd94-cc57fee26900" time="1380065585680" ignored="false" />
     <file path="/RaygunMessage.java" changelist="b9cb1dd0-6592-44a0-bd94-cc57fee26900" time="1379905044996" ignored="false" />
-    <file path="/RaygunMessageDetails.java" changelist="b9cb1dd0-6592-44a0-bd94-cc57fee26900" time="1379905172518" ignored="false" />
+    <file path="/RaygunMessageDetails.java" changelist="b9cb1dd0-6592-44a0-bd94-cc57fee26900" time="1380065602007" ignored="false" />
     <file path="/RaygunErrorMessage.java" changelist="b9cb1dd0-6592-44a0-bd94-cc57fee26900" time="1379905353828" ignored="false" />
-    <file path="/pom.xml" changelist="b9cb1dd0-6592-44a0-bd94-cc57fee26900" time="1379906438776" ignored="false" />
+    <file path="/pom.xml" changelist="b9cb1dd0-6592-44a0-bd94-cc57fee26900" time="1380165550225" ignored="false" />
     <file path="/.gitignore" changelist="b9cb1dd0-6592-44a0-bd94-cc57fee26900" time="1379910526697" ignored="false" />
-    <file path="$PROJECT_DIR$/.idea/workspace.xml" changelist="b9cb1dd0-6592-44a0-bd94-cc57fee26900" time="1379910527786" ignored="false" />
+    <file path="$PROJECT_DIR$/.idea/workspace.xml" changelist="b9cb1dd0-6592-44a0-bd94-cc57fee26900" time="1380077540874" ignored="false" />
+    <file path="$PROJECT_DIR$/../../Android/RaygunTestApp/AndroidManifest.xml" changelist="b9cb1dd0-6592-44a0-bd94-cc57fee26900" time="1380086501844" ignored="false" />
+    <file path="$PROJECT_DIR$/../../Android/RaygunTestApp/src/com/example/RaygunTestApp/MyActivity.java" changelist="b9cb1dd0-6592-44a0-bd94-cc57fee26900" time="1380162775627" ignored="false" />
+    <file path="$PROJECT_DIR$/../../Android/RaygunTestApp/res/layout/main.xml" changelist="b9cb1dd0-6592-44a0-bd94-cc57fee26900" time="1379913422334" ignored="false" />
+    <file path="$PROJECT_DIR$/../../Android/RaygunTestApp/res/values/strings.xml" changelist="b9cb1dd0-6592-44a0-bd94-cc57fee26900" time="1379911697368" ignored="false" />
+    <file path="$PROJECT_DIR$/../../Android/RaygunTestApp/build.xml" changelist="b9cb1dd0-6592-44a0-bd94-cc57fee26900" time="1379911697368" ignored="false" />
+    <file path="$PROJECT_DIR$/../../Android/RaygunTestApp/pom.xml" changelist="b9cb1dd0-6592-44a0-bd94-cc57fee26900" time="1380165804231" ignored="false" />
+    <file path="/MyActivity.java" changelist="b9cb1dd0-6592-44a0-bd94-cc57fee26900" time="1380083659642" ignored="false" />
+    <file path="$PROJECT_DIR$/../../Android/RaygunTestApp/project.properties" changelist="b9cb1dd0-6592-44a0-bd94-cc57fee26900" time="1380165809383" ignored="false" />
+    <file path="$PROJECT_DIR$/../../Android/RaygunTestApp/gen/com/example/RaygunTestApp/R.java" changelist="b9cb1dd0-6592-44a0-bd94-cc57fee26900" time="1380158901555" ignored="false" />
+    <file path="$USER_HOME$/.IntelliJIdea12/system/compile-server/rayguntestapp_a817687/targets/java-production/RaygunTestApp/android/generated_sources/aapt/com/example/RaygunTestApp/R.java" changelist="b9cb1dd0-6592-44a0-bd94-cc57fee26900" time="1380162855300" ignored="false" />
+    <file path="/main.xml" changelist="b9cb1dd0-6592-44a0-bd94-cc57fee26900" time="1379913278319" ignored="false" />
+    <file path="/README.md" changelist="b9cb1dd0-6592-44a0-bd94-cc57fee26900" time="1379979591371" ignored="false" />
+    <file path="$MAVEN_REPOSITORY$/com/mindscapehq/android/raygun4android/1.0.0-SNAPSHOT/raygun4android-1.0.0-SNAPSHOT.jar!/main/java/com/mindscapehq/raygun4android/RaygunClient.class" changelist="b9cb1dd0-6592-44a0-bd94-cc57fee26900" time="1380160965714" ignored="false" />
+    <file path="$PROJECT_DIR$/../../Android/RaygunTestApp/gen/com/example/RaygunTestApp/BuildConfig.java" changelist="b9cb1dd0-6592-44a0-bd94-cc57fee26900" time="1380158902645" ignored="false" />
+    <file path="/RaygunHttpClient.java" changelist="b9cb1dd0-6592-44a0-bd94-cc57fee26900" time="1380164295349" ignored="false" />
+    <file path="$MAVEN_REPOSITORY$/com/mindscapehq/android/raygun4android/1.0.0-SNAPSHOT/raygun4android-1.0.0-SNAPSHOT.jar!/META-INF/maven/com.mindscapehq.android/raygun4android/pom.xml" changelist="b9cb1dd0-6592-44a0-bd94-cc57fee26900" time="1380081616461" ignored="false" />
+    <file path="$PROJECT_DIR$/.idea/misc.xml" changelist="b9cb1dd0-6592-44a0-bd94-cc57fee26900" time="1380063419660" ignored="false" />
+    <file path="$PROJECT_DIR$/.idea/compiler.xml" changelist="b9cb1dd0-6592-44a0-bd94-cc57fee26900" time="1380063419660" ignored="false" />
+    <file path="$PROJECT_DIR$/.idea/encodings.xml" changelist="b9cb1dd0-6592-44a0-bd94-cc57fee26900" time="1380063426543" ignored="false" />
+    <file path="D:/AndroidADT/sdk/platforms/android-4/android.jar!/java/security/KeyStore.class" changelist="b9cb1dd0-6592-44a0-bd94-cc57fee26900" time="1380075340369" ignored="false" />
+    <file path="$PROJECT_DIR$/gen/com/mindscapehq/raygun4android/BuildConfig.java" changelist="b9cb1dd0-6592-44a0-bd94-cc57fee26900" time="1380076671866" ignored="false" />
+    <file path="$MAVEN_REPOSITORY$/com/mindscapehq/android/raygun4android/1.0.0-SNAPSHOT/raygun4android-1.0.0-SNAPSHOT.jar!/main/java/com/mindscapehq/raygun4android/RaygunHttpClient.class" changelist="b9cb1dd0-6592-44a0-bd94-cc57fee26900" time="1380081616461" ignored="false" />
+    <file path="/AndroidManifest.xml" changelist="b9cb1dd0-6592-44a0-bd94-cc57fee26900" time="1380086465208" ignored="false" />
+    <file path="$PROJECT_DIR$/target/raygun4android-sources.jar!/com/mindscapehq/raygun4android/R.java" changelist="b9cb1dd0-6592-44a0-bd94-cc57fee26900" time="1380148016133" ignored="false" />
+    <file path="$MAVEN_REPOSITORY$/com/mindscapehq/android/raygun4android/1.0.0-SNAPSHOT/raygun4android-1.0.0-SNAPSHOT.jar!/META-INF/MANIFEST.MF" changelist="b9cb1dd0-6592-44a0-bd94-cc57fee26900" time="1380151247219" ignored="false" />
+    <file path="$MAVEN_REPOSITORY$/com/mindscapehq/android/raygun4android/1.0.0-SNAPSHOT/raygun4android-sources.jar!/main/java/com/mindscapehq/raygun4android/RaygunHttpClient.java" changelist="b9cb1dd0-6592-44a0-bd94-cc57fee26900" time="1380165579902" ignored="false" />
+    <file path="$PROJECT_DIR$/target/raygun4android-sources.jar!/main/java/com/mindscapehq/raygun4android/RaygunHttpClient.java" changelist="b9cb1dd0-6592-44a0-bd94-cc57fee26900" time="1380158865590" ignored="false" />
+    <file path="$PROJECT_DIR$/../../Android/RaygunTestApp/gen/com/example/RaygunTestApp/Manifest.java" changelist="b9cb1dd0-6592-44a0-bd94-cc57fee26900" time="1380158901555" ignored="false" />
     <option name="TRACKING_ENABLED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -33,7 +71,6 @@
     <disable_hints />
   </component>
   <component name="DebuggerManager">
-    <ui_properties default_suspend_policy="SuspendAll" default_condition_enabled="true" />
     <breakpoint_any default_suspend_policy="SuspendAll" default_condition_enabled="true">
       <breakpoint>
         <option name="NOTIFY_CAUGHT" value="true" />
@@ -70,6 +107,7 @@
         <option name="LOG_MESSAGE" value="" />
       </breakpoint>
     </breakpoint_any>
+    <ui_properties default_suspend_policy="SuspendAll" default_condition_enabled="true" />
     <breakpoint_rules />
     <ui_properties />
   </component>
@@ -79,57 +117,28 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
+      <file leaf-file-name="pom.xml" pinned="false" current="true" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/pom.xml">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="29" column="39" selection-start="1211" selection-end="1211" vertical-scroll-proportion="0.8559028">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
       <file leaf-file-name="RaygunClient.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/com/mindscapehq/raygun4android/RaygunClient.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="123" column="5" selection-start="3490" selection-end="3490" vertical-scroll-proportion="0.0">
-              <folding>
-                <element signature="imports" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name=".gitignore" pinned="false" current="true" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/.gitignore">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="23" column="15" selection-start="275" selection-end="275" vertical-scroll-proportion="0.60339504">
+            <state line="33" column="32" selection-start="1167" selection-end="1167" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="RaygunSettings.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/com/mindscapehq/raygun4android/RaygunSettings.java">
+      <file leaf-file-name="RaygunHttpClient.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/com/mindscapehq/raygun4android/RaygunHttpClient.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="14" column="0" selection-start="343" selection-end="343" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="pom.xml" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/pom.xml">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="34" column="25" selection-start="1331" selection-end="1331" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="RaygunClientMessage.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/com/mindscapehq/raygun4android/messages/RaygunClientMessage.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="12" column="35" selection-start="308" selection-end="308" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="RaygunEnvironmentMessage.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/com/mindscapehq/raygun4android/messages/RaygunEnvironmentMessage.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="8" column="0" selection-start="230" selection-end="230" vertical-scroll-proportion="0.0">
+            <state line="56" column="41" selection-start="2207" selection-end="2207" vertical-scroll-proportion="0.0">
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -156,22 +165,27 @@
   <component name="IdeDocumentHistory">
     <option name="changedFiles">
       <list>
-        <option value="$PROJECT_DIR$/src/main/java/com/mindscapehq/raygun4android/IRaygunMessageBuilder.java" />
-        <option value="$PROJECT_DIR$/src/main/java/com/mindscapehq/raygun4android/RaygunMessage.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/mindscapehq/raygun4android/RaygunMessageDetails.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/mindscapehq/raygun4android/messages/RaygunMessage.java" />
-        <option value="$PROJECT_DIR$/src/main/java/com/mindscapehq/raygun4android/messages/RaygunMessageDetails.java" />
-        <option value="$PROJECT_DIR$/src/main/java/com/mindscapehq/raygun4android/RaygunMessageBuilder.java" />
-        <option value="$PROJECT_DIR$/pom.xml" />
-        <option value="$PROJECT_DIR$/src/main/java/com/mindscapehq/raygun4android/RaygunSettings.java" />
-        <option value="$PROJECT_DIR$/src/main/java/com/mindscapehq/raygun4android/RaygunClient.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/mindscapehq/raygun4android/messages/RaygunClientMessage.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/mindscapehq/raygun4android/messages/RaygunErrorMessage.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/mindscapehq/raygun4android/messages/RaygunErrorStackTraceLineMessage.java" />
-        <option value="$PROJECT_DIR$/src/main/java/com/mindscapehq/raygun4android/messages/RaygunEnvironmentMessage.java" />
         <option value="$PROJECT_DIR$/.gitignore" />
+        <option value="$PROJECT_DIR$/README.md" />
+        <option value="$PROJECT_DIR$/src/main/java/com/mindscapehq/raygun4android/messages/RaygunEnvironmentMessage.java" />
+        <option value="$PROJECT_DIR$/src/main/java/com/mindscapehq/raygun4android/RaygunMessageBuilder.java" />
+        <option value="$PROJECT_DIR$/src/main/java/com/mindscapehq/raygun4android/IRaygunMessageBuilder.java" />
+        <option value="$PROJECT_DIR$/src/main/java/com/mindscapehq/raygun4android/messages/RaygunMessageDetails.java" />
+        <option value="$PROJECT_DIR$/src/main/java/com/mindscapehq/raygun4android/RaygunSettings.java" />
+        <option value="$PROJECT_DIR$/src/main/java/com/mindscapehq/raygun4android/RaygunClient.java" />
+        <option value="$USER_HOME$/.IntelliJIdea12/system/compile-server/raygun4android_f38c8562/targets/java-production/raygun4android/android/generated_sources/aapt/com/mindscapehq/raygun4android/R.java" />
+        <option value="$PROJECT_DIR$/src/main/java/com/mindscapehq/raygun4android/RaygunHttpClient.java" />
+        <option value="$PROJECT_DIR$/pom.xml" />
       </list>
     </option>
+  </component>
+  <component name="MavenRunner">
+    <option name="jreName" value="1.6" />
   </component>
   <component name="ProjectFrameBounds">
     <option name="x" value="-8" />
@@ -471,7 +485,6 @@
       <sortByType />
     </navigator>
     <panes>
-      <pane id="PackagesPane" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -510,22 +523,29 @@
           </PATH>
         </subPane>
       </pane>
+      <pane id="PackagesPane" />
       <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
+    <property name="project.structure.last.edited" value="Modules" />
     <property name="GoToFile.includeJavaFiles" value="false" />
+    <property name="project.structure.proportion" value="0.15" />
     <property name="OverrideImplement.combined" value="true" />
-    <property name="GoToClass.toSaveIncludeLibraries" value="false" />
     <property name="options.splitter.main.proportions" value="0.3" />
-    <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="options.lastSelected" value="project.propVCSSupport.Confirmation" />
     <property name="MemberChooser.sorted" value="false" />
+    <property name="options.lastSelected" value="reference.settings.project.maven.runner" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/lib/scprov-jdk15on-1.47.0.3.jar!/" />
+    <property name="AndroidLayoutSelectedEditor" value="android-designer" />
+    <property name="project.structure.side.proportion" value="0.2" />
+    <property name="MemberChooser.copyJavadoc" value="false" />
+    <property name="GoToClass.toSaveIncludeLibraries" value="false" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="MemberChooser.showClasses" value="true" />
+    <property name="FullScreen" value="false" />
     <property name="GoToClass.includeLibraries" value="false" />
     <property name="options.searchVisible" value="true" />
     <property name="options.splitter.details.proportions" value="0.2" />
-    <property name="MemberChooser.copyJavadoc" value="false" />
   </component>
   <component name="RecentsManager">
     <key name="CreateClassDialog.RecentsKey">
@@ -566,6 +586,19 @@
       <option name="PORT" value="5005" />
       <method />
     </configuration>
+    <configuration default="true" type="Applet" factoryName="Applet">
+      <module name="" />
+      <option name="MAIN_CLASS_NAME" />
+      <option name="HTML_FILE_NAME" />
+      <option name="HTML_USED" value="false" />
+      <option name="WIDTH" value="400" />
+      <option name="HEIGHT" value="300" />
+      <option name="POLICY_FILE" value="$APPLICATION_HOME_DIR$/bin/appletviewer.policy" />
+      <option name="VM_PARAMETERS" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+      <method />
+    </configuration>
     <configuration default="true" type="TestNG" factoryName="TestNG">
       <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
       <module name="" />
@@ -592,19 +625,6 @@
       <envs />
       <properties />
       <listeners />
-      <method />
-    </configuration>
-    <configuration default="true" type="Applet" factoryName="Applet">
-      <module name="" />
-      <option name="MAIN_CLASS_NAME" />
-      <option name="HTML_FILE_NAME" />
-      <option name="HTML_USED" value="false" />
-      <option name="WIDTH" value="400" />
-      <option name="HEIGHT" value="300" />
-      <option name="POLICY_FILE" value="$APPLICATION_HOME_DIR$/bin/appletviewer.policy" />
-      <option name="VM_PARAMETERS" />
-      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
-      <option name="ALTERNATIVE_JRE_PATH" />
       <method />
     </configuration>
     <configuration default="true" type="Application" factoryName="Application">
@@ -680,30 +700,32 @@
     <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
-      <window_info id="JetGradle" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
-      <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
-      <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
+      <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="JetGradle" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="IDEtalk Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
-      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.2494432" sideWeight="0.5" order="-1" side_tool="true" content_ui="tabs" />
-      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="-1" side_tool="true" content_ui="tabs" />
-      <window_info id="IDEtalk" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
-      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
-      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
-      <window_info id="Android" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
+      <window_info id="IDEtalk Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.32962137" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
+      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
+      <window_info id="IDEtalk" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.32962137" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Android" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
+      <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.16808964" sideWeight="0.75055677" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.16808964" sideWeight="0.6703786" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Palette&#9;" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32977587" sideWeight="0.6703786" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
+      <window_info id="Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32977587" sideWeight="0.6703786" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
-      <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
     </layout>
   </component>
   <component name="VcsContentAnnotationSettings">
@@ -771,98 +793,24 @@
     <option name="FILTER_TARGETS" value="false" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/AndroidManifest.xml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="15" column="33" selection-start="639" selection-end="639" vertical-scroll-proportion="0.3935185">
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/README.md">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../raygun4java/core/src/main/java/com/mindscapehq/raygun4java/core/RaygunSettings.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="13" column="10" selection-start="327" selection-end="327" vertical-scroll-proportion="0.34104937">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/mindscapehq/raygun4android/messages/RaygunMessageDetails.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="1" column="0" selection-start="59" selection-end="59" vertical-scroll-proportion="0.027113238">
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/mindscapehq/raygun4android/IRaygunMessageBuilder.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="7" column="40" selection-start="218" selection-end="218" vertical-scroll-proportion="0.18364197">
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/mindscapehq/raygun4android/RaygunMessageBuilder.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="65" column="0" selection-start="1752" selection-end="1752" vertical-scroll-proportion="1.7052469">
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/pom.xml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="34" column="25" selection-start="1331" selection-end="1331" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/mindscapehq/raygun4android/messages/RaygunMessage.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="7" column="0" selection-start="179" selection-end="179" vertical-scroll-proportion="0.08179013">
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/mindscapehq/raygun4android/messages/RaygunErrorMessage.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="19" column="56" selection-start="627" selection-end="627" vertical-scroll-proportion="0.49845678">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/mindscapehq/raygun4android/messages/RaygunErrorStackTraceLineMessage.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="3" column="2" selection-start="110" selection-end="110" vertical-scroll-proportion="0.0787037">
-          <folding />
-        </state>
+        <state line="12" column="0" selection-start="281" selection-end="281" vertical-scroll-proportion="0.0" />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/com/mindscapehq/raygun4android/messages/RaygunEnvironmentMessage.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="8" column="0" selection-start="230" selection-end="230" vertical-scroll-proportion="0.0">
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
+        <state line="36" column="23" selection-start="1215" selection-end="1215" vertical-scroll-proportion="0.0" />
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/mindscapehq/raygun4android/RaygunSettings.java">
+    <entry file="file://$PROJECT_DIR$/gen/com/mindscapehq/raygun4android/R.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="14" column="0" selection-start="343" selection-end="343" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
+        <state line="6" column="1" selection-start="183" selection-end="183" vertical-scroll-proportion="0.17708333" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/gen/com/mindscapehq/raygun4android/BuildConfig.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="7" column="1" selection-start="201" selection-end="201" vertical-scroll-proportion="0.0" />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/com/mindscapehq/raygun4android/messages/RaygunClientMessage.java">
@@ -872,22 +820,162 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/mindscapehq/raygun4android/messages/RaygunMessage.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="16" column="44" selection-start="439" selection-end="439" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/mindscapehq/raygun4android/IRaygunMessageBuilder.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="9" column="24" selection-start="244" selection-end="244" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/mindscapehq/raygun4android/RaygunMessageBuilder.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="17" column="3" selection-start="608" selection-end="608" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/mindscapehq/raygun4android/messages/RaygunMessageDetails.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="12" column="28" selection-start="357" selection-end="357" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/mindscapehq/raygun4android/RaygunSettings.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="5" column="0" selection-start="113" selection-end="113" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/AndroidManifest.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="10" column="40" selection-start="522" selection-end="522" vertical-scroll-proportion="0.25641027">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/target/generated-sources/r/com/mindscapehq/raygun4android/R.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
+          <folding>
+            <element signature="e#0#468#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/com/mindscapehq/raygun4android/RaygunClient.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="123" column="5" selection-start="3490" selection-end="3490" vertical-scroll-proportion="0.0">
+        <state line="33" column="32" selection-start="1167" selection-end="1167" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/.IntelliJIdea12/system/compile-server/raygun4android_f38c8562/targets/java-production/raygun4android/android/generated_sources/aapt/com/mindscapehq/raygun4android/R.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="19" column="1" selection-start="527" selection-end="527" vertical-scroll-proportion="0.41319445">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/mindscapehq/raygun4android/RaygunHttpClient.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="56" column="41" selection-start="2207" selection-end="2207" vertical-scroll-proportion="0.0">
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/.gitignore">
+    <entry file="file://$PROJECT_DIR$/pom.xml">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="23" column="15" selection-start="275" selection-end="275" vertical-scroll-proportion="0.60339504">
+        <state line="29" column="39" selection-start="1211" selection-end="1211" vertical-scroll-proportion="0.8559028">
           <folding />
         </state>
       </provider>
     </entry>
+  </component>
+  <component name="masterDetails">
+    <states>
+      <state key="ArtifactsStructureConfigurable.UI">
+        <settings>
+          <artifact-editor />
+          <splitter-proportions>
+            <option name="proportions">
+              <list>
+                <option value="0.2" />
+              </list>
+            </option>
+          </splitter-proportions>
+        </settings>
+      </state>
+      <state key="FacetStructureConfigurable.UI">
+        <settings>
+          <last-edited>Android (raygun4android)|Android</last-edited>
+          <splitter-proportions>
+            <option name="proportions">
+              <list>
+                <option value="0.2" />
+              </list>
+            </option>
+          </splitter-proportions>
+        </settings>
+      </state>
+      <state key="GlobalLibrariesConfigurable.UI">
+        <settings>
+          <splitter-proportions>
+            <option name="proportions">
+              <list>
+                <option value="0.2" />
+              </list>
+            </option>
+          </splitter-proportions>
+        </settings>
+      </state>
+      <state key="JdkListConfigurable.UI">
+        <settings>
+          <last-edited>Android 1.6 Platform</last-edited>
+          <splitter-proportions>
+            <option name="proportions">
+              <list>
+                <option value="0.2" />
+              </list>
+            </option>
+          </splitter-proportions>
+        </settings>
+      </state>
+      <state key="ModuleStructureConfigurable.UI">
+        <settings>
+          <last-edited>Android|raygun4android</last-edited>
+          <splitter-proportions>
+            <option name="proportions">
+              <list>
+                <option value="0.2" />
+              </list>
+            </option>
+          </splitter-proportions>
+        </settings>
+      </state>
+      <state key="ProjectLibrariesConfigurable.UI">
+        <settings>
+          <last-edited>Maven: xpp3:xpp3:1.1.4c</last-edited>
+          <splitter-proportions>
+            <option name="proportions">
+              <list>
+                <option value="0.2" />
+              </list>
+            </option>
+          </splitter-proportions>
+        </settings>
+      </state>
+    </states>
   </component>
 </project>
 

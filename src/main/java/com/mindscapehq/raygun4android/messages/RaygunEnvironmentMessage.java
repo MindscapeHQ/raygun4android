@@ -2,8 +2,8 @@ package main.java.com.mindscapehq.raygun4android.messages;
 
 
 import java.awt.*;
-import java.lang.management.ManagementFactory;
-import java.lang.management.OperatingSystemMXBean;
+//import java.lang.management.ManagementFactory;
+//import java.lang.management.OperatingSystemMXBean;
 import java.util.Locale;
 import java.util.TimeZone;
 
@@ -27,7 +27,7 @@ public class RaygunEnvironmentMessage {
   public RaygunEnvironmentMessage()
   {
     try {
-      OperatingSystemMXBean osMXBean = ManagementFactory.getOperatingSystemMXBean();
+      /*OperatingSystemMXBean osMXBean = ManagementFactory.getOperatingSystemMXBean();
       com.sun.management.OperatingSystemMXBean sunMxBean = (com.sun.management.OperatingSystemMXBean) osMXBean;
 
       architecture = sunMxBean.getArch();
@@ -46,7 +46,7 @@ public class RaygunEnvironmentMessage {
 
       processorCount = sunMxBean.getAvailableProcessors();
 
-      osVersion = sunMxBean.getName() + " - " +sunMxBean.getVersion();
+      osVersion = sunMxBean.getName() + " - " +sunMxBean.getVersion();*/
 
     } catch (Exception e) {
     }

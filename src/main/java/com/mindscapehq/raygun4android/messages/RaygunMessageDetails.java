@@ -5,7 +5,7 @@ import java.util.Map;
 
 public class RaygunMessageDetails {
 
-  private String deviceName;
+  private String machineName;
   private String version;
   private RaygunErrorMessage error;
   private RaygunEnvironmentMessage environment;
@@ -13,12 +13,12 @@ public class RaygunMessageDetails {
   private AbstractList tags;
   private Map userCustomData;
 
-  public void setDeviceName(String deviceName) {
-    this.deviceName = deviceName;
+  public void setMachineName(String machineName) {
+    this.machineName = machineName;
   }
 
-  public String getDeviceName() {
-    return deviceName;
+  public String getMachineName() {
+    return machineName;
   }
 
   public String getVersion() {

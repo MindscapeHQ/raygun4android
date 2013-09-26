@@ -23,8 +23,8 @@ public class RaygunMessageBuilder implements IRaygunMessageBuilder {
   }
 
   @Override
-  public IRaygunMessageBuilder SetDeviceName(String deviceName) {
-    _raygunMessage.getDetails().setDeviceName(deviceName);
+  public IRaygunMessageBuilder SetMachineName(String machineName) {
+    _raygunMessage.getDetails().setMachineName(machineName);
     return this;
   }
 

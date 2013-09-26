@@ -9,7 +9,7 @@ public interface IRaygunMessageBuilder {
 
   RaygunMessage Build();
 
-  IRaygunMessageBuilder SetDeviceName(String deviceName);
+  IRaygunMessageBuilder SetMachineName(String machineName);
 
   IRaygunMessageBuilder SetExceptionDetails(Throwable throwable);
 

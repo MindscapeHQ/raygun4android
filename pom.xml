@@ -4,14 +4,14 @@
     <groupId>com.mindscapehq.android</groupId>
     <artifactId>raygun4android</artifactId>
     <version>1.0.0-SNAPSHOT</version>
-    <packaging>apk</packaging>
+    <packaging>apklib</packaging>
     <name>Raygun4Android</name>
 
     <dependencies>
         <dependency>
             <groupId>com.google.android</groupId>
             <artifactId>android</artifactId>
-            <version>1.6_r2</version>
+            <version>2.2.1</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -19,30 +19,87 @@
             <artifactId>gson</artifactId>
             <version>2.1</version>
         </dependency>
+        <dependency>
+            <groupId>com.madgag</groupId>
+            <artifactId>sc-light-jdk15on</artifactId>
+            <version>1.47.0.3</version>
+        </dependency>
+        <dependency>
+            <groupId>com.madgag</groupId>
+            <artifactId>scprov-jdk15on</artifactId>
+            <version>1.47.0.3</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>2.4</version>
+        </dependency>
+
     </dependencies>
     <build>
         <finalName>${project.artifactId}</finalName>
         <sourceDirectory>src</sourceDirectory>
         <pluginManagement>
-       <plugins>
-        <plugin>
-         <groupId>com.jayway.maven.plugins.android.generation2</groupId>
-         <artifactId>android-maven-plugin</artifactId>
-         <version>3.1.1</version>
-         <extensions>true</extensions>
-        </plugin>
-       </plugins>
-      </pluginManagement>
-      <plugins>
-       <plugin>
-        <groupId>com.jayway.maven.plugins.android.generation2</groupId>
-        <artifactId>android-maven-plugin</artifactId>
-        <configuration>
-         <sdk>          
-          <platform>4</platform>
-         </sdk>
-        </configuration>
-       </plugin>
-      </plugins>
+            <plugins>
+                <plugin>
+                    <artifactId>maven-resources-plugin</artifactId>
+                    <version>2.5</version>
+                    <configuration>
+                        <encoding>UTF-8</encoding>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-source-plugin</artifactId>
+                    <version>2.1.2</version>
+                    <executions>
+                        <execution>
+                            <goals>
+                                <goal>jar-no-fork</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <configuration>
+                        <source>1.6</source>
+                        <target>1.6</target>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>com.jayway.maven.plugins.android.generation2</groupId>
+                    <artifactId>android-maven-plugin</artifactId>
+                    <version>3.6.1</version>
+                    <extensions>true</extensions>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+        <plugins>
+            <plugin>
+                <groupId>com.jayway.maven.plugins.android.generation2</groupId>
+                <artifactId>android-maven-plugin</artifactId>
+                <extensions>true</extensions>
+                <configuration>
+                    <sdk>
+                        <platform>8</platform>
+                    </sdk>
+                </configuration>
+            </plugin>
+            <!--<plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>1.6</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>-->
+        </plugins>
     </build>
 </project>

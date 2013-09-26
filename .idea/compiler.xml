@@ -25,6 +25,9 @@
         <module name="raygun4android" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="raygun4android" target="1.6" />
+    </bytecodeTargetLevel>
   </component>
 </project>
 
