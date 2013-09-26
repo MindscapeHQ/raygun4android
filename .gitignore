@@ -20,5 +20,5 @@ local.properties
 .classpath
 .project
 
-.idea/wordspace.xml
+.idea/workspace.xml
 .idea/tasks.xml
