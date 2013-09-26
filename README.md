@@ -16,7 +16,7 @@ Troubleshooting
 
 ### Developing
 
-Run `mvn install` to grab the dependencies and install the library to your local Maven repo. Runs with Android 1.6_r2 (API v4) and JDK 1.6
+Run `mvn install` to grab the dependencies and install the library to your local Maven repo. Runs with Android 2.2 (API level 8) and JDK 1.6
 
 `mvn source:jar` to generate source jar for debugging
 

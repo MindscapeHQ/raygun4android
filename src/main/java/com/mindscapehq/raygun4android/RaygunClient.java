@@ -1,6 +1,7 @@
 package main.java.com.mindscapehq.raygun4android;
 
 import android.content.Context;
+import android.util.Log;
 import com.google.gson.Gson;
 import main.java.com.mindscapehq.raygun4android.messages.RaygunMessage;
 import org.apache.http.HttpResponse;
@@ -74,7 +75,7 @@ public class RaygunClient
     }
     catch (Exception e)
     {
-      System.err.println("Raygun4Java: Failed to build RaygunMessage - " + e);
+      Log.e("Raygun4Java", "Failed to build RaygunMessage - " + e);
     }
     return null;
   }
@@ -87,58 +88,7 @@ public class RaygunClient
       {
         String jsonPayload = new Gson().toJson(raygunMessage);
 
-        /*HttpURLConnection connection = (HttpURLConnection) new URL(RaygunSettings.getSettings().getApiEndpoint()).openConnection();
-
-        connection.setDoOutput(true);
-        connection.setRequestMethod("POST");
-        connection.setRequestProperty("Content-Type", "application/json");
-        connection.setRequestProperty("charset", "utf-8");
-        connection.setRequestProperty("X-ApiKey", _apiKey);
-
-        OutputStreamWriter writer = new OutputStreamWriter(connection.getOutputStream());
-        writer.write(jsonPayload);
-        writer.flush();
-        writer.close();
-        connection.disconnect();
-        return connection.getResponseCode();*/
-
-        // ----
-
-        /*HttpClient httpClient = new DefaultHttpClient();
-        HttpPost post = new HttpPost(RaygunSettings.getSettings().getApiEndpoint());
-        HttpResponse response;
-
-        StringEntity se = new StringEntity(jsonPayload.toString());
-        se.setContentEncoding(new BasicHeader(HTTP.CONTENT_TYPE, "application/json"));
-        post.setEntity(se);
-        response = httpClient.execute(post);
-        return response.getStatusLine().getStatusCode();*/
-        //---
-        /*URL url = new URL(RaygunSettings.getSettings().getApiEndpoint());
-        HttpsURLConnection conn = (HttpsURLConnection) url.openConnection();
-        SSLContext sc = SSLContext.getInstance("TLS");
-        sc.init(null, null, new SecureRandom());
-        conn.setSSLSocketFactory(sc.getSocketFactory());
-        conn.setRequestMethod("POST");
-        conn.setRequestProperty("Content-Type", "application/json");
-        conn.setDoOutput(true);
-        conn.setDoInput(true);
-        PrintWriter out = new PrintWriter(conn.getOutputStream());
-        out.print(jsonPayload);
-        out.close();
-
-        String result = new String();
-        InputStream is = conn.getInputStream();
-        BufferedReader in = new BufferedReader(new InputStreamReader(is));
-        String inputLine;
-        while ((inputLine = in.readLine()) != null) {
-          result += inputLine;
-        }
-        return 400;*/
-
-        System.out.println(jsonPayload);
-
-        DefaultHttpClient client = new DefaultHttpClient(); // new RaygunHttpClient(_context);
+        DefaultHttpClient client = new DefaultHttpClient();
         HttpPost post = new HttpPost(RaygunSettings.getSettings().getApiEndpoint());
         HttpResponse response;
 
@@ -151,7 +101,7 @@ public class RaygunClient
     }
     catch (Exception e)
     {
-      System.err.println("Raygun4Java: Couldn't post exception - "); // TODO change to use Log.e
+      Log.e("Raygun4Android", "Couldn't post exception - ");
       e.printStackTrace();
     }
     return -1;
@@ -161,7 +111,8 @@ public class RaygunClient
   {
     if (_apiKey.length() == 0)
     {
-      throw new Exception("API key has not been provided, exception will not be logged");
+      Log.e("Raygun4Android", "API key has not been provided, exception will not be logged");
+      return false;
     }
     else
     {
