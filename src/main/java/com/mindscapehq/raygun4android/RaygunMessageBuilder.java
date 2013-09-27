@@ -47,8 +47,8 @@ public class RaygunMessageBuilder implements IRaygunMessageBuilder {
   }
 
   @Override
-  public IRaygunMessageBuilder SetVersion() {
-    // TODO
+  public IRaygunMessageBuilder SetVersion(String version) {
+    _raygunMessage.getDetails().setVersion(version);
     return this;
   }
 

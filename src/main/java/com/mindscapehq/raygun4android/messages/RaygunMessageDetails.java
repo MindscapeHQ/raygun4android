@@ -6,7 +6,7 @@ import java.util.Map;
 public class RaygunMessageDetails {
 
   private String machineName;
-  private String version;
+  private String version = "Not supplied";
   private RaygunErrorMessage error;
   private RaygunEnvironmentMessage environment;
   private RaygunClientMessage client;

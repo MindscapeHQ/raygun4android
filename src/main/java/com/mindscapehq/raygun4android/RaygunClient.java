@@ -34,26 +34,72 @@ public class RaygunClient
 {
   private static String _apiKey;
   private static Context _context;
+  private static String _version;
 
+  /**
+   * Initializes the Raygun client with your Android application's context and your
+   * Raygun API key.
+   * @param context The Android context of your application
+   * @param apiKey An API key that belongs to a Raygun application created in your dashboard
+   */
   public static void Init(Context context, String apiKey)
   {
     _apiKey = apiKey;
     _context = context;
   }
 
+  /**
+   * Initializes the Raygun client with your Android application's context, your
+   * Raygun API key, and the version of your application
+   * @param context The Android context of your application
+   * @param apiKey An API key that belongs to a Raygun application created in your dashboard
+   * @param version The current version identifier of your Android application. This will be attached to the Raygun message.
+   */
+  public static void Init(Context context, String apiKey, String version)
+  {
+    _apiKey = apiKey;
+    _context = context;
+    _version = version;
+  }
+
+  /**
+   * Sends an exception-type object to Raygun.
+   * @param throwable The Throwable object that occurred in your application that will be sent to Raygun.
+   * @return An HTTP code representing the response from the Raygun API.
+   *         200 if successful, 400 if bad message generated, 403 if incorrect API key.
+   */
   public static int Send(Throwable throwable)
   {
     return Post(BuildMessage(throwable));
   }
 
-  public static int Send(Throwable throwable, AbstractList<Object> tags)
+  /**
+   * Sends an exception-type object to Raygun with a list of tags you specify.
+   * @param throwable The Throwable object that occurred in your application that will be sent to Raygun.
+   * @param tags A list of data that will be attached to the Raygun message and visible on the error in the dashboard.
+   *             This could be a build tag, lifecycle state, debug/production version etc.
+   * @return An HTTP code representing the response from the Raygun API.
+   * 200 if successful, 400 if bad message generated, 403 if incorrect API key.
+   */
+  public static int Send(Throwable throwable, AbstractList tags)
   {
     RaygunMessage msg = BuildMessage(throwable);
     msg.getDetails().setTags(tags);
     return Post(msg);
   }
 
-  public static int Send(Throwable throwable, AbstractList<Object> tags, Map<Object, Object> userCustomData)
+  /**
+   * Sends an exception-type object to Raygun with a list of tags you specify, and a set of
+   * custom data.
+   * @param throwable The Throwable object that occurred in your application that will be sent to Raygun.
+   * @param tags A list of data that will be attached to the Raygun message and visible on the error in the dashboard.
+   *             This could be a build tag, lifecycle state, debug/production version etc.
+   * @param userCustomData A set of custom key-value pairs relating to your application and its current state. This is a bucket
+   *                       where you can attach any related data you want to see to the error.
+   * @return An HTTP code representing the response from the Raygun API.
+   * 200 if successful, 400 if bad message generated, 403 if incorrect API key.
+   */
+  public static int Send(Throwable throwable, AbstractList tags, Map userCustomData)
   {
     RaygunMessage msg = BuildMessage(throwable);
     msg.getDetails().setTags(tags);
@@ -65,21 +111,31 @@ public class RaygunClient
   {
     try
     {
-      return RaygunMessageBuilder.New()
-          .SetEnvironmentDetails()
-          .SetMachineName("TODO DEVICE NAME")
-          .SetExceptionDetails(throwable)
-          .SetClientDetails()
-          .SetVersion()
-          .Build();
+      RaygunMessage msg =  RaygunMessageBuilder.New()
+                              .SetEnvironmentDetails()
+                              .SetMachineName("TODO DEVICE NAME")
+                              .SetExceptionDetails(throwable)
+                              .SetClientDetails()
+                              .Build();
+      if (_version != null)
+      {
+        msg.getDetails().setVersion(_version);
+      }
+      return msg;
     }
     catch (Exception e)
     {
-      Log.e("Raygun4Java", "Failed to build RaygunMessage - " + e);
+      Log.e("Raygun4Android", "Failed to build RaygunMessage - " + e);
     }
     return null;
   }
 
+  /**
+   * Raw post method that delivers a pre-built RaygunMessage to the Raygun API. You do not need to call this method
+   * directly unless you want to manually build your own message - for most purposes you should call Send().
+   * @param raygunMessage The RaygunMessage to deliver over HTTPS.
+   * @return
+   */
   public static int Post(RaygunMessage raygunMessage)
   {
     try
@@ -90,12 +146,14 @@ public class RaygunClient
 
         DefaultHttpClient client = new DefaultHttpClient();
         HttpPost post = new HttpPost(RaygunSettings.getSettings().getApiEndpoint());
-        HttpResponse response;
+        post.addHeader("X-ApiKey", _apiKey);
+        post.addHeader("Content-Type", "application/json");
+
+        Log.d("Raygun4Android", jsonPayload);
 
         StringEntity se = new StringEntity(jsonPayload.toString());
-        se.setContentEncoding(new BasicHeader(HTTP.CONTENT_TYPE, "application/json"));
         post.setEntity(se);
-        response = client.execute(post);
+        HttpResponse response = client.execute(post);
         return response.getStatusLine().getStatusCode();
       }
     }
