@@ -1,5 +1,6 @@
 package main.java.com.mindscapehq.raygun4android;
 
+import android.content.Context;
 import main.java.com.mindscapehq.raygun4android.messages.RaygunMessage;
 
 import java.util.AbstractList;
@@ -15,7 +16,7 @@ public interface IRaygunMessageBuilder {
 
   IRaygunMessageBuilder SetClientDetails();
 
-  IRaygunMessageBuilder SetEnvironmentDetails();
+  IRaygunMessageBuilder SetEnvironmentDetails(Context context);
 
   IRaygunMessageBuilder SetVersion(String version);
 

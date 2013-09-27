@@ -1,5 +1,6 @@
 package main.java.com.mindscapehq.raygun4android;
 
+import android.content.Context;
 import main.java.com.mindscapehq.raygun4android.messages.RaygunClientMessage;
 import main.java.com.mindscapehq.raygun4android.messages.RaygunEnvironmentMessage;
 import main.java.com.mindscapehq.raygun4android.messages.RaygunErrorMessage;
@@ -41,8 +42,8 @@ public class RaygunMessageBuilder implements IRaygunMessageBuilder {
   }
 
   @Override
-  public IRaygunMessageBuilder SetEnvironmentDetails() {
-    _raygunMessage.getDetails().setEnvironment(new RaygunEnvironmentMessage());
+  public IRaygunMessageBuilder SetEnvironmentDetails(Context context) {
+    _raygunMessage.getDetails().setEnvironment(new RaygunEnvironmentMessage(context));
     return this;
   }
 

@@ -1,6 +1,7 @@
 package main.java.com.mindscapehq.raygun4android;
 
 import android.content.Context;
+import android.os.Build;
 import android.util.Log;
 import com.google.gson.Gson;
 import main.java.com.mindscapehq.raygun4android.messages.RaygunMessage;
@@ -112,8 +113,8 @@ public class RaygunClient
     try
     {
       RaygunMessage msg =  RaygunMessageBuilder.New()
-                              .SetEnvironmentDetails()
-                              .SetMachineName("TODO DEVICE NAME")
+                              .SetEnvironmentDetails(_context)
+                              .SetMachineName(Build.MODEL)
                               .SetExceptionDetails(throwable)
                               .SetClientDetails()
                               .Build();

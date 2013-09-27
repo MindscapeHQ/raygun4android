@@ -1,10 +1,10 @@
 package main.java.com.mindscapehq.raygun4android.messages;
 
-
-import java.awt.*;
-//import java.lang.management.ManagementFactory;
-//import java.lang.management.OperatingSystemMXBean;
-import java.util.Locale;
+import android.content.Context;
+import android.os.Build;
+import android.view.Display;
+import android.view.WindowManager;
+import java.util.Date;
 import java.util.TimeZone;
 
 public class RaygunEnvironmentMessage {
@@ -24,29 +24,48 @@ public class RaygunEnvironmentMessage {
   private int diskSpaceFree;
   private double utcOffset;
 
-  public RaygunEnvironmentMessage()
+  public RaygunEnvironmentMessage(Context context)
   {
     try {
-      /*OperatingSystemMXBean osMXBean = ManagementFactory.getOperatingSystemMXBean();
-      com.sun.management.OperatingSystemMXBean sunMxBean = (com.sun.management.OperatingSystemMXBean) osMXBean;
-
-      architecture = sunMxBean.getArch();
-      processorCount = Runtime.getRuntime().availableProcessors();
-
-      windowBoundsWidth = GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds().width;
-      windowBoundsHeight = GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds().height;
-      locale = Locale.getDefault().getLanguage() + "-" + Locale.getDefault().getCountry();
-
-      utcOffset = TimeZone.getDefault().getRawOffset() / 3600000.0;
-
+      /*
       availablePhysicalMemory = sunMxBean.getFreePhysicalMemorySize();
       totalPhysicalMemory = sunMxBean.getTotalPhysicalMemorySize();
       totalVirtualMemory = sunMxBean.getTotalSwapSpaceSize();
-      availableVirtualMemory = sunMxBean.getFreeSwapSpaceSize();
+      availableVirtualMemory = sunMxBean.getFreeSwapSpaceSize();*/
 
-      processorCount = sunMxBean.getAvailableProcessors();
+      architecture = Build.CPU_ABI;
+      osVersion = Build.VERSION.RELEASE;
 
-      osVersion = sunMxBean.getName() + " - " +sunMxBean.getVersion();*/
+      processorCount = Runtime.getRuntime().availableProcessors();
+
+      int orientation = context.getResources().getConfiguration().orientation;
+      if (orientation == 1)
+      {
+        currentOrientation = "Portrait";
+      }
+      else if (orientation == 2)
+      {
+        currentOrientation = "Landscape";
+      }
+      else if (orientation == 3)
+      {
+        currentOrientation = "Square";
+      }
+      else
+      {
+        currentOrientation = "Undefined";
+      }
+
+      WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+      Display d = wm.getDefaultDisplay();
+      windowBoundsWidth = d.getWidth();
+      windowBoundsHeight = d.getHeight();
+
+      TimeZone tz = TimeZone.getDefault();
+      Date now = new Date();
+      utcOffset = tz.getOffset(now.getTime());
+
+      locale = context.getResources().getConfiguration().locale.toString();
 
     } catch (Exception e) {
     }
