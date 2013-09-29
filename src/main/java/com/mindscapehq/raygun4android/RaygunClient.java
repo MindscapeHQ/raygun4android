@@ -150,12 +150,12 @@ public class RaygunClient
         post.addHeader("X-ApiKey", _apiKey);
         post.addHeader("Content-Type", "application/json");
 
-        Log.d("Raygun4Android", jsonPayload);
-
         StringEntity se = new StringEntity(jsonPayload.toString());
         post.setEntity(se);
         HttpResponse response = client.execute(post);
-        return response.getStatusLine().getStatusCode();
+        int result = response.getStatusLine().getStatusCode();
+        Log.d("Raygun4Android", "Exception message HTTP POST result: " + result);
+        return result;
       }
     }
     catch (Exception e)

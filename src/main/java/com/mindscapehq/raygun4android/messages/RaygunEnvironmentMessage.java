@@ -1,20 +1,29 @@
 package main.java.com.mindscapehq.raygun4android.messages;
 
+import android.app.ActivityManager;
 import android.content.Context;
-import android.os.Build;
+import android.os.*;
+import android.util.Log;
 import android.view.Display;
 import android.view.WindowManager;
+
+import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.util.Date;
 import java.util.TimeZone;
+import java.util.concurrent.TimeUnit;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class RaygunEnvironmentMessage {
 
   private String cpu;
   private String architecture;
   private int processorCount;
-  private String osVersion;
-  private int windowBoundsWidth;
-  private int windowBoundsHeight;
+  private String oSVersion;
+  private String osSDKVersion;
+  private int windowsBoundWidth;
+  private int windowsBoundHeight;
   private String currentOrientation;
   private String locale;
   private long totalPhysicalMemory;
@@ -23,18 +32,21 @@ public class RaygunEnvironmentMessage {
   private long availableVirtualMemory;
   private int diskSpaceFree;
   private double utcOffset;
+  private String deviceName;
+  private String brand;
+  private String board;
+  private String deviceCode;
 
   public RaygunEnvironmentMessage(Context context)
   {
     try {
-      /*
-      availablePhysicalMemory = sunMxBean.getFreePhysicalMemorySize();
-      totalPhysicalMemory = sunMxBean.getTotalPhysicalMemorySize();
-      totalVirtualMemory = sunMxBean.getTotalSwapSpaceSize();
-      availableVirtualMemory = sunMxBean.getFreeSwapSpaceSize();*/
-
       architecture = Build.CPU_ABI;
-      osVersion = Build.VERSION.RELEASE;
+      oSVersion = Build.VERSION.RELEASE;
+      osSDKVersion = Build.VERSION.SDK;
+      deviceName = Build.MODEL;
+      deviceCode = Build.DEVICE;
+      brand = Build.BRAND;
+      board = Build.BOARD;
 
       processorCount = Runtime.getRuntime().availableProcessors();
 
@@ -58,17 +70,40 @@ public class RaygunEnvironmentMessage {
 
       WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
       Display d = wm.getDefaultDisplay();
-      windowBoundsWidth = d.getWidth();
-      windowBoundsHeight = d.getHeight();
+      windowsBoundWidth = d.getWidth();
+      windowsBoundHeight = d.getHeight();
 
       TimeZone tz = TimeZone.getDefault();
       Date now = new Date();
-      utcOffset = tz.getOffset(now.getTime());
+      utcOffset = TimeUnit.HOURS.convert(tz.getOffset(now.getTime()), TimeUnit.MILLISECONDS);
 
       locale = context.getResources().getConfiguration().locale.toString();
 
+      ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
+      ActivityManager am = (ActivityManager) context.getSystemService(context.ACTIVITY_SERVICE);
+      am.getMemoryInfo(mi);
+      availablePhysicalMemory = mi.availMem / 1048576L;
+
+      Pattern p = Pattern.compile("^\\D*(\\d*).*$");
+      Matcher m = p.matcher(getTotalRam());
+      m.find();
+      String match = m.group(1);
+      totalPhysicalMemory = Long.parseLong(match) / 1024;
     } catch (Exception e) {
+      Log.w("Raygun4Android", "Couldn't get all env data: " + e);
     }
 
+  }
+
+  private String getTotalRam() throws IOException {
+    RandomAccessFile reader = null;
+    String load = null;
+    try {
+      reader = new RandomAccessFile("/proc/meminfo", "r");
+      load = reader.readLine();
+    } finally {
+      reader.close();
+    }
+    return load;
   }
 }
