@@ -1,7 +1,12 @@
 package main.java.com.mindscapehq.raygun4android;
 
 import android.content.Context;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageItemInfo;
+import android.content.pm.PackageManager;
+import android.content.res.XmlResourceParser;
 import android.os.Build;
+import android.os.Bundle;
 import android.util.Log;
 import com.google.gson.Gson;
 import main.java.com.mindscapehq.raygun4android.messages.RaygunMessage;
@@ -16,6 +21,7 @@ import org.apache.http.message.BasicHeader;
 import org.apache.http.protocol.HTTP;
 
 import javax.crypto.Cipher;
+import javax.naming.NameNotFoundException;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
 import java.io.*;
@@ -38,9 +44,30 @@ public class RaygunClient
   private static String _version;
 
   /**
+   * Initializes the Raygun client. This expects that you have placed the API key in your
+   * AndroidManifest.xml, in a <meta-data /> element.
+   * @param context The context of the calling Android activity.
+   */
+  public static void Init(Context context) {
+    String apiKey = readApiKey(context);
+    Init(context, apiKey);
+  }
+
+  /**
+   * Initializes the Raygun client with the version of your application.
+   * This expects that you have placed the API key in your AndroidManifest.xml, in a <meta-data /> element.
+   * @param version The version of your application which will be attached to any exception messages sent.
+   * @param context The context of the calling Android activity.
+   */
+  public static void Init(String version, Context context) {
+    String apiKey = readApiKey(context);
+    Init(context, apiKey, version);
+  }
+
+  /**
    * Initializes the Raygun client with your Android application's context and your
    * Raygun API key.
-   * @param context The Android context of your application
+   * @param context The Android context of your activity
    * @param apiKey An API key that belongs to a Raygun application created in your dashboard
    */
   public static void Init(Context context, String apiKey)
@@ -52,14 +79,13 @@ public class RaygunClient
   /**
    * Initializes the Raygun client with your Android application's context, your
    * Raygun API key, and the version of your application
-   * @param context The Android context of your application
+   * @param context The Android context of your activity
    * @param apiKey An API key that belongs to a Raygun application created in your dashboard
    * @param version The current version identifier of your Android application. This will be attached to the Raygun message.
    */
   public static void Init(Context context, String apiKey, String version)
   {
-    _apiKey = apiKey;
-    _context = context;
+    Init(context, apiKey);
     _version = version;
   }
 
@@ -164,6 +190,22 @@ public class RaygunClient
       e.printStackTrace();
     }
     return -1;
+  }
+
+  private static String readApiKey(Context context)
+  {
+    try
+    {
+      ApplicationInfo ai = context.getPackageManager().getApplicationInfo(context.getPackageName(), PackageManager.GET_META_DATA);
+      Bundle bundle = ai.metaData;
+      String apiKey = bundle.getString("com.mindscapehq.android.raygun4android.apikey");
+      return apiKey;
+    }
+    catch (PackageManager.NameNotFoundException e)
+    {
+      Log.e("Raygun4Android", "Couldn't read API key from your AndroidManifest.xml <meta-data /> element; cannot send: " + e.getMessage());
+    }
+    return null;
   }
 
   private static Boolean validateApiKey() throws Exception

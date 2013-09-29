@@ -83,13 +83,13 @@ public class RaygunEnvironmentMessage {
       ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
       ActivityManager am = (ActivityManager) context.getSystemService(context.ACTIVITY_SERVICE);
       am.getMemoryInfo(mi);
-      availablePhysicalMemory = mi.availMem / 1048576L;
+      availablePhysicalMemory = mi.availMem / 0x100000;
 
       Pattern p = Pattern.compile("^\\D*(\\d*).*$");
       Matcher m = p.matcher(getTotalRam());
       m.find();
       String match = m.group(1);
-      totalPhysicalMemory = Long.parseLong(match) / 1024;
+      totalPhysicalMemory = Long.parseLong(match) / 0x400;
 
       StatFs stat = new StatFs(Environment.getDataDirectory().getPath());
       diskSpaceFree = (stat.getAvailableBlocks() * stat.getBlockSize()) / 0x100000;
