@@ -7,6 +7,8 @@ import android.util.Log;
 import android.view.Display;
 import android.view.WindowManager;
 
+import java.awt.*;
+import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.Date;
@@ -76,7 +78,6 @@ public class RaygunEnvironmentMessage {
       TimeZone tz = TimeZone.getDefault();
       Date now = new Date();
       utcOffset = TimeUnit.HOURS.convert(tz.getOffset(now.getTime()), TimeUnit.MILLISECONDS);
-
       locale = context.getResources().getConfiguration().locale.toString();
 
       ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
@@ -89,10 +90,12 @@ public class RaygunEnvironmentMessage {
       m.find();
       String match = m.group(1);
       totalPhysicalMemory = Long.parseLong(match) / 1024;
+
+      StatFs stat = new StatFs(Environment.getDataDirectory().getPath());
+      diskSpaceFree = (stat.getAvailableBlocks() * stat.getBlockSize()) / 0x100000;
     } catch (Exception e) {
       Log.w("Raygun4Android", "Couldn't get all env data: " + e);
     }
-
   }
 
   private String getTotalRam() throws IOException {
