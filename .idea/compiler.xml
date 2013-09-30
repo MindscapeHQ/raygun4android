@@ -23,6 +23,7 @@
         <outputRelativeToContentRoot value="true" />
         <processorPath useClasspath="true" />
         <module name="raygun4android" />
+        <module name="sample-app" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
