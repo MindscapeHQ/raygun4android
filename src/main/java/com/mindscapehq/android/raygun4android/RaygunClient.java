@@ -1,34 +1,19 @@
-package main.java.com.mindscapehq.raygun4android;
+package main.java.com.mindscapehq.android.raygun4android;
 
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
-import android.content.pm.PackageItemInfo;
 import android.content.pm.PackageManager;
-import android.content.res.XmlResourceParser;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import com.google.gson.Gson;
-import main.java.com.mindscapehq.raygun4android.messages.RaygunMessage;
+import main.java.com.mindscapehq.android.raygun4android.messages.RaygunMessage;
 import org.apache.http.HttpResponse;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.message.BasicHeader;
-import org.apache.http.protocol.HTTP;
 
-import javax.crypto.Cipher;
-import javax.naming.NameNotFoundException;
-import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLContext;
-import java.io.*;
 import java.lang.Thread.UncaughtExceptionHandler;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.security.SecureRandom;
 import java.util.AbstractList;
 import java.util.Map;
 

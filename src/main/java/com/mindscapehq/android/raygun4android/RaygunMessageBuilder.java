@@ -1,10 +1,10 @@
-package main.java.com.mindscapehq.raygun4android;
+package main.java.com.mindscapehq.android.raygun4android;
 
 import android.content.Context;
-import main.java.com.mindscapehq.raygun4android.messages.RaygunClientMessage;
-import main.java.com.mindscapehq.raygun4android.messages.RaygunEnvironmentMessage;
-import main.java.com.mindscapehq.raygun4android.messages.RaygunErrorMessage;
-import main.java.com.mindscapehq.raygun4android.messages.RaygunMessage;
+import main.java.com.mindscapehq.android.raygun4android.messages.RaygunClientMessage;
+import main.java.com.mindscapehq.android.raygun4android.messages.RaygunEnvironmentMessage;
+import main.java.com.mindscapehq.android.raygun4android.messages.RaygunErrorMessage;
+import main.java.com.mindscapehq.android.raygun4android.messages.RaygunMessage;
 
 import java.util.AbstractList;
 import java.util.Map;

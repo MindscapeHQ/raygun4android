@@ -1,4 +1,4 @@
-package main.java.com.mindscapehq.raygun4android;
+package main.java.com.mindscapehq.android.raygun4android;
 
 public class RaygunSettings {
 

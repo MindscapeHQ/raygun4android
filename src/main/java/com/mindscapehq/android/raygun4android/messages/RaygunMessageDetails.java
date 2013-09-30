@@ -1,4 +1,4 @@
-package main.java.com.mindscapehq.raygun4android.messages;
+package main.java.com.mindscapehq.android.raygun4android.messages;
 
 import java.util.AbstractList;
 import java.util.Map;

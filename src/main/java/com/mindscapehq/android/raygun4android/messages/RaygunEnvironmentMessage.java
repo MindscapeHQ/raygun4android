@@ -1,14 +1,14 @@
-package main.java.com.mindscapehq.raygun4android.messages;
+package main.java.com.mindscapehq.android.raygun4android.messages;
 
 import android.app.ActivityManager;
 import android.content.Context;
-import android.os.*;
+import android.os.Build;
+import android.os.Environment;
+import android.os.StatFs;
 import android.util.Log;
 import android.view.Display;
 import android.view.WindowManager;
 
-import java.awt.*;
-import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.Date;
