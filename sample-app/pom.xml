@@ -6,7 +6,6 @@
     <version>1.0.0-SNAPSHOT</version>
     <packaging>apk</packaging>
     <name>Raygun4Android</name>
-
     <dependencies>
         <dependency>
             <groupId>com.google.android</groupId>
@@ -18,11 +17,6 @@
             <groupId>com.mindscapehq.android</groupId>
             <artifactId>raygun4android</artifactId>
             <version>1.0.0-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>com.google.code.gson</groupId>
-            <artifactId>gson</artifactId>
-            <version>2.1</version>
         </dependency>
     </dependencies>
     <repositories>

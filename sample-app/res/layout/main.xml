@@ -21,6 +21,11 @@
                 android:text="Send an Error"
                 android:id="@+id/button" android:layout_gravity="center" android:layout_marginTop="80dp"
                 android:background="#7abdff" android:singleLine="true" android:textColor="#ffffff"/>
+        <ProgressBar
+                android:layout_width="30px"
+                android:layout_height="30px"
+                android:id="@+id/progress"
+        />
         <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

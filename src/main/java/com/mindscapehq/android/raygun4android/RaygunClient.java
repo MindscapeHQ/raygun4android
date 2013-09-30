@@ -3,6 +3,7 @@ package main.java.com.mindscapehq.android.raygun4android;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -16,6 +17,7 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import java.lang.Thread.UncaughtExceptionHandler;
 import java.util.AbstractList;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 /**
  * User: Mindscape
@@ -82,7 +84,7 @@ public class RaygunClient
    */
   public static int Send(Throwable throwable)
   {
-    return Post(BuildMessage(throwable));
+    return SendAsync(BuildMessage(throwable));
   }
 
   /**
@@ -97,7 +99,7 @@ public class RaygunClient
   {
     RaygunMessage msg = BuildMessage(throwable);
     msg.getDetails().setTags(tags);
-    return Post(msg);
+    return SendAsync(msg);
   }
 
   /**
@@ -116,7 +118,13 @@ public class RaygunClient
     RaygunMessage msg = BuildMessage(throwable);
     msg.getDetails().setTags(tags);
     msg.getDetails().setUserCustomData(userCustomData);
-    return Post(msg);
+    return SendAsync(msg);
+  }
+
+  private static int SendAsync(RaygunMessage msg)
+  {
+      new RaygunAsyncSender().execute(msg);
+      return -1;
   }
 
   private static RaygunMessage BuildMessage(Throwable throwable)
@@ -219,6 +227,29 @@ public class RaygunClient
     public void uncaughtException(Thread thread, Throwable throwable) {
       RaygunClient.Send(throwable);
       this.defaultHandler.uncaughtException(thread, throwable);
+    }
+  }
+
+  private static class RaygunAsyncSender extends AsyncTask<RaygunMessage, Integer, Integer>
+  {
+    @Override
+    protected void onPreExecute() {
+      Log.i("Raygun4Android", "Sending exception message asynchronously");
+    }
+    @Override
+    protected Integer doInBackground(RaygunMessage... msgs) {
+      int count = msgs.length;
+      int result = -1;
+      for (int i = 0; i < count; i++)
+      {
+        Log.i("Raygun4Android", "Posting async... : " + result);
+        result = RaygunClient.Post(msgs[i]);
+      }
+      return result;
+    }
+    @Override
+    protected void onPostExecute(final Integer result) {
+      Log.i("Raygun4Android", "Message sent");
     }
   }
 }
