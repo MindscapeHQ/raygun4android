@@ -18,13 +18,17 @@ To your pom.xml, add:
 
 In your IDE, build your project (or run `mvn compile`), then see the configuration section below.
 
-## With Ant, other build tools, or manually
+### With Ant, other build tools, or manually
 
 Download the JAR and place it in a /lib folder in your project. Add it to your project's classpath, then see below.
 
 ## Configuration & Usage
 
-1. In your **AndroidManifest.xml**, make sure you have granted Internet permissions: `<uses-permission android:name="android.permission.INTERNET" />` (beneath the **manifest** element)
+1. In your **AndroidManifest.xml**, make sure you have granted Internet permissions. Beneath the **manifest** element add:
+
+```xml
+<uses-permission android:name="android.permission.INTERNET" />
+```
 
 2. Inside the **application** element, add:
 
@@ -37,7 +41,11 @@ Download the JAR and place it in a /lib folder in your project. Add it to your p
 
 4. When an exception occurs, such as in a catch block, call RaygunClient.Send(), passing in the Throwable. This will send it to the Raygun service, where it will be viewable in the dashboard.
 
+For a usage example, check out the application in /sample-app.
+
 ## Documentation
+
+### API
 
 The following method overloads are available for initializing RaygunClient:
 
@@ -48,6 +56,8 @@ The following method overloads are available for initializing RaygunClient:
 * RaygunClient.Init (Context context, String apiKey)
 
 * RaygunClient.Init (Context context, String apiKey, String version)
+
+The first two read the API key from the application's AndroidManifest.xml. Whichever Context you pass in will have its API key read. If you want to specify your API key programmatically, use one of the latter two methods.
 
 The following methods are available for sending; pick one depending on how much extra data you'd like to send:
 
@@ -64,6 +74,10 @@ These build a RaygunMessage for you then send it. If you'd like to build a messa
 Note that this will require certain fields to be present - documentation is available at http://raygun.io/raygun-providers/rest-json-api
 
 ### Frequently Asked Questions
+
+* Not seeing errors in the dashboard?
+	
+	Raygun4Android outputs Logcat messages - look for the 'Exception Message HTTP POST result' message - 403 will indicate an invalid API key, 400 a bad message, and 202 will indicate received successfully.
 
 * Environment Data
 
