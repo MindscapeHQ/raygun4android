@@ -4,22 +4,21 @@
           android:versionCode="1"
           android:versionName="1.0">
     <uses-sdk android:minSdkVersion="4"/>
-
     <uses-permission android:name="android.permission.INTERNET" />
-
-    <application android:label="Raygun Sample App"
+    <application android:label="Raygun Sample"
                  android:icon="@drawable/icon">
 
         <meta-data android:name="com.mindscapehq.android.raygun4android.apikey"
-                   android:value="pDUt18WQX7pXvQd6Xj8YhA==" />
+                   android:value="PASTE_YOUR_API_KEY_HERE" />
+        <service android:name="main.java.com.mindscapehq.android.raygun4android.RaygunPostService"
+                 android:exported="false"
+                 android:process=":raygunpostservice"/>
 
         <activity android:name="RaygunSampleApp">
-
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
     </application>
-
 </manifest> 

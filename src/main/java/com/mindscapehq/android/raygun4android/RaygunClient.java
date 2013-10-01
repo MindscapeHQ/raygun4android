@@ -1,6 +1,8 @@
 package main.java.com.mindscapehq.android.raygun4android;
 
+import android.app.IntentService;
 import android.app.Service;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
@@ -129,7 +131,8 @@ public class RaygunClient
    */
   public static void Send(Throwable throwable)
   {
-    new RaygunAsyncSender(_context).execute((BuildMessage(throwable)));
+    RaygunMessage msg = BuildMessage(throwable);
+    SpinUpService(new Gson().toJson(msg));
   }
 
   /**
@@ -142,7 +145,7 @@ public class RaygunClient
   {
     RaygunMessage msg = BuildMessage(throwable);
     msg.getDetails().setTags(tags);
-    new RaygunAsyncSender(_context).execute(msg);
+    SpinUpService(new Gson().toJson(msg));
   }
 
   /**
@@ -159,46 +162,21 @@ public class RaygunClient
     RaygunMessage msg = BuildMessage(throwable);
     msg.getDetails().setTags(tags);
     msg.getDetails().setUserCustomData(userCustomData);
-    new RaygunAsyncSender(_context).execute(msg);
-  }
-
-  private static RaygunMessage BuildMessage(Throwable throwable)
-  {
-    try
-    {
-      RaygunMessage msg =  RaygunMessageBuilder.New()
-                              .SetEnvironmentDetails(_context)
-                              .SetMachineName(Build.MODEL)
-                              .SetExceptionDetails(throwable)
-                              .SetClientDetails()
-                              .Build();
-      if (_version != null)
-      {
-        msg.getDetails().setVersion(_version);
-      }
-      return msg;
-    }
-    catch (Exception e)
-    {
-      Log.e("Raygun4Android", "Failed to build RaygunMessage - " + e);
-    }
-    return null;
+    SpinUpService(new Gson().toJson(msg));
   }
 
   /**
    * Raw post method that delivers a pre-built RaygunMessage to the Raygun API. You do not need to call this method
    * directly unless you want to manually build your own message - for most purposes you should call Send().
-   * @param raygunMessage The RaygunMessage to deliver over HTTPS.
+   * @param jsonPayload The JSON representation of a RaygunMessage to be delivered over HTTPS.
    * @return HTTP result code - 202 if successful, 403 if API key invalid, 400 if bad message (invalid properties)
    */
-  public static int Post(RaygunMessage raygunMessage)
+  public static int Post(String jsonPayload)
   {
     try
     {
       if (validateApiKey())
       {
-        String jsonPayload = new Gson().toJson(raygunMessage);
-
         DefaultHttpClient client = new DefaultHttpClient();
         HttpPost post = new HttpPost(RaygunSettings.getSettings().getApiEndpoint());
         post.addHeader("X-ApiKey", _apiKey);
@@ -218,6 +196,29 @@ public class RaygunClient
       e.printStackTrace();
     }
     return -1;
+  }
+
+  private static RaygunMessage BuildMessage(Throwable throwable)
+  {
+    try
+    {
+      RaygunMessage msg =  RaygunMessageBuilder.New()
+          .SetEnvironmentDetails(_context)
+          .SetMachineName(Build.MODEL)
+          .SetExceptionDetails(throwable)
+          .SetClientDetails()
+          .Build();
+      if (_version != null)
+      {
+        msg.getDetails().setVersion(_version);
+      }
+      return msg;
+    }
+    catch (Exception e)
+    {
+      Log.e("Raygun4Android", "Failed to build RaygunMessage - " + e);
+    }
+    return null;
   }
 
   private static String readApiKey(Context context)
@@ -247,6 +248,18 @@ public class RaygunClient
     {
       return true;
     }
+  }
+
+  private static void SpinUpService(String jsonPayload)
+  {
+    Intent intent = new Intent(_context, RaygunPostService.class);
+    intent.setAction("main.java.com.mindscapehq.android.raygun4android.RaygunClient.RaygunPostService");
+    intent.setPackage("main.java.com.mindscapehq.android.raygun4android.RaygunClient");
+    intent.setComponent(new ComponentName(_context, RaygunPostService.class));
+    intent.putExtra("msg", jsonPayload);
+    intent.putExtra("apikey", _apiKey);
+    Log.i("Raygun4Android", "About to start service");
+    _context.startService(intent);
   }
 
   private static class RaygunUncaughtExceptionHandler implements Thread.UncaughtExceptionHandler
@@ -288,38 +301,6 @@ public class RaygunClient
         RaygunClient.Send(throwable);
       }
       _defaultHandler.uncaughtException(thread, throwable);
-    }
-  }
-
-  private static class RaygunAsyncSender extends AsyncTask<RaygunMessage, Void, Void>
-  {
-    private WeakReference<Context> _context;
-
-    public RaygunAsyncSender(Context context)
-    {
-      _context = new WeakReference<Context>(context);
-    }
-
-    @Override
-    protected void onPreExecute() {
-      _context.get().startService(new Intent(_context.get(), EmptyService.class));
-    }
-    @Override
-    protected Void doInBackground(RaygunMessage... msgs) {
-      int count = msgs.length;
-      for (int i = 0; i < count; i++)
-      {
-        Log.v("Raygun4Android", "Posting message asynchronously");
-        RaygunClient.Post(msgs[i]);
-      }
-      return null;
-    }
-  }
-
-  public class EmptyService extends Service {
-    @Override
-    public IBinder onBind(Intent intent) {
-      return null;
     }
   }
 }
