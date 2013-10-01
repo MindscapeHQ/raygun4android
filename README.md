@@ -59,7 +59,19 @@ The following method overloads are available for initializing RaygunClient:
 
 The first two read the API key from the application's AndroidManifest.xml. Whichever Context you pass in will have its API key read. If you want to specify your API key programmatically, use one of the latter two methods.
 
-The following methods are available for sending; pick one depending on how much extra data you'd like to send:
+The following methods are available for setting up a pre-made Uncaught Exception Handler, which will automatically send an exception when one reaches it (ie. just before your app crashes):
+
+* RaygunClient.AttachExceptionHandler()
+
+* RaygunClient.AttachExceptionHandler(List tags)
+
+* RaygunClient.AttachExceptionHandler(List tags, Map userCustomData)
+
+The tags and custom data will be attached to all exceptions that reaches it. This allows you to automatically send crash data when your app crashes.
+
+The handler will call any other pre-existing exception handlers you have set up before it sends to Raygun. After it is complete, it will call the default handler, which will crash the app and display the 'close app' user dialog. Exceptions are guaranteed to be sent if your app crashes.
+
+The following methods are available for sending manually; pick one depending on how much extra data you'd like to send:
 
 * RaygunClient.Send(Throwable throwable)
 
