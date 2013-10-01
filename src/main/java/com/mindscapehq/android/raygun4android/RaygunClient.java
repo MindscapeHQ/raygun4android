@@ -1,11 +1,14 @@
 package main.java.com.mindscapehq.android.raygun4android;
 
+import android.app.Service;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.util.Log;
 import com.google.gson.Gson;
 import main.java.com.mindscapehq.android.raygun4android.messages.RaygunMessage;
@@ -15,7 +18,8 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 
 import java.lang.Thread.UncaughtExceptionHandler;
-import java.util.AbstractList;
+import java.lang.ref.WeakReference;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
@@ -77,14 +81,55 @@ public class RaygunClient
   }
 
   /**
+   * Attaches a pre-built Raygun exception handler to the thread's DefaultUncaughtExceptionHandler.
+   * This automatically sends any exceptions that reaches it to the Raygun API.
+   */
+  public static void AttachExceptionHandler() {
+    UncaughtExceptionHandler oldHandler = Thread.getDefaultUncaughtExceptionHandler();
+    if (!(oldHandler instanceof RaygunUncaughtExceptionHandler))
+    {
+      Thread.setDefaultUncaughtExceptionHandler(new RaygunUncaughtExceptionHandler(oldHandler));
+    }
+  }
+
+  /**
+   * Attaches a pre-built Raygun exception handler to the thread's DefaultUncaughtExceptionHandler.
+   * This automatically sends any exceptions that reaches it to the Raygun API.
+   * @param tags A list of tags that relate to the calling application's currently build or state.
+   *             These will be appended to all exception messages sent to Raygun.
+   */
+  public static void AttachExceptionHandler(List tags) {
+    UncaughtExceptionHandler oldHandler = Thread.getDefaultUncaughtExceptionHandler();
+    if (!(oldHandler instanceof RaygunUncaughtExceptionHandler))
+    {
+      Thread.setDefaultUncaughtExceptionHandler(new RaygunUncaughtExceptionHandler(oldHandler, tags));
+    }
+  }
+
+  /**
+   * Attaches a pre-built Raygun exception handler to the thread's DefaultUncaughtExceptionHandler.
+   * This automatically sends any exceptions that reaches it to the Raygun API.
+   * @param tags A list of tags that relate to the calling application's currently build or state.
+   *             These will be appended to all exception messages sent to Raygun.
+   * @param userCustomData A set of key-value pairs that will be attached to each exception message
+   *                       sent to Raygun. This can contain any extra data relating to the calling
+   *                       application's state you would like to see.
+   */
+  public static void AttachExceptionHandler(List tags, Map userCustomData) {
+    UncaughtExceptionHandler oldHandler = Thread.getDefaultUncaughtExceptionHandler();
+    if (!(oldHandler instanceof RaygunUncaughtExceptionHandler))
+    {
+      Thread.setDefaultUncaughtExceptionHandler(new RaygunUncaughtExceptionHandler(oldHandler, tags, userCustomData));
+    }
+  }
+
+  /**
    * Sends an exception-type object to Raygun.
    * @param throwable The Throwable object that occurred in your application that will be sent to Raygun.
-   * @return An HTTP code representing the response from the Raygun API.
-   *         200 if successful, 400 if bad message generated, 403 if incorrect API key.
    */
-  public static int Send(Throwable throwable)
+  public static void Send(Throwable throwable)
   {
-    return SendAsync(BuildMessage(throwable));
+    new RaygunAsyncSender(_context).execute((BuildMessage(throwable)));
   }
 
   /**
@@ -92,14 +137,12 @@ public class RaygunClient
    * @param throwable The Throwable object that occurred in your application that will be sent to Raygun.
    * @param tags A list of data that will be attached to the Raygun message and visible on the error in the dashboard.
    *             This could be a build tag, lifecycle state, debug/production version etc.
-   * @return An HTTP code representing the response from the Raygun API.
-   * 200 if successful, 400 if bad message generated, 403 if incorrect API key.
    */
-  public static int Send(Throwable throwable, AbstractList tags)
+  public static void Send(Throwable throwable, List tags)
   {
     RaygunMessage msg = BuildMessage(throwable);
     msg.getDetails().setTags(tags);
-    return SendAsync(msg);
+    new RaygunAsyncSender(_context).execute(msg);
   }
 
   /**
@@ -110,21 +153,13 @@ public class RaygunClient
    *             This could be a build tag, lifecycle state, debug/production version etc.
    * @param userCustomData A set of custom key-value pairs relating to your application and its current state. This is a bucket
    *                       where you can attach any related data you want to see to the error.
-   * @return An HTTP code representing the response from the Raygun API.
-   * 200 if successful, 400 if bad message generated, 403 if incorrect API key.
    */
-  public static int Send(Throwable throwable, AbstractList tags, Map userCustomData)
+  public static void Send(Throwable throwable, List tags, Map userCustomData)
   {
     RaygunMessage msg = BuildMessage(throwable);
     msg.getDetails().setTags(tags);
     msg.getDetails().setUserCustomData(userCustomData);
-    return SendAsync(msg);
-  }
-
-  private static int SendAsync(RaygunMessage msg)
-  {
-      new RaygunAsyncSender().execute(msg);
-      return -1;
+    new RaygunAsyncSender(_context).execute(msg);
   }
 
   private static RaygunMessage BuildMessage(Throwable throwable)
@@ -154,7 +189,7 @@ public class RaygunClient
    * Raw post method that delivers a pre-built RaygunMessage to the Raygun API. You do not need to call this method
    * directly unless you want to manually build your own message - for most purposes you should call Send().
    * @param raygunMessage The RaygunMessage to deliver over HTTPS.
-   * @return
+   * @return HTTP result code - 202 if successful, 403 if API key invalid, 400 if bad message (invalid properties)
    */
   public static int Post(RaygunMessage raygunMessage)
   {
@@ -216,40 +251,75 @@ public class RaygunClient
 
   private static class RaygunUncaughtExceptionHandler implements Thread.UncaughtExceptionHandler
   {
-    private UncaughtExceptionHandler defaultHandler;
+    private UncaughtExceptionHandler _defaultHandler;
+    private List _tags;
+    private Map _userCustomData;
 
     public RaygunUncaughtExceptionHandler(UncaughtExceptionHandler defaultHandler)
     {
-      this.defaultHandler = defaultHandler;
+      _defaultHandler = defaultHandler;
+    }
+
+    public RaygunUncaughtExceptionHandler(UncaughtExceptionHandler defaultHandler, List tags)
+    {
+      _defaultHandler = defaultHandler;
+      _tags = tags;
+    }
+
+    public RaygunUncaughtExceptionHandler(UncaughtExceptionHandler defaultHandler, List tags, Map userCustomData)
+    {
+      _defaultHandler = defaultHandler;
+      _tags = tags;
+      _userCustomData = userCustomData;
     }
 
     @Override
     public void uncaughtException(Thread thread, Throwable throwable) {
-      RaygunClient.Send(throwable);
-      this.defaultHandler.uncaughtException(thread, throwable);
+      if (_userCustomData != null && _tags != null)
+      {
+        RaygunClient.Send(throwable, _tags, _userCustomData);
+      }
+      else if (_tags != null)
+      {
+        RaygunClient.Send(throwable, _tags);
+      }
+      else
+      {
+        RaygunClient.Send(throwable);
+      }
+      _defaultHandler.uncaughtException(thread, throwable);
     }
   }
 
-  private static class RaygunAsyncSender extends AsyncTask<RaygunMessage, Integer, Integer>
+  private static class RaygunAsyncSender extends AsyncTask<RaygunMessage, Void, Void>
   {
+    private WeakReference<Context> _context;
+
+    public RaygunAsyncSender(Context context)
+    {
+      _context = new WeakReference<Context>(context);
+    }
+
     @Override
     protected void onPreExecute() {
-      Log.i("Raygun4Android", "Sending exception message asynchronously");
+      _context.get().startService(new Intent(_context.get(), EmptyService.class));
     }
     @Override
-    protected Integer doInBackground(RaygunMessage... msgs) {
+    protected Void doInBackground(RaygunMessage... msgs) {
       int count = msgs.length;
-      int result = -1;
       for (int i = 0; i < count; i++)
       {
-        Log.i("Raygun4Android", "Posting async... : " + result);
-        result = RaygunClient.Post(msgs[i]);
+        Log.v("Raygun4Android", "Posting message asynchronously");
+        RaygunClient.Post(msgs[i]);
       }
-      return result;
+      return null;
     }
+  }
+
+  public class EmptyService extends Service {
     @Override
-    protected void onPostExecute(final Integer result) {
-      Log.i("Raygun4Android", "Message sent");
+    public IBinder onBind(Intent intent) {
+      return null;
     }
   }
 }

@@ -6,7 +6,7 @@ import main.java.com.mindscapehq.android.raygun4android.messages.RaygunEnvironme
 import main.java.com.mindscapehq.android.raygun4android.messages.RaygunErrorMessage;
 import main.java.com.mindscapehq.android.raygun4android.messages.RaygunMessage;
 
-import java.util.AbstractList;
+import java.util.List;
 import java.util.Map;
 
 public class RaygunMessageBuilder implements IRaygunMessageBuilder {
@@ -54,7 +54,7 @@ public class RaygunMessageBuilder implements IRaygunMessageBuilder {
   }
 
   @Override
-  public IRaygunMessageBuilder SetTags(AbstractList tags) {
+  public IRaygunMessageBuilder SetTags(List tags) {
     _raygunMessage.getDetails().setTags(tags);
     return this;
   }

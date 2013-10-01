@@ -1,6 +1,6 @@
 package main.java.com.mindscapehq.android.raygun4android.messages;
 
-import java.util.AbstractList;
+import java.util.List;
 import java.util.Map;
 
 public class RaygunMessageDetails {
@@ -10,7 +10,7 @@ public class RaygunMessageDetails {
   private RaygunErrorMessage error;
   private RaygunEnvironmentMessage environment;
   private RaygunClientMessage client;
-  private AbstractList tags;
+  private List tags;
   private Map userCustomData;
 
   public void setMachineName(String machineName) {
@@ -53,11 +53,11 @@ public class RaygunMessageDetails {
     this.client = client;
   }
 
-  public AbstractList getTags() {
+  public List getTags() {
     return tags;
   }
 
-  public void setTags(AbstractList tags) {
+  public void setTags(List tags) {
     this.tags = tags;
   }
 

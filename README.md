@@ -63,9 +63,9 @@ The following methods are available for sending; pick one depending on how much 
 
 * RaygunClient.Send(Throwable throwable)
 
-* RaygunClient.Send(Throwable throwable, AbstractList tags)
+* RaygunClient.Send(Throwable throwable, List tags)
 
-* RaygunClient.Send(Throwable throwable, AbstractList tags, Map userCustomData)
+* RaygunClient.Send(Throwable throwable, List tags, Map userCustomData)
 
 These build a RaygunMessage for you then send it. If you'd like to build a message manually you can use:
 
