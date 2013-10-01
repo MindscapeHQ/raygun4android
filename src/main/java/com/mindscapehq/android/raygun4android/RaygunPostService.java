@@ -14,6 +14,7 @@ public class RaygunPostService extends Service
     RaygunClient.Init(this.getApplicationContext(), (String) bundle.get("apikey"));
     RaygunClient.Post((String) bundle.get("msg"));
     Log.i("Raygun4Android", "Service posting done");
+    this.stopSelf(startId);
   }
 
   @Override
