@@ -9,6 +9,29 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
+    <parent>
+        <groupId>org.sonatype.oss</groupId>
+        <artifactId>oss-parent</artifactId>
+        <version>7</version>
+    </parent>
+    <developers>
+        <developer>
+            <id>callum</id>
+            <name>Callum Gavin</name>
+            <email>hello@raygun.io</email>
+            <organisation>Mindscape</organisation>
+            <organisationUrl>http://raygun.io</organisationUrl>
+            <roles>
+                <role>developer</role>
+            </roles>
+            <timezone>+12</timezone>
+        </developer>
+    </developers>
+    <scm>
+        <url>https://github.com/mindscapehq/raygun4android</url>
+        <connection>scm:git:ssh://git@github.com/MindscapeHQ/raygun4android.git</connection>
+        <developerConnection>scm:git:ssh://git@github.com/MindscapeHQ/raygun4android.git</developerConnection>
+    </scm>
 
     <dependencies>
         <dependency>
@@ -59,6 +82,20 @@
                         <platform>8</platform>
                     </sdk>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-gpg-plugin</artifactId>
+                <version>1.4</version>
+                <executions>
+                    <execution>
+                        <id>sign-artifacts</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>sign</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>

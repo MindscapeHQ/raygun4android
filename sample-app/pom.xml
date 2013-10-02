@@ -19,13 +19,6 @@
             <version>1.0.0-SNAPSHOT</version>
         </dependency>
     </dependencies>
-    <repositories>
-        <repository>
-            <id>project-repo</id>
-            <name>my project repo</name>
-            <url>file://C:\Users\callum\Documents\GitHub\raygun4android\target\</url>
-        </repository>
-    </repositories>
     <build>
         <finalName>${project.artifactId}</finalName>
         <sourceDirectory>src</sourceDirectory>
