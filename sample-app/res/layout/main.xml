@@ -18,7 +18,7 @@
         <Button
                 android:layout_width="160dp"
                 android:layout_height="123dp"
-                android:text="Send an error"
+                android:text="Crash and send"
                 android:id="@+id/button" android:layout_gravity="center" android:layout_marginTop="80dp"
                 android:background="#7abdff" android:singleLine="true" android:textColor="#ffffff"/>
         <TextView

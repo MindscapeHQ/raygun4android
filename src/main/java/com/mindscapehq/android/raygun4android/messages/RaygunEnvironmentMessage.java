@@ -77,7 +77,7 @@ public class RaygunEnvironmentMessage {
 
       TimeZone tz = TimeZone.getDefault();
       Date now = new Date();
-      utcOffset = TimeUnit.HOURS.convert(tz.getOffset(now.getTime()), TimeUnit.MILLISECONDS);
+      utcOffset = TimeUnit.SECONDS.convert(tz.getOffset(now.getTime()), TimeUnit.MILLISECONDS) / 3600;
       locale = context.getResources().getConfiguration().locale.toString();
 
       ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();

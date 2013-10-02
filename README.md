@@ -2,6 +2,8 @@
 
 The world's best Android crash reporter.
 
+Supports Android 2.3.3 (API 9) and above.
+
 ## Installation
 
 ### With Maven

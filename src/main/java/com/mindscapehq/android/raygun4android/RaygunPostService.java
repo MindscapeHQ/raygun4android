@@ -10,10 +10,18 @@ public class RaygunPostService extends Service
 {
   @Override
   public void onStart(Intent intent, int startId) {
-    Bundle bundle = intent.getExtras();
+    final Bundle bundle = intent.getExtras();
     RaygunClient.Init(this.getApplicationContext(), (String) bundle.get("apikey"));
-    RaygunClient.Post((String) bundle.get("msg"));
-    Log.i("Raygun4Android", "Service posting done");
+    Thread t = new Thread(new Runnable()
+    {
+        @Override
+        public void run()
+        {
+            RaygunClient.Post((String) bundle.get("msg"));
+            Log.i("Raygun4Android", "Service posting done");
+        }
+    });
+    t.start();
     this.stopSelf(startId);
   }
 
