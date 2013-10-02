@@ -42,7 +42,7 @@ Download the JAR and place it in a /lib folder in your project. Add it to your p
 	           android:value="PASTE_YOUR_API_KEY_HERE" />
 	```
 
-And replace the value in meta-data with your API key, available from your Raygun dashboard.
+	And replace the value in meta-data with your API key, available from your Raygun dashboard.
 
 3. In a central location in your app's code, call `RaygunClient.Init()`, passing in your activity's context.
 
