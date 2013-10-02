@@ -1,8 +1,8 @@
 # Raygun4Android
 
-The world's best Android crash reporter.
+The world's best Android crash and exception reporter.
 
-Supports Android 2.3.3 (API 9) and above.
+Supports Android 2.3.3 (API 9) and above
 
 ## Installation
 
@@ -35,11 +35,16 @@ Download the JAR and place it in a /lib folder in your project. Add it to your p
 2. Inside the **application** element, add:
 
 ```xml
+<service   android:name="main.java.com.mindscapehq.android.raygun4android.RaygunPostService"
+           android:exported="false"
+           android:process=":raygunpostservice"/>
 <meta-data android:name="com.mindscapehq.android.raygun4android.apikey"
-                   android:value="PASTE_YOUR_API_KEY_HERE" />
+           android:value="PASTE_YOUR_API_KEY_HERE" />
 ```
 
-3. In a central location, call `RaygunClient.Init()`, passing in your activity's context.
+And replace the value in meta-data with your API key, available from your Raygun dashboard.
+
+3. In a central location in your app's code, call `RaygunClient.Init()`, passing in your activity's context.
 
 4. When an exception occurs, such as in a catch block, call RaygunClient.Send(), passing in the Throwable. This will send it to the Raygun service, where it will be viewable in the dashboard.
 
