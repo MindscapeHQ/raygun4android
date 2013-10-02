@@ -104,7 +104,7 @@ Note that this will require certain fields to be present - documentation is avai
 
 ### Contributing
 
-Clone this repository, then run `mvn install` to grab the dependencies and install the library to your local Maven repo. Runs with Android 2.2 (API level 8) and JDK 1.6
+Clone this repository, then run `mvn install` to grab the dependencies and install the library to your local Maven repo.
 
 
 ## Changelog
