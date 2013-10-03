@@ -65,6 +65,20 @@ public class RaygunMessageBuilder implements IRaygunMessageBuilder {
     return this;
   }
 
+  @Override
+  public IRaygunMessageBuilder SetAppContext(String identifier)
+  {
+    _raygunMessage.getDetails().setAppContext(identifier);
+    return this;
+  }
+
+  @Override
+  public IRaygunMessageBuilder SetUserContext(Context context)
+  {
+    _raygunMessage.getDetails().setUserContext(context);
+    return this;
+  }
+
   public static RaygunMessageBuilder New() {
     return new RaygunMessageBuilder();
   }

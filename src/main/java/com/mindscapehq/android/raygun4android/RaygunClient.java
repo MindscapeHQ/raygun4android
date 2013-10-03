@@ -23,6 +23,7 @@ import java.lang.Thread.UncaughtExceptionHandler;
 import java.lang.ref.WeakReference;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 
 /**
@@ -35,6 +36,13 @@ public class RaygunClient
   private static String _apiKey;
   private static Context _context;
   private static String _version;
+  private static Intent _service;
+  private static String _appContextIdentifier;
+
+  public static String getApiKey()
+  {
+    return _apiKey;
+  }
 
   /**
    * Initializes the Raygun client. This expects that you have placed the API key in your
@@ -43,6 +51,7 @@ public class RaygunClient
    */
   public static void Init(Context context) {
     String apiKey = readApiKey(context);
+    _appContextIdentifier = UUID.randomUUID().toString();
     Init(context, apiKey);
   }
 
@@ -168,18 +177,19 @@ public class RaygunClient
   /**
    * Raw post method that delivers a pre-built RaygunMessage to the Raygun API. You do not need to call this method
    * directly unless you want to manually build your own message - for most purposes you should call Send().
+   * @param apiKey The API key of the app to deliver to
    * @param jsonPayload The JSON representation of a RaygunMessage to be delivered over HTTPS.
    * @return HTTP result code - 202 if successful, 403 if API key invalid, 400 if bad message (invalid properties)
    */
-  public static int Post(String jsonPayload)
+  public static int Post(String apiKey, String jsonPayload)
   {
     try
     {
-      if (validateApiKey())
+      if (validateApiKey(apiKey))
       {
         DefaultHttpClient client = new DefaultHttpClient();
         HttpPost post = new HttpPost(RaygunSettings.getSettings().getApiEndpoint());
-        post.addHeader("X-ApiKey", _apiKey);
+        post.addHeader("X-ApiKey", apiKey);
         post.addHeader("Content-Type", "application/json");
 
         StringEntity se = new StringEntity(jsonPayload.toString());
@@ -207,6 +217,8 @@ public class RaygunClient
           .SetMachineName(Build.MODEL)
           .SetExceptionDetails(throwable)
           .SetClientDetails()
+          .SetAppContext(_appContextIdentifier)
+          .SetUserContext(_context)
           .Build();
       if (_version != null)
       {
@@ -237,9 +249,9 @@ public class RaygunClient
     return null;
   }
 
-  private static Boolean validateApiKey() throws Exception
+  private static Boolean validateApiKey(String apiKey) throws Exception
   {
-    if (_apiKey.length() == 0)
+    if (apiKey.length() == 0)
     {
       Log.e("Raygun4Android", "API key has not been provided, exception will not be logged");
       return false;
@@ -252,14 +264,23 @@ public class RaygunClient
 
   private static void SpinUpService(String jsonPayload)
   {
-    Intent intent = new Intent(_context, RaygunPostService.class);
-    intent.setAction("main.java.com.mindscapehq.android.raygun4android.RaygunClient.RaygunPostService");
-    intent.setPackage("main.java.com.mindscapehq.android.raygun4android.RaygunClient");
-    intent.setComponent(new ComponentName(_context, RaygunPostService.class));
-    intent.putExtra("msg", jsonPayload);
-    intent.putExtra("apikey", _apiKey);
-    Log.i("Raygun4Android", "About to start service");
-    _context.startService(intent);
+      Intent intent;
+      if (_service == null)
+      {
+          intent = new Intent(_context, RaygunPostService.class);
+          intent.setAction("main.java.com.mindscapehq.android.raygun4android.RaygunClient.RaygunPostService");
+          intent.setPackage("main.java.com.mindscapehq.android.raygun4android.RaygunClient");
+          intent.setComponent(new ComponentName(_context, RaygunPostService.class));
+      }
+      else
+      {
+          intent = _service;
+      }
+      intent.putExtra("msg", jsonPayload);
+      intent.putExtra("apikey", _apiKey);
+      Log.i("Raygun4Android", "About to start service");
+      _service = intent;
+        _context.startService(_service);
   }
 
   private static class RaygunUncaughtExceptionHandler implements Thread.UncaughtExceptionHandler

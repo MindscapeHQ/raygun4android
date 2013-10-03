@@ -1,5 +1,7 @@
 package main.java.com.mindscapehq.android.raygun4android.messages;
 
+import android.content.Context;
+
 import java.util.List;
 import java.util.Map;
 
@@ -12,6 +14,8 @@ public class RaygunMessageDetails {
   private RaygunClientMessage client;
   private List tags;
   private Map userCustomData;
+  private RaygunAppContext context;
+  private RaygunUserContext user;
 
   public void setMachineName(String machineName) {
     this.machineName = machineName;
@@ -67,5 +71,25 @@ public class RaygunMessageDetails {
 
   public void setUserCustomData(Map userCustomData) {
     this.userCustomData = userCustomData;
+  }
+
+  public RaygunAppContext getAppContext()
+  {
+    return context;
+  }
+
+  public void setAppContext(String identifier)
+  {
+    this.context = new RaygunAppContext(identifier);
+  }
+
+  public RaygunUserContext getUserContext()
+  {
+    return user;
+  }
+
+  public void setUserContext(Context context)
+  {
+    this.user = new RaygunUserContext(context);
   }
 }

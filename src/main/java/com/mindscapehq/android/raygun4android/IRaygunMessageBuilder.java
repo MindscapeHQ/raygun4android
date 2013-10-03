@@ -23,4 +23,8 @@ public interface IRaygunMessageBuilder {
   IRaygunMessageBuilder SetTags(List tags);
 
   IRaygunMessageBuilder SetUserCustomData(Map userCustomData);
+
+  IRaygunMessageBuilder SetAppContext(String identifier);
+
+  IRaygunMessageBuilder SetUserContext(Context context);
 }
