@@ -2,7 +2,7 @@
 
 The world's best Android crash and exception reporter.
 
-Supports Android 2.3.3 (API 9) and above
+Supports Android 2.3.1 (API 9) and above
 
 ## Installation
 

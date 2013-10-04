@@ -202,7 +202,7 @@ public class RaygunClient
     }
     catch (Exception e)
     {
-      Log.e("Raygun4Android", "Couldn't post exception - ");
+      Log.e("Raygun4Android", "Couldn't post exception - " + e.getMessage());
       e.printStackTrace();
     }
     return -1;
@@ -278,7 +278,6 @@ public class RaygunClient
       }
       intent.putExtra("msg", jsonPayload);
       intent.putExtra("apikey", _apiKey);
-      Log.i("Raygun4Android", "About to start service");
       _service = intent;
         _context.startService(_service);
   }

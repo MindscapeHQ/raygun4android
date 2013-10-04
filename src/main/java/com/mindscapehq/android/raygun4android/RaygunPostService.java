@@ -10,34 +10,40 @@ import android.util.Log;
 
 public class RaygunPostService extends Service
 {
-  @Override
-  public void onStart(Intent intent, int startId) {
 
-  }
+  private int tCount = 0;
+  private Intent _intent;
 
   @Override
-  public int onStartCommand(Intent intent, int flags, int startId)
+  public synchronized int onStartCommand(Intent intent, int flags, int startId)
   {
-      final Bundle bundle = intent.getExtras();
+    _intent = intent;
+    final Bundle bundle = intent.getExtras();
 
-      Thread t = new Thread(new Runnable()
+    Thread t = new Thread(new Runnable()
+    {
+      @Override
+      public void run()
       {
-          @Override
-          public void run()
-          {
-              if (hasInternetConnection())
-              {
-                  RaygunClient.Post((String) bundle.get("apikey"), (String) bundle.get("msg"));
-              }
-              else
-              {
-                  Log.i("Raygun4Android", "No internet connection available; saving exception to disk");
-              }
-          }
-      });
-      t.start();
-      this.stopSelf(startId);
-      return START_NOT_STICKY;
+        if (hasInternetConnection())
+        {
+          RaygunClient.Post((String) bundle.get("apikey"), (String) bundle.get("msg"));
+        }
+        else
+        {
+          Log.i("Raygun4Android", "No internet connection available; saving exception to disk");
+        }
+        tCount--;
+        if (tCount == 0)
+        {
+          stopSelf();
+        }
+      }
+    });
+    t.setDaemon(true);
+    tCount++;
+    t.start();
+    return START_NOT_STICKY;
   }
 
   private boolean hasInternetConnection()
@@ -46,7 +52,13 @@ public class RaygunPostService extends Service
     return cm.getActiveNetworkInfo() != null && cm.getActiveNetworkInfo().isConnectedOrConnecting();
   }
 
-    @Override
+  @Override
+  public void onDestroy() {
+    super.onDestroy();
+    stopService(_intent);
+  }
+
+  @Override
   public IBinder onBind(Intent intent) {
     return null;
   }
