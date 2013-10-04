@@ -8,6 +8,10 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
 
+import java.io.*;
+import java.nio.file.Files;
+import java.util.Scanner;
+
 public class RaygunPostService extends Service
 {
 
@@ -15,7 +19,7 @@ public class RaygunPostService extends Service
   private Intent _intent;
 
   @Override
-  public synchronized int onStartCommand(Intent intent, int flags, int startId)
+  public int onStartCommand(Intent intent, int flags, int startId)
   {
     _intent = intent;
     final Bundle bundle = intent.getExtras();
@@ -25,13 +29,77 @@ public class RaygunPostService extends Service
       @Override
       public void run()
       {
+        String message = (String) bundle.get("msg");
+        String apiKey = (String) bundle.get("apikey");
         if (hasInternetConnection())
         {
-          RaygunClient.Post((String) bundle.get("apikey"), (String) bundle.get("msg"));
+          RaygunClient.Post(apiKey, message);
+          synchronized (this)
+          {
+            File[] fileList = getCacheDir().listFiles();
+            for (File f : fileList)
+            {
+              try
+              {
+                ObjectInputStream ois = new ObjectInputStream(new FileInputStream(f));
+                while (ois.available() == 1)
+                {
+                  MessageApiKey messageApiKey = (MessageApiKey) ois.readObject();
+                  RaygunClient.Post(messageApiKey.apiKey, messageApiKey.message);
+                  f.delete();
+                }
+              } catch (FileNotFoundException e)
+              {
+                Log.e("Raygun4Android", "Error loading cached message from filesystem - " + e.getMessage());
+
+              } catch (IOException e)
+              {
+                Log.e("Raygun4Android", "Error reading cached message from filesystem - " + e.getMessage());
+                e.printStackTrace();
+              } catch (ClassNotFoundException e)
+              {
+                Log.e("Raygun4Android", "Error in cached message from filesystem - " + e.getMessage());
+              }
+            }
+          }
         }
         else
         {
-          Log.i("Raygun4Android", "No internet connection available; saving exception to disk");
+          synchronized (this)
+          {
+            int file = 0;
+            File[] files = getCacheDir().listFiles();
+            if (files != null)
+            {
+              for (File f : files)
+              {
+                String fileName = Integer.toString(file);
+                if (!f.getName().equals(fileName))
+                {
+                  break;
+                }
+                else
+                {
+                  file++;
+                }
+              }
+            }
+            File fn = new File(getCacheDir(), Integer.toString(file));
+            try
+            {
+              MessageApiKey messageApiKey = new MessageApiKey(apiKey, message);
+              ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(fn));
+              out.writeObject(messageApiKey);
+              out.close();
+              Log.i("Raygun4Android", "Wrote file to disk");
+            } catch (FileNotFoundException e)
+            {
+              Log.e("Raygun4Android", "Error creating file when caching message to filesystem - " + e.getMessage());
+            } catch (IOException e)
+            {
+              Log.e("Raygun4Android", "Error writing message to filesystem - " + e.getMessage());
+            }
+          }
         }
         tCount--;
         if (tCount == 0)
