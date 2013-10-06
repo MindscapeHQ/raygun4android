@@ -332,7 +332,7 @@ public class RaygunClient
       intent.putExtra("msg", jsonPayload);
       intent.putExtra("apikey", apiKey);
       _service = intent;
-        _context.startService(_service);
+      _context.startService(_service);
   }
 
   private static class RaygunUncaughtExceptionHandler implements Thread.UncaughtExceptionHandler

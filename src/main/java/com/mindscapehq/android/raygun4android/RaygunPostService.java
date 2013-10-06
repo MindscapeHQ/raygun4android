@@ -10,6 +10,8 @@ import android.util.Log;
 
 import java.io.*;
 import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Scanner;
 
 public class RaygunPostService extends Service
@@ -40,7 +42,7 @@ public class RaygunPostService extends Service
           synchronized (this)
           {
             int file = 0;
-            File[] files = getCacheDir().listFiles();
+            ArrayList<File> files = new ArrayList<File>(Arrays.asList(getCacheDir().listFiles()));
             if (files != null)
             {
               for (File f : files)
@@ -50,9 +52,13 @@ public class RaygunPostService extends Service
                 {
                   break;
                 }
-                else
+                else if (file < 64)
                 {
                   file++;
+                }
+                else
+                {
+                  files.get(0).delete();
                 }
               }
             }
@@ -63,6 +69,7 @@ public class RaygunPostService extends Service
               ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(fn));
               out.writeObject(messageApiKey);
               out.close();
+              Log.i("Raygun4Android", "Wrote file " + file + " to disk");
             } catch (FileNotFoundException e)
             {
               Log.e("Raygun4Android", "Error creating file when caching message to filesystem - " + e.getMessage());
@@ -84,6 +91,11 @@ public class RaygunPostService extends Service
     t.start();
 
     return START_NOT_STICKY;
+  }
+
+  public void Post()
+  {
+
   }
 
   private boolean hasInternetConnection()
