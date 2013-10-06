@@ -102,6 +102,10 @@ Note that this will require certain fields to be present - documentation is avai
 
 	A selection of enironment data will be attached and available in the Environment tab in the dashboard, and more in the Raw tab. This data is gathered from android.os.Build - if you wish to see more data you can add them on the userCustomData object.
 
+* What happens when the phone has no internet connection?
+
+	Raygun4Android will save the exception message to disk. When the provider is later asked to send another message it will check if the internet is now available, and if it is, send the cached messages.
+
 ### Contributing
 
 Clone this repository, then run `mvn install` to grab the dependencies and install the library to your local Maven repo.
@@ -109,6 +113,6 @@ Clone this repository, then run `mvn install` to grab the dependencies and insta
 
 ## Changelog
 
-Version 1.0.0: Completed initial version with background service for performing posting, API key read from AndroidManifest, and more. Released for private beta.
+Version 1.0.0: Completed initial version with background service for performing posting, API key read from AndroidManifest, cache messages to disk when network unavailable & post them when it is available and more.
 
 Version 0.0.1: Initial release with basic functionality.

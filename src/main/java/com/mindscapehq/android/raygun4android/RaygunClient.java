@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
+import android.net.ConnectivityManager;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -19,6 +20,7 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 
+import java.io.*;
 import java.lang.Thread.UncaughtExceptionHandler;
 import java.lang.ref.WeakReference;
 import java.util.List;
@@ -141,7 +143,8 @@ public class RaygunClient
   public static void Send(Throwable throwable)
   {
     RaygunMessage msg = BuildMessage(throwable);
-    SpinUpService(new Gson().toJson(msg));
+    postCachedMessages();
+    spinUpService(_apiKey, new Gson().toJson(msg));
   }
 
   /**
@@ -154,7 +157,8 @@ public class RaygunClient
   {
     RaygunMessage msg = BuildMessage(throwable);
     msg.getDetails().setTags(tags);
-    SpinUpService(new Gson().toJson(msg));
+    postCachedMessages();
+    spinUpService(_apiKey, new Gson().toJson(msg));
   }
 
   /**
@@ -171,7 +175,8 @@ public class RaygunClient
     RaygunMessage msg = BuildMessage(throwable);
     msg.getDetails().setTags(tags);
     msg.getDetails().setUserCustomData(userCustomData);
-    SpinUpService(new Gson().toJson(msg));
+    postCachedMessages();
+    spinUpService(_apiKey, new Gson().toJson(msg));
   }
 
   /**
@@ -206,6 +211,12 @@ public class RaygunClient
       e.printStackTrace();
     }
     return -1;
+  }
+
+  private static boolean hasInternetConnection()
+  {
+    ConnectivityManager cm = (ConnectivityManager) _context.getSystemService(Context.CONNECTIVITY_SERVICE);
+    return cm.getActiveNetworkInfo() != null && cm.getActiveNetworkInfo().isConnectedOrConnecting();
   }
 
   private static RaygunMessage BuildMessage(Throwable throwable)
@@ -262,7 +273,49 @@ public class RaygunClient
     }
   }
 
-  private static void SpinUpService(String jsonPayload)
+  private static void postCachedMessages()
+  {
+    if (hasInternetConnection())
+    {
+      File[] fileList = _context.getCacheDir().listFiles();
+      Log.i("Raygun4Android", fileList.length + " files in list on thread " + Thread.currentThread().getId());
+      for (File f : fileList)
+      {
+        try
+        {
+          ObjectInputStream ois = null;
+          try
+          {
+            ois = new ObjectInputStream(new FileInputStream(f));
+            Log.i("Raygun4Android", "OIS available: " + ois.available());
+
+            MessageApiKey messageApiKey = (MessageApiKey) ois.readObject();
+            spinUpService(messageApiKey.apiKey, messageApiKey.message);
+            Log.i("Raygun4Android", "Sent " + f.getName() + ", now deleting");
+            f.delete();
+          }
+          finally
+          {
+            ois.close();
+          }
+        }
+        catch (FileNotFoundException e)
+        {
+          Log.e("Raygun4Android", "Error loading cached message from filesystem - " + e.getMessage());
+
+        } catch (IOException e)
+        {
+          Log.e("Raygun4Android", "Error reading cached message from filesystem - " + e.getMessage());
+          e.printStackTrace();
+        } catch (ClassNotFoundException e)
+        {
+          Log.e("Raygun4Android", "Error in cached message from filesystem - " + e.getMessage());
+        }
+      }
+    }
+  }
+
+  private static void spinUpService(String apiKey, String jsonPayload)
   {
       Intent intent;
       if (_service == null)
@@ -277,7 +330,7 @@ public class RaygunClient
           intent = _service;
       }
       intent.putExtra("msg", jsonPayload);
-      intent.putExtra("apikey", _apiKey);
+      intent.putExtra("apikey", apiKey);
       _service = intent;
         _context.startService(_service);
   }
