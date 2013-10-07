@@ -1,17 +1,13 @@
 package main.java.com.mindscapehq.android.raygun4android;
 
-import android.app.IntentService;
-import android.app.Service;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.IBinder;
 import android.util.Log;
 import com.google.gson.Gson;
 import main.java.com.mindscapehq.android.raygun4android.messages.RaygunMessage;
@@ -22,12 +18,10 @@ import org.apache.http.impl.client.DefaultHttpClient;
 
 import java.io.*;
 import java.lang.Thread.UncaughtExceptionHandler;
-import java.lang.ref.WeakReference;
-import java.nio.file.Files;
+
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.ExecutionException;
 
 /**
  * User: Mindscape
