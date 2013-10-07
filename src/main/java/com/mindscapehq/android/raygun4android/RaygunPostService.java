@@ -47,7 +47,7 @@ public class RaygunPostService extends Service
             {
               for (File f : files)
               {
-                String fileName = Integer.toString(file);
+                String fileName = Integer.toString(file) + ".raygun";
                 if (!f.getName().equals(fileName))
                 {
                   break;
@@ -62,7 +62,7 @@ public class RaygunPostService extends Service
                 }
               }
             }
-            File fn = new File(getCacheDir(), Integer.toString(file));
+            File fn = new File(getCacheDir(), Integer.toString(file) + ".raygun");
             try
             {
               MessageApiKey messageApiKey = new MessageApiKey(apiKey, message);
@@ -91,11 +91,6 @@ public class RaygunPostService extends Service
     t.start();
 
     return START_NOT_STICKY;
-  }
-
-  public void Post()
-  {
-
   }
 
   private boolean hasInternetConnection()

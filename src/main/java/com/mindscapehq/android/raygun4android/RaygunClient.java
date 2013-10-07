@@ -23,6 +23,7 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import java.io.*;
 import java.lang.Thread.UncaughtExceptionHandler;
 import java.lang.ref.WeakReference;
+import java.nio.file.Files;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -278,35 +279,34 @@ public class RaygunClient
     if (hasInternetConnection())
     {
       File[] fileList = _context.getCacheDir().listFiles();
-      Log.i("Raygun4Android", fileList.length + " files in list on thread " + Thread.currentThread().getId());
       for (File f : fileList)
       {
+        Log.i("Raygun4Android", "Filename: " + f.getName());
         try
         {
-          ObjectInputStream ois = null;
-          try
+          String ext = getExtension(f.getName());
+          if (ext.equalsIgnoreCase("raygun"))
           {
-            ois = new ObjectInputStream(new FileInputStream(f));
-            Log.i("Raygun4Android", "OIS available: " + ois.available());
-
-            MessageApiKey messageApiKey = (MessageApiKey) ois.readObject();
-            spinUpService(messageApiKey.apiKey, messageApiKey.message);
-            Log.i("Raygun4Android", "Sent " + f.getName() + ", now deleting");
-            f.delete();
-          }
-          finally
-          {
-            ois.close();
+            ObjectInputStream ois = null;
+            try
+            {
+              ois = new ObjectInputStream(new FileInputStream(f));
+              MessageApiKey messageApiKey = (MessageApiKey) ois.readObject();
+              spinUpService(messageApiKey.apiKey, messageApiKey.message);
+              f.delete();
+            }
+            finally
+            {
+              ois.close();
+            }
           }
         }
         catch (FileNotFoundException e)
         {
           Log.e("Raygun4Android", "Error loading cached message from filesystem - " + e.getMessage());
-
         } catch (IOException e)
         {
           Log.e("Raygun4Android", "Error reading cached message from filesystem - " + e.getMessage());
-          e.printStackTrace();
         } catch (ClassNotFoundException e)
         {
           Log.e("Raygun4Android", "Error in cached message from filesystem - " + e.getMessage());
@@ -333,6 +333,20 @@ public class RaygunClient
       intent.putExtra("apikey", apiKey);
       _service = intent;
       _context.startService(_service);
+  }
+
+  private static String getExtension(final String filename) {
+    if (filename == null) {
+      return null;
+    }
+    int lastSeparator = Math.max(filename.lastIndexOf('/'), filename.lastIndexOf('\\'));
+    int extensionPos = filename.lastIndexOf(".");
+    int index =  lastSeparator > extensionPos ? -1 : extensionPos;
+    if (index == -1) {
+      return "";
+    } else {
+      return filename.substring(index + 1);
+    }
   }
 
   private static class RaygunUncaughtExceptionHandler implements Thread.UncaughtExceptionHandler
