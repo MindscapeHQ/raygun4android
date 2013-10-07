@@ -22,7 +22,7 @@ In your IDE, build your project (or run `mvn compile`), then see the configurati
 
 ### With Ant, other build tools, or manually
 
-(Download the JAR for the latest version)[http://search.maven.org/#search%7Cga%7C1%7Ca%3A%22raygun4android%22] and place it in a /lib folder in your project. Add it to your project's classpath, then see below.
+[Download the JAR for the latest version](http://search.maven.org/#search%7Cga%7C1%7Ca%3A%22raygun4android%22) and place it in a /lib folder in your project. Add it to your project's classpath, then see below.
 
 ## Configuration & Usage
 
