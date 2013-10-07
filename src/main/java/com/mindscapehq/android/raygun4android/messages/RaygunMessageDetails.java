@@ -92,4 +92,9 @@ public class RaygunMessageDetails {
   {
     this.user = new RaygunUserContext(context);
   }
+
+  public void setUserContext(String user)
+  {
+    this.user = new RaygunUserContext(user);
+  }
 }

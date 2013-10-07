@@ -14,7 +14,7 @@ To your pom.xml, add:
 <dependency>
     <groupId>com.mindscapehq.android</groupId>
     <artifactId>raygun4android</artifactId>
-    <version>1.0.1</version>
+    <version>1.0.2</version>
 </dependency>
 ```
 
@@ -57,15 +57,15 @@ For a usage example, check out the application in /sample-app.
 
 The following method overloads are available for initializing RaygunClient:
 
-* RaygunClient.Init(Context context)
+	* RaygunClient.Init(Context context)
 
-* RaygunClient.Init(String version, Context context)
+	* RaygunClient.Init(String version, Context context)
 
-* RaygunClient.Init (Context context, String apiKey)
+	* RaygunClient.Init (Context context, String apiKey)
 
-* RaygunClient.Init (Context context, String apiKey, String version)
+	* RaygunClient.Init (Context context, String apiKey, String version)
 
-The first two read the API key from the application's AndroidManifest.xml. Whichever Context you pass in will have its API key read. If you want to specify your API key programmatically, use one of the latter two methods.
+	The first two read the API key from the application's AndroidManifest.xml. Whichever Context you pass in will have its API key read. If you want to specify your API key programmatically, use one of the latter two methods.
 
 The following methods are available for setting up a pre-made Uncaught Exception Handler, which will automatically send an exception when one reaches it (ie. just before your app crashes):
 
@@ -75,23 +75,29 @@ The following methods are available for setting up a pre-made Uncaught Exception
 
 * RaygunClient.AttachExceptionHandler(List tags, Map userCustomData)
 
-The tags and custom data will be attached to all exceptions that reaches it. This allows you to automatically send crash data when your app crashes.
+	The tags and custom data will be attached to all exceptions that reaches it. This allows you to automatically send crash data when your app crashes.
 
-The handler will call any other pre-existing exception handlers you have set up before it sends to Raygun. After it is complete, it will call the default handler, which will crash the app and display the 'close app' user dialog. Exceptions are guaranteed to be sent if your app crashes.
+	The handler will call any other pre-existing exception handlers you have set up before it sends to Raygun. After it is complete, it will call the default handler, which will crash the app and display the 'close app' user dialog. Exceptions are guaranteed to be sent if your app crashes.
 
 The following methods are available for sending manually; pick one depending on how much extra data you'd like to send:
 
-* RaygunClient.Send(Throwable throwable)
+	* RaygunClient.Send(Throwable throwable)
 
-* RaygunClient.Send(Throwable throwable, List tags)
+	* RaygunClient.Send(Throwable throwable, List tags)
 
-* RaygunClient.Send(Throwable throwable, List tags, Map userCustomData)
+	* RaygunClient.Send(Throwable throwable, List tags, Map userCustomData)
 
 These build a RaygunMessage for you then send it. If you'd like to build a message manually you can use:
 
-* RaygunClient.Post(RaygunMessage raygunMessage)
+	* RaygunClient.Post(RaygunMessage raygunMessage)
 
-Note that this will require certain fields to be present - documentation is available at http://raygun.io/raygun-providers/rest-json-api
+	Note that this will require certain fields to be present - documentation is available at http://raygun.io/raygun-providers/rest-json-api
+
+The following misc method is available:
+
+	* RaygunClient.SetUser(String user)
+
+	This allows you to set the user name or email address of the current user of the application, which will be attached to the resulting message. This allows you to track unique users. If it is not provided the device UUID will be used, which will display the count of unique users in the dashboard.
 
 ### Frequently Asked Questions
 
@@ -117,6 +123,8 @@ Clone this repository, then run `mvn install` to grab the dependencies and insta
 
 
 ## Changelog
+
+Version 1.0.2: Added SetUser method for unique user tracking.
 
 Version 1.0.1: Added caching of messages to disk when network unavailable & post them when it becomes available again; several bugfixes relating to the posting service. This version is recommended; do not use 1.0.0.
 

@@ -13,11 +13,16 @@ public class RaygunUserContext
   protected static final String PREFS_FILE = "device_id.xml";
   protected static final String PREFS_DEVICE_ID = "device_id";
 
-  private UUID identifier;
+  private String identifier;
 
   public RaygunUserContext(Context context)
   {
     getDeviceUuid(context);
+  }
+
+  public RaygunUserContext(String user)
+  {
+    identifier = user;
   }
 
   private void getDeviceUuid(Context context) {
@@ -27,16 +32,16 @@ public class RaygunUserContext
           final String id = prefs.getString(PREFS_DEVICE_ID, null );
 
           if (id != null) {
-            identifier = UUID.fromString(id);
+            identifier = UUID.fromString(id).toString();
           } else {
 
             final String androidId = Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID);
 
             try {
               if (!"9774d56d682e549c".equals(androidId)) {
-                identifier = UUID.nameUUIDFromBytes(androidId.getBytes("utf8"));
+                identifier = UUID.nameUUIDFromBytes(androidId.getBytes("utf8")).toString();
               } else {
-                identifier = UUID.randomUUID();
+                identifier = UUID.randomUUID().toString();
               }
             } catch (UnsupportedEncodingException e) {
               throw new RuntimeException(e);
@@ -50,6 +55,6 @@ public class RaygunUserContext
 
   public String getIdentifier()
   {
-    return identifier.toString();
+    return identifier;
   }
 }

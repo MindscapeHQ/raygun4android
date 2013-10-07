@@ -35,6 +35,7 @@ public class RaygunClient
   private static String _version;
   private static Intent _service;
   private static String _appContextIdentifier;
+  private static String _user;
 
   public static String getApiKey()
   {
@@ -224,11 +225,18 @@ public class RaygunClient
           .SetExceptionDetails(throwable)
           .SetClientDetails()
           .SetAppContext(_appContextIdentifier)
-          .SetUserContext(_context)
           .Build();
       if (_version != null)
       {
         msg.getDetails().setVersion(_version);
+      }
+      if (_user != null)
+      {
+        msg.getDetails().setUserContext(_user);
+      }
+      else
+      {
+        msg.getDetails().setUserContext(_context);
       }
       return msg;
     }
@@ -343,6 +351,14 @@ public class RaygunClient
     else
     {
       return filename.substring(index + 1);
+    }
+  }
+
+  public static void SetUser(String user)
+  {
+    if (user != null && user.length() > 0)
+    {
+      _user = user;
     }
   }
 
