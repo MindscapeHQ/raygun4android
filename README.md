@@ -14,7 +14,7 @@ To your pom.xml, add:
 <dependency>
     <groupId>com.mindscapehq.android</groupId>
     <artifactId>raygun4android</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
 </dependency>
 ```
 
@@ -118,6 +118,8 @@ Clone this repository, then run `mvn install` to grab the dependencies and insta
 
 ## Changelog
 
-Version 1.0.0: Completed initial version with background service for performing posting, API key read from AndroidManifest, cache messages to disk when network unavailable & post them when it is available and more.
+Version 1.0.1: Added caching of messages to disk when network unavailable & post them when it becomes available again; several bugfixes relating to the posting service. This version is recommended; do not use 1.0.0.
+
+Version 1.0.0: Completed initial version with background service for performing posting, API key read from AndroidManifest and more.
 
 Version 0.0.1: Initial release with basic functionality.
