@@ -16,7 +16,7 @@
         <dependency>
             <groupId>com.mindscapehq.android</groupId>
             <artifactId>raygun4android</artifactId>
-            <version>1.0.0-SNAPSHOT</version>
+            <version>1.0.1</version>
         </dependency>
     </dependencies>
     <build>
