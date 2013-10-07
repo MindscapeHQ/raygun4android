@@ -22,7 +22,7 @@ In your IDE, build your project (or run `mvn compile`), then see the configurati
 
 ### With Ant, other build tools, or manually
 
-Download the JAR and place it in a /lib folder in your project. Add it to your project's classpath, then see below.
+(Download the JAR for the latest version)[http://search.maven.org/#search%7Cga%7C1%7Ca%3A%22raygun4android%22] and place it in a /lib folder in your project. Add it to your project's classpath, then see below.
 
 ## Configuration & Usage
 
@@ -30,6 +30,7 @@ Download the JAR and place it in a /lib folder in your project. Add it to your p
 
 	```xml
 	<uses-permission android:name="android.permission.INTERNET" />
+	<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 	```
 
 2. Inside the **application** element, add:
@@ -94,6 +95,10 @@ Note that this will require certain fields to be present - documentation is avai
 
 ### Frequently Asked Questions
 
+* Is there an example project?
+	
+	Yup - clone this repository then load the sample-app project. It has been confirmed to run on the emulator for SDK >= 9, and physical devices (4.1.2).
+
 * Not seeing errors in the dashboard?
 	
 	Raygun4Android outputs Logcat messages - look for the 'Exception Message HTTP POST result' message - 403 will indicate an invalid API key, 400 a bad message, and 202 will indicate received successfully.
@@ -104,11 +109,11 @@ Note that this will require certain fields to be present - documentation is avai
 
 * What happens when the phone has no internet connection?
 
-	Raygun4Android will save the exception message to disk. When the provider is later asked to send another message it will check if the internet is now available, and if it is, send the cached messages.
+	Raygun4Android will save the exception message to disk. When the provider is later asked to send another message it will check if the internet is now available, and if it is, send the cached messages. A maximum of 64 messages will be cached, then overwritten (using a LRU strategy). 
 
 ### Contributing
 
-Clone this repository, then run `mvn install` to grab the dependencies and install the library to your local Maven repo.
+Clone this repository, then run `mvn install` to grab the dependencies and install the library to your local Maven repo. Issues and pull requests are welcome.
 
 
 ## Changelog
