@@ -69,7 +69,6 @@ public class RaygunPostService extends Service
               ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(fn));
               out.writeObject(messageApiKey);
               out.close();
-              Log.i("Raygun4Android", "Wrote file " + file + " to disk");
             } catch (FileNotFoundException e)
             {
               Log.e("Raygun4Android", "Error creating file when caching message to filesystem - " + e.getMessage());

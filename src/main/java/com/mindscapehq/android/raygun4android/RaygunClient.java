@@ -281,7 +281,6 @@ public class RaygunClient
       File[] fileList = _context.getCacheDir().listFiles();
       for (File f : fileList)
       {
-        Log.i("Raygun4Android", "Filename: " + f.getName());
         try
         {
           String ext = getExtension(f.getName());
@@ -335,16 +334,20 @@ public class RaygunClient
       _context.startService(_service);
   }
 
-  protected static String getExtension(final String filename) {
-    if (filename == null) {
+  protected static String getExtension(String filename) {
+    if (filename == null)
+    {
       return null;
     }
-    int lastSeparator = Math.max(filename.lastIndexOf('/'), filename.lastIndexOf('\\'));
-    int extensionPos = filename.lastIndexOf(".");
-    int index =  lastSeparator > extensionPos ? -1 : extensionPos;
-    if (index == -1) {
+    int separator = Math.max(filename.lastIndexOf('/'), filename.lastIndexOf('\\'));
+    int dotPos = filename.lastIndexOf(".");
+    int index =  separator > dotPos ? -1 : dotPos;
+    if (index == -1)
+    {
       return "";
-    } else {
+    }
+    else
+    {
       return filename.substring(index + 1);
     }
   }
