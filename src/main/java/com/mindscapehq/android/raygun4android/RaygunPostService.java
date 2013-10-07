@@ -48,7 +48,7 @@ public class RaygunPostService extends Service
               for (File f : files)
               {
                 String fileName = Integer.toString(file) + ".raygun";
-                if (!f.getName().equals(fileName))
+                if (RaygunClient.getExtension(f.getName()) == "raygun" && !f.getName().equals(fileName))
                 {
                   break;
                 }

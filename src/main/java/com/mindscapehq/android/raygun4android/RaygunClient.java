@@ -335,7 +335,7 @@ public class RaygunClient
       _context.startService(_service);
   }
 
-  private static String getExtension(final String filename) {
+  protected static String getExtension(final String filename) {
     if (filename == null) {
       return null;
     }
