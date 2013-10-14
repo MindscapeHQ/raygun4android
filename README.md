@@ -57,13 +57,13 @@ For a usage example, check out the application in /sample-app.
 
 The following method overloads are available for initializing RaygunClient:
 
-	* RaygunClient.Init(Context context)
+* RaygunClient.Init(Context context)
 
-	* RaygunClient.Init(String version, Context context)
+* RaygunClient.Init(String version, Context context)
 
-	* RaygunClient.Init (Context context, String apiKey)
+* RaygunClient.Init (Context context, String apiKey)
 
-	* RaygunClient.Init (Context context, String apiKey, String version)
+* RaygunClient.Init (Context context, String apiKey, String version)
 
 	The first two read the API key from the application's AndroidManifest.xml. Whichever Context you pass in will have its API key read. If you want to specify your API key programmatically, use one of the latter two methods.
 
@@ -81,21 +81,21 @@ The following methods are available for setting up a pre-made Uncaught Exception
 
 The following methods are available for sending manually; pick one depending on how much extra data you'd like to send:
 
-	* RaygunClient.Send(Throwable throwable)
+* RaygunClient.Send(Throwable throwable)
 
-	* RaygunClient.Send(Throwable throwable, List tags)
+* RaygunClient.Send(Throwable throwable, List tags)
 
-	* RaygunClient.Send(Throwable throwable, List tags, Map userCustomData)
+* RaygunClient.Send(Throwable throwable, List tags, Map userCustomData)
 
 These build a RaygunMessage for you then send it. If you'd like to build a message manually you can use:
 
-	* RaygunClient.Post(RaygunMessage raygunMessage)
+* RaygunClient.Post(RaygunMessage raygunMessage)
 
 	Note that this will require certain fields to be present - documentation is available at http://raygun.io/raygun-providers/rest-json-api
 
 The following misc method is available:
 
-	* RaygunClient.SetUser(String user)
+* RaygunClient.SetUser(String user)
 
 	This allows you to set the user name or email address of the current user of the application, which will be attached to the resulting message. This allows you to track unique users. If it is not provided the device UUID will be used, which will display the count of unique users in the dashboard.
 
