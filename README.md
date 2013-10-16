@@ -22,7 +22,7 @@ In your IDE, build your project (or run `mvn compile`), then see the configurati
 
 ### With Ant, other build tools, or manually
 
-[Download the JAR for the latest version](http://search.maven.org/#search%7Cga%7C1%7Ca%3A%22raygun4android%22) and place it in a /lib folder in your project. Add it to your project's classpath, then see below.
+[Download the JAR for the latest version](http://search.maven.org/#search%7Cga%7C1%7Ca%3A%22raygun4android%22), as well as [the Gson library](http://search.maven.org/remotecontent?filepath=com/google/code/gson/gson/2.1/gson-2.1.jar) (if you do not already use it). Place both of these in a /lib folder in your project, add them to your project's classpath, then see below.
 
 ## Configuration & Usage
 
