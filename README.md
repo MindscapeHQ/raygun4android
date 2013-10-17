@@ -14,7 +14,7 @@ To your pom.xml, add:
 <dependency>
     <groupId>com.mindscapehq.android</groupId>
     <artifactId>raygun4android</artifactId>
-    <version>1.0.2</version>
+    <version>1.0.3</version>
 </dependency>
 ```
 
@@ -52,6 +52,10 @@ In your IDE, build your project (or run `mvn compile`), then see the configurati
 For a usage example, check out the application in /sample-app.
 
 ## Documentation
+
+### Version tracking
+
+Set the versionName attribute on <manifest> in your AndroidManifest.xml to be of the form x.x.x.x, where x is a positive integer, and it will be sent with each message. You can then filter by version in the Raygun dashboard.
 
 ### API
 
@@ -93,11 +97,15 @@ These build a RaygunMessage for you then send it. If you'd like to build a messa
 
 	Note that this will require certain fields to be present - documentation is available at http://raygun.io/raygun-providers/rest-json-api
 
-The following misc method is available:
+The following misc methods are available:
 
 * RaygunClient.SetUser(String user)
 
 	This allows you to set the user name or email address of the current user of the application, which will be attached to the resulting message. This allows you to track unique users. If it is not provided the device UUID will be used, which will display the count of unique users in the dashboard.
+
+* RaygunClient.SetVersion(String version)
+
+	Stores the version of your application manually. Normally, this is automatically read from AndroidManifest (the versionName attribute on <manifest>) and is provided as a convenience.
 
 ### Frequently Asked Questions
 
@@ -123,6 +131,8 @@ Clone this repository, then run `mvn install` to grab the dependencies and insta
 
 
 ## Changelog
+
+Version 1.0.3: Improved version tracking support
 
 Version 1.0.2: Added SetUser method for unique user tracking.
 
