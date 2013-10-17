@@ -49,14 +49,14 @@ public class RaygunClient
    */
   public static void Init(Context context) {
     String apiKey = readApiKey(context);
-    _appContextIdentifier = UUID.randomUUID().toString();
     Init(context, apiKey);
+    _appContextIdentifier = UUID.randomUUID().toString();
   }
 
   /**
    * Initializes the Raygun client with the version of your application.
    * This expects that you have placed the API key in your AndroidManifest.xml, in a <meta-data /> element.
-   * @param version The version of your application which will be attached to any exception messages sent.
+   * @param version The version of your application, format x.x.x.x, where x is a positive integer.
    * @param context The context of the calling Android activity.
    */
   public static void Init(String version, Context context) {
@@ -66,7 +66,7 @@ public class RaygunClient
 
   /**
    * Initializes the Raygun client with your Android application's context and your
-   * Raygun API key.
+   * Raygun API key. The version transmitted will be the value of the versionName attribute in your manifest element.
    * @param context The Android context of your activity
    * @param apiKey An API key that belongs to a Raygun application created in your dashboard
    */
@@ -74,6 +74,23 @@ public class RaygunClient
   {
     _apiKey = apiKey;
     _context = context;
+
+    String version = null;
+    try
+    {
+      version = context.getPackageManager().getPackageInfo(context.getPackageName(), 0).versionName;
+    } catch (PackageManager.NameNotFoundException e)
+    {
+      Log.i("Raygun4Android", "Couldn't read version from calling package");
+    }
+    if (version != null)
+    {
+      _version = version;
+    }
+    else
+    {
+      _version = "Not provided";
+    }
   }
 
   /**
@@ -81,7 +98,7 @@ public class RaygunClient
    * Raygun API key, and the version of your application
    * @param context The Android context of your activity
    * @param apiKey An API key that belongs to a Raygun application created in your dashboard
-   * @param version The current version identifier of your Android application. This will be attached to the Raygun message.
+   * @param version The version of your application, format x.x.x.x, where x is a positive integer.
    */
   public static void Init(Context context, String apiKey, String version)
   {
@@ -225,6 +242,7 @@ public class RaygunClient
           .SetExceptionDetails(throwable)
           .SetClientDetails()
           .SetAppContext(_appContextIdentifier)
+          .SetVersion(_version)
           .Build();
       if (_version != null)
       {
@@ -354,11 +372,32 @@ public class RaygunClient
     }
   }
 
+  /**
+   * Sets the current user of your application. If user is an email address which is associated with a Gravatar,
+   * their picture will be displayed in the error view. If this is not called a random ID will be assigned.
+   * If the user context changes in your application (i.e log in/out), be sure to call this again with the
+   * updated user name/email address.
+   * @param user A user name or email address representing the current user
+   */
   public static void SetUser(String user)
   {
     if (user != null && user.length() > 0)
     {
       _user = user;
+    }
+  }
+
+  /**
+   * Manually stores the version of your application to be transmitted with each message, for version
+   * filtering. This is normally read from your AndroidManifest.xml (the versionName attribute on <manifest>)
+   * or passed in on Init(); this is only provided as a convenience.
+   * @param version The version of your application, format x.x.x.x, where x is a positive integer.
+   */
+  public static void SetVersion(String version)
+  {
+    if (version != null)
+    {
+      _version = version;
     }
   }
 
