@@ -53,6 +53,16 @@ For a usage example, check out the application in /sample-app.
 
 ## Documentation
 
+### Unique user tracking
+
+Raygun supports tracking the unique users who encounter bugs in your apps.
+
+You can transmit the current user who was affected by the exception by calling **SetUser**(*string*) and passing in their user name or email address. A count of affected users will then appear in the error statistics in Raygun. If you provide an email address, you will see it on the error page in Raygun, and if they have an associated Gravatar you will see that too.
+
+If the user context changes, for instance on log in/out, you should remember to call SetUser again to store the updated username.
+
+This feature is optional if you wish it disabled for privacy purposes.
+
 ### Version tracking
 
 Set the versionName attribute on <manifest> in your AndroidManifest.xml to be of the form x.x.x.x, where x is a positive integer, and it will be sent with each message. You can then filter by version in the Raygun dashboard.
@@ -110,11 +120,11 @@ The following misc methods are available:
 ### Frequently Asked Questions
 
 * Is there an example project?
-	
+
 	Yup - clone this repository then load the sample-app project. It has been confirmed to run on the emulator for SDK >= 9, and physical devices (4.1.2).
 
 * Not seeing errors in the dashboard?
-	
+
 	Raygun4Android outputs Logcat messages - look for the 'Exception Message HTTP POST result' message - 403 will indicate an invalid API key, 400 a bad message, and 202 will indicate received successfully.
 
 * Environment Data
@@ -123,7 +133,7 @@ The following misc methods are available:
 
 * What happens when the phone has no internet connection?
 
-	Raygun4Android will save the exception message to disk. When the provider is later asked to send another message it will check if the internet is now available, and if it is, send the cached messages. A maximum of 64 messages will be cached, then overwritten (using a LRU strategy). 
+	Raygun4Android will save the exception message to disk. When the provider is later asked to send another message it will check if the internet is now available, and if it is, send the cached messages. A maximum of 64 messages will be cached, then overwritten (using a LRU strategy).
 
 ### Contributing
 
