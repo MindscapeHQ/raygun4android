@@ -14,7 +14,7 @@ To your pom.xml, add:
 <dependency>
     <groupId>com.mindscapehq.android</groupId>
     <artifactId>raygun4android</artifactId>
-    <version>1.0.3</version>
+    <version>1.0.4</version>
 </dependency>
 ```
 
@@ -142,12 +142,14 @@ Clone this repository, then run `mvn install` to grab the dependencies and insta
 
 ## Changelog
 
-Version 1.0.3: Improved version tracking support
+v1.0.4: JSON payload now encoded in UTF-8, fixes issues with post-ASCII chars (e.g Cyrillic) were displayed as '?' in Raygun dashboard
 
-Version 1.0.2: Added SetUser method for unique user tracking.
+v1.0.3: Improved version tracking support
 
-Version 1.0.1: Added caching of messages to disk when network unavailable & post them when it becomes available again; several bugfixes relating to the posting service. This version is recommended; do not use 1.0.0.
+v1.0.2: Added SetUser method for unique user tracking.
 
-Version 1.0.0: Completed initial version with background service for performing posting, API key read from AndroidManifest and more.
+v1.0.1: Added caching of messages to disk when network unavailable & post them when it becomes available again; several bugfixes relating to the posting service. This version is recommended; do not use 1.0.0.
 
-Version 0.0.1: Initial release with basic functionality.
+v1.0.0: Completed initial version with background service for performing posting, API key read from AndroidManifest and more.
+
+v0.0.1: Initial release with basic functionality.

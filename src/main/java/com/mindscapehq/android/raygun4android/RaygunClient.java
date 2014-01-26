@@ -15,6 +15,7 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.protocol.HTTP;
 
 import java.io.*;
 import java.lang.Thread.UncaughtExceptionHandler;
@@ -210,7 +211,7 @@ public class RaygunClient
         post.addHeader("X-ApiKey", apiKey);
         post.addHeader("Content-Type", "application/json");
 
-        StringEntity se = new StringEntity(jsonPayload.toString());
+        StringEntity se = new StringEntity(jsonPayload.toString(), HTTP.UTF_8);
         post.setEntity(se);
         HttpResponse response = client.execute(post);
         int result = response.getStatusLine().getStatusCode();
