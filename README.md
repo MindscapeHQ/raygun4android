@@ -45,9 +45,14 @@ In your IDE, build your project (or run `mvn compile`), then see the configurati
 
 	And replace the value in meta-data with your API key, available from your Raygun dashboard.
 
-3. In a central location in your app's code, call `RaygunClient.Init()`, passing in your activity's context.
+3. In a central activity, call the following:
 
-4. When an exception occurs, such as in a catch block, call RaygunClient.Send(), passing in the Throwable. This will send it to the Raygun service, where it will be viewable in the dashboard.
+	```java
+	RaygunClient.Init(getApplicationContext());
+	RaygunClient.AttachExceptionHandler();
+	```
+
+The above exception handler automatically catches & sends all uncaught exceptions. You can create your own or send from a catch block by calling RaygunClient.Send() and passing in the Throwable.
 
 For a usage example, check out the application in /sample-app.
 
