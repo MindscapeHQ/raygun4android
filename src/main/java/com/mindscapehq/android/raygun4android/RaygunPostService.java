@@ -24,6 +24,11 @@ public class RaygunPostService extends Service
     _intent = intent;
     final Bundle bundle = intent.getExtras();
 
+    if (bundle == null)
+    {
+      return START_NOT_STICKY;
+    }
+
     Thread t = new Thread(new Runnable()
     {
       @Override
