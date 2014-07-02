@@ -97,4 +97,9 @@ public class RaygunMessageDetails {
   {
     this.user = new RaygunUserContext(user);
   }
+
+  public void setUserContext(RaygunUserInfo userInfo, Context context)
+  {
+    this.user = new RaygunUserContext(userInfo, context);
+  }
 }
