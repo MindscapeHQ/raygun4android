@@ -7,6 +7,7 @@ import android.view.Window;
 import android.widget.Button;
 import android.widget.TextView;
 import main.java.com.mindscapehq.android.raygun4android.RaygunClient;
+import main.java.com.mindscapehq.android.raygun4android.messages.RaygunUserInfo;
 
 import java.util.*;
 
@@ -28,6 +29,15 @@ public class RaygunSampleApp extends Activity {
     final Button button = (Button) findViewById(R.id.button);
     button.setOnClickListener(new View.OnClickListener() {
       public void onClick(View view) {
+        RaygunUserInfo user = new RaygunUserInfo();
+        user.FullName = "User Name";
+        user.FirstName = "User";
+        user.LastName = "Name";
+        user.Email = "a@b.com";
+        user.Uuid = "a uuid";
+        user.IsAnonymous = false;
+
+        RaygunClient.SetUser(user);
         RaygunClient.Send(new Exception("Congratulations, you have sent errors with Raygun4Android")); // Example 1: Manual exception creation & sending
 
         int i = 3 / 0;                          // Example 2: A real exception will be thrown here, which will be caught & sent by RaygunClient

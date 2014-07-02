@@ -14,10 +14,16 @@ public class RaygunUserContext
   protected static final String PREFS_DEVICE_ID = "device_id";
 
   private String identifier;
+  private String firstName;
+  private String lastName;
+  private String fullName;
+  private String email;
+  private String uuid;
+  private Boolean isAnonymous;
 
   public RaygunUserContext(Context context)
   {
-    getDeviceUuid(context);
+    identifier = getDeviceUuid(context);
   }
 
   public RaygunUserContext(String user)
@@ -25,31 +31,50 @@ public class RaygunUserContext
     identifier = user;
   }
 
-  private void getDeviceUuid(Context context) {
+  public RaygunUserContext(RaygunUserInfo userInfo, Context context)
+  {
+    if (userInfo.Identifier == null) {
+      identifier = getDeviceUuid(context);
+    }
+    else {
+      identifier = userInfo.Identifier;
+    }
+
+    firstName = userInfo.FirstName;
+    lastName = userInfo.LastName;
+    fullName = userInfo.FullName;
+    email = userInfo.Email;
+    uuid = userInfo.Uuid;
+    isAnonymous = userInfo.IsAnonymous;
+  }
+
+  private String getDeviceUuid(Context context) {
       synchronized (RaygunAppContext.class) {
         if( identifier == null) {
           final SharedPreferences prefs = context.getSharedPreferences( PREFS_FILE, 0);
-          final String id = prefs.getString(PREFS_DEVICE_ID, null );
+          String id = prefs.getString(PREFS_DEVICE_ID, null );
 
           if (id != null) {
-            identifier = UUID.fromString(id).toString();
+            return UUID.fromString(id).toString();
           } else {
 
             final String androidId = Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID);
 
             try {
               if (!"9774d56d682e549c".equals(androidId)) {
-                identifier = UUID.nameUUIDFromBytes(androidId.getBytes("utf8")).toString();
+                id = UUID.nameUUIDFromBytes(androidId.getBytes("utf8")).toString();
               } else {
-                identifier = UUID.randomUUID().toString();
+                id = UUID.randomUUID().toString();
               }
             } catch (UnsupportedEncodingException e) {
               throw new RuntimeException(e);
             }
 
-            prefs.edit().putString(PREFS_DEVICE_ID, identifier.toString() ).commit();
+            prefs.edit().putString(PREFS_DEVICE_ID, id.toString() ).commit();
+            return id;
           }
         }
+        return identifier;
       }
   }
 

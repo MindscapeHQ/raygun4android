@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.util.Log;
 import com.google.gson.Gson;
 import main.java.com.mindscapehq.android.raygun4android.messages.RaygunMessage;
+import main.java.com.mindscapehq.android.raygun4android.messages.RaygunUserInfo;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
@@ -37,6 +38,7 @@ public class RaygunClient
   private static Intent _service;
   private static String _appContextIdentifier;
   private static String _user;
+  private static RaygunUserInfo _userInfo;
 
   public static String getApiKey()
   {
@@ -249,7 +251,12 @@ public class RaygunClient
       {
         msg.getDetails().setVersion(_version);
       }
-      if (_user != null)
+
+      if (_userInfo != null)
+      {
+        msg.getDetails().setUserContext(_userInfo, _context);
+      }
+      else if (_user != null)
       {
         msg.getDetails().setUserContext(_user);
       }
@@ -378,14 +385,21 @@ public class RaygunClient
    * their picture will be displayed in the error view. If this is not called a random ID will be assigned.
    * If the user context changes in your application (i.e log in/out), be sure to call this again with the
    * updated user name/email address.
+   * @deprecated Call SetUser(RaygunUserInfo) instead
    * @param user A user name or email address representing the current user
    */
+  @Deprecated
   public static void SetUser(String user)
   {
     if (user != null && user.length() > 0)
     {
       _user = user;
     }
+  }
+
+  public static void SetUser(RaygunUserInfo userInfo)
+  {
+    _userInfo = userInfo;
   }
 
   /**
