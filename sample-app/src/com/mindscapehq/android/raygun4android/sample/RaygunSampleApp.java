@@ -32,7 +32,6 @@ public class RaygunSampleApp extends Activity {
         RaygunUserInfo user = new RaygunUserInfo();
         user.FullName = "User Name";
         user.FirstName = "User";
-        user.LastName = "Name";
         user.Email = "a@b.com";
         user.Uuid = "a uuid";
         user.IsAnonymous = false;

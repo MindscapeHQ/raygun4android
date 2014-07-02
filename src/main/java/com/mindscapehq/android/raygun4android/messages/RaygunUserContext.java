@@ -41,7 +41,6 @@ public class RaygunUserContext
     }
 
     firstName = userInfo.FirstName;
-    lastName = userInfo.LastName;
     fullName = userInfo.FullName;
     email = userInfo.Email;
     uuid = userInfo.Uuid;
