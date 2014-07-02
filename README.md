@@ -14,7 +14,7 @@ To your pom.xml, add:
 <dependency>
     <groupId>com.mindscapehq.android</groupId>
     <artifactId>raygun4android</artifactId>
-    <version>1.0.5</version>
+    <version>1.1.0</version>
 </dependency>
 ```
 
@@ -62,11 +62,28 @@ For a usage example, check out the application in /sample-app.
 
 Raygun supports tracking the unique users who encounter bugs in your apps.
 
-You can transmit the current user who was affected by the exception by calling **SetUser**(*string*) and passing in their user name or email address. A count of affected users will then appear in the error statistics in Raygun. If you provide an email address, you will see it on the error page in Raygun, and if they have an associated Gravatar you will see that too.
+By default the device UUID is transmitted. You can also add the currently logged in user's data like this:
+
+```java
+RaygunUserInfo user = new RaygunUserInfo();
+user.Identifier = "a@b.com";
+user.FullName = "User Name";
+user.FirstName = "User";
+user.LastName = "Name";
+user.Email = "a@b.com";
+user.Uuid = "a uuid";
+user.IsAnonymous = false;
+
+RaygunClient.SetUser(user);
+```
+
+Any of these properties are optional, for instance you can set just IsAnonymous. There is also a constructor overload if you prefer to specify all in one statement.
+
+`Identifier` should be a unique representation of the current logged in user - we will assume that messages with the same Identifier are the same user. If you do not set it, it will be automatically set to the device UUID.
 
 If the user context changes, for instance on log in/out, you should remember to call SetUser again to store the updated username.
 
-This feature is optional if you wish it disabled for privacy purposes.
+This was upgraded in 1.1, previously a SetUser(string) method was available - this has now been deprecated and will be removed in a future version.
 
 ### Version tracking
 
@@ -114,9 +131,9 @@ These build a RaygunMessage for you then send it. If you'd like to build a messa
 
 The following misc methods are available:
 
-* RaygunClient.SetUser(String user)
+* RaygunClient.SetUser(RaygunUserInfo userInfo)
 
-	This allows you to set the user name or email address of the current user of the application, which will be attached to the resulting message. This allows you to track unique users. If it is not provided the device UUID will be used, which will display the count of unique users in the dashboard.
+	An object containing data about the currently logged in user - see above for details. Ensure you call this again if the user context changes.
 
 * RaygunClient.SetVersion(String version)
 
@@ -147,6 +164,7 @@ Clone this repository, then run `mvn install` to grab the dependencies and insta
 
 ## Changelog
 
+- v1.1.0: Add new user info properties, bump Gson to 2.2.4
 - v1.0.5: Guard against a spurious NullPointerException caused by the posting service
 - v1.0.4: JSON payload now encoded in UTF-8, fixes issues with post-ASCII chars (e.g Cyrillic) were displayed as '?' in Raygun dashboard
 - v1.0.3: Improved version tracking support
