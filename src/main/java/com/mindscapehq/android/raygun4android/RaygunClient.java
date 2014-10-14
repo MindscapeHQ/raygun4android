@@ -246,7 +246,9 @@ public class RaygunClient
           .SetClientDetails()
           .SetAppContext(_appContextIdentifier)
           .SetVersion(_version)
+          .SetNetworkInfo()
           .Build();
+
       if (_version != null)
       {
         msg.getDetails().setVersion(_version);

@@ -79,6 +79,13 @@ public class RaygunMessageBuilder implements IRaygunMessageBuilder {
     return this;
   }
 
+  @Override
+  public IRaygunMessageBuilder SetNetworkInfo()
+  {
+    _raygunMessage.getDetails().setNetworkInfo();
+    return this;
+  }
+
   public static RaygunMessageBuilder New() {
     return new RaygunMessageBuilder();
   }

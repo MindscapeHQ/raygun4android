@@ -16,6 +16,7 @@ public class RaygunMessageDetails {
   private Map userCustomData;
   private RaygunAppContext context;
   private RaygunUserContext user;
+  private NetworkInfo request;
 
   public void setMachineName(String machineName) {
     this.machineName = machineName;
@@ -101,5 +102,10 @@ public class RaygunMessageDetails {
   public void setUserContext(RaygunUserInfo userInfo, Context context)
   {
     this.user = new RaygunUserContext(userInfo, context);
+  }
+
+  public void setNetworkInfo()
+  {
+    this.request = new NetworkInfo();
   }
 }
