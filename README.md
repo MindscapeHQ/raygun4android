@@ -163,6 +163,7 @@ Clone this repository, then run `mvn install` to grab the dependencies and insta
 
 ## Changelog
 
+- v1.2.0: Added device IP data (shown in the 'Request' tab in the Raygun dashboard)
 - v1.1.0: Add new user info properties, bump Gson to 2.2.4
 - v1.0.5: Guard against a spurious NullPointerException caused by the posting service
 - v1.0.4: JSON payload now encoded in UTF-8, fixes issues with post-ASCII chars (e.g Cyrillic) were displayed as '?' in Raygun dashboard
