@@ -22,7 +22,7 @@ In your IDE, build your project (or run `mvn compile`), then see the configurati
 
 ### With Gradle
 
-To the build.gradle, add:
+To a build.gradle file, add:
 
 ```j
 dependencies {
