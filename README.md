@@ -24,7 +24,11 @@ In your IDE, build your project (or run `mvn compile`), then see the configurati
 
 To a build.gradle file, add:
 
-```j
+```
+repositories {
+	...
+	mavenCentral()
+}
 dependencies {
 	...
 	compile 'com.google.code.gson:gson:2.1'
