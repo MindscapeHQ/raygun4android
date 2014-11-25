@@ -24,7 +24,7 @@ In your IDE, build your project (or run `mvn compile`), then see the configurati
 
 To the build.gradle, add:
 
-```json
+```j
 dependencies {
 	...
 	compile 'com.google.code.gson:gson:2.1'
