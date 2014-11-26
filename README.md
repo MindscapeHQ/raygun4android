@@ -37,7 +37,12 @@ dependencies {
 }
 ```
 
-After syncing the Raygun package will be accessible to import.
+After syncing the Raygun package will be accessible to import. For Gradle, you may need to add the following specific imports to your class, where you wish to use RaygunClient:
+
+```java
+import main.java.com.mindscapehq.android.raygun4android.RaygunClient;
+import main.java.com.mindscapehq.android.raygun4android.messages.RaygunUserInfo;
+```
 
 ### With Ant, other build tools, or manually
 
