@@ -187,6 +187,7 @@ Clone this repository, then run `mvn install` to grab the dependencies and insta
 
 ## Changelog
 
+- v1.2.1: Fix: only distinct device IPs are transmitted
 - v1.2.0: Added device IP data (shown in the 'Request' tab in the Raygun dashboard)
 - v1.1.0: Add new user info properties, bump Gson to 2.2.4
 - v1.0.5: Guard against a spurious NullPointerException caused by the posting service
