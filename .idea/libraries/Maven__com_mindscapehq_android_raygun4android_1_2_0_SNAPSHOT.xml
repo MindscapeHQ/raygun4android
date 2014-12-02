@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="Maven: com.mindscapehq.android:raygun4android:1.2.0-SNAPSHOT">
+    <CLASSES />
+    <JAVADOC>
+      <root url="jar://$MAVEN_REPOSITORY$/com/mindscapehq/android/raygun4android/1.2.0-SNAPSHOT/raygun4android-1.2.0-SNAPSHOT-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/com/mindscapehq/android/raygun4android/1.2.0-SNAPSHOT/raygun4android-1.2.0-SNAPSHOT-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>
