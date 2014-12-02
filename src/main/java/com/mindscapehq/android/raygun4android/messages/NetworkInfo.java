@@ -34,14 +34,22 @@ public class NetworkInfo
 
             if (isIPv4)
             {
-              iPAddress.add(sAddr);
+              if (!iPAddress.contains(sAddr))
+              {
+                iPAddress.add(sAddr);
+              }
             }
             else
             {
               if (!isIPv4)
               {
                 int delim = sAddr.indexOf('%'); // drop ip6 port suffix
-                iPAddress.add(delim<0 ? sAddr : sAddr.substring(0, delim));
+                String delimited = delim < 0 ? sAddr : sAddr.substring(0, delim);
+
+                if (!iPAddress.contains(delimited))
+                {
+                  iPAddress.add(delimited);
+                }
               }
             }
           }
