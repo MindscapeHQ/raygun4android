@@ -28,5 +28,5 @@ public interface IRaygunMessageBuilder {
 
   IRaygunMessageBuilder SetUserContext(Context context);
 
-  IRaygunMessageBuilder SetNetworkInfo();
+  IRaygunMessageBuilder SetNetworkInfo(Context context);
 }

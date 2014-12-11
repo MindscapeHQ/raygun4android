@@ -21,9 +21,7 @@ import org.apache.http.protocol.HTTP;
 import java.io.*;
 import java.lang.Thread.UncaughtExceptionHandler;
 
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * User: Mindscape
@@ -39,11 +37,10 @@ public class RaygunClient
   private static String _appContextIdentifier;
   private static String _user;
   private static RaygunUserInfo _userInfo;
+  private static RaygunUncaughtExceptionHandler _handler;
 
-  public static String getApiKey()
-  {
-    return _apiKey;
-  }
+  private static List _tags;
+  private static Map _userCustomData;
 
   /**
    * Initializes the Raygun client. This expects that you have placed the API key in your
@@ -117,7 +114,9 @@ public class RaygunClient
     UncaughtExceptionHandler oldHandler = Thread.getDefaultUncaughtExceptionHandler();
     if (!(oldHandler instanceof RaygunUncaughtExceptionHandler))
     {
-      Thread.setDefaultUncaughtExceptionHandler(new RaygunUncaughtExceptionHandler(oldHandler));
+      _handler = new RaygunUncaughtExceptionHandler(oldHandler);
+
+      Thread.setDefaultUncaughtExceptionHandler(_handler);
     }
   }
 
@@ -126,14 +125,20 @@ public class RaygunClient
    * This automatically sends any exceptions that reaches it to the Raygun API.
    * @param tags A list of tags that relate to the calling application's currently build or state.
    *             These will be appended to all exception messages sent to Raygun.
+   * @deprecated Call AttachExceptionHandler(), then SetTags(List) instead
    */
+  @Deprecated
   public static void AttachExceptionHandler(List tags) {
     UncaughtExceptionHandler oldHandler = Thread.getDefaultUncaughtExceptionHandler();
     if (!(oldHandler instanceof RaygunUncaughtExceptionHandler))
     {
-      Thread.setDefaultUncaughtExceptionHandler(new RaygunUncaughtExceptionHandler(oldHandler, tags));
+      _handler = new RaygunUncaughtExceptionHandler(oldHandler, tags);
+
+      Thread.setDefaultUncaughtExceptionHandler(_handler);
     }
   }
+
+
 
   /**
    * Attaches a pre-built Raygun exception handler to the thread's DefaultUncaughtExceptionHandler.
@@ -143,12 +148,16 @@ public class RaygunClient
    * @param userCustomData A set of key-value pairs that will be attached to each exception message
    *                       sent to Raygun. This can contain any extra data relating to the calling
    *                       application's state you would like to see.
+   * @deprecated Call AttachExceptionHandler(), then SetUserCustomData(Map) instead
    */
+  @Deprecated
   public static void AttachExceptionHandler(List tags, Map userCustomData) {
     UncaughtExceptionHandler oldHandler = Thread.getDefaultUncaughtExceptionHandler();
     if (!(oldHandler instanceof RaygunUncaughtExceptionHandler))
     {
-      Thread.setDefaultUncaughtExceptionHandler(new RaygunUncaughtExceptionHandler(oldHandler, tags, userCustomData));
+      _handler = new RaygunUncaughtExceptionHandler(oldHandler, tags, userCustomData);
+
+      Thread.setDefaultUncaughtExceptionHandler(_handler);
     }
   }
 
@@ -160,6 +169,15 @@ public class RaygunClient
   {
     RaygunMessage msg = BuildMessage(throwable);
     postCachedMessages();
+
+    if (_tags != null) {
+      msg.getDetails().setTags(_tags);
+    }
+
+    if (_userCustomData != null) {
+      msg.getDetails().setUserCustomData(_userCustomData);
+    }
+
     spinUpService(_apiKey, new Gson().toJson(msg));
   }
 
@@ -172,7 +190,13 @@ public class RaygunClient
   public static void Send(Throwable throwable, List tags)
   {
     RaygunMessage msg = BuildMessage(throwable);
-    msg.getDetails().setTags(tags);
+
+    msg.getDetails().setTags(mergeTags(tags));
+
+    if (_userCustomData != null) {
+      msg.getDetails().setUserCustomData(_userCustomData);
+    }
+
     postCachedMessages();
     spinUpService(_apiKey, new Gson().toJson(msg));
   }
@@ -189,8 +213,10 @@ public class RaygunClient
   public static void Send(Throwable throwable, List tags, Map userCustomData)
   {
     RaygunMessage msg = BuildMessage(throwable);
-    msg.getDetails().setTags(tags);
-    msg.getDetails().setUserCustomData(userCustomData);
+
+    msg.getDetails().setTags(mergeTags(tags));
+    msg.getDetails().setUserCustomData(mergeUserCustomData(userCustomData));
+
     postCachedMessages();
     spinUpService(_apiKey, new Gson().toJson(msg));
   }
@@ -246,7 +272,7 @@ public class RaygunClient
           .SetClientDetails()
           .SetAppContext(_appContextIdentifier)
           .SetVersion(_version)
-          .SetNetworkInfo()
+          .SetNetworkInfo(_context)
           .Build();
 
       if (_version != null)
@@ -364,6 +390,28 @@ public class RaygunClient
       _context.startService(_service);
   }
 
+  private static List mergeTags(List paramTags) {
+    if (_tags != null) {
+      List merged = new ArrayList(_tags);
+      merged.addAll(paramTags);
+
+      return merged;
+    } else {
+      return paramTags;
+    }
+  }
+
+  private static Map mergeUserCustomData(Map paramUserCustomData) {
+    if (_userCustomData != null) {
+      Map merged = new HashMap(_userCustomData);
+      merged.putAll(paramUserCustomData);
+
+      return merged;
+    } else {
+      return paramUserCustomData;
+    }
+  }
+
   protected static String getExtension(String filename) {
     if (filename == null)
     {
@@ -418,7 +466,32 @@ public class RaygunClient
     }
   }
 
-  private static class RaygunUncaughtExceptionHandler implements Thread.UncaughtExceptionHandler
+  public static RaygunUncaughtExceptionHandler GetExceptionHandler() {
+    return _handler;
+  }
+
+  public static String getApiKey()
+  {
+    return _apiKey;
+  }
+
+  public static List GetTags() {
+    return _tags;
+  }
+
+  public static void SetTags(List tags) {
+    _tags = tags;
+  }
+
+  public static Map GetUserCustomData() {
+    return _userCustomData;
+  }
+
+  public static void SetUserCustomData(Map userCustomData) {
+    _userCustomData = userCustomData;
+  }
+
+  public static class RaygunUncaughtExceptionHandler implements Thread.UncaughtExceptionHandler
   {
     private UncaughtExceptionHandler _defaultHandler;
     private List _tags;
@@ -429,12 +502,14 @@ public class RaygunClient
       _defaultHandler = defaultHandler;
     }
 
+    @Deprecated
     public RaygunUncaughtExceptionHandler(UncaughtExceptionHandler defaultHandler, List tags)
     {
       _defaultHandler = defaultHandler;
       _tags = tags;
     }
 
+    @Deprecated
     public RaygunUncaughtExceptionHandler(UncaughtExceptionHandler defaultHandler, List tags, Map userCustomData)
     {
       _defaultHandler = defaultHandler;
@@ -444,7 +519,7 @@ public class RaygunClient
 
     @Override
     public void uncaughtException(Thread thread, Throwable throwable) {
-      if (_userCustomData != null && _tags != null)
+      if (_userCustomData != null)
       {
         RaygunClient.Send(throwable, _tags, _userCustomData);
       }

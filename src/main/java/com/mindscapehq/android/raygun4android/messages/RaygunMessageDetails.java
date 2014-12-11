@@ -104,8 +104,8 @@ public class RaygunMessageDetails {
     this.user = new RaygunUserContext(userInfo, context);
   }
 
-  public void setNetworkInfo()
+  public void setNetworkInfo(Context context)
   {
-    this.request = new NetworkInfo();
+    this.request = new NetworkInfo(context);
   }
 }
