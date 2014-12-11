@@ -80,9 +80,9 @@ public class RaygunMessageBuilder implements IRaygunMessageBuilder {
   }
 
   @Override
-  public IRaygunMessageBuilder SetNetworkInfo()
+  public IRaygunMessageBuilder SetNetworkInfo(Context context)
   {
-    _raygunMessage.getDetails().setNetworkInfo();
+    _raygunMessage.getDetails().setNetworkInfo(context);
     return this;
   }
 

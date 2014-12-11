@@ -272,7 +272,7 @@ public class RaygunClient
           .SetClientDetails()
           .SetAppContext(_appContextIdentifier)
           .SetVersion(_version)
-          .SetNetworkInfo()
+          .SetNetworkInfo(_context)
           .Build();
 
       if (_version != null)
