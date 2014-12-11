@@ -126,13 +126,9 @@ The following method overloads are available for initializing RaygunClient:
 
 	The first two read the API key from the application's AndroidManifest.xml. Whichever Context you pass in will have its API key read. If you want to specify your API key programmatically, use one of the latter two methods.
 
-The following methods are available for setting up a pre-made Uncaught Exception Handler, which will automatically send an exception when one reaches it (ie. just before your app crashes):
+The following method is available for setting up a pre-made Uncaught Exception Handler, which will automatically send an exception when one reaches it (ie. just before your app crashes):
 
 * RaygunClient.AttachExceptionHandler()
-
-* RaygunClient.AttachExceptionHandler(List tags)
-
-* RaygunClient.AttachExceptionHandler(List tags, Map userCustomData)
 
 	The tags and custom data will be attached to all exceptions that reaches it. This allows you to automatically send crash data when your app crashes.
 
@@ -162,6 +158,14 @@ The following misc methods are available:
 
 	Stores the version of your application manually. Normally, this is automatically read from AndroidManifest (the versionName attribute on <manifest>) and is provided as a convenience.
 
+* RaygunnClient.SetTags(List tags)
+
+  Sets a list of tags which will be sent along with every exception. This will be merged with any other tags passed as the second param of Send().
+
+* RaygunnClient.SetUserCustomData(Map userCustomData)
+
+  Sets a key-value Map which, like the tags above, will be sent along with every exception. This will be merged with any other tags passed as the third param of Send().
+
 ### Frequently Asked Questions
 
 * Is there an example project?
@@ -184,9 +188,9 @@ The following misc methods are available:
 
 Clone this repository, then run `mvn install` to grab the dependencies and install the library to your local Maven repo. Issues and pull requests are welcome.
 
-
 ## Changelog
 
+- v1.3.0: Added RaygunClient.SetTags() and SetUserCustomData() to provide objects that will be attached to all exceptions
 - v1.2.1: Fix: only distinct device IPs are transmitted
 - v1.2.0: Added device IP data (shown in the 'Request' tab in the Raygun dashboard)
 - v1.1.0: Add new user info properties, bump Gson to 2.2.4
