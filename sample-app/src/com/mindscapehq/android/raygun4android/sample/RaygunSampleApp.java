@@ -23,8 +23,14 @@ public class RaygunSampleApp extends Activity {
     requestWindowFeature(Window.FEATURE_NO_TITLE);
     setContentView(R.layout.main);
 
+    Map initialCustomData = new HashMap();
+
+    initialCustomData.put("firstkey", "firstvalue");
+
     RaygunClient.Init(getApplicationContext()); // This sets up the client with the API key as provided in your AndroidManifest.xml
     RaygunClient.AttachExceptionHandler();      // This attaches a pre-made exception handler to catch all uncaught exceptions, and send them to Raygun
+
+    RaygunClient.SetUserCustomData(initialCustomData);
 
     final Button button = (Button) findViewById(R.id.button);
     button.setOnClickListener(new View.OnClickListener() {
@@ -36,8 +42,13 @@ public class RaygunSampleApp extends Activity {
         user.Uuid = "a uuid";
         user.IsAnonymous = false;
 
+        Map tw = new HashMap();
+
+        tw.put("secondkey", "secondvalue");
+
         RaygunClient.SetUser(user);
-        RaygunClient.Send(new Exception("Congratulations, you have sent errors with Raygun4Android")); // Example 1: Manual exception creation & sending
+        RaygunClient.Send(new Exception("Congratulations, you have sent errors with Raygun4Android"), null, tw); // Example 1: Manual exception creation & sending
+
 
         int i = 3 / 0;                          // Example 2: A real exception will be thrown here, which will be caught & sent by RaygunClient
       }
