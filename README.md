@@ -184,13 +184,15 @@ The following misc methods are available:
 
 	Raygun4Android will save the exception message to disk. When the provider is later asked to send another message it will check if the internet is now available, and if it is, send the cached messages. A maximum of 64 messages will be cached, then overwritten (using a LRU strategy).
 
+  The provider now attaches the device's network connectivity state to the payload when the exception occurs. This is visible under the Request tab in the Raygun dashboard.
+
 ### Contributing
 
 Clone this repository, then run `mvn install` to grab the dependencies and install the library to your local Maven repo. Issues and pull requests are welcome.
 
 ## Changelog
 
-- v1.3.0: Added RaygunClient.SetTags() and SetUserCustomData() to provide objects that will be attached to all exceptions
+- v1.3.0: Provide device network connectivity state under Request section; aAdded RaygunClient.SetTags() and SetUserCustomData() to provide objects that will be attached to all exceptions
 - v1.2.1: Fix: only distinct device IPs are transmitted
 - v1.2.0: Added device IP data (shown in the 'Request' tab in the Raygun dashboard)
 - v1.1.0: Add new user info properties, bump Gson to 2.2.4
