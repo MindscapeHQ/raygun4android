@@ -82,7 +82,7 @@ For a usage example, check out the application in /sample-app.
 
 ## Documentation
 
-### Unique user tracking
+### Affected user tracking
 
 Raygun supports tracking the unique users who encounter bugs in your apps.
 
