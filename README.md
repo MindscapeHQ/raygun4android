@@ -14,7 +14,7 @@ To your pom.xml, add:
 <dependency>
     <groupId>com.mindscapehq.android</groupId>
     <artifactId>raygun4android</artifactId>
-    <version>1.1.0</version>
+    <version>1.3.0</version>
 </dependency>
 ```
 
@@ -32,8 +32,7 @@ repositories {
 dependencies {
 	...
 	compile 'com.google.code.gson:gson:2.1'
-	compile 'com.mindscapehq.android:raygun4android:1.2.0'
-	compile 'com.mindscapehq.android:raygun4android:1.2.0:sources'
+	compile 'com.mindscapehq.android:raygun4android:1.3.0:sources'
 }
 ```
 
