@@ -3,8 +3,8 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.mindscapehq.android</groupId>
     <artifactId>raygun4android</artifactId>
-    <version>1.3.1-SNAPSHOT</version>
-    <packaging>apk</packaging>
+    <version>2.0.0-SNAPSHOT</version>
+    <packaging>aar</packaging>
     <name>Raygun4Android</name>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -52,15 +52,6 @@
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.1</version>
-                <configuration>
-                    <source>6</source>
-                    <target>6</target>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
                 <version>2.2.1</version>
                 <executions>
@@ -73,13 +64,21 @@
                 </executions>
             </plugin>
             <plugin>
-                <groupId>com.jayway.maven.plugins.android.generation2</groupId>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <version>1.10</version>
+            </plugin>
+            <plugin>
+                <groupId>com.simpligility.maven.plugins</groupId>
                 <artifactId>android-maven-plugin</artifactId>
+                <version>4.3.0</version>
                 <extensions>true</extensions>
-                <version>3.6.1</version>
                 <configuration>
+                    <sign>
+                        <debug>false</debug>
+                    </sign>
                     <sdk>
-                        <platform>8</platform>
+                        <platform>9</platform>
                     </sdk>
                 </configuration>
             </plugin>

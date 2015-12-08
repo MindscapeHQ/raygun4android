@@ -1,5 +1,11 @@
 package main.java.com.mindscapehq.android.raygun4android;
 
+import java.io.*;
+import java.lang.Thread.UncaughtExceptionHandler;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.*;
+
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -12,21 +18,14 @@ import android.util.Log;
 import com.google.gson.Gson;
 import main.java.com.mindscapehq.android.raygun4android.messages.RaygunMessage;
 import main.java.com.mindscapehq.android.raygun4android.messages.RaygunUserInfo;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.protocol.HTTP;
-
-import java.io.*;
-import java.lang.Thread.UncaughtExceptionHandler;
-
-import java.util.*;
 
 /**
  * User: Mindscape
  * The official Raygun provider for Android. This is the main class that provides functionality
  * for automatically sending exceptions to the Raygun service.
+ *
+ * You should call Init() on the static RaygunClient instance, passing in the current Context,
+ * instead of instantiating this class.
  */
 public class RaygunClient
 {
@@ -234,17 +233,21 @@ public class RaygunClient
     {
       if (validateApiKey(apiKey))
       {
-        DefaultHttpClient client = new DefaultHttpClient();
-        HttpPost post = new HttpPost(RaygunSettings.getSettings().getApiEndpoint());
-        post.addHeader("X-ApiKey", apiKey);
-        post.addHeader("Content-Type", "application/json");
+        URL endpoint = new URL(RaygunSettings.getSettings().getApiEndpoint());
+        HttpURLConnection connection = (HttpURLConnection) endpoint.openConnection();
 
-        StringEntity se = new StringEntity(jsonPayload.toString(), HTTP.UTF_8);
-        post.setEntity(se);
-        HttpResponse response = client.execute(post);
-        int result = response.getStatusLine().getStatusCode();
-        Log.d("Raygun4Android", "Exception message HTTP POST result: " + result);
-        return result;
+        connection.setRequestMethod("POST");
+        connection.setRequestProperty("X-ApiKey", apiKey);
+        connection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+
+        OutputStream outputStream = connection.getOutputStream();
+        outputStream.write(jsonPayload.toString().getBytes("UTF-8"));
+        outputStream.close();
+
+        int responseCode = connection.getResponseCode();
+        Log.d("Raygun4Android", "Exception message HTTP POST result: " + responseCode);
+
+        return responseCode;
       }
     }
     catch (Exception e)

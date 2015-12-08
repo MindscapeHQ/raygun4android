@@ -2,9 +2,40 @@
 
 The world's best Android crash and exception reporter.
 
-Supports Android 2.3.1 (API 9) and above
+Supports Android 2.3.1 (API 9 Gingerbread) through Android 6+
 
 ## Installation
+
+### With Android Studio and Gradle
+
+Ensure Maven Central is present in your **project's** build.gradle:
+
+```
+allprojects {
+    repositories {
+        mavenCentral()
+    }
+}
+```
+
+Then add the following to your **module's** build.gradle:
+
+```
+dependencies {
+	...
+	compile 'com.google.code.gson:gson:2.1'
+	compile 'com.mindscapehq.android:raygun4android:2.0.0'
+}
+```
+
+You may need to add the following specific imports to your class, where you wish to use RaygunClient:
+
+```java
+import main.java.com.mindscapehq.android.raygun4android.RaygunClient;
+import main.java.com.mindscapehq.android.raygun4android.messages.RaygunUserInfo;
+```
+
+Then see the configuration section below.
 
 ### With Maven
 
@@ -14,34 +45,11 @@ To your pom.xml, add:
 <dependency>
     <groupId>com.mindscapehq.android</groupId>
     <artifactId>raygun4android</artifactId>
-    <version>1.3.0</version>
+    <version>2.0.0</version>
 </dependency>
 ```
 
 In your IDE, build your project (or run `mvn compile`), then see the configuration section below.
-
-### With Gradle
-
-To a build.gradle file, add:
-
-```
-repositories {
-	...
-	mavenCentral()
-}
-dependencies {
-	...
-	compile 'com.google.code.gson:gson:2.1'
-	compile 'com.mindscapehq.android:raygun4android:1.3.0:sources'
-}
-```
-
-After syncing the Raygun package will be accessible to import. For Gradle, you may need to add the following specific imports to your class, where you wish to use RaygunClient:
-
-```java
-import main.java.com.mindscapehq.android.raygun4android.RaygunClient;
-import main.java.com.mindscapehq.android.raygun4android.messages.RaygunUserInfo;
-```
 
 ### With Ant, other build tools, or manually
 
@@ -191,6 +199,7 @@ Clone this repository, then run `mvn install` to grab the dependencies and insta
 
 ## Changelog
 
+- v2.0.0: Replace deprecated Apache HTTP library with HttpUrlConnection; change packaging format to AAR for Android Studio/Gradle compatibility
 - v1.3.0: Provide device network connectivity state under Request section; aAdded RaygunClient.SetTags() and SetUserCustomData() to provide objects that will be attached to all exceptions
 - v1.2.1: Fix: only distinct device IPs are transmitted
 - v1.2.0: Added device IP data (shown in the 'Request' tab in the Raygun dashboard)
