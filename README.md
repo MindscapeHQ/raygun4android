@@ -119,6 +119,62 @@ This was upgraded in 1.1, previously a SetUser(string) method was available - th
 
 Set the versionName attribute on <manifest> in your AndroidManifest.xml to be of the form x.x.x.x, where x is a positive integer, and it will be sent with each message. You can then filter by version in the Raygun dashboard.
 
+### Getting/setting/cancelling the error before it is sent
+
+This provider has an OnBeforeSend API to support accessing or mutating the candidate error payload immediately before it is sent, or cancelling the send outright. This is provided as the public method `RaygunClient.SetOnBeforeSend(RaygunOnBeforeSend)`, which takes an instance of a class that implements the `RaygunOnBeforeSend` interface. Your class needs a public `OnBeforeSend` method that takes a `RaygunMessage` parameter, and returns the same.
+
+By example:
+
+```java
+class BeforeSendImplementation implements RaygunOnBeforeSend {
+    @Override
+    public RaygunMessage OnBeforeSend(RaygunMessage message) {
+        Log.i("OnBeforeSend", "About to post to Raygun, returning the payload as is...");
+        return message;
+    }
+}
+
+
+public class FullscreenActivity extends Activity {
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        // Initialize the activity as normal
+
+        RaygunClient.Init(getApplicationContext());
+        RaygunClient.AttachExceptionHandler();
+        RaygunClient.SetOnBeforeSend(new BeforeSendImplementation());
+    }
+}
+```
+
+In the example above, the overridden `OnBeforeSend` method will log an info message every time an error is sent.
+
+To mutate the error payload, for instance to change the message:
+
+```java
+@Override
+public RaygunMessage OnBeforeSend(RaygunMessage message) {
+    Log.i("OnBeforeSend", "Changing the message...");
+
+    RaygunMessageDetails details = message.getDetails();
+    RaygunErrorMessage error = details.getError();
+    error.setMessage("Mutated message");
+
+    return message;
+}
+```
+
+To cancel the send (prevent the error from reaching the Raygun dashboard) by returning null:
+
+```java
+@Override
+public RaygunMessage OnBeforeSend(RaygunMessage message) {
+    Log.i("OnBeforeSend", "Cancelling sending message to Raygun...");
+
+    return null;
+}
+```
+
 ### API
 
 The following method overloads are available for initializing RaygunClient:
@@ -165,13 +221,17 @@ The following misc methods are available:
 
 	Stores the version of your application manually. Normally, this is automatically read from AndroidManifest (the versionName attribute on <manifest>) and is provided as a convenience.
 
-* RaygunnClient.SetTags(List tags)
+* RaygunClient.SetTags(List tags)
 
   Sets a list of tags which will be sent along with every exception. This will be merged with any other tags passed as the second param of Send().
 
-* RaygunnClient.SetUserCustomData(Map userCustomData)
+* RaygunClient.SetUserCustomData(Map userCustomData)
 
   Sets a key-value Map which, like the tags above, will be sent along with every exception. This will be merged with any other tags passed as the third param of Send().
+
+* RaygunClient.SetOnBeforeSend(RaygunOnBeforeSend onBeforeSendImplementation)
+
+  Provides an instance of a class which has an OnBeforeSend method that can be used to inspect, mutate or cancel the send to the Raygun API immediately before it happens. Can be used to filter arbitrary data.
 
 ### Frequently Asked Questions
 
@@ -199,6 +259,7 @@ Clone this repository, then run `mvn install` to grab the dependencies and insta
 
 ## Changelog
 
+- v2.1.0: Add OnBeforeSend implementation
 - v2.0.0: Replace deprecated Apache HTTP library with HttpUrlConnection; change packaging format to AAR for Android Studio/Gradle compatibility
 - v1.3.0: Provide device network connectivity state under Request section; aAdded RaygunClient.SetTags() and SetUserCustomData() to provide objects that will be attached to all exceptions
 - v1.2.1: Fix: only distinct device IPs are transmitted
