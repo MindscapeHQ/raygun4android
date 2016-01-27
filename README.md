@@ -24,7 +24,7 @@ Then add the following to your **module's** build.gradle:
 dependencies {
 	...
 	compile 'com.google.code.gson:gson:2.1'
-	compile 'com.mindscapehq.android:raygun4android:2.0.0'
+	compile 'com.mindscapehq.android:raygun4android:2.1.0'
 }
 ```
 
@@ -45,7 +45,7 @@ To your pom.xml, add:
 <dependency>
     <groupId>com.mindscapehq.android</groupId>
     <artifactId>raygun4android</artifactId>
-    <version>2.0.0</version>
+    <version>2.1.0</version>
 </dependency>
 ```
 
