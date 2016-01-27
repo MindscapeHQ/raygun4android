@@ -7,6 +7,7 @@ import java.util.Map;
 
 public class RaygunMessageDetails {
 
+  private String groupingKey;
   private String machineName;
   private String version = "Not supplied";
   private RaygunErrorMessage error;
@@ -108,4 +109,6 @@ public class RaygunMessageDetails {
   {
     this.request = new NetworkInfo(context);
   }
+
+  public void setGroupingKey(String groupingKey) { this.groupingKey = groupingKey; }
 }

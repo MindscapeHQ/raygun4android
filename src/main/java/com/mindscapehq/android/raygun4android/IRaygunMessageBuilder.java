@@ -29,4 +29,6 @@ public interface IRaygunMessageBuilder {
   IRaygunMessageBuilder SetUserContext(Context context);
 
   IRaygunMessageBuilder SetNetworkInfo(Context context);
+
+  IRaygunMessageBuilder SetGroupingKey(String groupingKey);
 }

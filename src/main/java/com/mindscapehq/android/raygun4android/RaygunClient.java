@@ -37,6 +37,7 @@ public class RaygunClient
   private static String _user;
   private static RaygunUserInfo _userInfo;
   private static RaygunUncaughtExceptionHandler _handler;
+  private static RaygunOnBeforeSend _onBeforeSend;
 
   private static List _tags;
   private static Map _userCustomData;
@@ -177,6 +178,14 @@ public class RaygunClient
       msg.getDetails().setUserCustomData(_userCustomData);
     }
 
+    if (_onBeforeSend != null) {
+      msg = _onBeforeSend.OnBeforeSend(msg);
+
+      if (msg == null) {
+        return;
+      }
+    }
+
     spinUpService(_apiKey, new Gson().toJson(msg));
   }
 
@@ -194,6 +203,14 @@ public class RaygunClient
 
     if (_userCustomData != null) {
       msg.getDetails().setUserCustomData(_userCustomData);
+    }
+
+    if (_onBeforeSend != null) {
+      msg = _onBeforeSend.OnBeforeSend(msg);
+
+      if (msg == null) {
+        return;
+      }
     }
 
     postCachedMessages();
@@ -215,6 +232,14 @@ public class RaygunClient
 
     msg.getDetails().setTags(mergeTags(tags));
     msg.getDetails().setUserCustomData(mergeUserCustomData(userCustomData));
+
+    if (_onBeforeSend != null) {
+      msg = _onBeforeSend.OnBeforeSend(msg);
+
+      if (msg == null) {
+        return;
+      }
+    }
 
     postCachedMessages();
     spinUpService(_apiKey, new Gson().toJson(msg));
@@ -493,6 +518,8 @@ public class RaygunClient
   public static void SetUserCustomData(Map userCustomData) {
     _userCustomData = userCustomData;
   }
+
+  public static void SetOnBeforeSend(RaygunOnBeforeSend onBeforeSend) { _onBeforeSend = onBeforeSend; }
 
   public static class RaygunUncaughtExceptionHandler implements Thread.UncaughtExceptionHandler
   {
