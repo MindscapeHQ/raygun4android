@@ -86,9 +86,12 @@ public class RaygunMessageBuilder implements IRaygunMessageBuilder {
     return this;
   }
 
+  public IRaygunMessageBuilder SetGroupingKey(String groupingKey) {
+    _raygunMessage.getDetails().setGroupingKey(groupingKey);
+    return this;
+  }
+
   public static RaygunMessageBuilder New() {
     return new RaygunMessageBuilder();
   }
-
-
 }
