@@ -180,6 +180,10 @@ public class RaygunClient
 
     if (_onBeforeSend != null) {
       msg = _onBeforeSend.OnBeforeSend(msg);
+
+      if (msg == null) {
+        return;
+      }
     }
 
     spinUpService(_apiKey, new Gson().toJson(msg));
@@ -203,6 +207,10 @@ public class RaygunClient
 
     if (_onBeforeSend != null) {
       msg = _onBeforeSend.OnBeforeSend(msg);
+
+      if (msg == null) {
+        return;
+      }
     }
 
     postCachedMessages();
@@ -227,6 +235,10 @@ public class RaygunClient
 
     if (_onBeforeSend != null) {
       msg = _onBeforeSend.OnBeforeSend(msg);
+
+      if (msg == null) {
+        return;
+      }
     }
 
     postCachedMessages();
