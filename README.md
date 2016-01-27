@@ -175,6 +175,22 @@ public RaygunMessage OnBeforeSend(RaygunMessage message) {
 }
 ```
 
+### Custom error grouping
+
+You can override Raygun's default grouping logic for Android exceptions by setting the grouping key manually in OnBeforeSend (see above):
+
+```java
+@Override
+public RaygunMessage OnBeforeSend(RaygunMessage message) {
+    RaygunMessageDetails details = message.getDetails();
+    details.setGroupingKey("foo");
+
+    return message;
+}
+```
+
+Any error instances with a certain key will be grouped together. The example above will place all errors within one group (as the key is hardcoded to 'foo'). The grouping key is a String and must be between 1 and 100 characters long. You should send all data you care about (for instance, parts of the exception message, stacktrace frames, class names etc) to a hash function (for instance MD5), then pass that to `setGroupingKey`.
+
 ### API
 
 The following method overloads are available for initializing RaygunClient:
@@ -233,6 +249,10 @@ The following misc methods are available:
 
   Provides an instance of a class which has an OnBeforeSend method that can be used to inspect, mutate or cancel the send to the Raygun API immediately before it happens. Can be used to filter arbitrary data.
 
+* RaygunMessageDetails.setGroupingKey(String groupingKey)
+
+  Provides a way to override the default grouping algorithm (see above for details). Any error instances with this key will be grouped together.
+
 ### Frequently Asked Questions
 
 * Is there an example project?
@@ -259,7 +279,7 @@ Clone this repository, then run `mvn install` to grab the dependencies and insta
 
 ## Changelog
 
-- v2.1.0: Add OnBeforeSend implementation
+- v2.1.0: Add OnBeforeSend implementation; expose setGroupingKey
 - v2.0.0: Replace deprecated Apache HTTP library with HttpUrlConnection; change packaging format to AAR for Android Studio/Gradle compatibility
 - v1.3.0: Provide device network connectivity state under Request section; aAdded RaygunClient.SetTags() and SetUserCustomData() to provide objects that will be attached to all exceptions
 - v1.2.1: Fix: only distinct device IPs are transmitted
