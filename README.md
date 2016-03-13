@@ -64,12 +64,18 @@ In your IDE, build your project (or run `mvn compile`), then see the configurati
 	<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 	```
 
-2. Inside the **application** element, add:
+2. Inside the **<application>** element, add:
 
 	```xml
 	<service   android:name="main.java.com.mindscapehq.android.raygun4android.RaygunPostService"
 	           android:exported="false"
 	           android:process=":raygunpostservice"/>
+    <receiver  android:name="main.java.com.mindscapehq.android.raygun4android.OnPackageReplaced"
+               android:exported="false">
+        <intent-filter>
+            <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+        </intent-filter>
+    </receiver>
 	<meta-data android:name="com.mindscapehq.android.raygun4android.apikey"
 	           android:value="PASTE_YOUR_API_KEY_HERE" />
 	```
