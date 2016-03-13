@@ -9,7 +9,7 @@ public class RaygunClientMessage {
   public RaygunClientMessage()
   {
     setName("Raygun4Android");
-    setVersion("2.0.0.0");
+    setVersion("2.1.1.0");
     setClientUrl("https://github.com/MindscapeHQ/raygun4android");
   }
 

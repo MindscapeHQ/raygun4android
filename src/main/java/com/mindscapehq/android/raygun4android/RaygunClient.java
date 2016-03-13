@@ -285,8 +285,12 @@ public class RaygunClient
 
   private static boolean hasInternetConnection()
   {
-    ConnectivityManager cm = (ConnectivityManager) _context.getSystemService(Context.CONNECTIVITY_SERVICE);
-    return cm.getActiveNetworkInfo() != null && cm.getActiveNetworkInfo().isConnectedOrConnecting();
+    if (_context != null) {
+      ConnectivityManager cm = (ConnectivityManager) _context.getSystemService(Context.CONNECTIVITY_SERVICE);
+      return cm.getActiveNetworkInfo() != null && cm.getActiveNetworkInfo().isConnectedOrConnecting();
+    }
+
+    return false;
   }
 
   private static RaygunMessage BuildMessage(Throwable throwable)
@@ -416,6 +420,15 @@ public class RaygunClient
       intent.putExtra("apikey", apiKey);
       _service = intent;
       _context.startService(_service);
+  }
+
+  public static void closePostService()
+  {
+    if (_service != null)
+    {
+      _context.stopService(_service);
+      _service = null;
+    }
   }
 
   private static List mergeTags(List paramTags) {

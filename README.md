@@ -64,12 +64,18 @@ In your IDE, build your project (or run `mvn compile`), then see the configurati
 	<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 	```
 
-2. Inside the **application** element, add:
+2. Inside the **<application>** element, add:
 
 	```xml
 	<service   android:name="main.java.com.mindscapehq.android.raygun4android.RaygunPostService"
 	           android:exported="false"
 	           android:process=":raygunpostservice"/>
+    <receiver  android:name="main.java.com.mindscapehq.android.raygun4android.OnPackageReplaced"
+               android:exported="false">
+        <intent-filter>
+            <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+        </intent-filter>
+    </receiver>
 	<meta-data android:name="com.mindscapehq.android.raygun4android.apikey"
 	           android:value="PASTE_YOUR_API_KEY_HERE" />
 	```
@@ -279,6 +285,7 @@ Clone this repository, then run `mvn install` to grab the dependencies and insta
 
 ## Changelog
 
+- v2.1.1: Added MY_PACKAGE_REPLACED intent receiver and guard against spurious null Context seen on some devices when checking net connection
 - v2.1.0: Add OnBeforeSend implementation; expose setGroupingKey
 - v2.0.0: Replace deprecated Apache HTTP library with HttpUrlConnection; change packaging format to AAR for Android Studio/Gradle compatibility
 - v1.3.0: Provide device network connectivity state under Request section; aAdded RaygunClient.SetTags() and SetUserCustomData() to provide objects that will be attached to all exceptions
