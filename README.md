@@ -279,6 +279,7 @@ Clone this repository, then run `mvn install` to grab the dependencies and insta
 
 ## Changelog
 
+- v2.1.1: Added MY_PACKAGE_REPLACED intent receiver and guard against spurious null Context seen on some devices when checking net connection
 - v2.1.0: Add OnBeforeSend implementation; expose setGroupingKey
 - v2.0.0: Replace deprecated Apache HTTP library with HttpUrlConnection; change packaging format to AAR for Android Studio/Gradle compatibility
 - v1.3.0: Provide device network connectivity state under Request section; aAdded RaygunClient.SetTags() and SetUserCustomData() to provide objects that will be attached to all exceptions
