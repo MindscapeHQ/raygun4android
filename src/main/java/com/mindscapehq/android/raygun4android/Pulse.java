@@ -103,6 +103,6 @@ public class Pulse implements ActivityLifecycleCallbacks {
   }
 
   private static String getActivityName(Activity activity) {
-    return activity.getClass().getName();
+    return activity.getClass().getSimpleName();
   }
 }

@@ -23,6 +23,7 @@ import main.java.com.mindscapehq.android.raygun4android.messages.RaygunPulseData
 import main.java.com.mindscapehq.android.raygun4android.messages.RaygunPulseDataMessage;
 import main.java.com.mindscapehq.android.raygun4android.messages.RaygunPulseMessage;
 import main.java.com.mindscapehq.android.raygun4android.messages.RaygunPulseTimingMessage;
+import main.java.com.mindscapehq.android.raygun4android.messages.RaygunUserContext;
 import main.java.com.mindscapehq.android.raygun4android.messages.RaygunUserInfo;
 
 /**
@@ -335,8 +336,11 @@ public class RaygunClient
     dataMessage.setVersion(_version);
     dataMessage.setOS("Android");
     dataMessage.setOSVersion(Build.VERSION.RELEASE);
-    dataMessage.setPlatform(String.format("{0} {1}", Build.MANUFACTURER, Build.MODEL));
+    dataMessage.setPlatform(String.format("%s %s", Build.MANUFACTURER, Build.MODEL));
     dataMessage.setType("mobile_event_timing");
+
+    RaygunUserContext userContext = _userInfo == null ? new RaygunUserContext(new RaygunUserInfo(null, null, null, null, null, true), _context) : new RaygunUserContext(_userInfo, _context);
+    dataMessage.setUser(userContext);
 
     RaygunPulseData data = new RaygunPulseData();
     RaygunPulseTimingMessage timingMessage = new RaygunPulseTimingMessage();

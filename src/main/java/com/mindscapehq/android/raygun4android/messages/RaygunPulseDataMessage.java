@@ -4,7 +4,7 @@ public class RaygunPulseDataMessage {
   private String sessionId;
   private String timestamp;
   private String type;
-  private RaygunUserInfo user;
+  private RaygunUserContext user;
   private String version;
   private String os;
   private String osVersion;
@@ -35,11 +35,11 @@ public class RaygunPulseDataMessage {
     this.type = type;
   }
 
-  public RaygunUserInfo getUser() {
+  public RaygunUserContext getUser() {
     return user;
   }
 
-  public void setUser(RaygunUserInfo user) {
+  public void setUser(RaygunUserContext user) {
     this.user = user;
   }
 
