@@ -4,8 +4,10 @@ import java.io.*;
 import java.lang.Thread.UncaughtExceptionHandler;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
+import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -17,6 +19,8 @@ import android.os.Bundle;
 import android.util.Log;
 import com.google.gson.Gson;
 import main.java.com.mindscapehq.android.raygun4android.messages.RaygunMessage;
+import main.java.com.mindscapehq.android.raygun4android.messages.RaygunPulseDataMessage;
+import main.java.com.mindscapehq.android.raygun4android.messages.RaygunPulseMessage;
 import main.java.com.mindscapehq.android.raygun4android.messages.RaygunUserInfo;
 
 /**
@@ -138,7 +142,12 @@ public class RaygunClient
     }
   }
 
-
+  /**
+   * Attaches the Raygun Pulse feature which will automatically report session and view events.
+   */
+  public static void AttachPulse(Activity activity) {
+    Pulse.Attach(activity);
+  }
 
   /**
    * Attaches a pre-built Raygun exception handler to the thread's DefaultUncaughtExceptionHandler.
@@ -186,7 +195,7 @@ public class RaygunClient
       }
     }
 
-    spinUpService(_apiKey, new Gson().toJson(msg));
+    spinUpService(_apiKey, new Gson().toJson(msg), false);
   }
 
   /**
@@ -214,7 +223,7 @@ public class RaygunClient
     }
 
     postCachedMessages();
-    spinUpService(_apiKey, new Gson().toJson(msg));
+    spinUpService(_apiKey, new Gson().toJson(msg), false);
   }
 
   /**
@@ -242,7 +251,7 @@ public class RaygunClient
     }
 
     postCachedMessages();
-    spinUpService(_apiKey, new Gson().toJson(msg));
+    spinUpService(_apiKey, new Gson().toJson(msg), false);
   }
 
   /**
@@ -271,6 +280,58 @@ public class RaygunClient
 
         int responseCode = connection.getResponseCode();
         Log.d("Raygun4Android", "Exception message HTTP POST result: " + responseCode);
+
+        return responseCode;
+      }
+    }
+    catch (Exception e)
+    {
+      Log.e("Raygun4Android", "Couldn't post exception - " + e.getMessage());
+      e.printStackTrace();
+    }
+    return -1;
+  }
+
+  private static String _sessionId;
+
+  protected static void SendPulseEvent(String name) {
+    RaygunPulseMessage message = new RaygunPulseMessage();
+    RaygunPulseDataMessage pulseData = new RaygunPulseDataMessage();
+
+    SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+    df.setTimeZone(TimeZone.getTimeZone("UTC"));
+    String timestamp = df.format(Calendar.getInstance().getTime());
+    pulseData.setTimestamp(timestamp);
+    pulseData.setVersion(_version);
+
+    _sessionId = "0F5B";
+    pulseData.setSessionId(_sessionId);
+    pulseData.setType("session_start");
+
+    message.setEventData(new RaygunPulseDataMessage[]{pulseData});
+
+    spinUpService(_apiKey, new Gson().toJson(message), true);
+  }
+
+  protected static int PostPulseMessage(String apiKey, String jsonPayload)
+  {
+    try
+    {
+      if (validateApiKey(apiKey))
+      {
+        URL endpoint = new URL(RaygunSettings.getSettings().getPulseEndpoint());
+        HttpURLConnection connection = (HttpURLConnection) endpoint.openConnection();
+
+        connection.setRequestMethod("POST");
+        connection.setRequestProperty("X-ApiKey", apiKey);
+        connection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+
+        OutputStream outputStream = connection.getOutputStream();
+        outputStream.write(jsonPayload.toString().getBytes("UTF-8"));
+        outputStream.close();
+
+        int responseCode = connection.getResponseCode();
+        Log.d("Raygun4Android", "Pulse HTTP POST result: " + responseCode);
 
         return responseCode;
       }
@@ -379,7 +440,7 @@ public class RaygunClient
             {
               ois = new ObjectInputStream(new FileInputStream(f));
               MessageApiKey messageApiKey = (MessageApiKey) ois.readObject();
-              spinUpService(messageApiKey.apiKey, messageApiKey.message);
+              spinUpService(messageApiKey.apiKey, messageApiKey.message, false);
               f.delete();
             }
             finally
@@ -402,8 +463,9 @@ public class RaygunClient
     }
   }
 
-  private static void spinUpService(String apiKey, String jsonPayload)
+  private static void spinUpService(String apiKey, String jsonPayload, boolean isPulse)
   {
+    System.out.println(jsonPayload);
       Intent intent;
       if (_service == null)
       {
@@ -418,6 +480,7 @@ public class RaygunClient
       }
       intent.putExtra("msg", jsonPayload);
       intent.putExtra("apikey", apiKey);
+      intent.putExtra("isPulse", isPulse ? "True" : "False");
       _service = intent;
       _context.startService(_service);
   }
