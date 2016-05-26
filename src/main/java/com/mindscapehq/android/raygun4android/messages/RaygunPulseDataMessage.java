@@ -71,7 +71,7 @@ public class RaygunPulseDataMessage {
     return platform;
   }
 
-  public void setPlatform() {
+  public void setPlatform(String platform) {
     this.platform = platform;
   }
 

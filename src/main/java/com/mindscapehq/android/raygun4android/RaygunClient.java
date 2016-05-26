@@ -19,8 +19,10 @@ import android.os.Bundle;
 import android.util.Log;
 import com.google.gson.Gson;
 import main.java.com.mindscapehq.android.raygun4android.messages.RaygunMessage;
+import main.java.com.mindscapehq.android.raygun4android.messages.RaygunPulseData;
 import main.java.com.mindscapehq.android.raygun4android.messages.RaygunPulseDataMessage;
 import main.java.com.mindscapehq.android.raygun4android.messages.RaygunPulseMessage;
+import main.java.com.mindscapehq.android.raygun4android.messages.RaygunPulseTimingMessage;
 import main.java.com.mindscapehq.android.raygun4android.messages.RaygunUserInfo;
 
 /**
@@ -312,6 +314,43 @@ public class RaygunClient
     pulseData.setType(name);
 
     message.setEventData(new RaygunPulseDataMessage[]{pulseData});
+
+    spinUpService(_apiKey, new Gson().toJson(message), true);
+  }
+
+  protected static void SendPulsePageTimingEvent(String name, double duration) {
+    if(_sessionId == null) {
+      SendPulseEvent("session_start");
+    }
+
+    RaygunPulseMessage message = new RaygunPulseMessage();
+    RaygunPulseDataMessage dataMessage = new RaygunPulseDataMessage();
+
+    SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+    df.setTimeZone(TimeZone.getTimeZone("UTC"));
+    String timestamp = df.format(Calendar.getInstance().getTime());
+
+    dataMessage.setTimestamp(timestamp);
+    dataMessage.setSessionId(_sessionId);
+    dataMessage.setVersion(_version);
+    dataMessage.setOS("Android");
+    dataMessage.setOSVersion(Build.VERSION.RELEASE);
+    dataMessage.setPlatform(String.format("{0} {1}", Build.MANUFACTURER, Build.MODEL));
+    dataMessage.setType("mobile_event_timing");
+
+    RaygunPulseData data = new RaygunPulseData();
+    RaygunPulseTimingMessage timingMessage = new RaygunPulseTimingMessage();
+    timingMessage.setType("p");
+    timingMessage.setDuration(duration);
+    data.setName(name);
+    data.setTiming(timingMessage);
+
+    RaygunPulseData[] dataArray = new RaygunPulseData[1];
+    dataArray[0] = data;
+    String dataStr = new Gson().toJson(dataArray);
+    dataMessage.setData(dataStr);
+
+    message.setEventData(new RaygunPulseDataMessage[]{dataMessage});
 
     spinUpService(_apiKey, new Gson().toJson(message), true);
   }
