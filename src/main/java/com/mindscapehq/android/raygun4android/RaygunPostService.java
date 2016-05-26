@@ -36,7 +36,11 @@ public class RaygunPostService extends Service
       {
         String message = (String) bundle.get("msg");
         String apiKey = (String) bundle.get("apikey");
-        if (hasInternetConnection())
+        String isPulse =  (String)bundle.get("isPulse");
+        if("True".equals(isPulse)) {
+          RaygunClient.PostPulseMessage(apiKey, message);
+        }
+        else if (hasInternetConnection())
         {
           RaygunClient.Post(apiKey, message);
         }
