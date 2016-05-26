@@ -9,7 +9,6 @@ public class Pulse implements ActivityLifecycleCallbacks {
     private static Pulse pulse;
 
     protected static void Attach(Activity mainActivity) {
-        System.out.println("ATTACHED");
         if(mainActivity != null) {
             Application application = mainActivity.getApplication();
             if(application != null) {

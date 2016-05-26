@@ -295,6 +295,10 @@ public class RaygunClient
   private static String _sessionId;
 
   protected static void SendPulseEvent(String name) {
+    if("session_start".equals(name)) {
+      _sessionId = UUID.randomUUID().toString();
+    }
+
     RaygunPulseMessage message = new RaygunPulseMessage();
     RaygunPulseDataMessage pulseData = new RaygunPulseDataMessage();
 
@@ -304,9 +308,8 @@ public class RaygunClient
     pulseData.setTimestamp(timestamp);
     pulseData.setVersion(_version);
 
-    _sessionId = "0F5B";
     pulseData.setSessionId(_sessionId);
-    pulseData.setType("session_start");
+    pulseData.setType(name);
 
     message.setEventData(new RaygunPulseDataMessage[]{pulseData});
 
