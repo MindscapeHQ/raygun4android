@@ -688,7 +688,9 @@ public class RaygunClient
       }
       else
       {
-        RaygunClient.Send(throwable);
+        List tags = new ArrayList();
+        tags.add("UnhandledException");
+        RaygunClient.Send(throwable, tags);
       }
       _defaultHandler.uncaughtException(thread, throwable);
     }
