@@ -61,7 +61,7 @@ public class Pulse implements ActivityLifecycleCallbacks {
       _currentActivity = activity;
       _startTime = System.nanoTime();
     }
-    System.out.println("CREATED");
+    //System.out.println("CREATED");
   }
 
   @Override
@@ -74,7 +74,7 @@ public class Pulse implements ActivityLifecycleCallbacks {
       _currentActivity = activity;
       _startTime = System.nanoTime();
     }
-    System.out.println("STARTED");
+    //System.out.println("STARTED");
   }
 
   @Override
@@ -92,7 +92,7 @@ public class Pulse implements ActivityLifecycleCallbacks {
     _currentActivity = activity;
 
     RaygunClient.SendPulsePageTimingEvent(activityName, duration);
-    System.out.println("RESUMED");
+    //System.out.println("RESUMED");
   }
 
   @Override
@@ -106,7 +106,7 @@ public class Pulse implements ActivityLifecycleCallbacks {
       _currentActivity = null;
       RaygunClient.SendPulseEvent("session_end");
     }
-    System.out.println("STOPPED");
+    //System.out.println("STOPPED");
   }
 
   @Override
