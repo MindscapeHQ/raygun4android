@@ -147,6 +147,7 @@ public class RaygunClient
 
   /**
    * Attaches the Raygun Pulse feature which will automatically report session and view events.
+   * @param activity The main/entry activity of the Android app.
    */
   public static void AttachPulse(Activity activity) {
     Pulse.Attach(activity);
