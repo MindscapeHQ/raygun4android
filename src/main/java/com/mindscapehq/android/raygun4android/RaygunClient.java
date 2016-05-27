@@ -307,7 +307,11 @@ public class RaygunClient
 
     SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
     df.setTimeZone(TimeZone.getTimeZone("UTC"));
-    String timestamp = df.format(Calendar.getInstance().getTime());
+    Calendar c = Calendar.getInstance();
+    if("session_end".equals(name)){
+      c.add(Calendar.SECOND, 2);
+    }
+    String timestamp = df.format(c.getTime());
     pulseData.setTimestamp(timestamp);
     pulseData.setVersion(_version);
     pulseData.setOS("Android");
@@ -691,6 +695,7 @@ public class RaygunClient
         List tags = new ArrayList();
         tags.add("UnhandledException");
         RaygunClient.Send(throwable, tags);
+        Pulse.SendRemainingActivity();
       }
       _defaultHandler.uncaughtException(thread, throwable);
     }

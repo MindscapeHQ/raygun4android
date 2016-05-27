@@ -37,6 +37,20 @@ public class Pulse implements ActivityLifecycleCallbacks {
     }
   }
 
+  protected static void SendRemainingActivity() {
+    if(_pulse != null) {
+      if(_currentActivity != null) {
+        String activityName = getActivityName(_currentActivity);
+
+        long diff = System.nanoTime() - _startTime;
+        double duration = TimeUnit.NANOSECONDS.toMillis(diff);
+
+        RaygunClient.SendPulsePageTimingEvent(activityName, duration);
+      }
+      RaygunClient.SendPulseEvent("session_end");
+    }
+  }
+
   @Override
   public void onActivityCreated(Activity activity, Bundle bundle) {
     if(_currentActivity == null) {
