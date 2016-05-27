@@ -310,6 +310,12 @@ public class RaygunClient
     String timestamp = df.format(Calendar.getInstance().getTime());
     pulseData.setTimestamp(timestamp);
     pulseData.setVersion(_version);
+    pulseData.setOS("Android");
+    pulseData.setOSVersion(Build.VERSION.RELEASE);
+    pulseData.setPlatform(String.format("%s %s", Build.MANUFACTURER, Build.MODEL));
+
+    RaygunUserContext userContext = _userInfo == null ? new RaygunUserContext(new RaygunUserInfo(null, null, null, null, null, true), _context) : new RaygunUserContext(_userInfo, _context);
+    pulseData.setUser(userContext);
 
     pulseData.setSessionId(_sessionId);
     pulseData.setType(name);
@@ -329,7 +335,9 @@ public class RaygunClient
 
     SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
     df.setTimeZone(TimeZone.getTimeZone("UTC"));
-    String timestamp = df.format(Calendar.getInstance().getTime());
+    Calendar c = Calendar.getInstance();
+    c.add(Calendar.MILLISECOND, -(int)duration);
+    String timestamp = df.format(c.getTime());
 
     dataMessage.setTimestamp(timestamp);
     dataMessage.setSessionId(_sessionId);
@@ -349,8 +357,7 @@ public class RaygunClient
     data.setName(name);
     data.setTiming(timingMessage);
 
-    RaygunPulseData[] dataArray = new RaygunPulseData[1];
-    dataArray[0] = data;
+    RaygunPulseData[] dataArray = new RaygunPulseData[]{data};
     String dataStr = new Gson().toJson(dataArray);
     dataMessage.setData(dataStr);
 

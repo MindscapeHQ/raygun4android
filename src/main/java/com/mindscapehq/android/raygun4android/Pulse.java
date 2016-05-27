@@ -5,6 +5,8 @@ import android.app.Application;
 import android.app.Application.ActivityLifecycleCallbacks;
 import android.os.Bundle;
 
+import java.util.concurrent.TimeUnit;
+
 public class Pulse implements ActivityLifecycleCallbacks {
   private static Pulse _pulse;
   private static Activity _mainActivity;
@@ -70,7 +72,8 @@ public class Pulse implements ActivityLifecycleCallbacks {
     String activityName = getActivityName(activity);
     double duration = 0;
     if(activity == _currentActivity) {
-      duration = System.nanoTime() - _startTime;
+      long diff = System.nanoTime() - _startTime;
+      duration = TimeUnit.NANOSECONDS.toMillis(diff);
     }
     _currentActivity = activity;
 
@@ -87,7 +90,7 @@ public class Pulse implements ActivityLifecycleCallbacks {
   public void onActivityStopped(Activity activity) {
     if(activity == _currentActivity) {
       _currentActivity = null;
-      RaygunClient.SendPulseEvent("session_start");
+      RaygunClient.SendPulseEvent("session_end");
     }
     System.out.println("STOPPED");
   }
