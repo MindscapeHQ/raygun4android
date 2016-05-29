@@ -11,6 +11,7 @@ public class Pulse implements ActivityLifecycleCallbacks {
   private static Pulse _pulse;
   private static Activity _mainActivity;
   private static Activity _currentActivity;
+  private static Activity _loadingActivity;
   private static long _startTime;
 
   protected static void Attach(Activity mainActivity) {
@@ -39,8 +40,8 @@ public class Pulse implements ActivityLifecycleCallbacks {
 
   protected static void SendRemainingActivity() {
     if(_pulse != null) {
-      if(_currentActivity != null) {
-        String activityName = getActivityName(_currentActivity);
+      if(_loadingActivity != null) {
+        String activityName = getActivityName(_loadingActivity);
 
         long diff = System.nanoTime() - _startTime;
         double duration = TimeUnit.NANOSECONDS.toMillis(diff);
@@ -59,6 +60,7 @@ public class Pulse implements ActivityLifecycleCallbacks {
 
     if(activity != _currentActivity) {
       _currentActivity = activity;
+      _loadingActivity = activity;
       _startTime = System.nanoTime();
     }
     //System.out.println("CREATED");
@@ -72,6 +74,7 @@ public class Pulse implements ActivityLifecycleCallbacks {
 
     if(activity != _currentActivity) {
       _currentActivity = activity;
+      _loadingActivity = activity;
       _startTime = System.nanoTime();
     }
     //System.out.println("STARTED");
@@ -90,6 +93,7 @@ public class Pulse implements ActivityLifecycleCallbacks {
       duration = TimeUnit.NANOSECONDS.toMillis(diff);
     }
     _currentActivity = activity;
+    _loadingActivity = null;
 
     RaygunClient.SendPulsePageTimingEvent(activityName, duration);
     //System.out.println("RESUMED");
@@ -104,6 +108,7 @@ public class Pulse implements ActivityLifecycleCallbacks {
   public void onActivityStopped(Activity activity) {
     if(activity == _currentActivity) {
       _currentActivity = null;
+      _loadingActivity = null;
       RaygunClient.SendPulseEvent("session_end");
     }
     //System.out.println("STOPPED");
