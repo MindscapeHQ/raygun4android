@@ -330,7 +330,13 @@ public class RaygunClient
     spinUpService(_apiKey, new Gson().toJson(message), true);
   }
 
-  protected static void SendPulsePageTimingEvent(String name, double duration) {
+  /**
+   * Sends a pulse timing event to Raygun. The message is sent on a background thread.
+   * @param eventType The type of event that occurred.
+   * @param name The name of the event resource such as the activity name or URL of a network call.
+   * @param milliseconds The duration of the event in milliseconds.
+   */
+  public static void SendPulseTimingEvent(RaygunPulseEventType eventType, String name, long milliseconds) {
     if(_sessionId == null) {
       SendPulseEvent("session_start");
     }
@@ -341,7 +347,7 @@ public class RaygunClient
     SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
     df.setTimeZone(TimeZone.getTimeZone("UTC"));
     Calendar c = Calendar.getInstance();
-    c.add(Calendar.MILLISECOND, -(int)duration);
+    c.add(Calendar.MILLISECOND, -(int)milliseconds);
     String timestamp = df.format(c.getTime());
 
     dataMessage.setTimestamp(timestamp);
@@ -357,8 +363,8 @@ public class RaygunClient
 
     RaygunPulseData data = new RaygunPulseData();
     RaygunPulseTimingMessage timingMessage = new RaygunPulseTimingMessage();
-    timingMessage.setType("p");
-    timingMessage.setDuration(duration);
+    timingMessage.setType(eventType == RaygunPulseEventType.ActivityLoaded ? "p" : "n");
+    timingMessage.setDuration(milliseconds);
     data.setName(name);
     data.setTiming(timingMessage);
 

@@ -2,7 +2,7 @@ package main.java.com.mindscapehq.android.raygun4android.messages;
 
 public class RaygunPulseTimingMessage {
     private String type;
-    private double duration;
+    private long duration;
 
     public String getType() {
         return type;
@@ -12,11 +12,11 @@ public class RaygunPulseTimingMessage {
         this.type = type;
     }
 
-    public double getDuration() {
+    public long getDuration() {
         return duration;
     }
 
-    public void setDuration(double duration) {
-        this.duration = duration;
+    public void setDuration(long milliseconds) {
+        this.duration = milliseconds;
     }
 }

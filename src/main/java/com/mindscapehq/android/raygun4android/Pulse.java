@@ -44,9 +44,9 @@ public class Pulse implements ActivityLifecycleCallbacks {
         String activityName = getActivityName(_loadingActivity);
 
         long diff = System.nanoTime() - _startTime;
-        double duration = TimeUnit.NANOSECONDS.toMillis(diff);
+        long duration = TimeUnit.NANOSECONDS.toMillis(diff);
 
-        RaygunClient.SendPulsePageTimingEvent(activityName, duration);
+        RaygunClient.SendPulseTimingEvent(RaygunPulseEventType.ActivityLoaded, activityName, duration);
       }
       RaygunClient.SendPulseEvent("session_end");
     }
@@ -87,7 +87,7 @@ public class Pulse implements ActivityLifecycleCallbacks {
     }
 
     String activityName = getActivityName(activity);
-    double duration = 0;
+    long duration = 0;
     if(activity == _currentActivity) {
       long diff = System.nanoTime() - _startTime;
       duration = TimeUnit.NANOSECONDS.toMillis(diff);
@@ -95,7 +95,7 @@ public class Pulse implements ActivityLifecycleCallbacks {
     _currentActivity = activity;
     _loadingActivity = null;
 
-    RaygunClient.SendPulsePageTimingEvent(activityName, duration);
+    RaygunClient.SendPulseTimingEvent(RaygunPulseEventType.ActivityLoaded, activityName, duration);
     //System.out.println("RESUMED");
   }
 
