@@ -37,7 +37,7 @@
         <dependency>
             <groupId>com.google.android</groupId>
             <artifactId>android</artifactId>
-            <version>2.2.1</version>
+            <version>4.0.1.2</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -78,7 +78,7 @@
                         <debug>false</debug>
                     </sign>
                     <sdk>
-                        <platform>9</platform>
+                        <platform>14</platform>
                     </sdk>
                 </configuration>
             </plugin>
