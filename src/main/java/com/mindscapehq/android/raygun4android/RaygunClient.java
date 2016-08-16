@@ -51,7 +51,7 @@ public class RaygunClient
 
   /**
    * Initializes the Raygun client. This expects that you have placed the API key in your
-   * AndroidManifest.xml, in a <meta-data /> element.
+   * AndroidManifest.xml, in a meta-data element.
    * @param context The context of the calling Android activity.
    */
   public static void Init(Context context) {
@@ -62,7 +62,7 @@ public class RaygunClient
 
   /**
    * Initializes the Raygun client with the version of your application.
-   * This expects that you have placed the API key in your AndroidManifest.xml, in a <meta-data /> element.
+   * This expects that you have placed the API key in your AndroidManifest.xml, in a meta-data element.
    * @param version The version of your application, format x.x.x.x, where x is a positive integer.
    * @param context The context of the calling Android activity.
    */
@@ -622,7 +622,7 @@ public class RaygunClient
 
   /**
    * Manually stores the version of your application to be transmitted with each message, for version
-   * filtering. This is normally read from your AndroidManifest.xml (the versionName attribute on <manifest>)
+   * filtering. This is normally read from your AndroidManifest.xml (the versionName attribute on manifest element)
    * or passed in on Init(); this is only provided as a convenience.
    * @param version The version of your application, format x.x.x.x, where x is a positive integer.
    */
