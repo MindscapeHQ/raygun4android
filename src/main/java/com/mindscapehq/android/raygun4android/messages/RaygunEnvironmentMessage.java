@@ -1,5 +1,6 @@
 package main.java.com.mindscapehq.android.raygun4android.messages;
 
+import main.java.com.mindscapehq.android.raygun4android.RaygunLogger;
 import android.app.ActivityManager;
 import android.content.Context;
 import android.os.Build;
@@ -94,7 +95,7 @@ public class RaygunEnvironmentMessage {
       StatFs stat = new StatFs(Environment.getDataDirectory().getPath());
       diskSpaceFree = (stat.getAvailableBlocks() * stat.getBlockSize()) / 0x100000;
     } catch (Exception e) {
-      Log.w("Raygun4Android", "Couldn't get all env data: " + e);
+      RaygunLogger.w("Couldn't get all env data: " + e);
     }
   }
 
