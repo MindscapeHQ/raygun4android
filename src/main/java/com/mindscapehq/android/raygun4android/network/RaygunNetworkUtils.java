@@ -1,24 +1,25 @@
 package main.java.com.mindscapehq.android.raygun4android.network;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.lang.reflect.Method;
+import java.net.HttpURLConnection;
+import java.net.URLConnection;
 import java.util.Collection;
 import java.util.HashSet;
 
-//import main.java.com.mindscapehq.android.raygun4android.RaygunLogger;
+public class RaygunNetworkUtils {
 
-public class RaygunNetworkUtils
-{
-  public static synchronized String exceptionToString(Throwable e)
-  {
-    if (e == null) {
-      return "NA";
+  public static int getStatusCode(URLConnection urlConnection) {
+    int statusCode = 0;
+    if (urlConnection != null) {
+      if ((urlConnection instanceof HttpURLConnection)) {
+        try {
+          statusCode = ((HttpURLConnection) urlConnection).getResponseCode();
+        }
+        catch (Exception ignore) {
+        }
+      }
     }
-    StringWriter sw = new StringWriter();
-    PrintWriter pw = new PrintWriter(sw);
-    e.printStackTrace(pw);
-    return sw.toString();
+    return statusCode;
   }
 
   public static Method findMethod(Class<?> clazz, String methodName, Class<?>[] args)
@@ -26,29 +27,25 @@ public class RaygunNetworkUtils
   {
     Method methodMatched = null;
 
-    // First check the class of the handler then check against the super classes.
-    for (Method m : getAllMethods(clazz))
-    {
-      if (m.getName().equals(methodName))
-      {
+    for (Method m : getAllMethods(clazz)) {
+
+      if (m.getName().equals(methodName)) {
+
         Class<?>[] paramClasses = m.getParameterTypes();
-        if (paramClasses.length == args.length)
-        {
+        if (paramClasses.length == args.length) {
+
           boolean paramsMatch = true;
-          for (int i = 0; i < paramClasses.length; ++i)
-          {
+          for (int i = 0; i < paramClasses.length; ++i) {
             Class<?> paramType = paramClasses[i];
             paramType = convertPrimitiveClass(paramType);
 
-            if (paramType != args[i])
-            {
+            if (paramType != args[i]) {
               paramsMatch = false;
               break;
             }
           }
 
-          if (paramsMatch)
-          {
+          if (paramsMatch) {
             methodMatched = m;
             break;
           }
@@ -56,27 +53,22 @@ public class RaygunNetworkUtils
       }
     }
 
-    if (methodMatched != null)
-    {
+    if (methodMatched != null) {
       return methodMatched;
-    }
-    else
-    {
+    } else {
       throw new NoSuchMethodException("Cannot find method: " + methodName);
     }
   }
 
-  public static Collection<Method> getAllMethods(Class<?> clazz)
-  {
-    Collection<Method> methods = new HashSet();
+  public static Collection<Method> getAllMethods(Class<?> clazz) {
+    HashSet<Method> methods = new HashSet<Method>();
+
     for (Method m : clazz.getDeclaredMethods()) {
       methods.add(m);
     }
 
-    for (Class<?> s : getAllSuperClasses(clazz))
-    {
-      for (Method m : s.getDeclaredMethods())
-      {
+    for (Class<?> s : getAllSuperClasses(clazz)) {
+      for (Method m : s.getDeclaredMethods()) {
         methods.add(m);
       }
     }
@@ -84,26 +76,21 @@ public class RaygunNetworkUtils
     return methods;
   }
 
-  public static Collection<Class<?>> getAllSuperClasses(Class<?> clazz)
-  {
-    Collection<Class<?>> classes = new HashSet();
-    if ((clazz != null) && (!clazz.equals(Object.class)))
-    {
+  public static Collection<Class<?>> getAllSuperClasses(Class<?> clazz) {
+    HashSet<Class<?>> classes = new HashSet<Class<?>>();
+    if ((clazz != null) && (!clazz.equals(Object.class))) {
       classes.add(clazz);
       classes.addAll(getAllSuperClasses(clazz.getSuperclass()));
 
-      for (Class<?> i : clazz.getInterfaces())
-      {
+      for (Class<?> i : clazz.getInterfaces()) {
         classes.addAll(getAllSuperClasses(i));
       }
     }
     return classes;
   }
 
-  public static Class<?> convertPrimitiveClass(Class<?> primitive)
-  {
-    if (primitive.isPrimitive())
-    {
+  public static Class<?> convertPrimitiveClass(Class<?> primitive) {
+    if (primitive.isPrimitive()) {
       if (primitive == Integer.TYPE) {
         return Integer.class;
       }

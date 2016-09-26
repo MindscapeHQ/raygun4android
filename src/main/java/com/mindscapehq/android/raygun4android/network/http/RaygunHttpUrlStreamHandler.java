@@ -1,8 +1,10 @@
 package main.java.com.mindscapehq.android.raygun4android.network.http;
 
+import main.java.com.mindscapehq.android.raygun4android.RaygunLogger;
 import main.java.com.mindscapehq.android.raygun4android.network.RaygunNetworkUtils;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.Proxy;
 import java.net.URL;
@@ -29,20 +31,22 @@ public final class RaygunHttpUrlStreamHandler extends URLStreamHandler
       Method method = RaygunNetworkUtils.findMethod(originalHandler.getClass(), "openConnection", new Class<?>[]{ URL.class });
       method.setAccessible(true);
 
-      URLConnection urlConnection = (URLConnection) method.invoke(originalHandler, new Object[]{ url } );
+      URLConnection urlConnection = (URLConnection) method.invoke(originalHandler, url);
 
-      if (urlConnection == null)
-      {
-        throw new IOException();
+      if (urlConnection == null) {
+        throw new IOException("Failed to create connection");
       }
 
       return new RaygunHttpUrlConnection(urlConnection);
     }
     catch(NoSuchMethodException e) {
+      RaygunLogger.e("Exception occurred in openConnection: " + e.getMessage());
     }
     catch(IllegalAccessException e) {
+      RaygunLogger.e("Exception occurred in openConnection: " + e.getMessage());
     }
-    catch(Throwable e) {
+    catch(InvocationTargetException e) {
+      RaygunLogger.e("Exception occurred in openConnection: " + e.getMessage());
     }
 
     throw new IOException();
@@ -56,20 +60,22 @@ public final class RaygunHttpUrlStreamHandler extends URLStreamHandler
       Method method = RaygunNetworkUtils.findMethod(originalHandler.getClass(), "openConnection", new Class<?>[]{ URL.class, Proxy.class });
       method.setAccessible(true);
 
-      URLConnection urlConnection = (URLConnection) method.invoke(originalHandler, new Object[]{ url, proxy } );
+      URLConnection urlConnection = (URLConnection) method.invoke(originalHandler, url, proxy);
 
-      if (urlConnection == null)
-      {
-        throw new IOException();
+      if (urlConnection == null) {
+        throw new IOException("Failed to create connection");
       }
 
       return new RaygunHttpUrlConnection(urlConnection);
     }
     catch(NoSuchMethodException e) {
+      RaygunLogger.e("Exception occurred in openConnection: " + e.getMessage());
     }
     catch(IllegalAccessException e) {
+      RaygunLogger.e("Exception occurred in openConnection: " + e.getMessage());
     }
-    catch(Throwable e) {
+    catch(InvocationTargetException e) {
+      RaygunLogger.e("Exception occurred in openConnection: " + e.getMessage());
     }
 
     throw new IOException();

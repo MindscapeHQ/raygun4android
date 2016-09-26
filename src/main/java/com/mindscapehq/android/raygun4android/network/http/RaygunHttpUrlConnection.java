@@ -1,6 +1,7 @@
 package main.java.com.mindscapehq.android.raygun4android.network.http;
 
 import main.java.com.mindscapehq.android.raygun4android.network.RaygunNetworkLogger;
+import main.java.com.mindscapehq.android.raygun4android.network.RaygunNetworkUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -15,35 +16,34 @@ import java.util.Map;
 
 public final class RaygunHttpUrlConnection extends HttpURLConnection
 {
-  private URLConnection original;
+  private URLConnection connectionInstance;
 
-  public RaygunHttpUrlConnection(URLConnection original)
-  {
-    super(original.getURL());
-    this.original = original;
-    RaygunNetworkLogger.getInstance().startNetworkCall(original.getURL().toExternalForm(), original.getURL().toExternalForm(), System.currentTimeMillis(), "HTTP");
+  public RaygunHttpUrlConnection(URLConnection connection) {
+    super(connection.getURL());
+    connectionInstance = connection;
+    RaygunNetworkLogger.getInstance().startNetworkCall(connectionInstance.getURL().toExternalForm(), System.currentTimeMillis());
   }
 
   public void connect() throws IOException
   {
     try
     {
-      this.original.connect();
+      connectionInstance.connect();
     }
     catch (IOException e)
     {
-      RaygunNetworkLogger.getInstance().cancelNetworkCall(this.url.toExternalForm(), System.currentTimeMillis(), e.getMessage());
+      RaygunNetworkLogger.getInstance().cancelNetworkCall(url.toExternalForm(), System.currentTimeMillis(), e.getMessage());
       throw e;
     }
   }
 
   public void disconnect()
   {
-    int statusCode = RaygunNetworkLogger.getStatusCodeFromUrlConnection(this.original);
-    RaygunNetworkLogger.getInstance().endNetworkCall(this.url.toExternalForm(), System.currentTimeMillis(), statusCode);
+    int statusCode = RaygunNetworkUtils.getStatusCode(connectionInstance);
+    RaygunNetworkLogger.getInstance().endNetworkCall(url.toExternalForm(), System.currentTimeMillis(), statusCode);
 
-    if ((this.original instanceof HttpURLConnection)) {
-      ((HttpURLConnection)this.original).disconnect();
+    if ((connectionInstance instanceof HttpURLConnection)) {
+      ((HttpURLConnection)connectionInstance).disconnect();
     }
   }
 
@@ -51,11 +51,11 @@ public final class RaygunHttpUrlConnection extends HttpURLConnection
   {
     try
     {
-      return this.original.getInputStream();
+      return connectionInstance.getInputStream();
     }
     catch (IOException e)
     {
-      RaygunNetworkLogger.getInstance().cancelNetworkCall(this.url.toExternalForm(), System.currentTimeMillis(), e.getMessage());
+      RaygunNetworkLogger.getInstance().cancelNetworkCall(url.toExternalForm(), System.currentTimeMillis(), e.getMessage());
       throw e;
     }
   }
@@ -64,28 +64,28 @@ public final class RaygunHttpUrlConnection extends HttpURLConnection
   {
     try
     {
-      return this.original.getOutputStream();
+      return connectionInstance.getOutputStream();
     }
     catch (IOException e)
     {
-      RaygunNetworkLogger.getInstance().cancelNetworkCall(this.url.toExternalForm(), System.currentTimeMillis(), e.getMessage());
+      RaygunNetworkLogger.getInstance().cancelNetworkCall(url.toExternalForm(), System.currentTimeMillis(), e.getMessage());
       throw e;
     }
   }
 
   public boolean getAllowUserInteraction()
   {
-    return this.original.getAllowUserInteraction();
+    return connectionInstance.getAllowUserInteraction();
   }
 
   public void addRequestProperty(String field, String newValue)
   {
-    this.original.addRequestProperty(field, newValue);
+    connectionInstance.addRequestProperty(field, newValue);
   }
 
   public int getConnectTimeout()
   {
-    return this.original.getConnectTimeout();
+    return connectionInstance.getConnectTimeout();
   }
 
   public Object getContent()
@@ -93,11 +93,11 @@ public final class RaygunHttpUrlConnection extends HttpURLConnection
   {
     try
     {
-      return this.original.getContent();
+      return connectionInstance.getContent();
     }
     catch (IOException e)
     {
-      RaygunNetworkLogger.getInstance().cancelNetworkCall(this.url.toExternalForm(), System.currentTimeMillis(), e.getMessage());
+      RaygunNetworkLogger.getInstance().cancelNetworkCall(url.toExternalForm(), System.currentTimeMillis(), e.getMessage());
       throw e;
     }
   }
@@ -107,93 +107,93 @@ public final class RaygunHttpUrlConnection extends HttpURLConnection
   {
     try
     {
-      return this.original.getContent(types);
+      return connectionInstance.getContent(types);
     }
     catch (IOException e)
     {
-      RaygunNetworkLogger.getInstance().cancelNetworkCall(this.url.toExternalForm(), System.currentTimeMillis(), e.getMessage());
+      RaygunNetworkLogger.getInstance().cancelNetworkCall(url.toExternalForm(), System.currentTimeMillis(), e.getMessage());
       throw e;
     }
   }
 
   public String getContentEncoding()
   {
-    return this.original.getContentEncoding();
+    return connectionInstance.getContentEncoding();
   }
 
   public int getContentLength()
   {
-    return this.original.getContentLength();
+    return connectionInstance.getContentLength();
   }
 
   public String getContentType()
   {
-    return this.original.getContentType();
+    return connectionInstance.getContentType();
   }
 
   public long getDate()
   {
-    return this.original.getDate();
+    return connectionInstance.getDate();
   }
 
   public boolean getDefaultUseCaches()
   {
-    return this.original.getDefaultUseCaches();
+    return connectionInstance.getDefaultUseCaches();
   }
 
   public boolean getDoInput()
   {
-    return this.original.getDoInput();
+    return connectionInstance.getDoInput();
   }
 
   public boolean getDoOutput()
   {
-    return this.original.getDoOutput();
+    return connectionInstance.getDoOutput();
   }
 
   public long getExpiration()
   {
-    return this.original.getExpiration();
+    return connectionInstance.getExpiration();
   }
 
   public String getHeaderField(int pos)
   {
-    return this.original.getHeaderField(pos);
+    return connectionInstance.getHeaderField(pos);
   }
 
   public String getHeaderField(String key)
   {
-    return this.original.getHeaderField(key);
+    return connectionInstance.getHeaderField(key);
   }
 
   public long getHeaderFieldDate(String field, long defaultValue)
   {
-    return this.original.getHeaderFieldDate(field, defaultValue);
+    return connectionInstance.getHeaderFieldDate(field, defaultValue);
   }
 
   public int getHeaderFieldInt(String field, int defaultValue)
   {
-    return this.original.getHeaderFieldInt(field, defaultValue);
+    return connectionInstance.getHeaderFieldInt(field, defaultValue);
   }
 
   public String getHeaderFieldKey(int posn)
   {
-    return this.original.getHeaderFieldKey(posn);
+    return connectionInstance.getHeaderFieldKey(posn);
   }
 
   public Map<String, List<String>> getHeaderFields()
   {
-    return this.original.getHeaderFields();
+    return connectionInstance.getHeaderFields();
   }
 
   public long getIfModifiedSince()
   {
-    return this.original.getIfModifiedSince();
+    return connectionInstance.getIfModifiedSince();
   }
 
   public long getLastModified()
   {
-    return this.original.getLastModified();
+    return connectionInstance.getLastModified();
   }
 
   public Permission getPermission()
@@ -201,113 +201,113 @@ public final class RaygunHttpUrlConnection extends HttpURLConnection
   {
     try
     {
-      return this.original.getPermission();
+      return connectionInstance.getPermission();
     }
     catch (IOException e)
     {
-      RaygunNetworkLogger.getInstance().cancelNetworkCall(this.url.toExternalForm(), System.currentTimeMillis(), e.getMessage());
+      RaygunNetworkLogger.getInstance().cancelNetworkCall(url.toExternalForm(), System.currentTimeMillis(), e.getMessage());
       throw e;
     }
   }
 
   public int getReadTimeout()
   {
-    return this.original.getReadTimeout();
+    return connectionInstance.getReadTimeout();
   }
 
   public Map<String, List<String>> getRequestProperties()
   {
-    return this.original.getRequestProperties();
+    return connectionInstance.getRequestProperties();
   }
 
   public String getRequestProperty(String field)
   {
-    return this.original.getRequestProperty(field);
+    return connectionInstance.getRequestProperty(field);
   }
 
   public URL getURL()
   {
-    return this.original.getURL();
+    return connectionInstance.getURL();
   }
 
   public boolean getUseCaches()
   {
-    return this.original.getUseCaches();
+    return connectionInstance.getUseCaches();
   }
 
   public void setAllowUserInteraction(boolean newValue)
   {
-    this.original.setAllowUserInteraction(newValue);
+    connectionInstance.setAllowUserInteraction(newValue);
   }
 
   public void setConnectTimeout(int timeoutMillis)
   {
-    this.original.setConnectTimeout(timeoutMillis);
+    connectionInstance.setConnectTimeout(timeoutMillis);
   }
 
   public void setDefaultUseCaches(boolean newValue)
   {
-    this.original.setDefaultUseCaches(newValue);
+    connectionInstance.setDefaultUseCaches(newValue);
   }
 
   public void setDoInput(boolean newValue)
   {
-    this.original.setDoInput(newValue);
+    connectionInstance.setDoInput(newValue);
   }
 
   public void setDoOutput(boolean newValue)
   {
-    this.original.setDoOutput(newValue);
+    connectionInstance.setDoOutput(newValue);
   }
 
   public void setIfModifiedSince(long newValue)
   {
-    this.original.setIfModifiedSince(newValue);
+    connectionInstance.setIfModifiedSince(newValue);
   }
 
   public void setReadTimeout(int timeoutMillis)
   {
-    this.original.setReadTimeout(timeoutMillis);
+    connectionInstance.setReadTimeout(timeoutMillis);
   }
 
   public void setRequestProperty(String field, String newValue)
   {
-    this.original.setRequestProperty(field, newValue);
+    connectionInstance.setRequestProperty(field, newValue);
   }
 
   public void setUseCaches(boolean newValue)
   {
-    this.original.setUseCaches(newValue);
+    connectionInstance.setUseCaches(newValue);
   }
 
   public boolean usingProxy()
   {
-    if ((this.original instanceof HttpURLConnection)) {
-      return ((HttpURLConnection)this.original).usingProxy();
+    if ((connectionInstance instanceof HttpURLConnection)) {
+      return ((HttpURLConnection)connectionInstance).usingProxy();
     }
     return false;
   }
 
   public InputStream getErrorStream()
   {
-    if ((this.original instanceof HttpURLConnection)) {
-      return ((HttpURLConnection)this.original).getErrorStream();
+    if ((connectionInstance instanceof HttpURLConnection)) {
+      return ((HttpURLConnection)connectionInstance).getErrorStream();
     }
     return null;
   }
 
   public boolean getInstanceFollowRedirects()
   {
-    if ((this.original instanceof HttpURLConnection)) {
-      return ((HttpURLConnection)this.original).getInstanceFollowRedirects();
+    if ((connectionInstance instanceof HttpURLConnection)) {
+      return ((HttpURLConnection)connectionInstance).getInstanceFollowRedirects();
     }
     return true;
   }
 
   public String getRequestMethod()
   {
-    if ((this.original instanceof HttpURLConnection)) {
-      return ((HttpURLConnection)this.original).getRequestMethod();
+    if ((connectionInstance instanceof HttpURLConnection)) {
+      return ((HttpURLConnection)connectionInstance).getRequestMethod();
     }
     return "GET";
   }
@@ -315,8 +315,8 @@ public final class RaygunHttpUrlConnection extends HttpURLConnection
   public int getResponseCode()
       throws IOException
   {
-    if ((this.original instanceof HttpURLConnection)) {
-      return ((HttpURLConnection)this.original).getResponseCode();
+    if ((connectionInstance instanceof HttpURLConnection)) {
+      return ((HttpURLConnection)connectionInstance).getResponseCode();
     }
     return -1;
   }
@@ -324,38 +324,38 @@ public final class RaygunHttpUrlConnection extends HttpURLConnection
   public String getResponseMessage()
       throws IOException
   {
-    if ((this.original instanceof HttpURLConnection)) {
-      return ((HttpURLConnection)this.original).getResponseMessage();
+    if ((connectionInstance instanceof HttpURLConnection)) {
+      return ((HttpURLConnection)connectionInstance).getResponseMessage();
     }
     return "";
   }
 
   public void setChunkedStreamingMode(int chunkLength)
   {
-    if ((this.original instanceof HttpURLConnection)) {
-      ((HttpURLConnection)this.original).setChunkedStreamingMode(chunkLength);
+    if ((connectionInstance instanceof HttpURLConnection)) {
+      ((HttpURLConnection)connectionInstance).setChunkedStreamingMode(chunkLength);
     }
   }
 
   public void setFixedLengthStreamingMode(int contentLength)
   {
-    if ((this.original instanceof HttpURLConnection)) {
-      ((HttpURLConnection)this.original).setFixedLengthStreamingMode(contentLength);
+    if ((connectionInstance instanceof HttpURLConnection)) {
+      ((HttpURLConnection)connectionInstance).setFixedLengthStreamingMode(contentLength);
     }
   }
 
   public void setInstanceFollowRedirects(boolean followRedirects)
   {
-    if ((this.original instanceof HttpURLConnection)) {
-      ((HttpURLConnection)this.original).setInstanceFollowRedirects(followRedirects);
+    if ((connectionInstance instanceof HttpURLConnection)) {
+      ((HttpURLConnection)connectionInstance).setInstanceFollowRedirects(followRedirects);
     }
   }
 
   public void setRequestMethod(String method)
       throws ProtocolException
   {
-    if ((this.original instanceof HttpURLConnection)) {
-      ((HttpURLConnection)this.original).setRequestMethod(method);
+    if ((connectionInstance instanceof HttpURLConnection)) {
+      ((HttpURLConnection)connectionInstance).setRequestMethod(method);
     }
   }
 }

@@ -1,156 +1,106 @@
 package main.java.com.mindscapehq.android.raygun4android.network;
 
+//import main.java.com.mindscapehq.android.raygun4android.RaygunClient;
+import main.java.com.mindscapehq.android.raygun4android.RaygunSettings;
 import main.java.com.mindscapehq.android.raygun4android.network.http.RaygunUrlStreamHandlerFactory;
 
-import javax.net.ssl.HttpsURLConnection;
-import java.net.HttpURLConnection;
-import java.net.URLConnection;
 import java.net.URL;
-import java.util.Map;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 
-public class RaygunNetworkLogger
-{
+public class RaygunNetworkLogger {
+
   class RequestInfo {
-    public String protocol;
     public String url;
     public Long startTime;
   }
 
   private static final long CONNECTION_TIMEOUT = 60000L; // 1 min
-  private static volatile HashMap<String, RequestInfo> connections = new HashMap();
-  private static RaygunNetworkLogger networkLogger = null;
+  private static volatile HashMap<String, RequestInfo> connections = new HashMap<String, RequestInfo>();
+  private static RaygunNetworkLogger logger = null;
 
-  private boolean networkMonitoringEnabled = true;
-  private boolean networkMonitoringInitialized = false;
+  private boolean loggingEnabled = true;
+  private boolean loggingInitialized = false;
 
-  public static synchronized RaygunNetworkLogger getInstance()
-  {
-    if (networkLogger == null) {
-      networkLogger = new RaygunNetworkLogger();
+  public static synchronized RaygunNetworkLogger getInstance() {
+    if (logger == null) {
+      logger = new RaygunNetworkLogger();
     }
-    return networkLogger;
+    return logger;
   }
 
-  public void initializeMonitoring()
-  {
-    if (networkMonitoringEnabled && !networkMonitoringInitialized)
-    {
-      try
-      {
+  public void init() {
+    if (loggingEnabled && !loggingInitialized) {
+      try {
         RaygunUrlStreamHandlerFactory factory = new RaygunUrlStreamHandlerFactory();
         URL.setURLStreamHandlerFactory(factory);
+        loggingInitialized = true;
       }
-      catch (final Error e)
-      {
-        networkMonitoringInitialized = false;
-      }
-      catch (SecurityException e)
-      {
-        networkMonitoringInitialized = false;
-      }
-      catch (Throwable e)
-      {
-        networkMonitoringInitialized = false;
+      catch (SecurityException e) {
+        loggingInitialized = false;
       }
     }
   }
 
-  public void setNetworkMonitoringEnabled(boolean _enabled) {
-    this.networkMonitoringEnabled = _enabled;
+  public void setEnabled(boolean enabled) {
+    loggingEnabled = enabled;
   }
 
-  public synchronized void startNetworkCall(String id, String url, long startTime, String protocol) {
-    if (id != null)
-    {
-      id = sanitiseUrl(id);
-
-      boolean blacklisted = false;// TODO
-      if (!blacklisted)
-      {
+  public synchronized void startNetworkCall(String url, long startTime) {
+    if (!ignoreUrl(url)) {
         RequestInfo request = new RequestInfo();
 
-        request.protocol = protocol;
         request.url = url;
-        request.startTime = Long.valueOf(startTime);
+        request.startTime = startTime;
 
+        String id = sanitiseUrl(url);
         connections.put(id, request);
 
         removeOldEntries();
-      }
     }
   }
 
-  public synchronized void endNetworkCall(String id, long stopTime, int statusCode) {
-    if (id != null)
-    {
-      id = sanitiseUrl(id);
-      if ((connections != null) && (connections.containsKey(id)))
-      {
+  public synchronized void endNetworkCall(String url, long endTime, int statusCode) {
+    if (url != null) {
+
+      String id = sanitiseUrl(url);
+      if ((connections.containsKey(id))) {
+
         RequestInfo request = connections.get(id);
-        if (request != null)
-        {
-          connections.remove(id);
-
-          sendNetworkTimingEvent(request.protocol, request.url, request.startTime.longValue(), stopTime, statusCode, null);
+        if (request != null) {
+          connections.remove(url);
+          sendNetworkTimingEvent(request.url, request.startTime, endTime, statusCode, null);
         }
       }
     }
   }
 
-  public synchronized void cancelNetworkCall(String id, long stopTime, String exception) {
-    if (id != null)
-    {
-      id = sanitiseUrl(id);
-      if ((connections != null) && (connections.containsKey(id)))
-      {
+  public synchronized void cancelNetworkCall(String url, long endTime, String exception) {
+    if (url != null) {
+      String id = sanitiseUrl(url);
+      if ((connections != null) && (connections.containsKey(id))) {
         RequestInfo request = connections.get(id);
-        if (request != null)
-        {
+        if (request != null) {
           connections.remove(id);
-
-          sendNetworkTimingEvent(request.protocol, request.url, request.startTime.longValue(), stopTime, 0, exception);
+          sendNetworkTimingEvent(request.url, request.startTime, endTime, 0, exception);
         }
       }
     }
   }
 
-  public synchronized void sendNetworkTimingEvent(String protocol, String url, long startTime, long endTime, int statusCode, String exception)
-  {
-    // Send as pulse event
-  }
-
-  public static final int getStatusCodeFromUrlConnection(URLConnection urlConnection)
-  {
-    int statusCode = 0;
-    if (urlConnection != null)
-    {
-      if ((urlConnection instanceof HttpURLConnection)) {
-        try
-        {
-          statusCode = ((HttpURLConnection)urlConnection).getResponseCode();
-        }
-        catch (Exception localException) {}
-      }
-      else if ((urlConnection instanceof HttpsURLConnection)) {
-        try
-        {
-          statusCode = ((HttpsURLConnection)urlConnection).getResponseCode();
-        }
-        catch (Exception localException1) {}
-      }
+  public synchronized void sendNetworkTimingEvent(String url, long startTime, long endTime, int statusCode, String exception) {
+    if (!ignoreUrl(url)) {
+      //RaygunClient.SendPulseTimingEvent(RaygunPulseEventType.NetworkCall, url, endTime - startTime);
     }
-    return statusCode;
   }
 
   private synchronized void removeOldEntries() {
     Iterator<Map.Entry<String, RequestInfo>> it = connections.entrySet().iterator();
-    while (it.hasNext())
-    {
-      Map.Entry<String, RequestInfo> pairs = (Map.Entry)it.next();
+    while (it.hasNext()) {
+      Map.Entry<String, RequestInfo> pairs = it.next();
 
-      long startTime = pairs.getValue().startTime.longValue();
+      long startTime = pairs.getValue().startTime;
       if (System.currentTimeMillis() - startTime > CONNECTION_TIMEOUT) {
         it.remove();
       }
@@ -158,13 +108,26 @@ public class RaygunNetworkLogger
   }
 
   private String sanitiseUrl(String url) {
-    if (url != null)
-    {
+    if (url != null) {
       url = url.toLowerCase();
       url = url.replaceAll("https://", "");
       url = url.replaceAll("http://", "");
       url = url.replaceAll("www.", "");
     }
     return url;
+  }
+
+  private boolean ignoreUrl(String url) {
+    if (url == null) {
+      return true;
+    }
+
+    for (String ignoredUrl : RaygunSettings.getSettings().getIgnoredUrls()) {
+      if (url.contains(ignoredUrl) || ignoredUrl.contains(url)) {
+        return true;
+      }
+    }
+
+    return false;
   }
 }

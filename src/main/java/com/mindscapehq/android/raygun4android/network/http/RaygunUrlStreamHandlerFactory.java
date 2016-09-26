@@ -1,37 +1,37 @@
 package main.java.com.mindscapehq.android.raygun4android.network.http;
 
 import main.java.com.mindscapehq.android.raygun4android.RaygunLogger;
+
+import android.os.Build;
+
 import java.net.URLStreamHandler;
 import java.net.URLStreamHandlerFactory;
 import java.util.HashMap;
-import java.util.Map;
-import android.os.Build;
+
 
 public class RaygunUrlStreamHandlerFactory implements URLStreamHandlerFactory
 {
-  private Map<String, URLStreamHandler> handlers;
+  private HashMap<String, URLStreamHandler> handlers;
 
   public RaygunUrlStreamHandlerFactory()
   {
     createStreamHandlers();
   }
 
-  public void createStreamHandlers()
+  private void createStreamHandlers()
   {
-    this.handlers = new HashMap();
+    handlers = new HashMap<String, URLStreamHandler>();
 
     URLStreamHandler httpHandler = findHandler("http");
-    if (httpHandler != null)
-    {
+    if (httpHandler != null) {
       RaygunHttpUrlStreamHandler raygunHttpHandler = new RaygunHttpUrlStreamHandler(httpHandler);
-      this.handlers.put(raygunHttpHandler.getProtocol(), raygunHttpHandler);
+      handlers.put(raygunHttpHandler.getProtocol(), raygunHttpHandler);
     }
 
     URLStreamHandler httpsHandler = findHandler("https");
-    if (httpsHandler != null)
-    {
+    if (httpsHandler != null) {
       RaygunHttpsUrlStreamHandler raygunHttpsHandler = new RaygunHttpsUrlStreamHandler(httpsHandler);
-      this.handlers.put(raygunHttpsHandler.getProtocol(), raygunHttpsHandler);
+      handlers.put(raygunHttpsHandler.getProtocol(), raygunHttpsHandler);
     }
   }
 
@@ -57,13 +57,11 @@ public class RaygunUrlStreamHandlerFactory implements URLStreamHandlerFactory
             return streamHandler;
           }
         }
-        catch (IllegalAccessException ignored) {
+        catch (IllegalAccessException ignore) {
         }
-        catch (InstantiationException ignored) {
+        catch (InstantiationException ignore) {
         }
-        catch (ClassNotFoundException ignored) {
-        }
-        catch (Throwable e) {
+        catch (ClassNotFoundException ignore) {
         }
       }
     }
@@ -102,12 +100,14 @@ public class RaygunUrlStreamHandlerFactory implements URLStreamHandlerFactory
     }
     catch (Exception e)
     {
-      throw new AssertionError(e);
+      RaygunLogger.e("Exception occurred in createStreamHandler: " + e.getMessage());
     }
+
+    return null;
   }
 
   public URLStreamHandler createURLStreamHandler(String protocol)
   {
-    return this.handlers.get(protocol);
+    return handlers.get(protocol);
   }
 }
