@@ -74,10 +74,10 @@ public class RaygunPostService extends Service
               out.close();
             } catch (FileNotFoundException e)
             {
-              Log.e("Raygun4Android", "Error creating file when caching message to filesystem - " + e.getMessage());
+              RaygunLogger.e("Error creating file when caching message to filesystem - " + e.getMessage());
             } catch (IOException e)
             {
-              Log.e("Raygun4Android", "Error writing message to filesystem - " + e.getMessage());
+              RaygunLogger.e("Error writing message to filesystem - " + e.getMessage());
             }
           }
         }
