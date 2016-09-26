@@ -16,7 +16,6 @@ import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
 import com.google.gson.Gson;
 import main.java.com.mindscapehq.android.raygun4android.messages.RaygunMessage;
 import main.java.com.mindscapehq.android.raygun4android.messages.RaygunPulseData;
@@ -88,7 +87,7 @@ public class RaygunClient
       version = context.getPackageManager().getPackageInfo(context.getPackageName(), 0).versionName;
     } catch (PackageManager.NameNotFoundException e)
     {
-      Log.i("Raygun4Android", "Couldn't read version from calling package");
+      RaygunLogger.i("Couldn't read version from calling package");
     }
     if (version != null)
     {
@@ -283,14 +282,14 @@ public class RaygunClient
         outputStream.close();
 
         int responseCode = connection.getResponseCode();
-        Log.d("Raygun4Android", "Exception message HTTP POST result: " + responseCode);
+        RaygunLogger.d("Exception message HTTP POST result: " + responseCode);
 
         return responseCode;
       }
     }
     catch (Exception e)
     {
-      Log.e("Raygun4Android", "Couldn't post exception - " + e.getMessage());
+      RaygunLogger.e("Couldn't post exception - " + e.getMessage());
       e.printStackTrace();
     }
     return -1;
@@ -453,7 +452,7 @@ public class RaygunClient
     }
     catch (Exception e)
     {
-      Log.e("Raygun4Android", "Failed to build RaygunMessage - " + e);
+      RaygunLogger.e("Failed to build RaygunMessage - " + e);
     }
     return null;
   }
@@ -469,7 +468,7 @@ public class RaygunClient
     }
     catch (PackageManager.NameNotFoundException e)
     {
-      Log.e("Raygun4Android", "Couldn't read API key from your AndroidManifest.xml <meta-data /> element; cannot send: " + e.getMessage());
+      RaygunLogger.e("Couldn't read API key from your AndroidManifest.xml <meta-data /> element; cannot send: " + e.getMessage());
     }
     return null;
   }
@@ -478,7 +477,7 @@ public class RaygunClient
   {
     if (apiKey.length() == 0)
     {
-      Log.e("Raygun4Android", "API key has not been provided, exception will not be logged");
+      RaygunLogger.e("API key has not been provided, exception will not be logged");
       return false;
     }
     else
@@ -515,13 +514,13 @@ public class RaygunClient
         }
         catch (FileNotFoundException e)
         {
-          Log.e("Raygun4Android", "Error loading cached message from filesystem - " + e.getMessage());
+          RaygunLogger.e("Error loading cached message from filesystem - " + e.getMessage());
         } catch (IOException e)
         {
-          Log.e("Raygun4Android", "Error reading cached message from filesystem - " + e.getMessage());
+          RaygunLogger.e("Error reading cached message from filesystem - " + e.getMessage());
         } catch (ClassNotFoundException e)
         {
-          Log.e("Raygun4Android", "Error in cached message from filesystem - " + e.getMessage());
+          RaygunLogger.e("Error in cached message from filesystem - " + e.getMessage());
         }
       }
     }
