@@ -19,8 +19,6 @@ public class RaygunSettings {
   private final String defaultApiEndpoint = "https://api.raygun.io/entries";
   private final String defaultPulseEndpoint = "https://api.raygun.io/events";
 
-  private final IgnoredUrls ignoredUrls = new IgnoredUrls(defaultApiEndpoint, defaultPulseEndpoint);
-
   public String getApiEndpoint() {
     return defaultApiEndpoint;
   }
@@ -29,7 +27,9 @@ public class RaygunSettings {
     return defaultPulseEndpoint;
   }
 
- public HashSet<String> getIgnoredUrls() {
+  private final IgnoredUrls ignoredUrls = new IgnoredUrls(defaultApiEndpoint, defaultPulseEndpoint);
+
+  public HashSet<String> getIgnoredUrls() {
     return ignoredUrls;
   }
 

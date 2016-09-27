@@ -155,7 +155,7 @@ public class RaygunClient
   /**
    * Attaches the Raygun Pulse feature which will automatically report session and view events.
    * @param activity The main/entry activity of the Android app.
-   * @param networkLogging Automatically report network requests timings.
+   * @param networkLogging Automatically report the performance of network requests.
    */
   public static void AttachPulse(Activity activity, boolean networkLogging) {
     Pulse.Attach(activity, networkLogging);
