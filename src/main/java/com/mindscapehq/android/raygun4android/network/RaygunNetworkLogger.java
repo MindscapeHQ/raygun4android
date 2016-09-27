@@ -6,7 +6,6 @@ import java.util.Iterator;
 import java.util.Map;
 
 import main.java.com.mindscapehq.android.raygun4android.RaygunClient;
-import main.java.com.mindscapehq.android.raygun4android.RaygunLogger;
 import main.java.com.mindscapehq.android.raygun4android.RaygunPulseEventType;
 import main.java.com.mindscapehq.android.raygun4android.RaygunSettings;
 import main.java.com.mindscapehq.android.raygun4android.network.http.RaygunUrlStreamHandlerFactory;
@@ -22,7 +21,6 @@ public class RaygunNetworkLogger {
     if (loggingEnabled && !loggingInitialized) {
       try {
         RaygunUrlStreamHandlerFactory factory = new RaygunUrlStreamHandlerFactory();
-        RaygunLogger.d("MD | Setting URL Stream Handler Factory!");
         URL.setURLStreamHandlerFactory(factory);
         loggingInitialized = true;
       }
@@ -37,7 +35,6 @@ public class RaygunNetworkLogger {
   }
 
   public static synchronized void startNetworkCall(String url, long startTime) {
-    RaygunLogger.d("MD | startNetworkCall: "+url);
     if (!shouldIgnoreUrl(url)) {
 
         String id = sanitiseUrl(url);
@@ -47,7 +44,7 @@ public class RaygunNetworkLogger {
     }
   }
 
-  public static synchronized void endNetworkCall(String url, long endTime, int statusCode) {
+  public static synchronized void endNetworkCall(String url, String requestMethod, long endTime, int statusCode) {
     if (url != null) {
 
       String id = sanitiseUrl(url);
@@ -56,28 +53,28 @@ public class RaygunNetworkLogger {
         RaygunNetworkRequestInfo request = connections.get(id);
         if (request != null) {
           connections.remove(url);
-          sendNetworkTimingEvent(request.url, request.startTime, endTime, statusCode, null);
+          sendNetworkTimingEvent(request.url, requestMethod, request.startTime, endTime, statusCode, null);
         }
       }
     }
   }
 
-  public static synchronized void cancelNetworkCall(String url, long endTime, String exception) {
+  public static synchronized void cancelNetworkCall(String url, String requestMethod, long endTime, String exception) {
     if (url != null) {
       String id = sanitiseUrl(url);
       if ((connections != null) && (connections.containsKey(id))) {
         RaygunNetworkRequestInfo request = connections.get(id);
         if (request != null) {
           connections.remove(id);
-          sendNetworkTimingEvent(request.url, request.startTime, endTime, 0, exception);
+          sendNetworkTimingEvent(request.url, requestMethod, request.startTime, endTime, 0, exception);
         }
       }
     }
   }
 
-  public static synchronized void sendNetworkTimingEvent(String url, long startTime, long endTime, int statusCode, String exception) {
+  public static synchronized void sendNetworkTimingEvent(String url, String requestMethod, long startTime, long endTime, int statusCode, String exception) {
     if (!shouldIgnoreUrl(url)) {
-      RaygunClient.SendPulseTimingEvent(RaygunPulseEventType.NetworkCall, url, endTime - startTime);
+      RaygunClient.SendPulseTimingEvent(RaygunPulseEventType.NetworkCall, requestMethod+" "+url, endTime - startTime);
     }
   }
 
@@ -108,7 +105,6 @@ public class RaygunNetworkLogger {
     }
     for (String ignoredUrl : RaygunSettings.getSettings().getIgnoredUrls()) {
       if (url.contains(ignoredUrl) || ignoredUrl.contains(url)) {
-        RaygunLogger.d("MD | RaygunNetworkLogger - Ignoring: "+url);
         return true;
       }
     }
