@@ -153,6 +153,15 @@ public class RaygunClient
   }
 
   /**
+   * Attaches the Raygun Pulse feature which will automatically report session and view events.
+   * @param activity The main/entry activity of the Android app.
+   * @param networkLogging Automatically report network requests timings.
+   */
+  public static void AttachPulse(Activity activity, boolean networkLogging) {
+    Pulse.Attach(activity, networkLogging);
+  }
+
+  /**
    * Attaches a pre-built Raygun exception handler to the thread's DefaultUncaughtExceptionHandler.
    * This automatically sends any exceptions that reaches it to the Raygun API.
    * @param tags A list of tags that relate to the calling application's currently build or state.
@@ -273,18 +282,28 @@ public class RaygunClient
         URL endpoint = new URL(RaygunSettings.getSettings().getApiEndpoint());
         HttpURLConnection connection = (HttpURLConnection) endpoint.openConnection();
 
-        connection.setRequestMethod("POST");
-        connection.setRequestProperty("X-ApiKey", apiKey);
-        connection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+        try
+        {
+          connection.setRequestMethod("POST");
+          connection.setRequestProperty("X-ApiKey", apiKey);
+          connection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
 
-        OutputStream outputStream = connection.getOutputStream();
-        outputStream.write(jsonPayload.toString().getBytes("UTF-8"));
-        outputStream.close();
+          OutputStream outputStream = connection.getOutputStream();
+          outputStream.write(jsonPayload.toString().getBytes("UTF-8"));
+          outputStream.close();
 
-        int responseCode = connection.getResponseCode();
-        RaygunLogger.d("Exception message HTTP POST result: " + responseCode);
+          int responseCode = connection.getResponseCode();
+          RaygunLogger.d("Exception message HTTP POST result: " + responseCode);
 
-        return responseCode;
+          return responseCode;
+        }
+        finally
+        {
+          if (connection != null)
+          {
+            connection.disconnect();
+          }
+        }
       }
     }
     catch (Exception e)
@@ -385,23 +404,33 @@ public class RaygunClient
         URL endpoint = new URL(RaygunSettings.getSettings().getPulseEndpoint());
         HttpURLConnection connection = (HttpURLConnection) endpoint.openConnection();
 
-        connection.setRequestMethod("POST");
-        connection.setRequestProperty("X-ApiKey", apiKey);
-        connection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+        try
+        {
+          connection.setRequestMethod("POST");
+          connection.setRequestProperty("X-ApiKey", apiKey);
+          connection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
 
-        OutputStream outputStream = connection.getOutputStream();
-        outputStream.write(jsonPayload.toString().getBytes("UTF-8"));
-        outputStream.close();
+          OutputStream outputStream = connection.getOutputStream();
+          outputStream.write(jsonPayload.getBytes("UTF-8"));
+          outputStream.close();
 
-        int responseCode = connection.getResponseCode();
-        Log.d("Raygun4Android", "Pulse HTTP POST result: " + responseCode);
+          int responseCode = connection.getResponseCode();
+          RaygunLogger.d("Pulse HTTP POST result: " + responseCode);
 
-        return responseCode;
+          return responseCode;
+        }
+        finally
+        {
+          if (connection != null)
+          {
+            connection.disconnect();
+          }
+        }
       }
     }
     catch (Exception e)
     {
-      Log.e("Raygun4Android", "Couldn't post exception - " + e.getMessage());
+      RaygunLogger.e("Couldn't post exception - " + e.getMessage());
       e.printStackTrace();
     }
     return -1;

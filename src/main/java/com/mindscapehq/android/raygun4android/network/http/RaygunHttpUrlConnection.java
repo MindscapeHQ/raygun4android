@@ -1,8 +1,5 @@
 package main.java.com.mindscapehq.android.raygun4android.network.http;
 
-import main.java.com.mindscapehq.android.raygun4android.network.RaygunNetworkLogger;
-import main.java.com.mindscapehq.android.raygun4android.network.RaygunNetworkUtils;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -14,6 +11,9 @@ import java.security.Permission;
 import java.util.List;
 import java.util.Map;
 
+import main.java.com.mindscapehq.android.raygun4android.network.RaygunNetworkLogger;
+import main.java.com.mindscapehq.android.raygun4android.network.RaygunNetworkUtils;
+
 public final class RaygunHttpUrlConnection extends HttpURLConnection
 {
   private URLConnection connectionInstance;
@@ -21,7 +21,7 @@ public final class RaygunHttpUrlConnection extends HttpURLConnection
   public RaygunHttpUrlConnection(URLConnection connection) {
     super(connection.getURL());
     connectionInstance = connection;
-    RaygunNetworkLogger.getInstance().startNetworkCall(connectionInstance.getURL().toExternalForm(), System.currentTimeMillis());
+    RaygunNetworkLogger.startNetworkCall(connectionInstance.getURL().toExternalForm(), System.currentTimeMillis());
   }
 
   public void connect() throws IOException
@@ -32,7 +32,7 @@ public final class RaygunHttpUrlConnection extends HttpURLConnection
     }
     catch (IOException e)
     {
-      RaygunNetworkLogger.getInstance().cancelNetworkCall(url.toExternalForm(), System.currentTimeMillis(), e.getMessage());
+      RaygunNetworkLogger.cancelNetworkCall(url.toExternalForm(), System.currentTimeMillis(), e.getMessage());
       throw e;
     }
   }
@@ -40,7 +40,7 @@ public final class RaygunHttpUrlConnection extends HttpURLConnection
   public void disconnect()
   {
     int statusCode = RaygunNetworkUtils.getStatusCode(connectionInstance);
-    RaygunNetworkLogger.getInstance().endNetworkCall(url.toExternalForm(), System.currentTimeMillis(), statusCode);
+    RaygunNetworkLogger.endNetworkCall(url.toExternalForm(), System.currentTimeMillis(), statusCode);
 
     if ((connectionInstance instanceof HttpURLConnection)) {
       ((HttpURLConnection)connectionInstance).disconnect();
@@ -55,7 +55,7 @@ public final class RaygunHttpUrlConnection extends HttpURLConnection
     }
     catch (IOException e)
     {
-      RaygunNetworkLogger.getInstance().cancelNetworkCall(url.toExternalForm(), System.currentTimeMillis(), e.getMessage());
+      RaygunNetworkLogger.cancelNetworkCall(url.toExternalForm(), System.currentTimeMillis(), e.getMessage());
       throw e;
     }
   }
@@ -68,7 +68,7 @@ public final class RaygunHttpUrlConnection extends HttpURLConnection
     }
     catch (IOException e)
     {
-      RaygunNetworkLogger.getInstance().cancelNetworkCall(url.toExternalForm(), System.currentTimeMillis(), e.getMessage());
+      RaygunNetworkLogger.cancelNetworkCall(url.toExternalForm(), System.currentTimeMillis(), e.getMessage());
       throw e;
     }
   }
@@ -97,7 +97,7 @@ public final class RaygunHttpUrlConnection extends HttpURLConnection
     }
     catch (IOException e)
     {
-      RaygunNetworkLogger.getInstance().cancelNetworkCall(url.toExternalForm(), System.currentTimeMillis(), e.getMessage());
+      RaygunNetworkLogger.cancelNetworkCall(url.toExternalForm(), System.currentTimeMillis(), e.getMessage());
       throw e;
     }
   }
@@ -111,7 +111,7 @@ public final class RaygunHttpUrlConnection extends HttpURLConnection
     }
     catch (IOException e)
     {
-      RaygunNetworkLogger.getInstance().cancelNetworkCall(url.toExternalForm(), System.currentTimeMillis(), e.getMessage());
+      RaygunNetworkLogger.cancelNetworkCall(url.toExternalForm(), System.currentTimeMillis(), e.getMessage());
       throw e;
     }
   }
@@ -205,7 +205,7 @@ public final class RaygunHttpUrlConnection extends HttpURLConnection
     }
     catch (IOException e)
     {
-      RaygunNetworkLogger.getInstance().cancelNetworkCall(url.toExternalForm(), System.currentTimeMillis(), e.getMessage());
+      RaygunNetworkLogger.cancelNetworkCall(url.toExternalForm(), System.currentTimeMillis(), e.getMessage());
       throw e;
     }
   }

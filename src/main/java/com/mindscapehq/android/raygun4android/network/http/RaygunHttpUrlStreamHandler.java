@@ -1,8 +1,5 @@
 package main.java.com.mindscapehq.android.raygun4android.network.http;
 
-import main.java.com.mindscapehq.android.raygun4android.RaygunLogger;
-import main.java.com.mindscapehq.android.raygun4android.network.RaygunNetworkUtils;
-
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -11,6 +8,8 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLStreamHandler;
 
+import main.java.com.mindscapehq.android.raygun4android.RaygunLogger;
+import main.java.com.mindscapehq.android.raygun4android.network.RaygunNetworkUtils;
 
 public final class RaygunHttpUrlStreamHandler extends URLStreamHandler
 {

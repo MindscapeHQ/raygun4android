@@ -1,5 +1,7 @@
 package main.java.com.mindscapehq.android.raygun4android;
 
+import java.util.HashSet;
+
 public class RaygunSettings {
 
   private RaygunSettings() { }
@@ -17,7 +19,7 @@ public class RaygunSettings {
   private final String defaultApiEndpoint = "https://api.raygun.io/entries";
   private final String defaultPulseEndpoint = "https://api.raygun.io/events";
 
-  private final IgnoredUrls ignoredUrls = new IgnoredUrls(defaultApiEndpoint);
+  private final IgnoredUrls ignoredUrls = new IgnoredUrls(defaultApiEndpoint, defaultPulseEndpoint);
 
   public String getApiEndpoint() {
     return defaultApiEndpoint;

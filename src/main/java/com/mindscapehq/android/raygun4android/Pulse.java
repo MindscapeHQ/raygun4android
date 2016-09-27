@@ -7,6 +7,8 @@ import android.os.Bundle;
 
 import java.util.concurrent.TimeUnit;
 
+import main.java.com.mindscapehq.android.raygun4android.network.RaygunNetworkLogger;
+
 public class Pulse implements ActivityLifecycleCallbacks {
   private static Pulse _pulse;
   private static Activity _mainActivity;
@@ -25,8 +27,15 @@ public class Pulse implements ActivityLifecycleCallbacks {
         RaygunClient.SendPulseEvent("session_start");
         _currentActivity = _mainActivity;
         _startTime = System.nanoTime();
+        RaygunNetworkLogger.init();
       }
     }
+  }
+
+  protected static void Attach(Activity mainActivity, boolean networkLogging)
+  {
+    RaygunNetworkLogger.setEnabled(networkLogging);
+    Attach(mainActivity);
   }
 
   protected static void Detach() {

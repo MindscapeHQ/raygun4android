@@ -1,13 +1,12 @@
 package main.java.com.mindscapehq.android.raygun4android.network.http;
 
-import main.java.com.mindscapehq.android.raygun4android.RaygunLogger;
-
 import android.os.Build;
 
 import java.net.URLStreamHandler;
 import java.net.URLStreamHandlerFactory;
 import java.util.HashMap;
 
+import main.java.com.mindscapehq.android.raygun4android.RaygunLogger;
 
 public class RaygunUrlStreamHandlerFactory implements URLStreamHandlerFactory
 {
