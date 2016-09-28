@@ -8,8 +8,7 @@ import android.telephony.TelephonyManager;
 import java.io.UnsupportedEncodingException;
 import java.util.UUID;
 
-public class RaygunUserContext
-{
+public class RaygunUserContext {
   protected static final String PREFS_FILE = "device_id.xml";
   protected static final String PREFS_DEVICE_ID = "device_id";
 
@@ -21,64 +20,62 @@ public class RaygunUserContext
   private String uuid;
   private Boolean isAnonymous;
 
-  public RaygunUserContext(Context context)
-  {
+  public RaygunUserContext(Context context) {
     identifier = getDeviceUuid(context);
   }
 
-  public RaygunUserContext(String user)
-  {
+  public RaygunUserContext(String user) {
     identifier = user;
   }
 
-  public RaygunUserContext(RaygunUserInfo userInfo, Context context)
-  {
-    if (userInfo.Identifier == null) {
+  public RaygunUserContext(RaygunUserInfo userInfo, Context context) {
+    if (userInfo.identifier == null) {
       identifier = getDeviceUuid(context);
     }
     else {
-      identifier = userInfo.Identifier;
+      identifier = userInfo.identifier;
     }
 
-    firstName = userInfo.FirstName;
-    fullName = userInfo.FullName;
-    email = userInfo.Email;
-    uuid = userInfo.Uuid;
-    isAnonymous = userInfo.IsAnonymous;
+    firstName = userInfo.firstName;
+    fullName = userInfo.fullName;
+    email = userInfo.email;
+    uuid = userInfo.uuid;
+    isAnonymous = userInfo.isAnonymous;
   }
 
   private String getDeviceUuid(Context context) {
-      synchronized (RaygunAppContext.class) {
-        if( identifier == null) {
-          final SharedPreferences prefs = context.getSharedPreferences( PREFS_FILE, 0);
-          String id = prefs.getString(PREFS_DEVICE_ID, null );
+    synchronized (RaygunAppContext.class) {
+      if (identifier == null) {
+        final SharedPreferences prefs = context.getSharedPreferences(PREFS_FILE, 0);
+        String id = prefs.getString(PREFS_DEVICE_ID, null );
 
-          if (id != null) {
-            return UUID.fromString(id).toString();
-          } else {
-
-            final String androidId = Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID);
-
-            try {
-              if (!"9774d56d682e549c".equals(androidId)) {
-                id = UUID.nameUUIDFromBytes(androidId.getBytes("utf8")).toString();
-              } else {
-                id = UUID.randomUUID().toString();
-              }
-            } catch (UnsupportedEncodingException e) {
-              throw new RuntimeException(e);
-            }
-
-            prefs.edit().putString(PREFS_DEVICE_ID, id.toString() ).commit();
-            return id;
-          }
+        if (id != null) {
+          return UUID.fromString(id).toString();
         }
-        return identifier;
+        else {
+          final String androidId = Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID);
+
+          try {
+            if (!"9774d56d682e549c".equals(androidId)) {
+              id = UUID.nameUUIDFromBytes(androidId.getBytes("utf8")).toString();
+            }
+            else {
+              id = UUID.randomUUID().toString();
+            }
+          }
+          catch (UnsupportedEncodingException e) {
+            throw new RuntimeException(e);
+          }
+
+          prefs.edit().putString(PREFS_DEVICE_ID, id.toString() ).commit();
+          return id;
+        }
       }
+      return identifier;
+    }
   }
 
-  public String getIdentifier()
-  {
+  public String getIdentifier() {
     return identifier;
   }
 }

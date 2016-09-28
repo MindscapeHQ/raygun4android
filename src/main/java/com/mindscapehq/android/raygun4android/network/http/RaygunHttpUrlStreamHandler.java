@@ -11,22 +11,17 @@ import java.net.URLStreamHandler;
 import main.java.com.mindscapehq.android.raygun4android.RaygunLogger;
 import main.java.com.mindscapehq.android.raygun4android.network.RaygunNetworkUtils;
 
-public final class RaygunHttpUrlStreamHandler extends URLStreamHandler
-{
+public final class RaygunHttpUrlStreamHandler extends URLStreamHandler {
   private static final int PORT = 80;
   private static final String PROTOCOL = "http";
   private URLStreamHandler originalHandler;
 
-  public RaygunHttpUrlStreamHandler(URLStreamHandler handler)
-  {
+  public RaygunHttpUrlStreamHandler(URLStreamHandler handler) {
     originalHandler = handler;
   }
 
-  protected URLConnection openConnection(URL url)
-      throws IOException
-  {
-    try
-    {
+  protected URLConnection openConnection(URL url) throws IOException {
+    try {
       Method method = RaygunNetworkUtils.findMethod(originalHandler.getClass(), "openConnection", new Class<?>[]{ URL.class });
       method.setAccessible(true);
 
@@ -38,24 +33,21 @@ public final class RaygunHttpUrlStreamHandler extends URLStreamHandler
 
       return new RaygunHttpUrlConnection(urlConnection);
     }
-    catch(NoSuchMethodException e) {
+    catch (NoSuchMethodException e) {
       RaygunLogger.e("Exception occurred in openConnection: " + e.getMessage());
     }
-    catch(IllegalAccessException e) {
+    catch (IllegalAccessException e) {
       RaygunLogger.e("Exception occurred in openConnection: " + e.getMessage());
     }
-    catch(InvocationTargetException e) {
+    catch (InvocationTargetException e) {
       RaygunLogger.e("Exception occurred in openConnection: " + e.getMessage());
     }
 
     throw new IOException();
   }
 
-  protected URLConnection openConnection(URL url, Proxy proxy)
-      throws IOException
-  {
-    try
-    {
+  protected URLConnection openConnection(URL url, Proxy proxy) throws IOException {
+    try {
       Method method = RaygunNetworkUtils.findMethod(originalHandler.getClass(), "openConnection", new Class<?>[]{ URL.class, Proxy.class });
       method.setAccessible(true);
 
@@ -67,26 +59,24 @@ public final class RaygunHttpUrlStreamHandler extends URLStreamHandler
 
       return new RaygunHttpUrlConnection(urlConnection);
     }
-    catch(NoSuchMethodException e) {
+    catch (NoSuchMethodException e) {
       RaygunLogger.e("Exception occurred in openConnection: " + e.getMessage());
     }
-    catch(IllegalAccessException e) {
+    catch (IllegalAccessException e) {
       RaygunLogger.e("Exception occurred in openConnection: " + e.getMessage());
     }
-    catch(InvocationTargetException e) {
+    catch (InvocationTargetException e) {
       RaygunLogger.e("Exception occurred in openConnection: " + e.getMessage());
     }
 
     throw new IOException();
   }
 
-  public int getDefaultPort()
-  {
+  public int getDefaultPort() {
     return PORT;
   }
 
-  public String getProtocol()
-  {
+  public String getProtocol() {
     return PROTOCOL;
   }
 }

@@ -13,7 +13,7 @@ public class RaygunNetworkUtils {
     if (urlConnection != null) {
       if ((urlConnection instanceof HttpURLConnection)) {
         try {
-          statusCode = ((HttpURLConnection) urlConnection).getResponseCode();
+          statusCode = ((HttpURLConnection)urlConnection).getResponseCode();
         }
         catch (Exception ignore) {
         }
@@ -22,19 +22,17 @@ public class RaygunNetworkUtils {
     return statusCode;
   }
 
-  public static Method findMethod(Class<?> clazz, String methodName, Class<?>[] args)
-      throws NoSuchMethodException
-  {
+  public static Method findMethod(Class<?> clazz, String methodName, Class<?>[] args) throws NoSuchMethodException {
     Method methodMatched = null;
 
     for (Method m : getAllMethods(clazz)) {
 
       if (m.getName().equals(methodName)) {
-
         Class<?>[] paramClasses = m.getParameterTypes();
-        if (paramClasses.length == args.length) {
 
+        if (paramClasses.length == args.length) {
           boolean paramsMatch = true;
+
           for (int i = 0; i < paramClasses.length; ++i) {
             Class<?> paramType = paramClasses[i];
             paramType = convertPrimitiveClass(paramType);
@@ -55,7 +53,8 @@ public class RaygunNetworkUtils {
 
     if (methodMatched != null) {
       return methodMatched;
-    } else {
+    }
+    else {
       throw new NoSuchMethodException("Cannot find method: " + methodName);
     }
   }
@@ -78,6 +77,7 @@ public class RaygunNetworkUtils {
 
   public static Collection<Class<?>> getAllSuperClasses(Class<?> clazz) {
     HashSet<Class<?>> classes = new HashSet<Class<?>>();
+
     if ((clazz != null) && (!clazz.equals(Object.class))) {
       classes.add(clazz);
       classes.addAll(getAllSuperClasses(clazz.getSuperclass()));

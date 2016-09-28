@@ -1,34 +1,34 @@
 package main.java.com.mindscapehq.android.raygun4android;
 
 import android.content.Context;
-import main.java.com.mindscapehq.android.raygun4android.messages.RaygunMessage;
 
 import java.util.List;
 import java.util.Map;
 
+import main.java.com.mindscapehq.android.raygun4android.messages.RaygunMessage;
+
 public interface IRaygunMessageBuilder {
+  RaygunMessage build();
 
-  RaygunMessage Build();
+  IRaygunMessageBuilder setMachineName(String machineName);
 
-  IRaygunMessageBuilder SetMachineName(String machineName);
+  IRaygunMessageBuilder setExceptionDetails(Throwable throwable);
 
-  IRaygunMessageBuilder SetExceptionDetails(Throwable throwable);
+  IRaygunMessageBuilder setClientDetails();
 
-  IRaygunMessageBuilder SetClientDetails();
+  IRaygunMessageBuilder setEnvironmentDetails(Context context);
 
-  IRaygunMessageBuilder SetEnvironmentDetails(Context context);
+  IRaygunMessageBuilder setVersion(String version);
 
-  IRaygunMessageBuilder SetVersion(String version);
+  IRaygunMessageBuilder setTags(List tags);
 
-  IRaygunMessageBuilder SetTags(List tags);
+  IRaygunMessageBuilder setUserCustomData(Map userCustomData);
 
-  IRaygunMessageBuilder SetUserCustomData(Map userCustomData);
+  IRaygunMessageBuilder setAppContext(String identifier);
 
-  IRaygunMessageBuilder SetAppContext(String identifier);
+  IRaygunMessageBuilder setUserContext(Context context);
 
-  IRaygunMessageBuilder SetUserContext(Context context);
+  IRaygunMessageBuilder setNetworkInfo(Context context);
 
-  IRaygunMessageBuilder SetNetworkInfo(Context context);
-
-  IRaygunMessageBuilder SetGroupingKey(String groupingKey);
+  IRaygunMessageBuilder setGroupingKey(String groupingKey);
 }

@@ -11,15 +11,14 @@ import java.security.Permission;
 import java.security.cert.Certificate;
 import java.util.List;
 import java.util.Map;
+
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLPeerUnverifiedException;
 
 import main.java.com.mindscapehq.android.raygun4android.network.RaygunNetworkLogger;
 import main.java.com.mindscapehq.android.raygun4android.network.RaygunNetworkUtils;
 
-public final class RaygunHttpsUrlConnection
-    extends HttpsURLConnection
-{
+public final class RaygunHttpsUrlConnection extends HttpsURLConnection {
   private URLConnection connectionInstance;
 
   public RaygunHttpsUrlConnection(URLConnection connection) {
@@ -28,365 +27,290 @@ public final class RaygunHttpsUrlConnection
     RaygunNetworkLogger.startNetworkCall(connectionInstance.getURL().toExternalForm(), System.currentTimeMillis());
   }
 
-  public void connect()
-      throws IOException
-  {
-    try
-    {
+  public void connect() throws IOException {
+    try {
       connectionInstance.connect();
     }
-    catch (IOException e)
-    {
+    catch (IOException e) {
       RaygunNetworkLogger.cancelNetworkCall(url.toExternalForm(), getRequestMethod(), System.currentTimeMillis(), e.getMessage());
       throw e;
     }
   }
 
-  public void disconnect()
-  {
+  public void disconnect() {
     int statusCode = RaygunNetworkUtils.getStatusCode(connectionInstance);
     RaygunNetworkLogger.endNetworkCall(url.toExternalForm(), getRequestMethod(), System.currentTimeMillis(), statusCode);
 
     if ((connectionInstance instanceof HttpURLConnection)) {
-      ((HttpURLConnection)connectionInstance).disconnect();
+      ((HttpURLConnection) connectionInstance).disconnect();
     }
   }
 
-  public InputStream getInputStream()
-      throws IOException
-  {
-    try
-    {
+  public InputStream getInputStream() throws IOException {
+    try {
       return connectionInstance.getInputStream();
     }
-    catch (IOException e)
-    {
+    catch (IOException e) {
       RaygunNetworkLogger.cancelNetworkCall(url.toExternalForm(), getRequestMethod(), System.currentTimeMillis(), e.getMessage());
       throw e;
     }
   }
 
-  public OutputStream getOutputStream()
-      throws IOException
-  {
-    try
-    {
+  public OutputStream getOutputStream() throws IOException {
+    try {
       return connectionInstance.getOutputStream();
     }
-    catch (IOException e)
-    {
+    catch (IOException e) {
       RaygunNetworkLogger.cancelNetworkCall(url.toExternalForm(), getRequestMethod(), System.currentTimeMillis(), e.getMessage());
       throw e;
     }
   }
 
-  public boolean getAllowUserInteraction()
-  {
+  public boolean getAllowUserInteraction() {
     return connectionInstance.getAllowUserInteraction();
   }
 
-  public void addRequestProperty(String field, String newValue)
-  {
+  public void addRequestProperty(String field, String newValue) {
     connectionInstance.addRequestProperty(field, newValue);
   }
 
-  public int getConnectTimeout()
-  {
+  public int getConnectTimeout() {
     return connectionInstance.getConnectTimeout();
   }
 
-  public Object getContent()
-      throws IOException
-  {
-    try
-    {
+  public Object getContent() throws IOException {
+    try {
       return connectionInstance.getContent();
     }
-    catch (IOException e)
-    {
+    catch (IOException e) {
       RaygunNetworkLogger.cancelNetworkCall(url.toExternalForm(), getRequestMethod(), System.currentTimeMillis(), e.getMessage());
       throw e;
     }
   }
 
-  public Object getContent(Class[] types)
-      throws IOException
-  {
-    try
-    {
+  public Object getContent(Class[] types) throws IOException {
+    try {
       return connectionInstance.getContent(types);
     }
-    catch (IOException e)
-    {
+    catch (IOException e) {
       RaygunNetworkLogger.cancelNetworkCall(url.toExternalForm(), getRequestMethod(), System.currentTimeMillis(), e.getMessage());
       throw e;
     }
   }
 
-  public String getContentEncoding()
-  {
+  public String getContentEncoding() {
     return connectionInstance.getContentEncoding();
   }
 
-  public int getContentLength()
-  {
+  public int getContentLength() {
     return connectionInstance.getContentLength();
   }
 
-  public String getContentType()
-  {
+  public String getContentType() {
     return connectionInstance.getContentType();
   }
 
-  public long getDate()
-  {
+  public long getDate() {
     return connectionInstance.getDate();
   }
 
-  public boolean getDefaultUseCaches()
-  {
+  public boolean getDefaultUseCaches() {
     return connectionInstance.getDefaultUseCaches();
   }
 
-  public boolean getDoInput()
-  {
+  public boolean getDoInput() {
     return connectionInstance.getDoInput();
   }
 
-  public boolean getDoOutput()
-  {
+  public boolean getDoOutput() {
     return connectionInstance.getDoOutput();
   }
 
-  public long getExpiration()
-  {
+  public long getExpiration() {
     return connectionInstance.getExpiration();
   }
 
-  public String getHeaderField(int pos)
-  {
+  public String getHeaderField(int pos) {
     return connectionInstance.getHeaderField(pos);
   }
 
-  public String getHeaderField(String key)
-  {
+  public String getHeaderField(String key) {
     return connectionInstance.getHeaderField(key);
   }
 
-  public long getHeaderFieldDate(String field, long defaultValue)
-  {
+  public long getHeaderFieldDate(String field, long defaultValue) {
     return connectionInstance.getHeaderFieldDate(field, defaultValue);
   }
 
-  public int getHeaderFieldInt(String field, int defaultValue)
-  {
+  public int getHeaderFieldInt(String field, int defaultValue) {
     return connectionInstance.getHeaderFieldInt(field, defaultValue);
   }
 
-  public String getHeaderFieldKey(int posn)
-  {
+  public String getHeaderFieldKey(int posn) {
     return connectionInstance.getHeaderFieldKey(posn);
   }
 
-  public Map<String, List<String>> getHeaderFields()
-  {
+  public Map<String, List<String>> getHeaderFields() {
     return connectionInstance.getHeaderFields();
   }
 
-  public long getIfModifiedSince()
-  {
+  public long getIfModifiedSince() {
     return connectionInstance.getIfModifiedSince();
   }
 
-  public long getLastModified()
-  {
+  public long getLastModified() {
     return connectionInstance.getLastModified();
   }
 
-  public Permission getPermission()
-      throws IOException
-  {
-    try
-    {
+  public Permission getPermission() throws IOException {
+    try {
       return connectionInstance.getPermission();
     }
-    catch (IOException e)
-    {
+    catch (IOException e) {
       RaygunNetworkLogger.cancelNetworkCall(url.toExternalForm(), getRequestMethod(), System.currentTimeMillis(), e.getMessage());
       throw e;
     }
   }
 
-  public int getReadTimeout()
-  {
+  public int getReadTimeout() {
     return connectionInstance.getReadTimeout();
   }
 
-  public Map<String, List<String>> getRequestProperties()
-  {
+  public Map<String, List<String>> getRequestProperties() {
     return connectionInstance.getRequestProperties();
   }
 
-  public String getRequestProperty(String field)
-  {
+  public String getRequestProperty(String field) {
     return connectionInstance.getRequestProperty(field);
   }
 
-  public URL getURL()
-  {
+  public URL getURL() {
     return connectionInstance.getURL();
   }
 
-  public boolean getUseCaches()
-  {
+  public boolean getUseCaches() {
     return connectionInstance.getUseCaches();
   }
 
-  public void setAllowUserInteraction(boolean newValue)
-  {
+  public void setAllowUserInteraction(boolean newValue) {
     connectionInstance.setAllowUserInteraction(newValue);
   }
 
-  public void setConnectTimeout(int timeoutMillis)
-  {
+  public void setConnectTimeout(int timeoutMillis) {
     connectionInstance.setConnectTimeout(timeoutMillis);
   }
 
-  public void setDefaultUseCaches(boolean newValue)
-  {
+  public void setDefaultUseCaches(boolean newValue) {
     connectionInstance.setDefaultUseCaches(newValue);
   }
 
-  public void setDoInput(boolean newValue)
-  {
+  public void setDoInput(boolean newValue) {
     connectionInstance.setDoInput(newValue);
   }
 
-  public void setDoOutput(boolean newValue)
-  {
+  public void setDoOutput(boolean newValue) {
     connectionInstance.setDoOutput(newValue);
   }
 
-  public void setIfModifiedSince(long newValue)
-  {
+  public void setIfModifiedSince(long newValue) {
     connectionInstance.setIfModifiedSince(newValue);
   }
 
-  public void setReadTimeout(int timeoutMillis)
-  {
+  public void setReadTimeout(int timeoutMillis) {
     connectionInstance.setReadTimeout(timeoutMillis);
   }
 
-  public void setRequestProperty(String field, String newValue)
-  {
+  public void setRequestProperty(String field, String newValue) {
     connectionInstance.setRequestProperty(field, newValue);
   }
 
-  public void setUseCaches(boolean newValue)
-  {
+  public void setUseCaches(boolean newValue) {
     connectionInstance.setUseCaches(newValue);
   }
 
-  public boolean usingProxy()
-  {
+  public boolean usingProxy() {
     if ((connectionInstance instanceof HttpsURLConnection)) {
-      return ((HttpsURLConnection)connectionInstance).usingProxy();
+      return ((HttpsURLConnection) connectionInstance).usingProxy();
     }
     return false;
   }
 
-  public InputStream getErrorStream()
-  {
+  public InputStream getErrorStream() {
     if ((connectionInstance instanceof HttpsURLConnection)) {
-      return ((HttpsURLConnection)connectionInstance).getErrorStream();
+      return ((HttpsURLConnection) connectionInstance).getErrorStream();
     }
     return null;
   }
 
-  public boolean getInstanceFollowRedirects()
-  {
+  public boolean getInstanceFollowRedirects() {
     if ((connectionInstance instanceof HttpsURLConnection)) {
-      return ((HttpsURLConnection)connectionInstance).getInstanceFollowRedirects();
+      return ((HttpsURLConnection) connectionInstance).getInstanceFollowRedirects();
     }
     return true;
   }
 
-  public String getRequestMethod()
-  {
+  public String getRequestMethod() {
     if ((connectionInstance instanceof HttpsURLConnection)) {
-      return ((HttpsURLConnection)connectionInstance).getRequestMethod();
+      return ((HttpsURLConnection) connectionInstance).getRequestMethod();
     }
     return "GET";
   }
 
-  public int getResponseCode()
-      throws IOException
-  {
+  public int getResponseCode() throws IOException {
     if ((connectionInstance instanceof HttpsURLConnection)) {
-      return ((HttpsURLConnection)connectionInstance).getResponseCode();
+      return ((HttpsURLConnection) connectionInstance).getResponseCode();
     }
     return -1;
   }
 
-  public String getResponseMessage()
-      throws IOException
-  {
+  public String getResponseMessage() throws IOException {
     if ((connectionInstance instanceof HttpsURLConnection)) {
-      return ((HttpsURLConnection)connectionInstance).getResponseMessage();
+      return ((HttpsURLConnection) connectionInstance).getResponseMessage();
     }
     return "";
   }
 
-  public void setChunkedStreamingMode(int chunkLength)
-  {
+  public void setChunkedStreamingMode(int chunkLength) {
     if ((connectionInstance instanceof HttpsURLConnection)) {
-      ((HttpsURLConnection)connectionInstance).setChunkedStreamingMode(chunkLength);
+      ((HttpsURLConnection) connectionInstance).setChunkedStreamingMode(chunkLength);
     }
   }
 
-  public void setFixedLengthStreamingMode(int contentLength)
-  {
+  public void setFixedLengthStreamingMode(int contentLength) {
     if ((connectionInstance instanceof HttpsURLConnection)) {
-      ((HttpsURLConnection)connectionInstance).setFixedLengthStreamingMode(contentLength);
+      ((HttpsURLConnection) connectionInstance).setFixedLengthStreamingMode(contentLength);
     }
   }
 
-  public void setInstanceFollowRedirects(boolean followRedirects)
-  {
+  public void setInstanceFollowRedirects(boolean followRedirects) {
     if ((connectionInstance instanceof HttpsURLConnection)) {
-      ((HttpsURLConnection)connectionInstance).setInstanceFollowRedirects(followRedirects);
+      ((HttpsURLConnection) connectionInstance).setInstanceFollowRedirects(followRedirects);
     }
   }
 
-  public void setRequestMethod(String method)
-      throws ProtocolException
-  {
+  public void setRequestMethod(String method) throws ProtocolException {
     if ((connectionInstance instanceof HttpsURLConnection)) {
-      ((HttpsURLConnection)connectionInstance).setRequestMethod(method);
+      ((HttpsURLConnection) connectionInstance).setRequestMethod(method);
     }
   }
 
-  public String getCipherSuite()
-  {
+  public String getCipherSuite() {
     if ((connectionInstance instanceof HttpsURLConnection)) {
-      return ((HttpsURLConnection)connectionInstance).getCipherSuite();
+      return ((HttpsURLConnection) connectionInstance).getCipherSuite();
     }
     return "";
   }
 
-  public Certificate[] getLocalCertificates()
-  {
+  public Certificate[] getLocalCertificates() {
     if ((connectionInstance instanceof HttpsURLConnection)) {
-      return ((HttpsURLConnection)connectionInstance).getLocalCertificates();
+      return ((HttpsURLConnection) connectionInstance).getLocalCertificates();
     }
     return null;
   }
 
-  public Certificate[] getServerCertificates()
-      throws SSLPeerUnverifiedException
-  {
+  public Certificate[] getServerCertificates() throws SSLPeerUnverifiedException {
     if ((connectionInstance instanceof HttpsURLConnection)) {
-      return ((HttpsURLConnection)connectionInstance).getServerCertificates();
+      return ((HttpsURLConnection) connectionInstance).getServerCertificates();
     }
     return null;
   }

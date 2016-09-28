@@ -8,17 +8,14 @@ import java.util.HashMap;
 
 import main.java.com.mindscapehq.android.raygun4android.RaygunLogger;
 
-public class RaygunUrlStreamHandlerFactory implements URLStreamHandlerFactory
-{
+public class RaygunUrlStreamHandlerFactory implements URLStreamHandlerFactory {
   private HashMap<String, URLStreamHandler> handlers;
 
-  public RaygunUrlStreamHandlerFactory()
-  {
+  public RaygunUrlStreamHandlerFactory() {
     createStreamHandlers();
   }
 
-  private void createStreamHandlers()
-  {
+  private void createStreamHandlers() {
     handlers = new HashMap<String, URLStreamHandler>();
 
     URLStreamHandler httpHandler = findHandler("http");
@@ -34,25 +31,19 @@ public class RaygunUrlStreamHandlerFactory implements URLStreamHandlerFactory
     }
   }
 
-  private URLStreamHandler findHandler(String protocol)
-  {
+  private URLStreamHandler findHandler(String protocol) {
     URLStreamHandler streamHandler = null;
-
     String packageList = System.getProperty("java.protocol.handler.pkgs");
     ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
 
-    if (packageList != null && contextClassLoader != null)
-    {
-      for (String packageName : packageList.split("\\|"))
-      {
+    if (packageList != null && contextClassLoader != null) {
+      for (String packageName : packageList.split("\\|")) {
         String className = packageName + "." + protocol + ".Handler";
-        try
-        {
+        try {
           Class<?> c = contextClassLoader.loadClass(className);
-          streamHandler = (URLStreamHandler) c.newInstance();
+          streamHandler = (URLStreamHandler)c.newInstance();
 
-          if (streamHandler != null)
-          {
+          if (streamHandler != null) {
             return streamHandler;
           }
         }
@@ -65,25 +56,19 @@ public class RaygunUrlStreamHandlerFactory implements URLStreamHandlerFactory
       }
     }
 
-    if (Build.VERSION.SDK_INT >= 19)
-    {
-      if (protocol.equals("http"))
-      {
+    if (Build.VERSION.SDK_INT >= 19) {
+      if (protocol.equals("http")) {
         streamHandler = createStreamHandler("com.android.okhttp.HttpHandler");
       }
-      else if (protocol.equals("https"))
-      {
+      else if (protocol.equals("https")) {
         streamHandler = createStreamHandler("com.android.okhttp.HttpsHandler");
       }
     }
-    else
-    {
-      if (protocol.equals("http"))
-      {
+    else {
+      if (protocol.equals("http")) {
         streamHandler = createStreamHandler("libcore.net.http.HttpHandler");
       }
-      else if (protocol.equals("https"))
-      {
+      else if (protocol.equals("https")) {
         streamHandler = createStreamHandler("libcore.net.http.HttpsHandler");
       }
     }
@@ -91,22 +76,17 @@ public class RaygunUrlStreamHandlerFactory implements URLStreamHandlerFactory
     return streamHandler;
   }
 
-  private URLStreamHandler createStreamHandler(String className)
-  {
-    try
-    {
-      return (URLStreamHandler) Class.forName(className).newInstance();
+  private URLStreamHandler createStreamHandler(String className) {
+    try {
+      return (URLStreamHandler)Class.forName(className).newInstance();
     }
-    catch (Exception e)
-    {
+    catch (Exception e) {
       RaygunLogger.e("Exception occurred in createStreamHandler: " + e.getMessage());
     }
-
     return null;
   }
 
-  public URLStreamHandler createURLStreamHandler(String protocol)
-  {
+  public URLStreamHandler createURLStreamHandler(String protocol) {
     return handlers.get(protocol);
   }
 }

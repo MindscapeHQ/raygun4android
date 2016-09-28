@@ -1,18 +1,12 @@
 package main.java.com.mindscapehq.android.raygun4android.messages;
 
-public class RaygunUserInfo
-{
-  public Boolean IsAnonymous;
-
-  public String Email;
-
-  public String FullName;
-
-  public String FirstName;
-
-  public String Uuid;
-
-  public String Identifier;
+public class RaygunUserInfo {
+  public Boolean isAnonymous;
+  public String email;
+  public String fullName;
+  public String firstName;
+  public String uuid;
+  public String identifier;
 
   /**
    * Set the current user's info to be transmitted - any parameters can be null if the data is not available or
@@ -26,15 +20,15 @@ public class RaygunUserInfo
    *                   or a correlation ID for anonymous users if you have one. It doesn't have to be unique, but we will treat
    *                   any duplicated values as the same user. If you use their email address here, pass it in as the 'emailAddress' parameter too.
    */
-  public RaygunUserInfo(String identifier, String firstName, String fullName, String emailAddress, String uuid, Boolean isAnonymous)
-  {
-    FirstName = firstName;
-    FullName = fullName;
-    Email = emailAddress;
-    Uuid = uuid;
-    IsAnonymous = isAnonymous;
-    Identifier = identifier;
+  public RaygunUserInfo(String identifier, String firstName, String fullName, String emailAddress, String uuid, Boolean isAnonymous) {
+    this.identifier = identifier;
+    this.firstName = firstName;
+    this.fullName = fullName;
+    this.email = emailAddress;
+    this.uuid = uuid;
+    this.isAnonymous = isAnonymous;
   }
 
-  public RaygunUserInfo() { }
+  public RaygunUserInfo() {
+  }
 }

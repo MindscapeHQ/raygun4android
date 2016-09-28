@@ -1,31 +1,27 @@
 package main.java.com.mindscapehq.android.raygun4android.messages;
 
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.telephony.TelephonyManager;
+
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import android.content.Context;
-import android.net.ConnectivityManager;
-import android.telephony.TelephonyManager;
 import org.apache.http.conn.util.InetAddressUtils;
 
-public class NetworkInfo
-{
+public class NetworkInfo {
   public List<String> iPAddress = new ArrayList<String>();
-
   private String networkConnectivityState;
 
-  public NetworkInfo(Context context)
-  {
+  public NetworkInfo(Context context) {
     readIPAddress();
-
     networkConnectivityState = readNetworkConnectivityState(context);
   }
 
-  private String readNetworkConnectivityState(Context context)
-  {
+  private String readNetworkConnectivityState(Context context) {
     String result = "Not connected";
 
     ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -52,7 +48,7 @@ public class NetworkInfo
             result += "Mobile - ";
 
             int subtype = info.getSubtype();
-            switch(subtype){
+            switch (subtype) {
               case TelephonyManager.NETWORK_TYPE_1xRTT:
                 result += "1xRTT";
                 break;
@@ -100,38 +96,29 @@ public class NetworkInfo
     return result;
   }
 
-  private void readIPAddress()
-  {
+  private void readIPAddress() {
     try {
       List<NetworkInterface> interfaces = Collections.list(NetworkInterface.getNetworkInterfaces());
 
-      for (NetworkInterface intf : interfaces)
-      {
+      for (NetworkInterface intf : interfaces) {
         List<InetAddress> addrs = Collections.list(intf.getInetAddresses());
 
-        for (InetAddress addr : addrs)
-        {
-          if (!addr.isLoopbackAddress())
-          {
+        for (InetAddress addr : addrs) {
+          if (!addr.isLoopbackAddress()) {
             String sAddr = addr.getHostAddress().toUpperCase();
             boolean isIPv4 = InetAddressUtils.isIPv4Address(sAddr);
 
-            if (isIPv4)
-            {
-              if (!iPAddress.contains(sAddr))
-              {
+            if (isIPv4) {
+              if (!iPAddress.contains(sAddr)) {
                 iPAddress.add(sAddr);
               }
             }
-            else
-            {
-              if (!isIPv4)
-              {
+            else {
+              if (!isIPv4) {
                 int delim = sAddr.indexOf('%'); // drop ip6 port suffix
                 String delimited = delim < 0 ? sAddr : sAddr.substring(0, delim);
 
-                if (!iPAddress.contains(delimited))
-                {
+                if (!iPAddress.contains(delimited)) {
                   iPAddress.add(delimited);
                 }
               }
@@ -139,6 +126,8 @@ public class NetworkInfo
           }
         }
       }
-    } catch (Exception ex) { }
+    }
+    catch (Exception ex) {
+    }
   }
 }
