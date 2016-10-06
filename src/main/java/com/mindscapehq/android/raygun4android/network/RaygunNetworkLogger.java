@@ -34,7 +34,7 @@ public class RaygunNetworkLogger {
   }
 
   public static synchronized void startNetworkCall(String url, long startTime) {
-    if (!shouldIgnoreUrl(url)) {
+    if (!shouldIgnoreUrl(url) && loggingEnabled) {
         String id = sanitiseUrl(url);
         connections.put(id, new RaygunNetworkRequestInfo(url, startTime));
         removeOldEntries();
@@ -68,7 +68,7 @@ public class RaygunNetworkLogger {
   }
 
   public static synchronized void sendNetworkTimingEvent(String url, String requestMethod, long startTime, long endTime, int statusCode, String exception) {
-    if (!shouldIgnoreUrl(url)) {
+    if (!shouldIgnoreUrl(url) && loggingEnabled) {
       RaygunClient.sendPulseTimingEvent(RaygunPulseEventType.NETWORK_CALL, requestMethod+" "+url, endTime - startTime);
     }
   }
