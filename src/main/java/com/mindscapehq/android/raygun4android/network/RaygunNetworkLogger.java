@@ -35,9 +35,9 @@ public class RaygunNetworkLogger {
 
   public static synchronized void startNetworkCall(String url, long startTime) {
     if (!shouldIgnoreUrl(url) && loggingEnabled) {
-        String id = sanitiseUrl(url);
-        connections.put(id, new RaygunNetworkRequestInfo(url, startTime));
-        removeOldEntries();
+      removeOldEntries();
+      String id = sanitiseUrl(url);
+      connections.put(id, new RaygunNetworkRequestInfo(url, startTime));
     }
   }
 
@@ -54,6 +54,10 @@ public class RaygunNetworkLogger {
     }
   }
 
+  /**
+   * When a network request is cancelled we stop tracking it and do not send the information through.
+   * Future updates may include sending the cancelled request timing through with information showing it was cancelled.
+   */
   public static synchronized void cancelNetworkCall(String url, String requestMethod, long endTime, String exception) {
     if (url != null) {
       String id = sanitiseUrl(url);
@@ -61,7 +65,6 @@ public class RaygunNetworkLogger {
         RaygunNetworkRequestInfo request = connections.get(id);
         if (request != null) {
           connections.remove(id);
-          sendNetworkTimingEvent(request.url, requestMethod, request.startTime, endTime, 0, exception);
         }
       }
     }
