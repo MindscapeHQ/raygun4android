@@ -101,7 +101,7 @@ public class RaygunNetworkLogger {
     if (url == null) {
       return true;
     }
-    for (String ignoredUrl : RaygunSettings.getIgnoredUrls()) {
+    for (String ignoredUrl : RaygunSettings.getIgnoredURLs()) {
       if (url.contains(ignoredUrl) || ignoredUrl.contains(url)) {
         return true;
       }

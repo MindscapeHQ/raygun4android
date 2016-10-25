@@ -391,6 +391,12 @@ public class RaygunClient {
       sendPulseEvent("session_start");
     }
 
+    if (eventType == RaygunPulseEventType.ACTIVITY_LOADED) {
+      if (RaygunClient.shouldIgnoreActivity(name)) {
+        return;
+      }
+    }
+
     RaygunPulseMessage message = new RaygunPulseMessage();
     RaygunPulseDataMessage dataMessage = new RaygunPulseDataMessage();
 
@@ -735,11 +741,31 @@ public class RaygunClient {
   }
 
   /**
-   * Allows the user to add more URLs to filter out so timing events are not sent for them.
-   * @param urls An array of urls to filter out.
+   * Allows the user to add more URLs to filter out, so network timing events are not sent for them.
+   * @param urls An array of urls to filter out by.
    */
   public static void ignoreURLs(String[] urls) {
     RaygunSettings.ignoreURLs(urls);
+  }
+
+  /**
+   * Allows the user to add more activities to filter out, so load timing events are not sent for them.
+   * @param activities An array of activity names to filter out by.
+   */
+  public static void ignoreActivities(String[] activities) {
+    RaygunSettings.ignoreActivities(activities);
+  }
+
+  private static boolean shouldIgnoreActivity(String activity) {
+    if (activity == null) {
+      return true;
+    }
+    for (String ignoredActivity : RaygunSettings.getIgnoredActivities()) {
+      if (activity.contains(ignoredActivity) || ignoredActivity.contains(activity)) {
+        return true;
+      }
+    }
+    return false;
   }
 
   public static class RaygunUncaughtExceptionHandler implements Thread.UncaughtExceptionHandler {
