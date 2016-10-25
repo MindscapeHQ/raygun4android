@@ -8,7 +8,7 @@ public class RaygunSettings {
 
   private static final String defaultApiEndpoint = "https://api.raygun.io/entries";
   private static final String defaultPulseEndpoint = "https://api.raygun.io/events";
-  private static IgnoredUrls ignoredUrls = new IgnoredUrls(defaultApiEndpoint, defaultPulseEndpoint);
+  private static IgnoredURLs ignoredURLs = new IgnoredURLs("api.raygun.io");
 
   public static String getApiEndpoint() {
     return defaultApiEndpoint;
@@ -19,13 +19,23 @@ public class RaygunSettings {
   }
 
   public static HashSet<String> getIgnoredUrls() {
-    return ignoredUrls;
+    return ignoredURLs;
   }
 
-  public static class IgnoredUrls extends HashSet<String> {
-    public IgnoredUrls(String... defaultIgnoredUrls) {
+  public static class IgnoredURLs extends HashSet<String> {
+    public IgnoredURLs(String... defaultIgnoredUrls) {
       for (String url : defaultIgnoredUrls) {
         add(url);
+      }
+    }
+  }
+
+  public static void ignoreURLs(String[] urls) {
+    if (urls != null) {
+      for (String url : urls) {
+        if (url != null) {
+          RaygunSettings.ignoredURLs.add(url);
+        }
       }
     }
   }

@@ -34,16 +34,16 @@ public class RaygunNetworkLogger {
   }
 
   public static synchronized void startNetworkCall(String url, long startTime) {
-    if (!shouldIgnoreUrl(url) && loggingEnabled) {
+    if (!shouldIgnoreURL(url) && loggingEnabled) {
       removeOldEntries();
-      String id = sanitiseUrl(url);
+      String id = sanitiseURL(url);
       connections.put(id, new RaygunNetworkRequestInfo(url, startTime));
     }
   }
 
   public static synchronized void endNetworkCall(String url, String requestMethod, long endTime, int statusCode) {
     if (url != null) {
-      String id = sanitiseUrl(url);
+      String id = sanitiseURL(url);
       if ((connections.containsKey(id))) {
         RaygunNetworkRequestInfo request = connections.get(id);
         if (request != null) {
@@ -60,7 +60,7 @@ public class RaygunNetworkLogger {
    */
   public static synchronized void cancelNetworkCall(String url, String requestMethod, long endTime, String exception) {
     if (url != null) {
-      String id = sanitiseUrl(url);
+      String id = sanitiseURL(url);
       if ((connections != null) && (connections.containsKey(id))) {
         RaygunNetworkRequestInfo request = connections.get(id);
         if (request != null) {
@@ -71,7 +71,7 @@ public class RaygunNetworkLogger {
   }
 
   public static synchronized void sendNetworkTimingEvent(String url, String requestMethod, long startTime, long endTime, int statusCode, String exception) {
-    if (!shouldIgnoreUrl(url) && loggingEnabled) {
+    if (!shouldIgnoreURL(url) && loggingEnabled) {
       RaygunClient.sendPulseTimingEvent(RaygunPulseEventType.NETWORK_CALL, requestMethod+" "+url, endTime - startTime);
     }
   }
@@ -87,7 +87,7 @@ public class RaygunNetworkLogger {
     }
   }
 
-  private static String sanitiseUrl(String url) {
+  private static String sanitiseURL(String url) {
     if (url != null) {
       url = url.toLowerCase();
       url = url.replaceAll("https://", "");
@@ -97,7 +97,7 @@ public class RaygunNetworkLogger {
     return url;
   }
 
-  private static boolean shouldIgnoreUrl(String url) {
+  private static boolean shouldIgnoreURL(String url) {
     if (url == null) {
       return true;
     }

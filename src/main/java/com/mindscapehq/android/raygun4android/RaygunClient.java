@@ -734,6 +734,14 @@ public class RaygunClient {
     setOnBeforeSend(onBeforeSend);
   }
 
+  /**
+   * Allows the user to add more URLs to filter out so timing events are not sent for them.
+   * @param urls An array of urls to filter out.
+   */
+  public static void ignoreURLs(String[] urls) {
+    RaygunSettings.ignoreURLs(urls);
+  }
+
   public static class RaygunUncaughtExceptionHandler implements Thread.UncaughtExceptionHandler {
     private UncaughtExceptionHandler defaultHandler;
     private List tags;
