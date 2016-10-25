@@ -32,7 +32,7 @@ public class RaygunEnvironmentMessage {
   private long availablePhysicalMemory;
   private long totalVirtualMemory;
   private long availableVirtualMemory;
-  private int diskSpaceFree;
+  private long diskSpaceFree;
   private double utcOffset;
   private String deviceName;
   private String brand;
@@ -87,7 +87,10 @@ public class RaygunEnvironmentMessage {
       totalPhysicalMemory = Long.parseLong(match) / 0x400;
 
       StatFs stat = new StatFs(Environment.getDataDirectory().getPath());
-      diskSpaceFree = (stat.getAvailableBlocks() * stat.getBlockSize()) / 0x100000;
+
+      long availableBlocks = (long) stat.getAvailableBlocks();
+      long blockSize = (long) stat.getBlockSize();
+      diskSpaceFree = (availableBlocks * blockSize) / 0x100000;
     }
     catch (Exception e) {
       RaygunLogger.w("Couldn't get all env data: " + e);
