@@ -29,18 +29,18 @@ public class RaygunUserContext {
   }
 
   public RaygunUserContext(RaygunUserInfo userInfo, Context context) {
-    if (userInfo.identifier == null) {
+    if (userInfo.getIdentifier() == null) {
       identifier = getDeviceUuid(context);
     }
     else {
-      identifier = userInfo.identifier;
+      identifier = userInfo.getIdentifier();
     }
 
-    firstName = userInfo.firstName;
-    fullName = userInfo.fullName;
-    email = userInfo.email;
-    uuid = userInfo.uuid;
-    isAnonymous = userInfo.isAnonymous;
+    firstName = userInfo.getFirstName();
+    fullName = userInfo.getFullName();
+    email = userInfo.getEmail();
+    uuid = userInfo.getUuid();
+    isAnonymous = userInfo.getIsAnonymous();
   }
 
   private String getDeviceUuid(Context context) {

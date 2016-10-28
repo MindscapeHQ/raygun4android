@@ -1,12 +1,12 @@
 package main.java.com.mindscapehq.android.raygun4android.messages;
 
 public class RaygunUserInfo {
-  public Boolean isAnonymous;
-  public String email;
-  public String fullName;
-  public String firstName;
-  public String uuid;
-  public String identifier;
+  private Boolean isAnonymous;
+  private String email;
+  private String fullName;
+  private String firstName;
+  private String uuid;
+  private String identifier;
 
   /**
    * Set the current user's info to be transmitted - any parameters can be null if the data is not available or
@@ -30,5 +30,53 @@ public class RaygunUserInfo {
   }
 
   public RaygunUserInfo() {
+  }
+
+  public Boolean getIsAnonymous() {
+    return this.isAnonymous;
+  }
+
+  public void setAnonymous(Boolean anonymous) {
+    isAnonymous = anonymous;
+  }
+
+  public String getEmail() {
+    return this.email;
+  }
+
+  public void setEmail(String email) {
+    this.email = email;
+  }
+
+  public String getFullName() {
+    return this.fullName;
+  }
+
+  public void setFullName(String fullName) {
+    this.fullName = fullName;
+  }
+
+  public String getFirstName() {
+    return this.firstName;
+  }
+
+  public void setFirstName(String firstName) {
+    this.firstName = firstName;
+  }
+
+  public String getUuid() {
+    return this.uuid;
+  }
+
+  public void setUuid(String uuid) {
+    this.uuid = uuid;
+  }
+
+  public String getIdentifier() {
+    return this.identifier;
+  }
+
+  public void setIdentifier(String identifier) {
+    this.identifier = identifier;
   }
 }
