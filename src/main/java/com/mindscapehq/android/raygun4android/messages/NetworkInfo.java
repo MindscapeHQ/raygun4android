@@ -13,12 +13,20 @@ import java.util.List;
 import org.apache.http.conn.util.InetAddressUtils;
 
 public class NetworkInfo {
-  public List<String> iPAddress = new ArrayList<String>();
+  private List<String> iPAddress = new ArrayList<String>();
   private String networkConnectivityState;
 
   public NetworkInfo(Context context) {
     readIPAddress();
     networkConnectivityState = readNetworkConnectivityState(context);
+  }
+
+  public List<String> getiPAddress() {
+    return iPAddress;
+  }
+
+  public void setiPAddress(List<String> iPAddress) {
+    this.iPAddress = iPAddress;
   }
 
   private String readNetworkConnectivityState(Context context) {
