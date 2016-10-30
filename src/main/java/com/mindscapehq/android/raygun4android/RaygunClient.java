@@ -392,7 +392,7 @@ public class RaygunClient {
     }
 
     if (eventType == RaygunPulseEventType.ACTIVITY_LOADED) {
-      if (RaygunClient.shouldIgnoreActivity(name)) {
+      if (RaygunClient.shouldIgnoreView(name)) {
         return;
       }
     }
@@ -749,19 +749,19 @@ public class RaygunClient {
   }
 
   /**
-   * Allows the user to add more activities to filter out, so load timing events are not sent for them.
-   * @param activities An array of activity names to filter out by.
+   * Allows the user to add more views to filter out, so load timing events are not sent for them.
+   * @param views An array of activity names to filter out by.
    */
-  public static void ignoreActivities(String[] activities) {
-    RaygunSettings.ignoreActivities(activities);
+  public static void ignoreViews(String[] views) {
+    RaygunSettings.ignoreViews(views);
   }
 
-  private static boolean shouldIgnoreActivity(String activity) {
-    if (activity == null) {
+  private static boolean shouldIgnoreView(String viewName) {
+    if (viewName == null) {
       return true;
     }
-    for (String ignoredActivity : RaygunSettings.getIgnoredActivities()) {
-      if (activity.contains(ignoredActivity) || ignoredActivity.contains(activity)) {
+    for (String ignoredView : RaygunSettings.getIgnoredViews()) {
+      if (viewName.contains(ignoredView) || ignoredView.contains(viewName)) {
         return true;
       }
     }
