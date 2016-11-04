@@ -61,18 +61,24 @@ public class Pulse implements ActivityLifecycleCallbacks {
     }
   }
 
-  @Deprecated
-  protected static void Attach(Activity mainActivity) {
+  /**
+   * @deprecated As of release 3.0.0, replaced by {@link #attach(Activity)}
+   */
+  @Deprecated protected static void Attach(Activity mainActivity) {
     attach(mainActivity);
   }
 
-  @Deprecated
-  protected static void Detach() {
+  /**
+   * @deprecated As of release 3.0.0, replaced by {@link #detach()}
+   */
+  @Deprecated protected static void Detach() {
     detach();
   }
 
-  @Deprecated
-  protected static void SendRemainingActivity() {
+  /**
+   * @deprecated As of release 3.0.0, replaced by {@link #sendRemainingActivity()}
+   */
+  @Deprecated protected static void SendRemainingActivity() {
     sendRemainingActivity();
   }
 

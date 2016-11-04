@@ -60,8 +60,10 @@ public class RaygunClient {
     RaygunClient.appContextIdentifier = UUID.randomUUID().toString();
   }
 
-  @Deprecated
-  public static void Init(Context context) {
+  /**
+   * @deprecated As of release 3.0.0, replaced by {@link #init(Context)}
+   */
+  @Deprecated public static void Init(Context context) {
     init(context);
   }
 
@@ -76,8 +78,10 @@ public class RaygunClient {
     init(context, apiKey, version);
   }
 
-  @Deprecated
-  public static void Init(String version, Context context) {
+  /**
+   * @deprecated As of release 3.0.0, replaced by {@link #init(String,Context)}
+   */
+  @Deprecated public static void Init(String version, Context context) {
     init(version, context);
   }
 
@@ -107,8 +111,10 @@ public class RaygunClient {
     }
   }
 
-  @Deprecated
-  public static void Init(Context context, String apiKey) {
+  /**
+   * @deprecated As of release 3.0.0, replaced by {@link #init(Context,String)}
+   */
+  @Deprecated public static void Init(Context context, String apiKey) {
     init(context, apiKey);
   }
 
@@ -124,8 +130,10 @@ public class RaygunClient {
     RaygunClient.version = version;
   }
 
-  @Deprecated
-  public static void Init(Context context, String apiKey, String version) {
+  /**
+   * @deprecated As of release 3.0.0, replaced by {@link #init(Context,String,String)}
+   */
+  @Deprecated public static void Init(Context context, String apiKey, String version) {
     init(context, apiKey, version);
   }
 
@@ -141,8 +149,10 @@ public class RaygunClient {
     }
   }
 
-  @Deprecated
-  public static void AttachExceptionHandler() {
+  /**
+   * @deprecated As of release 3.0.0, replaced by {@link #attachExceptionHandler()}
+   */
+  @Deprecated public static void AttachExceptionHandler() {
     attachExceptionHandler();
   }
 
@@ -153,8 +163,7 @@ public class RaygunClient {
    *             These will be appended to all exception messages sent to Raygun.
    * @deprecated Call attachExceptionHandler(), then setTags(List) instead
    */
-  @Deprecated
-  public static void AttachExceptionHandler(List tags) {
+  @Deprecated public static void AttachExceptionHandler(List tags) {
     UncaughtExceptionHandler oldHandler = Thread.getDefaultUncaughtExceptionHandler();
     if (!(oldHandler instanceof RaygunUncaughtExceptionHandler)) {
       RaygunClient.handler = new RaygunUncaughtExceptionHandler(oldHandler, tags);
@@ -170,8 +179,10 @@ public class RaygunClient {
     Pulse.attach(activity);
   }
 
-  @Deprecated
-  public static void AttachPulse(Activity activity) {
+  /**
+   * @deprecated As of release 3.0.0, replaced by {@link #attachPulse(Activity)}
+   */
+  @Deprecated public static void AttachPulse(Activity activity) {
     attachPulse(activity);
   }
 
@@ -194,8 +205,7 @@ public class RaygunClient {
    *                       application's state you would like to see.
    * @deprecated Call attachExceptionHandler(), then setUserCustomData(Map) instead
    */
-  @Deprecated
-  public static void AttachExceptionHandler(List tags, Map userCustomData) {
+  @Deprecated public static void AttachExceptionHandler(List tags, Map userCustomData) {
     UncaughtExceptionHandler oldHandler = Thread.getDefaultUncaughtExceptionHandler();
     if (!(oldHandler instanceof RaygunUncaughtExceptionHandler)) {
       RaygunClient.handler = new RaygunUncaughtExceptionHandler(oldHandler, tags, userCustomData);
@@ -229,8 +239,10 @@ public class RaygunClient {
     spinUpService(RaygunClient.apiKey, new Gson().toJson(msg), false);
   }
 
-  @Deprecated
-  public static void Send(Throwable throwable) {
+  /**
+   * @deprecated As of release 3.0.0, replaced by {@link #send(Throwable)}
+   */
+  @Deprecated public static void Send(Throwable throwable) {
     send(throwable);
   }
 
@@ -259,8 +271,10 @@ public class RaygunClient {
     spinUpService(RaygunClient.apiKey, new Gson().toJson(msg), false);
   }
 
-  @Deprecated
-  public static void Send(Throwable throwable, List tags) {
+  /**
+   * @deprecated As of release 3.0.0, replaced by {@link #send(Throwable,List)}
+   */
+  @Deprecated public static void Send(Throwable throwable, List tags) {
     send(throwable, tags);
   }
 
@@ -290,8 +304,10 @@ public class RaygunClient {
     spinUpService(RaygunClient.apiKey, new Gson().toJson(msg), false);
   }
 
-  @Deprecated
-  public static void Send(Throwable throwable, List tags, Map userCustomData) {
+  /**
+   * @deprecated As of release 3.0.0, replaced by {@link #send(Throwable,List,Map)}
+   */
+  @Deprecated public static void Send(Throwable throwable, List tags, Map userCustomData) {
     send(throwable, tags, userCustomData);
   }
 
@@ -336,8 +352,10 @@ public class RaygunClient {
     return -1;
   }
 
-  @Deprecated
-  public static int Post(String apiKey, String jsonPayload) {
+  /**
+   * @deprecated As of release 3.0.0, replaced by {@link #post(String,String)}
+   */
+  @Deprecated public static int Post(String apiKey, String jsonPayload) {
     return post(apiKey, jsonPayload);
   }
 
@@ -375,8 +393,10 @@ public class RaygunClient {
     spinUpService(RaygunClient.apiKey, new Gson().toJson(message), true);
   }
 
-  @Deprecated
-  protected static void SendPulseEvent(String name) {
+  /**
+   * @deprecated As of release 3.0.0, replaced by {@link #sendPulseEvent(String)}
+   */
+  @Deprecated protected static void SendPulseEvent(String name) {
     sendPulseEvent(name);
   }
 
@@ -433,8 +453,10 @@ public class RaygunClient {
     spinUpService(RaygunClient.apiKey, new Gson().toJson(message), true);
   }
 
-  @Deprecated
-  public static void SendPulseTimingEvent(RaygunPulseEventType eventType, String name, long milliseconds) {
+  /**
+   * @deprecated As of release 3.0.0, replaced by {@link #sendPulseTimingEvent(RaygunPulseEventType,String,long)}
+   */
+  @Deprecated public static void SendPulseTimingEvent(RaygunPulseEventType eventType, String name, long milliseconds) {
     sendPulseTimingEvent(eventType, name, milliseconds);
   }
 
@@ -472,8 +494,10 @@ public class RaygunClient {
     return -1;
   }
 
-  @Deprecated
-  protected static int PostPulseMessage(String apiKey, String jsonPayload) {
+  /**
+   * @deprecated As of release 3.0.0, replaced by {@link #postPulseMessage(String,String)}
+   */
+  @Deprecated protected static int PostPulseMessage(String apiKey, String jsonPayload) {
     return postPulseMessage(apiKey, jsonPayload);
   }
 
@@ -646,18 +670,18 @@ public class RaygunClient {
    * their picture will be displayed in the error view. If this is not called a random ID will be assigned.
    * If the user context changes in your application (i.e log in/out), be sure to call this again with the
    * updated user name/email address.
-   * @deprecated Call setUser(RaygunUserInfo) instead
    * @param user A user name or email address representing the current user
    */
-  @Deprecated
-  public static void SetUser(String user) {
+  public static void setUser(String user) {
     if (user != null && user.length() > 0) {
       RaygunClient.user = user;
     }
   }
 
-  @Deprecated
-  public static void SetUser(RaygunUserInfo userInfo) {
+  /**
+   * @deprecated As of release 3.0.0, replaced by {@link #setUser(RaygunUserInfo)}
+   */
+  @Deprecated public static void SetUser(RaygunUserInfo userInfo) {
     setUser(userInfo);
   }
 
@@ -677,8 +701,10 @@ public class RaygunClient {
     }
   }
 
-  @Deprecated
-  public static void SetVersion(String version) {
+  /**
+   * @deprecated As of release 3.0.0, replaced by {@link #setVersion(String)}
+   */
+  @Deprecated public static void SetVersion(String version) {
     setVersion(version);
   }
 
@@ -686,8 +712,10 @@ public class RaygunClient {
     return RaygunClient.handler;
   }
 
-  @Deprecated
-  public static RaygunUncaughtExceptionHandler GetExceptionHandler() {
+  /**
+   * @deprecated As of release 3.0.0, replaced by {@link #getExceptionHandler()}
+   */
+  @Deprecated public static RaygunUncaughtExceptionHandler GetExceptionHandler() {
     return getExceptionHandler();
   }
 
@@ -699,8 +727,10 @@ public class RaygunClient {
     return RaygunClient.tags;
   }
 
-  @Deprecated
-  public static List GetTags() {
+  /**
+   * @deprecated As of release 3.0.0, replaced by {@link #getTags()}
+   */
+  @Deprecated public static List GetTags() {
     return getTags();
   }
 
@@ -708,8 +738,10 @@ public class RaygunClient {
     RaygunClient.tags = tags;
   }
 
-  @Deprecated
-  public static void SetTags(List tags) {
+  /**
+   * @deprecated As of release 3.0.0, replaced by {@link #setTags(List)}
+   */
+  @Deprecated public static void SetTags(List tags) {
     setTags(tags);
   }
 
@@ -717,8 +749,10 @@ public class RaygunClient {
     return RaygunClient.userCustomData;
   }
 
-  @Deprecated
-  public static Map GetUserCustomData() {
+  /**
+   * @deprecated As of release 3.0.0, replaced by {@link #getUserCustomData()}
+   */
+  @Deprecated public static Map GetUserCustomData() {
     return getUserCustomData();
   }
 
@@ -726,8 +760,10 @@ public class RaygunClient {
     RaygunClient.userCustomData = userCustomData;
   }
 
-  @Deprecated
-  public static void SetUserCustomData(Map userCustomData) {
+  /**
+   * @deprecated As of release 3.0.0, replaced by {@link #setUserCustomData(Map)}
+   */
+  @Deprecated public static void SetUserCustomData(Map userCustomData) {
     setUserCustomData(userCustomData);
   }
 
@@ -735,8 +771,10 @@ public class RaygunClient {
     RaygunClient.onBeforeSend = onBeforeSend;
   }
 
-  @Deprecated
-  public static void SetOnBeforeSend(RaygunOnBeforeSend onBeforeSend) {
+  /**
+   * @deprecated As of release 3.0.0, replaced by {@link #setOnBeforeSend(RaygunOnBeforeSend)}
+   */
+  @Deprecated public static void SetOnBeforeSend(RaygunOnBeforeSend onBeforeSend) {
     setOnBeforeSend(onBeforeSend);
   }
 
@@ -777,14 +815,12 @@ public class RaygunClient {
       this.defaultHandler = defaultHandler;
     }
 
-    @Deprecated
-    public RaygunUncaughtExceptionHandler(UncaughtExceptionHandler defaultHandler, List tags) {
+    @Deprecated public RaygunUncaughtExceptionHandler(UncaughtExceptionHandler defaultHandler, List tags) {
       this.defaultHandler = defaultHandler;
       this.tags = tags;
     }
 
-    @Deprecated
-    public RaygunUncaughtExceptionHandler(UncaughtExceptionHandler defaultHandler, List tags, Map userCustomData) {
+    @Deprecated public RaygunUncaughtExceptionHandler(UncaughtExceptionHandler defaultHandler, List tags, Map userCustomData) {
       this.defaultHandler = defaultHandler;
       this.tags = tags;
       this.userCustomData = userCustomData;
