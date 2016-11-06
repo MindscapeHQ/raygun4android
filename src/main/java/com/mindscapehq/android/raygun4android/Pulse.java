@@ -61,27 +61,6 @@ public class Pulse implements ActivityLifecycleCallbacks {
     }
   }
 
-  /**
-   * @deprecated As of release 3.0.0, replaced by {@link #attach(Activity)}
-   */
-  @Deprecated protected static void Attach(Activity mainActivity) {
-    attach(mainActivity);
-  }
-
-  /**
-   * @deprecated As of release 3.0.0, replaced by {@link #detach()}
-   */
-  @Deprecated protected static void Detach() {
-    detach();
-  }
-
-  /**
-   * @deprecated As of release 3.0.0, replaced by {@link #sendRemainingActivity()}
-   */
-  @Deprecated protected static void SendRemainingActivity() {
-    sendRemainingActivity();
-  }
-
   @Override
   public void onActivityCreated(Activity activity, Bundle bundle) {
     if (Pulse.currentActivity == null) {
