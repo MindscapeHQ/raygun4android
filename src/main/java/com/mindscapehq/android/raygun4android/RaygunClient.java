@@ -394,13 +394,6 @@ public class RaygunClient {
   }
 
   /**
-   * @deprecated As of release 3.0.0, replaced by {@link #sendPulseEvent(String)}
-   */
-  @Deprecated protected static void SendPulseEvent(String name) {
-    sendPulseEvent(name);
-  }
-
-  /**
    * Sends a pulse timing event to Raygun. The message is sent on a background thread.
    * @param eventType The type of event that occurred.
    * @param name The name of the event resource such as the activity name or URL of a network call.
@@ -492,13 +485,6 @@ public class RaygunClient {
       e.printStackTrace();
     }
     return -1;
-  }
-
-  /**
-   * @deprecated As of release 3.0.0, replaced by {@link #postPulseMessage(String,String)}
-   */
-  @Deprecated protected static int PostPulseMessage(String apiKey, String jsonPayload) {
-    return postPulseMessage(apiKey, jsonPayload);
   }
 
   private static boolean hasInternetConnection() {
