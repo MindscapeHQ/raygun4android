@@ -47,8 +47,8 @@ public class RaygunNetworkLogger {
       if ((connections.containsKey(id))) {
         RaygunNetworkRequestInfo request = connections.get(id);
         if (request != null) {
-          connections.remove(url);
           sendNetworkTimingEvent(request.url, requestMethod, request.startTime, endTime, statusCode, null);
+          connections.remove(id);
         }
       }
     }
@@ -62,16 +62,14 @@ public class RaygunNetworkLogger {
     if (url != null) {
       String id = sanitiseURL(url);
       if ((connections != null) && (connections.containsKey(id))) {
-        RaygunNetworkRequestInfo request = connections.get(id);
-        if (request != null) {
-          connections.remove(id);
-        }
+        connections.remove(id);
       }
     }
   }
 
   public static synchronized void sendNetworkTimingEvent(String url, String requestMethod, long startTime, long endTime, int statusCode, String exception) {
     if (!shouldIgnoreURL(url) && loggingEnabled) {
+      url = sanitiseURL(url);
       RaygunClient.sendPulseTimingEvent(RaygunPulseEventType.NETWORK_CALL, requestMethod+" "+url, endTime - startTime);
     }
   }
@@ -89,10 +87,10 @@ public class RaygunNetworkLogger {
 
   private static String sanitiseURL(String url) {
     if (url != null) {
-      url = url.toLowerCase();
-      url = url.replaceAll("https://", "");
-      url = url.replaceAll("http://", "");
-      url = url.replaceAll("www.", "");
+      int queryIndex = url.indexOf("?");
+      if (queryIndex > 0) {
+        url = url.substring(0, queryIndex);
+      }
     }
     return url;
   }
