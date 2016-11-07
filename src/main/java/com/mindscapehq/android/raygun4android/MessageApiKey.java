@@ -1,10 +1,8 @@
 package main.java.com.mindscapehq.android.raygun4android;
 
-
 import java.io.Serializable;
 
-public class MessageApiKey implements Serializable
-{
+public class MessageApiKey implements Serializable {
   public String apiKey;
   public String message;
 

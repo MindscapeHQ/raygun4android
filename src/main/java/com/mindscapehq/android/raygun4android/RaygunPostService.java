@@ -6,88 +6,81 @@ import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.util.Log;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class RaygunPostService extends Service
-{
-
+public class RaygunPostService extends Service {
   private int tCount = 0;
-  private Intent _intent;
+  private Intent intent;
 
   @Override
-  public int onStartCommand(Intent intent, int flags, int startId)
-  {
-    _intent = intent;
+  public int onStartCommand(Intent intent, int flags, int startId) {
+    this.intent = intent;
     final Bundle bundle = intent.getExtras();
 
-    if (bundle == null)
-    {
+    if (bundle == null) {
       return START_NOT_STICKY;
     }
 
-    Thread t = new Thread(new Runnable()
-    {
+    Thread t = new Thread(new Runnable() {
       @Override
-      public void run()
-      {
+      public void run() {
         String message = (String) bundle.get("msg");
         String apiKey = (String) bundle.get("apikey");
-        if (hasInternetConnection())
-        {
-          RaygunClient.Post(apiKey, message);
+        String isPulse = (String) bundle.get("isPulse");
+
+        if ("True".equals(isPulse)) {
+          RaygunClient.postPulseMessage(apiKey, message);
         }
-        else
-        {
-          synchronized (this)
-          {
+        else if (hasInternetConnection()) {
+          RaygunClient.post(apiKey, message);
+        }
+        else {
+          synchronized (this) {
             int file = 0;
             ArrayList<File> files = new ArrayList<File>(Arrays.asList(getCacheDir().listFiles()));
-            if (files != null)
-            {
-              for (File f : files)
-              {
+            if (files != null) {
+              for (File f : files) {
                 String fileName = Integer.toString(file) + ".raygun";
-                if (RaygunClient.getExtension(f.getName()) == "raygun" && !f.getName().equals(fileName))
-                {
+                if (RaygunClient.getExtension(f.getName()).equals("raygun") && !f.getName().equals(fileName)) {
                   break;
                 }
-                else if (file < 64)
-                {
+                else if (file < 64) {
                   file++;
                 }
-                else
-                {
+                else {
                   files.get(0).delete();
                 }
               }
             }
             File fn = new File(getCacheDir(), Integer.toString(file) + ".raygun");
-            try
-            {
+            try {
               MessageApiKey messageApiKey = new MessageApiKey(apiKey, message);
               ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(fn));
               out.writeObject(messageApiKey);
               out.close();
-            } catch (FileNotFoundException e)
-            {
-              Log.e("Raygun4Android", "Error creating file when caching message to filesystem - " + e.getMessage());
-            } catch (IOException e)
-            {
-              Log.e("Raygun4Android", "Error writing message to filesystem - " + e.getMessage());
+            }
+            catch (FileNotFoundException e) {
+              RaygunLogger.e("Error creating file when caching message to filesystem - " + e.getMessage());
+            }
+            catch (IOException e) {
+              RaygunLogger.e("Error writing message to filesystem - " + e.getMessage());
             }
           }
         }
         tCount--;
-        if (tCount == 0)
-        {
+        if (tCount == 0) {
           stopSelf();
         }
       }
     });
+
     t.setDaemon(true);
     tCount++;
     t.start();
@@ -95,8 +88,7 @@ public class RaygunPostService extends Service
     return START_NOT_STICKY;
   }
 
-  private boolean hasInternetConnection()
-  {
+  private boolean hasInternetConnection() {
     ConnectivityManager cm = (ConnectivityManager) this.getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
     return cm.getActiveNetworkInfo() != null && cm.getActiveNetworkInfo().isConnectedOrConnecting();
   }
@@ -104,7 +96,7 @@ public class RaygunPostService extends Service
   @Override
   public void onDestroy() {
     super.onDestroy();
-    stopService(_intent);
+    stopService(intent);
   }
 
   @Override

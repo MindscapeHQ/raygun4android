@@ -1,18 +1,12 @@
 package main.java.com.mindscapehq.android.raygun4android.messages;
 
-public class RaygunUserInfo
-{
-  public Boolean IsAnonymous;
-
-  public String Email;
-
-  public String FullName;
-
-  public String FirstName;
-
-  public String Uuid;
-
-  public String Identifier;
+public class RaygunUserInfo {
+  private Boolean isAnonymous;
+  private String email;
+  private String fullName;
+  private String firstName;
+  private String uuid;
+  private String identifier;
 
   /**
    * Set the current user's info to be transmitted - any parameters can be null if the data is not available or
@@ -25,17 +19,64 @@ public class RaygunUserInfo
    * @param identifier Unique identifier for this user. Set this to the internal identifier you use to look up users,
    *                   or a correlation ID for anonymous users if you have one. It doesn't have to be unique, but we will treat
    *                   any duplicated values as the same user. If you use their email address here, pass it in as the 'emailAddress' parameter too.
-   * @return HTTP result code - 202 if successful, 403 if API key invalid, 400 if bad message (invalid properties)
    */
-  public RaygunUserInfo(String identifier, String firstName, String fullName, String emailAddress, String uuid, Boolean isAnonymous)
-  {
-    FirstName = firstName;
-    FullName = fullName;
-    Email = emailAddress;
-    Uuid = uuid;
-    IsAnonymous = isAnonymous;
-    Identifier = identifier;
+  public RaygunUserInfo(String identifier, String firstName, String fullName, String emailAddress, String uuid, Boolean isAnonymous) {
+    this.identifier = identifier;
+    this.firstName = firstName;
+    this.fullName = fullName;
+    this.email = emailAddress;
+    this.uuid = uuid;
+    this.isAnonymous = isAnonymous;
   }
 
-  public RaygunUserInfo() { }
+  public RaygunUserInfo() {
+  }
+
+  public Boolean getIsAnonymous() {
+    return this.isAnonymous;
+  }
+
+  public void setAnonymous(Boolean anonymous) {
+    isAnonymous = anonymous;
+  }
+
+  public String getEmail() {
+    return this.email;
+  }
+
+  public void setEmail(String email) {
+    this.email = email;
+  }
+
+  public String getFullName() {
+    return this.fullName;
+  }
+
+  public void setFullName(String fullName) {
+    this.fullName = fullName;
+  }
+
+  public String getFirstName() {
+    return this.firstName;
+  }
+
+  public void setFirstName(String firstName) {
+    this.firstName = firstName;
+  }
+
+  public String getUuid() {
+    return this.uuid;
+  }
+
+  public void setUuid(String uuid) {
+    this.uuid = uuid;
+  }
+
+  public String getIdentifier() {
+    return this.identifier;
+  }
+
+  public void setIdentifier(String identifier) {
+    this.identifier = identifier;
+  }
 }

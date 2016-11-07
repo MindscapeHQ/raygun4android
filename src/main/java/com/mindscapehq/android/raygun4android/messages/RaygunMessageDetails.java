@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 
 public class RaygunMessageDetails {
-
   private String groupingKey;
   private String machineName;
   private String version = "Not supplied";
@@ -75,40 +74,35 @@ public class RaygunMessageDetails {
     this.userCustomData = userCustomData;
   }
 
-  public RaygunAppContext getAppContext()
-  {
+  public RaygunAppContext getAppContext() {
     return context;
   }
 
-  public void setAppContext(String identifier)
-  {
+  public void setAppContext(String identifier) {
     this.context = new RaygunAppContext(identifier);
   }
 
-  public RaygunUserContext getUserContext()
-  {
+  public RaygunUserContext getUserContext() {
     return user;
   }
 
-  public void setUserContext(Context context)
-  {
+  public void setUserContext(Context context) {
     this.user = new RaygunUserContext(context);
   }
 
-  public void setUserContext(String user)
-  {
+  public void setUserContext(String user) {
     this.user = new RaygunUserContext(user);
   }
 
-  public void setUserContext(RaygunUserInfo userInfo, Context context)
-  {
+  public void setUserContext(RaygunUserInfo userInfo, Context context) {
     this.user = new RaygunUserContext(userInfo, context);
   }
 
-  public void setNetworkInfo(Context context)
-  {
+  public void setNetworkInfo(Context context) {
     this.request = new NetworkInfo(context);
   }
 
-  public void setGroupingKey(String groupingKey) { this.groupingKey = groupingKey; }
+  public void setGroupingKey(String groupingKey) {
+    this.groupingKey = groupingKey;
+  }
 }

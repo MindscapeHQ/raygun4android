@@ -1,27 +1,23 @@
 package main.java.com.mindscapehq.android.raygun4android.messages;
 
 public class RaygunErrorMessage {
-
   private RaygunErrorMessage innerError;
   private String message;
   private String className;
   private RaygunErrorStackTraceLineMessage[] stackTrace;
 
-  public RaygunErrorMessage(Throwable throwable)
-  {
+  public RaygunErrorMessage(Throwable throwable) {
     message = throwable.getClass().getSimpleName() + ": " + throwable.getMessage();
     className = throwable.getClass().getCanonicalName();
 
-    if (throwable.getCause() != null)
-    {
+    if (throwable.getCause() != null) {
       innerError = new RaygunErrorMessage((Exception) throwable.getCause());
     }
 
     StackTraceElement[] ste = throwable.getStackTrace();
     stackTrace = new RaygunErrorStackTraceLineMessage[ste.length];
 
-    for (int i = 0; i < ste.length; i++)
-    {
+    for (int i = 0; i < ste.length; i++) {
       stackTrace[i] = new RaygunErrorStackTraceLineMessage(ste[i]);
     }
   }
