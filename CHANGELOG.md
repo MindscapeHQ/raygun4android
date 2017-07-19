@@ -1,5 +1,9 @@
 ## Changelog
 
+- v3.0.1: Update sample app in repository to remove usage of deprecated methods on RaygunClient
+
+- v3.0.0: Add support for Pulse for Mobile (automatic network call tracking etc)
+
 - v2.1.1: Added MY_PACKAGE_REPLACED intent receiver and guard against spurious null Context seen on some devices when checking net connection
 
 - v2.1.0: Add OnBeforeSend implementation; expose setGroupingKey
