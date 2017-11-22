@@ -57,7 +57,7 @@ public class RaygunMessageDetails {
   public void setUserContext(RaygunUserInfo userInfo, Context context) { this.user = new RaygunUserContext(userInfo, context); }
 
   // Network Info
-  public NetworkInfo getNetworkInfo(Context context) { return request; }
+  public NetworkInfo getNetworkInfo() { return request; }
   public void setNetworkInfo(Context context) { this.request = new NetworkInfo(context); }
 
   // Grouping Key
