@@ -1,5 +1,7 @@
 ## Changelog
 
+- v3.0.2: Allowing all properties of the RaygunMessageDetails to be modifiable during the onBeforeSend callback.
+
 - v3.0.1: Update sample app in repository to remove usage of deprecated methods on RaygunClient
 
 - v3.0.0: Add support for Pulse for Mobile (automatic network call tracking etc)
