@@ -817,7 +817,7 @@ public class RaygunClient {
       if (userCustomData != null) {
         RaygunClient.send(throwable, tags, userCustomData);
       }
-      else if (RaygunClient.tags != null) {
+      else if (tags != null) {
         RaygunClient.send(throwable, tags);
       }
       else {
