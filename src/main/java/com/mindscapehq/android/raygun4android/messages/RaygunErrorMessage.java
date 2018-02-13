@@ -11,7 +11,7 @@ public class RaygunErrorMessage {
     className = throwable.getClass().getCanonicalName();
 
     if (throwable.getCause() != null) {
-      innerError = new RaygunErrorMessage((Exception) throwable.getCause());
+      innerError = new RaygunErrorMessage(throwable.getCause());
     }
 
     StackTraceElement[] ste = throwable.getStackTrace();
