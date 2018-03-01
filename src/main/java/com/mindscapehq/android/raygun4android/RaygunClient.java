@@ -588,7 +588,6 @@ public class RaygunClient {
   }
 
   private static void spinUpService(String apiKey, String jsonPayload, boolean isPulse) {
-    System.out.println(jsonPayload);
     Intent intent;
     if (RaygunClient.service == null) {
       intent = new Intent(RaygunClient.context, RaygunPostService.class);
