@@ -33,7 +33,7 @@ public class RaygunPostService extends Service {
       public void run() {
         String message = (String) bundle.get("msg");
         String apiKey = (String) bundle.get("apikey");
-        boolean isPulse = (String) bundle.get("isPulse").equals("True");
+        boolean isPulse = ((String) bundle.get("isPulse")).equals("True");
         boolean hasInternet = hasInternetConnection();
 
         if (isPulse && hasInternet) {
