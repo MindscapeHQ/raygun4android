@@ -35,13 +35,13 @@ public class RaygunPostService extends Service {
         String apiKey = (String) bundle.get("apikey");
         String isPulse = (String) bundle.get("isPulse");
 
-        if ("True".equals(isPulse)) {
-          RaygunClient.postPulseMessage(apiKey, message);
-        }
-        else if (hasInternetConnection()) {
-          RaygunClient.post(apiKey, message);
-        }
-        else {
+        if (hasInternetConnection()) {
+          if ("True".equals(isPulse)) {
+            RaygunClient.postPulseMessage(apiKey, message);
+          } else if (hasInternetConnection()) {
+            RaygunClient.post(apiKey, message);
+          }
+        } else {
           synchronized (this) {
             int file = 0;
             ArrayList<File> files = new ArrayList<File>(Arrays.asList(getCacheDir().listFiles()));
