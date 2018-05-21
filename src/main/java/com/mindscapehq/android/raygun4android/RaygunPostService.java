@@ -38,7 +38,7 @@ public class RaygunPostService extends Service {
         if (hasInternetConnection()) {
           if ("True".equals(isPulse)) {
             RaygunClient.postPulseMessage(apiKey, message);
-          } else if (hasInternetConnection()) {
+          } else {
             RaygunClient.post(apiKey, message);
           }
         } else {
