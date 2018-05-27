@@ -1,5 +1,9 @@
 ## Changelog
 
+- v3.0.4: Fixing NPE in RaygunPostService (#34, PR #37); RaygunErrorMessage can now accept any Throwable (PR #33); Pulse now checks for connectivity (PR #38)
+
+- v3.0.3: Bugfix: removing println from code (PR #36)
+
 - v3.0.2: Allowing all properties of the RaygunMessageDetails to be modifiable during the onBeforeSend callback.
 
 - v3.0.1: Update sample app in repository to remove usage of deprecated methods on RaygunClient
