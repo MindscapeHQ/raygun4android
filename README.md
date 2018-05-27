@@ -2,7 +2,7 @@
 
 The world's best Android crash and exception reporter.
 
-Supports Android 2.3.1 (API 9 Gingerbread) through Android 6+
+Supports Android 2.3.1 (API 9 Gingerbread) through Android 8+
 
 ## Installation
 
@@ -24,7 +24,7 @@ Then add the following to your **module's** build.gradle:
 dependencies {
 	...
 	compile 'com.google.code.gson:gson:2.1'
-	compile 'com.mindscapehq.android:raygun4android:3.0.2'
+	compile 'com.mindscapehq.android:raygun4android:3.0.4'
 }
 ```
 
@@ -45,7 +45,7 @@ To your pom.xml, add:
 <dependency>
     <groupId>com.mindscapehq.android</groupId>
     <artifactId>raygun4android</artifactId>
-    <version>3.0.2</version>
+    <version>3.0.4</version>
 </dependency>
 ```
 
