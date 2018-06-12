@@ -88,8 +88,15 @@ public class RaygunPostService extends Service {
   }
 
   private boolean hasInternetConnection() {
+  
     ConnectivityManager cm = (ConnectivityManager) this.getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
-    return cm != null && cm.getActiveNetworkInfo() != null && cm.getActiveNetworkInfo().isConnectedOrConnecting();
+
+    if (cm != null) {
+      NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+      return activeNetwork != null && activeNetwork.isConnectedOrConnecting();
+    }
+    
+    return false;
   }
 
   @Override
