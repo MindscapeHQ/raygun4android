@@ -22,6 +22,9 @@ public class RaygunPostService extends Service {
 
   @Override
   public int onStartCommand(Intent intent, int flags, int startId) {
+    // the intent should never be null:
+    // https://developer.android.com/reference/android/app/Service#START_NOT_STICKY
+    // but somehow it is
     if (intent == null || intent.getExtras() == null) {
       return START_NOT_STICKY;
     }
