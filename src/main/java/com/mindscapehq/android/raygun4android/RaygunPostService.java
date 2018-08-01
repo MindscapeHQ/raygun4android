@@ -22,12 +22,12 @@ public class RaygunPostService extends Service {
 
   @Override
   public int onStartCommand(Intent intent, int flags, int startId) {
-    this.intent = intent;
-    final Bundle bundle = intent.getExtras();
-
-    if (bundle == null) {
+    if (intent == null || intent.getExtras() == null) {
       return START_NOT_STICKY;
     }
+
+    this.intent = intent;
+    final Bundle bundle = intent.getExtras();
 
     Thread t = new Thread(new Runnable() {
       @Override
