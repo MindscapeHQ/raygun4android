@@ -2,7 +2,19 @@
 
 The world's best Android crash and exception reporter.
 
-Supports Android 2.3.1 (API 9 Gingerbread) through Android 8+
+Supports Android 4+ (API 14+).
+
+## IMPORTANT
+
+### 21/09/2018
+
+Raygun4Android is currently actively being worked on for a release of version 4 and a lot of the documentation below is outdated and has not been updated (yet).
+
+If you found this branch (4.0.0) - it's probably not where you want to be and things will most likely break for you. Sorry.
+
+Please go back to master, in which you'll find the 3.x stream of the provider that we actively encourage you to use.
+
+***
 
 ## Installation
 
