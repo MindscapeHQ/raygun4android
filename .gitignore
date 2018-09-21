@@ -26,6 +26,7 @@ Thumbs.db
 .idea/workspace.xml
 .idea/libraries
 .idea/modules.xml
+.idea/caches/
 .gradle
 build/
 .navigation
