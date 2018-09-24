@@ -1,6 +1,88 @@
+import static groovyx.net.http.HttpBuilder.configure
+import static groovyx.net.http.ContentTypes.JSON
+
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
+
+// Implement something here to return a unique build number. Could be VCS revision from hg/git etc.
+def getVersionBuild = { ->
+    try {
+        return 2
+    }
+    catch (error) {
+        return -1;
+    }
+}
+
+// Used for Raygun notifyDeployment task. In the real world this would come from a local user.properties file etc.
+def localUserName = "Change Me"
+def localUserEmail = "changeme@test.com"
+
+// Used to build up versionName and versionCode
+def versionMajor = 1
+def versionMinor = 0
+def versionPatch = 0
+def versionBuild = getVersionBuild()
+
+// Raygun Gradle task configuration
+def RAYGUN_GROUP = "raygun"
+def RAYGUN_API_TOKEN = "<YOUR EXTERNAL ACCESS TOKEN>"
+def RAYGUN_API_KEY = "<YOUR RG APP API KEY>"
+def RAYGUN_APP_PATH = "<YOUR RG APP UPLOAD PATH>"
+
+/*
+ * Setup a sample Gradle task for deployment notification
+ * This is done as a function so that there's more flexibility when it comes to dealing with creating the tasks for multiple flavours etc.
+ */
+def createRaygunNotifyDeploymentTask(token,key,groupName,version,userName,userEmail) {
+
+    task "notifyDeployment" {
+        group "${groupName}"
+
+        doLast {
+            def result = configure {
+                request.uri = 'https://app.raygun.io/deployments?authToken=' + token
+                request.contentType = JSON[0]
+            }.post {
+                request.body = '{"apiKey":"' + key + '","version":"' + version + '","ownerName":"' + userName + '","emailAddress":"' + userEmail + '"}'
+                request.contentType = 'application/json'
+            }
+
+            println result
+            def depId = result.deploymentId as Long
+            assert depId != null && depId != '' && depId > 0
+        }
+    }
+}
+
+/*
+ * Setup a sample Gradle task for upload proguard mapping files
+ * This is done as a function so that there's more flexibility when it comes to dealing with creating the tasks for multiple flavours etc.
+ *
+ * TODO:
+ * The function as of now requires curl to be available on the PATH of the machine running it and probably doesn't work out of the box on Windows. Should be refactored to using the Groovy HTTP library
+ */
+def createRaygunProguardTask(token,raygunAppPath,groupName,version) {
+
+    task "uploadProguardMapping" {
+        group "${groupName}"
+
+        doLast {
+            def proguardMappingFileParam = "file=@${project.rootDir}/app/build/outputs/mapping/release/mapping.txt"
+            def versionIdentifierParam = "version=${version}"
+            def raygunProguardEndpointUrlParam = "https://app.raygun.com/upload/proguardsymbols/${raygunAppPath}?authToken=${token}"
+
+            def p = ['curl', '-F', proguardMappingFileParam, '-F', versionIdentifierParam, raygunProguardEndpointUrlParam].execute()
+            p.waitFor()
+
+            def result = p.text
+            println result
+            assert result == "true"
+        }
+    }
+}
+
 
 android {
     compileSdkVersion 27
@@ -8,16 +90,27 @@ android {
         applicationId "com.raygun.raygun4android.sample"
         minSdkVersion 14
         targetSdkVersion 27
-        versionCode 1
-        versionName "1.0"
+        versionCode versionMajor * 10000000 + versionMinor * 1000000 + versionPatch * 100000 + versionBuild
+        versionName "${versionMajor}.${versionMinor}.${versionPatch}.${versionBuild}"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
         release {
-            minifyEnabled false
+            debuggable false
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
+        debug {
+            debuggable true
+            minifyEnabled false
+            applicationIdSuffix '.debug'
+            versionNameSuffix '-DEBUG'
+        }
     }
+
+    // Setup RG tasks
+    createRaygunNotifyDeploymentTask(RAYGUN_API_TOKEN, RAYGUN_API_KEY, RAYGUN_GROUP, defaultConfig.versionName, localUserName, localUserEmail)
+    createRaygunProguardTask(RAYGUN_API_TOKEN, RAYGUN_APP_PATH, RAYGUN_GROUP, defaultConfig.versionName)
 }
 
 dependencies {
