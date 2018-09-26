@@ -12,15 +12,16 @@
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 
-        <service android:name="com.raygun.raygun4android.RaygunPostService"
+        <service
+            android:name="com.raygun.raygun4android.RaygunPostService"
             android:exported="false"
             android:process=":raygunpostservice"/>
-        <meta-data android:name="com.mindscapehq.android.raygun4android.apikey"
+        <meta-data
+            android:name="com.mindscapehq.android.raygun4android.apikey"
             android:value="PASTE_YOUR_API_KEY_HERE" />
     </application>
 
