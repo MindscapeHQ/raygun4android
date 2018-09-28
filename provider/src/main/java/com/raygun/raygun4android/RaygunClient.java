@@ -16,6 +16,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 import com.google.gson.Gson;
 
@@ -26,6 +27,12 @@ import com.raygun.raygun4android.messages.RaygunPulseMessage;
 import com.raygun.raygun4android.messages.RaygunPulseTimingMessage;
 import com.raygun.raygun4android.messages.RaygunUserContext;
 import com.raygun.raygun4android.messages.RaygunUserInfo;
+
+import okhttp3.MediaType;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
 
 /**
  * User: Mindscape
@@ -341,27 +348,29 @@ public class RaygunClient {
     public static int post(String apiKey, String jsonPayload) {
         try {
             if (validateApiKey(apiKey)) {
-                URL endpoint = new URL(RaygunSettings.getApiEndpoint());
-                HttpURLConnection connection = (HttpURLConnection) endpoint.openConnection();
+                String endpoint = RaygunSettings.getApiEndpoint();
+                MediaType MEDIA_TYPE_JSON = MediaType.parse("application/json; charset=utf-8");
 
+                OkHttpClient client = new OkHttpClient.Builder()
+                        .connectTimeout(10, TimeUnit.SECONDS)
+                        .writeTimeout(10,TimeUnit.SECONDS)
+                        .readTimeout(10,TimeUnit.SECONDS)
+                        .build();
+
+                RequestBody body = RequestBody.create(MEDIA_TYPE_JSON, jsonPayload);
+
+                Request request = new Request.Builder()
+                        .url(endpoint)
+                        .header("X-ApiKey", apiKey)
+                        .post(body)
+                        .build();
                 try {
-                    connection.setRequestMethod("POST");
-                    connection.setRequestProperty("X-ApiKey", apiKey);
-                    connection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
-
-                    OutputStream outputStream = connection.getOutputStream();
-                    outputStream.write(jsonPayload.toString().getBytes("UTF-8"));
-                    outputStream.close();
-
-                    int responseCode = connection.getResponseCode();
-
-                    RaygunLogger.d("Exception message HTTP POST result: " + responseCode);
-
-                    return responseCode;
-                } finally {
-                    if (connection != null) {
-                        connection.disconnect();
-                    }
+                    Response response = client.newCall(request).execute();
+                    RaygunLogger.d("Exception message HTTP POST result: " + response.code());
+                    return response.code();
+                } catch (IOException ioe) {
+                    RaygunLogger.e("OkHttp POST to Raygun backend failed - " + ioe.getMessage());
+                    ioe.printStackTrace();
                 }
             }
         } catch (Exception e) {
