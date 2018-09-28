@@ -369,7 +369,7 @@ public class RaygunClient {
                     RaygunLogger.d("Exception message HTTP POST result: " + response.code());
                     return response.code();
                 } catch (IOException ioe) {
-                    RaygunLogger.e("OkHttp POST to Raygun backend failed - " + ioe.getMessage());
+                    RaygunLogger.e("OkHttp POST to Raygun Crash Reporting backend failed - " + ioe.getMessage());
                     ioe.printStackTrace();
                 }
             }
@@ -487,26 +487,29 @@ public class RaygunClient {
     protected static int postPulseMessage(String apiKey, String jsonPayload) {
         try {
             if (validateApiKey(apiKey)) {
-                URL endpoint = new URL(RaygunSettings.getPulseEndpoint());
-                HttpURLConnection connection = (HttpURLConnection) endpoint.openConnection();
+                String endpoint = RaygunSettings.getPulseEndpoint();
+                MediaType MEDIA_TYPE_JSON = MediaType.parse("application/json; charset=utf-8");
 
+                OkHttpClient client = new OkHttpClient.Builder()
+                        .connectTimeout(30, TimeUnit.SECONDS)
+                        .writeTimeout(30,TimeUnit.SECONDS)
+                        .readTimeout(30,TimeUnit.SECONDS)
+                        .build();
+
+                RequestBody body = RequestBody.create(MEDIA_TYPE_JSON, jsonPayload);
+
+                Request request = new Request.Builder()
+                        .url(endpoint)
+                        .header("X-ApiKey", apiKey)
+                        .post(body)
+                        .build();
                 try {
-                    connection.setRequestMethod("POST");
-                    connection.setRequestProperty("X-ApiKey", apiKey);
-                    connection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
-
-                    OutputStream outputStream = connection.getOutputStream();
-                    outputStream.write(jsonPayload.getBytes("UTF-8"));
-                    outputStream.close();
-
-                    int responseCode = connection.getResponseCode();
-                    RaygunLogger.d("Pulse HTTP POST result: " + responseCode);
-
-                    return responseCode;
-                } finally {
-                    if (connection != null) {
-                        connection.disconnect();
-                    }
+                    Response response = client.newCall(request).execute();
+                    RaygunLogger.d("Pulse HTTP POST result: " + response.code());
+                    return response.code();
+                } catch (IOException ioe) {
+                    RaygunLogger.e("OkHttp POST to Raygun Pulse backend failed - " + ioe.getMessage());
+                    ioe.printStackTrace();
                 }
             }
         } catch (Exception e) {
