@@ -12,8 +12,7 @@ import android.os.Bundle;
 
 import java.io.*;
 import java.lang.Thread.UncaughtExceptionHandler;
-import java.net.HttpURLConnection;
-import java.net.URL;
+import java.lang.Thread.UncaughtExceptionHandler;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -618,7 +617,7 @@ public class RaygunClient {
         intent.putExtra("apikey", apiKey);
         intent.putExtra("isPulse", isPulse);
 
-        RaygunClient.context.startService(intent);
+        RaygunPostService.enqueueWork(RaygunClient.context, intent);
     }
 
     public static void closePostService() {

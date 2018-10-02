@@ -6,6 +6,27 @@ Supports Android 4+ (API 14+).
 
 ## IMPORTANT
 
+to be addded: 
+
+```
+<service
+         android:name="<fullpath>.ExampleJobIntentService"
+         android:permission="android.permission.BIND_JOB_SERVICE" />
+```
+
+Also add min requirements:
+
+minSDK
+compileSDK
+
+
+FAQ
+
+10-03 12:27:24.722 4927-4927/com.raygun.raygun4android.sample.debug:raygunpostservice I/art: Rejecting re-init on previously-failed class java.lang.Class<android.support.v4.app.JobIntentService$JobServiceEngineImpl>
+    Rejecting re-init on previously-failed class java.lang.Class<android.support.v4.app.JobIntentService$JobServiceEngineImpl>
+    
+    
+    
 ### 21/09/2018
 
 Raygun4Android is currently actively being worked on for a release of version 4 and a lot of the documentation below is outdated and has not been updated (yet).

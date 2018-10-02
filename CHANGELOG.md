@@ -8,7 +8,10 @@
   - Improvements to sample app:
     - Added sample Gradle task to send a deployment notification to Raygun
     - Added sample Gradle task to upload the Proguard mapping file from a release build to Raygun
-    
+  - RaygunPostService is now a JobIntentService to better deal with background limitations in Android 8+
+  - Sending POST data to the Raygun backend has been refactored to using Okhttp3 and RG4A therefore has a new implementation dependency on this library
+  - compileSDK 28, minDK 16
+   
 - v3.0.5: Fixing timing issue from ConnectivityManager in RaygunPostService (#41), adding null checks around intent extras being null that should never be null (XRAY-1898)
 
 - v3.0.4: Fixing NPE in RaygunPostService (#34, PR #37); RaygunErrorMessage can now accept any Throwable (PR #33); Pulse now checks for connectivity (PR #38)

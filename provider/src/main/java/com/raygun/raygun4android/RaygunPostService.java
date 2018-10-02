@@ -1,12 +1,12 @@
 package com.raygun.raygun4android;
 
-import android.app.IntentService;
 import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
-import android.os.IBinder;
+import android.support.annotation.NonNull;
+import android.support.v4.app.JobIntentService;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -16,16 +16,18 @@ import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class RaygunPostService extends IntentService {
+public class RaygunPostService extends JobIntentService {
 
+    static final int RAYGUNPOSTSERVICE_JOB_ID = 4711;
     private Intent intent;
 
-    public RaygunPostService() {
-        super("RaygunPostService");
+    static void enqueueWork(Context context, Intent intent) {
+        RaygunLogger.i("Work for RaygunPostService has been put in the job queue");
+        enqueueWork(context, RaygunPostService.class, RAYGUNPOSTSERVICE_JOB_ID, intent);
     }
 
     @Override
-    public void onHandleIntent(Intent intent) {
+    public void onHandleWork(@NonNull Intent intent) {
 
         if (intent != null && intent.getExtras() != null) {
             this.intent = intent;
@@ -88,11 +90,5 @@ public class RaygunPostService extends IntentService {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        stopSelf();
-    }
-
-    @Override
-    public IBinder onBind(Intent intent) {
-        return null;
     }
 }
