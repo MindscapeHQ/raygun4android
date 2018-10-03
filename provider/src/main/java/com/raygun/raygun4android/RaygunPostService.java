@@ -19,7 +19,6 @@ import java.util.Arrays;
 public class RaygunPostService extends JobIntentService {
 
     static final int RAYGUNPOSTSERVICE_JOB_ID = 4711;
-    private Intent intent;
 
     static void enqueueWork(Context context, Intent intent) {
         RaygunLogger.i("Work for RaygunPostService has been put in the job queue");
@@ -30,7 +29,6 @@ public class RaygunPostService extends JobIntentService {
     public void onHandleWork(@NonNull Intent intent) {
 
         if (intent != null && intent.getExtras() != null) {
-            this.intent = intent;
 
             final Bundle bundle = intent.getExtras();
 
