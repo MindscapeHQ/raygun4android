@@ -52,7 +52,7 @@ public class RaygunPostService extends JobIntentService {
                             String fileName = Integer.toString(file) + ".raygun";
                             if (RaygunClient.getExtension(f.getName()).equals("raygun") && !f.getName().equals(fileName)) {
                                 break;
-                            } else if (file < 64) {
+                            } else if (file < RaygunSettings.getMaxReportsStoredOnDevice()) {
                                 file++;
                             } else {
                                 files.get(0).delete();
