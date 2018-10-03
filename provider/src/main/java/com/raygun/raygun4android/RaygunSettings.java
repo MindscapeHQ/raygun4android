@@ -4,7 +4,7 @@ import java.util.HashSet;
 
 public class RaygunSettings {
 
-    public static final int MAX_REPORTS_STORED_ON_DEVICE_DEFAULT = 64;
+    private static final int MAX_REPORTS_STORED_ON_DEVICE_DEFAULT = 64;
     private static final String defaultApiEndpoint = "https://api.raygun.io/entries";
     private static final String defaultPulseEndpoint = "https://api.raygun.io/events";
 
