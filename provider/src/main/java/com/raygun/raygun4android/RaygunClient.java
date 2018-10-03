@@ -561,7 +561,7 @@ public class RaygunClient {
         try {
             ApplicationInfo ai = context.getPackageManager().getApplicationInfo(context.getPackageName(), PackageManager.GET_META_DATA);
             Bundle bundle = ai.metaData;
-            return bundle.getString("com.mindscapehq.android.raygun4android.apikey");
+            return bundle.getString("com.raygun.raygun4android.apikey");
         } catch (PackageManager.NameNotFoundException e) {
             RaygunLogger.e("Couldn't read API key from your AndroidManifest.xml <meta-data /> element; cannot send: " + e.getMessage());
         }
