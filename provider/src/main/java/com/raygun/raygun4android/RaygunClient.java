@@ -51,7 +51,6 @@ public class RaygunClient {
     private static Context context;
     private static String version;
     private static String appContextIdentifier;
-    private static String user;
     private static RaygunUserInfo userInfo;
     private static RaygunUncaughtExceptionHandler handler;
     private static RaygunOnBeforeSend onBeforeSend;
@@ -412,8 +411,6 @@ public class RaygunClient {
 
             if (RaygunClient.userInfo != null) {
                 msg.getDetails().setUserContext(RaygunClient.userInfo, RaygunClient.context);
-            } else if (RaygunClient.user != null) {
-                msg.getDetails().setUserContext(RaygunClient.user);
             } else {
                 msg.getDetails().setUserContext(RaygunClient.context);
             }
@@ -523,18 +520,30 @@ public class RaygunClient {
 
     /**
      * Sets the current user of your application. If user is an email address which is associated with a Gravatar,
-     * their picture will be displayed in the error view. If this is not called a random ID will be assigned.
+     * their picture will be displayed in the error view. If setUser is not called a random ID will be assigned.
      * If the user context changes in your application (i.e log in/out), be sure to call this again with the
      * updated user name/email address.
      *
-     * @param user A user name or email address representing the current user
+     * If you use an email address to identify the user, please consider using setUser(RaygunUserInfo userInfo)
+     * instead of this method as it would allow you to set the email address into both the identifier and email fields
+     * of the crash data to be sent.
+     *
+     * @param user A user name or email address representing the current user.
      */
     public static void setUser(String user) {
         if (user != null && user.length() > 0) {
-            RaygunClient.user = user;
+            RaygunClient.userInfo = new RaygunUserInfo(user);
         }
     }
 
+    /**
+     * Sets the current user of your application. If user is an email address which is associated with a Gravatar,
+     * their picture will be displayed in the error view. If setUser is not called a random ID will be assigned.
+     * If the user context changes in your application (i.e log in/out), be sure to call this again with the
+     * updated user name/email address.
+     *
+     * @param userInfo A RaygunUserInfo object containing the user data you want to send in its fields.
+     */
     public static void setUser(RaygunUserInfo userInfo) {
         RaygunClient.userInfo = userInfo;
     }
