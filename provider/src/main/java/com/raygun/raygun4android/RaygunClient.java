@@ -10,15 +10,7 @@ import android.net.ConnectivityManager;
 import android.os.Build;
 import android.os.Bundle;
 
-import java.io.*;
-import java.lang.Thread.UncaughtExceptionHandler;
-import java.lang.Thread.UncaughtExceptionHandler;
-import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.concurrent.TimeUnit;
-
 import com.google.gson.Gson;
-
 import com.raygun.raygun4android.messages.RaygunMessage;
 import com.raygun.raygun4android.messages.RaygunPulseData;
 import com.raygun.raygun4android.messages.RaygunPulseDataMessage;
@@ -27,6 +19,22 @@ import com.raygun.raygun4android.messages.RaygunPulseTimingMessage;
 import com.raygun.raygun4android.messages.RaygunUserContext;
 import com.raygun.raygun4android.messages.RaygunUserInfo;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.lang.Thread.UncaughtExceptionHandler;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.TimeZone;
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
+
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -34,12 +42,9 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 
 /**
- * User: Mindscape
- * The official Raygun provider for Android. This is the main class that provides functionality
- * for automatically sending exceptions to the Raygun service.
+ * The official Raygun provider for Android. This is the main class that provides functionality for automatically sending exceptions to the Raygun service.
  * <p>
- * You should call Init() on the static RaygunClient instance, passing in the current Context,
- * instead of instantiating this class.
+ * You should call Init() on the static RaygunClient instance, passing in the current Context, instead of instantiating this class.
  */
 public class RaygunClient {
     private static String apiKey;
@@ -55,28 +60,17 @@ public class RaygunClient {
     private static String sessionId;
 
     /**
-     * Initializes the Raygun client. This expects that you have placed the API key in your
-     * AndroidManifest.xml, in a meta-data element.
+     * Initializes the Raygun client. This expects that you have placed the API key in your AndroidManifest.xml, in a meta-data element.
      *
      * @param context The context of the calling Android activity.
      */
     public static void init(Context context) {
         String apiKey = readApiKey(context);
         init(context, apiKey);
-        RaygunClient.appContextIdentifier = UUID.randomUUID().toString();
     }
 
     /**
-     * @deprecated As of release 3.0.0, replaced by {@link #init(Context)}
-     */
-    @Deprecated
-    public static void Init(Context context) {
-        init(context);
-    }
-
-    /**
-     * Initializes the Raygun client with the version of your application.
-     * This expects that you have placed the API key in your AndroidManifest.xml, in a meta-data element.
+     * Initializes the Raygun client with the version of your application. This expects that you have placed the API key in your AndroidManifest.xml, in a meta-data element.
      *
      * @param version The version of your application, format x.x.x.x, where x is a positive integer.
      * @param context The context of the calling Android activity.
@@ -87,49 +81,26 @@ public class RaygunClient {
     }
 
     /**
-     * @deprecated As of release 3.0.0, replaced by {@link #init(String, Context)}
-     */
-    @Deprecated
-    public static void Init(String version, Context context) {
-        init(version, context);
-    }
-
-    /**
-     * Initializes the Raygun client with your Android application's context and your
-     * Raygun API key. The version transmitted will be the value of the versionName attribute in your manifest element.
+     * Initializes the Raygun client with your Android application's context and your Raygun API key. The version transmitted will be the value of the versionName attribute in your manifest element.
      *
      * @param context The Android context of your activity
      * @param apiKey  An API key that belongs to a Raygun application created in your dashboard
      */
     public static void init(Context context, String apiKey) {
         RaygunClient.apiKey = apiKey;
-        RaygunClient.context = context;
 
-        String version = null;
         try {
-            version = context.getPackageManager().getPackageInfo(context.getPackageName(), 0).versionName;
+            RaygunClient.version = context.getPackageManager().getPackageInfo(context.getPackageName(), 0).versionName;
         } catch (PackageManager.NameNotFoundException e) {
+            RaygunClient.version = "not provided";
             RaygunLogger.i("Couldn't read version from calling package");
         }
 
-        if (version != null) {
-            RaygunClient.version = version;
-        } else {
-            RaygunClient.version = "Not provided";
-        }
+        RaygunClient.appContextIdentifier = UUID.randomUUID().toString();
     }
 
     /**
-     * @deprecated As of release 3.0.0, replaced by {@link #init(Context, String)}
-     */
-    @Deprecated
-    public static void Init(Context context, String apiKey) {
-        init(context, apiKey);
-    }
-
-    /**
-     * Initializes the Raygun client with your Android application's context, your
-     * Raygun API key, and the version of your application
+     * Initializes the Raygun client with your Android application's context, your Raygun API key, and the version of your application
      *
      * @param context The Android context of your activity
      * @param apiKey  An API key that belongs to a Raygun application created in your dashboard
@@ -141,46 +112,12 @@ public class RaygunClient {
     }
 
     /**
-     * @deprecated As of release 3.0.0, replaced by {@link #init(Context, String, String)}
-     */
-    @Deprecated
-    public static void Init(Context context, String apiKey, String version) {
-        init(context, apiKey, version);
-    }
-
-    /**
-     * Attaches a pre-built Raygun exception handler to the thread's DefaultUncaughtExceptionHandler.
-     * This automatically sends any exceptions that reaches it to the Raygun API.
+     * Attaches a pre-built Raygun exception handler to the thread's DefaultUncaughtExceptionHandler. This automatically sends any exceptions that reaches it to the Raygun API.
      */
     public static void attachExceptionHandler() {
         UncaughtExceptionHandler oldHandler = Thread.getDefaultUncaughtExceptionHandler();
         if (!(oldHandler instanceof RaygunUncaughtExceptionHandler)) {
             RaygunClient.handler = new RaygunUncaughtExceptionHandler(oldHandler);
-            Thread.setDefaultUncaughtExceptionHandler(RaygunClient.handler);
-        }
-    }
-
-    /**
-     * @deprecated As of release 3.0.0, replaced by {@link #attachExceptionHandler()}
-     */
-    @Deprecated
-    public static void AttachExceptionHandler() {
-        attachExceptionHandler();
-    }
-
-    /**
-     * Attaches a pre-built Raygun exception handler to the thread's DefaultUncaughtExceptionHandler.
-     * This automatically sends any exceptions that reaches it to the Raygun API.
-     *
-     * @param tags A list of tags that relate to the calling application's currently build or state.
-     *             These will be appended to all exception messages sent to Raygun.
-     * @deprecated Call attachExceptionHandler(), then setTags(List) instead
-     */
-    @Deprecated
-    public static void AttachExceptionHandler(List tags) {
-        UncaughtExceptionHandler oldHandler = Thread.getDefaultUncaughtExceptionHandler();
-        if (!(oldHandler instanceof RaygunUncaughtExceptionHandler)) {
-            RaygunClient.handler = new RaygunUncaughtExceptionHandler(oldHandler, tags);
             Thread.setDefaultUncaughtExceptionHandler(RaygunClient.handler);
         }
     }
@@ -195,14 +132,6 @@ public class RaygunClient {
     }
 
     /**
-     * @deprecated As of release 3.0.0, replaced by {@link #attachPulse(Activity)}
-     */
-    @Deprecated
-    public static void AttachPulse(Activity activity) {
-        attachPulse(activity);
-    }
-
-    /**
      * Attaches the Raygun Pulse feature which will automatically report session and view events.
      *
      * @param activity       The main/entry activity of the Android app.
@@ -210,26 +139,6 @@ public class RaygunClient {
      */
     public static void attachPulse(Activity activity, boolean networkLogging) {
         Pulse.attach(activity, networkLogging);
-    }
-
-    /**
-     * Attaches a pre-built Raygun exception handler to the thread's DefaultUncaughtExceptionHandler.
-     * This automatically sends any exceptions that reaches it to the Raygun API.
-     *
-     * @param tags           A list of tags that relate to the calling application's currently build or state.
-     *                       These will be appended to all exception messages sent to Raygun.
-     * @param userCustomData A set of key-value pairs that will be attached to each exception message
-     *                       sent to Raygun. This can contain any extra data relating to the calling
-     *                       application's state you would like to see.
-     * @deprecated Call attachExceptionHandler(), then setUserCustomData(Map) instead
-     */
-    @Deprecated
-    public static void AttachExceptionHandler(List tags, Map userCustomData) {
-        UncaughtExceptionHandler oldHandler = Thread.getDefaultUncaughtExceptionHandler();
-        if (!(oldHandler instanceof RaygunUncaughtExceptionHandler)) {
-            RaygunClient.handler = new RaygunUncaughtExceptionHandler(oldHandler, tags, userCustomData);
-            Thread.setDefaultUncaughtExceptionHandler(RaygunClient.handler);
-        }
     }
 
     /**
@@ -256,15 +165,7 @@ public class RaygunClient {
             }
         }
 
-        spinUpService(RaygunClient.apiKey, new Gson().toJson(msg), false);
-    }
-
-    /**
-     * @deprecated As of release 3.0.0, replaced by {@link #send(Throwable)}
-     */
-    @Deprecated
-    public static void Send(Throwable throwable) {
-        send(throwable);
+        enqueueWorkForService(RaygunClient.apiKey, new Gson().toJson(msg), false);
     }
 
     /**
@@ -290,20 +191,11 @@ public class RaygunClient {
         }
 
         postCachedMessages();
-        spinUpService(RaygunClient.apiKey, new Gson().toJson(msg), false);
+        enqueueWorkForService(RaygunClient.apiKey, new Gson().toJson(msg), false);
     }
 
     /**
-     * @deprecated As of release 3.0.0, replaced by {@link #send(Throwable, List)}
-     */
-    @Deprecated
-    public static void Send(Throwable throwable, List tags) {
-        send(throwable, tags);
-    }
-
-    /**
-     * Sends an exception-type object to Raygun with a list of tags you specify, and a set of
-     * custom data.
+     * Sends an exception-type object to Raygun with a list of tags you specify, and a set of custom data.
      *
      * @param throwable      The Throwable object that occurred in your application that will be sent to Raygun.
      * @param tags           A list of data that will be attached to the Raygun message and visible on the error in the dashboard.
@@ -325,20 +217,11 @@ public class RaygunClient {
         }
 
         postCachedMessages();
-        spinUpService(RaygunClient.apiKey, new Gson().toJson(msg), false);
+        enqueueWorkForService(RaygunClient.apiKey, new Gson().toJson(msg), false);
     }
 
     /**
-     * @deprecated As of release 3.0.0, replaced by {@link #send(Throwable, List, Map)}
-     */
-    @Deprecated
-    public static void Send(Throwable throwable, List tags, Map userCustomData) {
-        send(throwable, tags, userCustomData);
-    }
-
-    /**
-     * Raw post method that delivers a pre-built RaygunMessage to the Raygun API. You do not need to call this method
-     * directly unless you want to manually build your own message - for most purposes you should call Send().
+     * Raw post method that delivers a pre-built RaygunMessage to the Raygun API. You do not need to call this method directly unless you want to manually build your own message - for most purposes you should call Send().
      *
      * @param apiKey      The API key of the app to deliver to
      * @param jsonPayload The JSON representation of a RaygunMessage to be delivered over HTTPS.
@@ -352,8 +235,8 @@ public class RaygunClient {
 
                 OkHttpClient client = new OkHttpClient.Builder()
                         .connectTimeout(30, TimeUnit.SECONDS)
-                        .writeTimeout(30,TimeUnit.SECONDS)
-                        .readTimeout(30,TimeUnit.SECONDS)
+                        .writeTimeout(30, TimeUnit.SECONDS)
+                        .readTimeout(30, TimeUnit.SECONDS)
                         .build();
 
                 RequestBody body = RequestBody.create(MEDIA_TYPE_JSON, jsonPayload);
@@ -377,14 +260,6 @@ public class RaygunClient {
             e.printStackTrace();
         }
         return -1;
-    }
-
-    /**
-     * @deprecated As of release 3.0.0, replaced by {@link #post(String, String)}
-     */
-    @Deprecated
-    public static int Post(String apiKey, String jsonPayload) {
-        return post(apiKey, jsonPayload);
     }
 
     protected static void sendPulseEvent(String name) {
@@ -418,7 +293,7 @@ public class RaygunClient {
 
         message.setEventData(new RaygunPulseDataMessage[]{pulseData});
 
-        spinUpService(RaygunClient.apiKey, new Gson().toJson(message), true);
+        enqueueWorkForService(RaygunClient.apiKey, new Gson().toJson(message), true);
     }
 
     /**
@@ -472,15 +347,7 @@ public class RaygunClient {
 
         message.setEventData(new RaygunPulseDataMessage[]{dataMessage});
 
-        spinUpService(RaygunClient.apiKey, new Gson().toJson(message), true);
-    }
-
-    /**
-     * @deprecated As of release 3.0.0, replaced by {@link #sendPulseTimingEvent(RaygunPulseEventType, String, long)}
-     */
-    @Deprecated
-    public static void SendPulseTimingEvent(RaygunPulseEventType eventType, String name, long milliseconds) {
-        sendPulseTimingEvent(eventType, name, milliseconds);
+        enqueueWorkForService(RaygunClient.apiKey, new Gson().toJson(message), true);
     }
 
     protected static int postPulseMessage(String apiKey, String jsonPayload) {
@@ -491,8 +358,8 @@ public class RaygunClient {
 
                 OkHttpClient client = new OkHttpClient.Builder()
                         .connectTimeout(30, TimeUnit.SECONDS)
-                        .writeTimeout(30,TimeUnit.SECONDS)
-                        .readTimeout(30,TimeUnit.SECONDS)
+                        .writeTimeout(30, TimeUnit.SECONDS)
+                        .readTimeout(30, TimeUnit.SECONDS)
                         .build();
 
                 RequestBody body = RequestBody.create(MEDIA_TYPE_JSON, jsonPayload);
@@ -544,7 +411,7 @@ public class RaygunClient {
             }
 
             if (RaygunClient.userInfo != null) {
-                msg.getDetails().setUserContext(RaygunClient.userInfo, RaygunClient.context);
+                msg.getDetails().setUser(RaygunClient.userInfo, RaygunClient.context);
             } else if (RaygunClient.user != null) {
                 msg.getDetails().setUserContext(RaygunClient.user);
             } else {
@@ -563,12 +430,12 @@ public class RaygunClient {
             Bundle bundle = ai.metaData;
             return bundle.getString("com.raygun.raygun4android.apikey");
         } catch (PackageManager.NameNotFoundException e) {
-            RaygunLogger.e("Couldn't read API key from your AndroidManifest.xml <meta-data /> element; cannot send: " + e.getMessage());
+            RaygunLogger.e("Couldn't read API key from your AndroidManifest.xml <meta-data /> element; cannot send. Detailed error: " + e.getMessage());
         }
         return null;
     }
 
-    private static Boolean validateApiKey(String apiKey) throws Exception {
+    private static Boolean validateApiKey(String apiKey) {
         if (apiKey.length() == 0) {
             RaygunLogger.e("API key has not been provided, exception will not be logged");
             return false;
@@ -588,7 +455,7 @@ public class RaygunClient {
                         try {
                             ois = new ObjectInputStream(new FileInputStream(f));
                             MessageApiKey messageApiKey = (MessageApiKey) ois.readObject();
-                            spinUpService(messageApiKey.apiKey, messageApiKey.message, false);
+                            enqueueWorkForService(messageApiKey.apiKey, messageApiKey.message, false);
                             f.delete();
                         } finally {
                             if (ois != null) {
@@ -607,7 +474,7 @@ public class RaygunClient {
         }
     }
 
-    private static void spinUpService(String apiKey, String jsonPayload, boolean isPulse) {
+    private static void enqueueWorkForService(String apiKey, String jsonPayload, boolean isPulse) {
         Intent intent = new Intent(RaygunClient.context, RaygunPostService.class);
         intent.setAction("com.raygun.raygun4android.intent.action.LAUNCH_POST_SERVICE");
         intent.setPackage("com.raygun.raygun4android");
@@ -618,15 +485,6 @@ public class RaygunClient {
         intent.putExtra("isPulse", isPulse);
 
         RaygunPostService.enqueueWork(RaygunClient.context, intent);
-    }
-
-    public static void closePostService() {
-        Intent intent = new Intent(RaygunClient.context, RaygunPostService.class);
-        intent.setAction("com.raygun.raygun4android.intent.action.LAUNCH_POST_SERVICE");
-        intent.setPackage("com.raygun.raygun4android");
-        intent.setComponent(new ComponentName(RaygunClient.context, RaygunPostService.class));
-
-        RaygunClient.context.stopService(intent);
     }
 
     private static List mergeTags(List paramTags) {
@@ -677,14 +535,6 @@ public class RaygunClient {
         }
     }
 
-    /**
-     * @deprecated As of release 3.0.0, replaced by {@link #setUser(RaygunUserInfo)}
-     */
-    @Deprecated
-    public static void SetUser(RaygunUserInfo userInfo) {
-        setUser(userInfo);
-    }
-
     public static void setUser(RaygunUserInfo userInfo) {
         RaygunClient.userInfo = userInfo;
     }
@@ -702,24 +552,8 @@ public class RaygunClient {
         }
     }
 
-    /**
-     * @deprecated As of release 3.0.0, replaced by {@link #setVersion(String)}
-     */
-    @Deprecated
-    public static void SetVersion(String version) {
-        setVersion(version);
-    }
-
     public static RaygunUncaughtExceptionHandler getExceptionHandler() {
         return RaygunClient.handler;
-    }
-
-    /**
-     * @deprecated As of release 3.0.0, replaced by {@link #getExceptionHandler()}
-     */
-    @Deprecated
-    public static RaygunUncaughtExceptionHandler GetExceptionHandler() {
-        return getExceptionHandler();
     }
 
     public static String getApiKey() {
@@ -730,60 +564,20 @@ public class RaygunClient {
         return RaygunClient.tags;
     }
 
-    /**
-     * @deprecated As of release 3.0.0, replaced by {@link #getTags()}
-     */
-    @Deprecated
-    public static List GetTags() {
-        return getTags();
-    }
-
     public static void setTags(List tags) {
         RaygunClient.tags = tags;
-    }
-
-    /**
-     * @deprecated As of release 3.0.0, replaced by {@link #setTags(List)}
-     */
-    @Deprecated
-    public static void SetTags(List tags) {
-        setTags(tags);
     }
 
     public static Map getUserCustomData() {
         return RaygunClient.userCustomData;
     }
 
-    /**
-     * @deprecated As of release 3.0.0, replaced by {@link #getUserCustomData()}
-     */
-    @Deprecated
-    public static Map GetUserCustomData() {
-        return getUserCustomData();
-    }
-
     public static void setUserCustomData(Map userCustomData) {
         RaygunClient.userCustomData = userCustomData;
     }
 
-    /**
-     * @deprecated As of release 3.0.0, replaced by {@link #setUserCustomData(Map)}
-     */
-    @Deprecated
-    public static void SetUserCustomData(Map userCustomData) {
-        setUserCustomData(userCustomData);
-    }
-
     public static void setOnBeforeSend(RaygunOnBeforeSend onBeforeSend) {
         RaygunClient.onBeforeSend = onBeforeSend;
-    }
-
-    /**
-     * @deprecated As of release 3.0.0, replaced by {@link #setOnBeforeSend(RaygunOnBeforeSend)}
-     */
-    @Deprecated
-    public static void SetOnBeforeSend(RaygunOnBeforeSend onBeforeSend) {
-        setOnBeforeSend(onBeforeSend);
     }
 
     /**
@@ -823,19 +617,6 @@ public class RaygunClient {
 
         public RaygunUncaughtExceptionHandler(UncaughtExceptionHandler defaultHandler) {
             this.defaultHandler = defaultHandler;
-        }
-
-        @Deprecated
-        public RaygunUncaughtExceptionHandler(UncaughtExceptionHandler defaultHandler, List tags) {
-            this.defaultHandler = defaultHandler;
-            this.tags = tags;
-        }
-
-        @Deprecated
-        public RaygunUncaughtExceptionHandler(UncaughtExceptionHandler defaultHandler, List tags, Map userCustomData) {
-            this.defaultHandler = defaultHandler;
-            this.tags = tags;
-            this.userCustomData = userCustomData;
         }
 
         @Override
