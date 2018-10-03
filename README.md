@@ -1,32 +1,11 @@
 # Raygun4Android
 
-The world's best Android crash and exception reporter.
+The world's best Android Crash Reporting and Real User Monitoring solution
 
-Supports Android 4+ (API 14+).
+Supports Android 4.1+ (API 16+).
 
 ## IMPORTANT
 
-to be addded: 
-
-```
-<service
-         android:name="<fullpath>.ExampleJobIntentService"
-         android:permission="android.permission.BIND_JOB_SERVICE" />
-```
-
-Also add min requirements:
-
-minSDK
-compileSDK
-
-
-FAQ
-
-10-03 12:27:24.722 4927-4927/com.raygun.raygun4android.sample.debug:raygunpostservice I/art: Rejecting re-init on previously-failed class java.lang.Class<android.support.v4.app.JobIntentService$JobServiceEngineImpl>
-    Rejecting re-init on previously-failed class java.lang.Class<android.support.v4.app.JobIntentService$JobServiceEngineImpl>
-    
-    
-    
 ### 21/09/2018
 
 Raygun4Android is currently actively being worked on for a release of version 4 and a lot of the documentation below is outdated and has not been updated (yet).
@@ -35,7 +14,10 @@ If you found this branch (4.0.0) - it's probably not where you want to be and th
 
 Please go back to master, in which you'll find the 3.x stream of the provider that we actively encourage you to use.
 
-***
+## Requirements
+
+- minSdkVersion 16+
+- compileSdkVersion 28
 
 ## Installation
 
@@ -56,71 +38,50 @@ Then add the following to your **module's** build.gradle:
 ```
 dependencies {
 	...
-	compile 'com.google.code.gson:gson:2.1'
-	compile 'com.mindscapehq.android:raygun4android:3.0.5'
+	compile 'com.raygun:raygun4android:4.0.0'
 }
 ```
 
-You may need to add the following specific imports to your class, where you wish to use RaygunClient:
 
-```java
-import main.java.com.mindscapehq.android.raygun4android.RaygunClient;
-import main.java.com.mindscapehq.android.raygun4android.messages.RaygunUserInfo;
-```
-
-Then see the configuration section below.
-
-### With Maven
-
-To your pom.xml, add:
+In your app's **AndroidManifest.xml**, make sure you have granted Internet permissions. Beneath the **manifest** element add:
 
 ```xml
-<dependency>
-    <groupId>com.mindscapehq.android</groupId>
-    <artifactId>raygun4android</artifactId>
-    <version>3.0.5</version>
-</dependency>
+<uses-permission android:name="android.permission.INTERNET" />
+<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 ```
 
-In your IDE, build your project (or run `mvn compile`), then see the configuration section below.
+Inside the **<application>** element, add:
 
-### With Ant, other build tools, or manually
+```xml
+<service android:name="com.raygun.raygun4android.RaygunPostService"
+         android:exported="false"
+         android:permission="android.permission.BIND_JOB_SERVICE"
+         android:process=":raygunpostservice"/>
+<meta-data android:name="com.raygun.raygun4android.apikey"
+           android:value="PASTE_YOUR_API_KEY_HERE" />
+```
 
-[Download the JAR for the latest version](http://search.maven.org/#search%7Cga%7C1%7Ca%3A%22raygun4android%22), as well as [the Gson library](http://search.maven.org/remotecontent?filepath=com/google/code/gson/gson/2.1/gson-2.1.jar) (if you do not already use it). Place both of these in a /lib folder in your project, add them to your project's classpath, then see below.
+Replace the value in meta-data with your API key, available from your Raygun dashboard.
 
-## Configuration & Usage
+In a central activity, call the following:
 
-1. In your **AndroidManifest.xml**, make sure you have granted Internet permissions. Beneath the **manifest** element add:
+```java
+RaygunClient.init(getApplicationContext());
+RaygunClient.attachExceptionHandler();
+```
 
-	```xml
-	<uses-permission android:name="android.permission.INTERNET" />
-	<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-	```
+You might need to add the following specific imports to your class, where you wish to use RaygunClient:
 
-2. Inside the **<application>** element, add:
-
-	```xml
-	<service android:name="main.java.com.mindscapehq.android.raygun4android.RaygunPostService"
-             android:exported="false"
-             android:process=":raygunpostservice"/>
-    <meta-data android:name="com.mindscapehq.android.raygun4android.apikey"
-               android:value="PASTE_YOUR_API_KEY_HERE" />
-	```
-
-	And replace the value in meta-data with your API key, available from your Raygun dashboard.
-
-3. In a central activity, call the following:
-
-	```java
-	RaygunClient.init(getApplicationContext());
-	RaygunClient.attachExceptionHandler();
-	```
+```java
+import com.raygun.raygun4android.RaygunClient;
+import com.raygun.messages.RaygunUserInfo;
+```
 
 The above exception handler automatically catches & sends all uncaught exceptions. You can create your own or send from a catch block by calling RaygunClient.send() and passing in the Throwable.
 
-For a usage example, check out the application in /sample-app.
+For an actual usage example, check out the sample application in the **app** modle of this project
 
-## Documentation
+## Documentation (NOT UP TO DATE)
 
 ### Affected user tracking
 
@@ -287,21 +248,25 @@ The following misc methods are available:
 
 * Is there an example project?
 
-	Yup - clone this repository then load the sample-app project. It has been confirmed to run on the emulator for SDK >= 9, and physical devices (4.1.2).
+  Yup - clone this repository then run the **app** module of the project. 
 
 * Not seeing errors in the dashboard?
 
-	Raygun4Android outputs Logcat messages - look for the 'Exception Message HTTP POST result' message - 403 will indicate an invalid API key, 400 a bad message, and 202 will indicate received successfully.
+  Raygun4Android outputs Logcat messages - look for the the logcat tag **Raygun4Android** in raygunpostservice. HTTP Status 403 will indicate an invalid API key, 400 a bad message, and 202 will indicate received successfully.
 
 * Environment Data
 
-	A selection of enironment data will be attached and available in the Environment tab in the dashboard, and more in the Raw tab. This data is gathered from android.os.Build - if you wish to see more data you can add them on the userCustomData object.
+  A selection of enironment data will be attached and available in the Environment tab in the dashboard, and more in the Raw tab. This data is gathered from android.os.Build - if you wish to see more data you can add them on the userCustomData object.
 
 * What happens when the phone has no internet connection?
 
-	Raygun4Android will save the exception message to disk. When the provider is later asked to send another message it will check if the internet is now available, and if it is, send the cached messages. A maximum of 64 messages will be cached, then overwritten (using a LRU strategy).
+  Raygun4Android will save the exception message to disk. When the provider is later asked to send another message it will check if the internet is now available, and if it is, send the cached messages. A maximum of 64 messages will be cached, then overwritten (using a LRU strategy).
 
   The provider now attaches the device's network connectivity state to the payload when the exception occurs. This is visible under the Request tab in the Raygun dashboard.
+
+* RayGunPostMessage logs an error message about a not found class: Rejecting re-init on previously-failed class java.lang.Class<android.support.v4.app.JobIntentService$JobServiceEngineImpl>
+      
+  The message above stems from certain versions of the Android support libraries. JobServiceEngineImpl is part of Android Oreo (8, SDK 26) and newer only. The support library catering for supporting services on earlier versions of Android runs internal checks for which implementation is available to it. As part of the checks, it outputs the message as an informational feedback only.
 
 ### Contributing
 
