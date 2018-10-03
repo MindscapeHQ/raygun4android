@@ -1,5 +1,6 @@
 package com.raygun.raygun4android;
 
+import java.util.Arrays;
 import java.util.HashSet;
 
 public class RaygunSettings {
@@ -9,16 +10,8 @@ public class RaygunSettings {
     private static final String defaultPulseEndpoint = "https://api.raygun.io/events";
 
     private static IgnoredURLs ignoredURLs = new IgnoredURLs("api.raygun.io");
-    private static HashSet<String> ignoredViews = new HashSet<String>();
+    private static HashSet<String> ignoredViews = new HashSet<>();
     private static int maxReportsStoredOnDevice = MAX_REPORTS_STORED_ON_DEVICE_DEFAULT;
-
-    public static int getMaxReportsStoredOnDevice() {
-        return maxReportsStoredOnDevice;
-    }
-
-    public static void setMaxReportsStoredOnDevice(int maxReportsStoredOnDevice) {
-        RaygunSettings.maxReportsStoredOnDevice = maxReportsStoredOnDevice;
-    }
 
     private RaygunSettings() {
     }
@@ -39,11 +32,17 @@ public class RaygunSettings {
         return ignoredViews;
     }
 
+    public static int getMaxReportsStoredOnDevice() {
+        return maxReportsStoredOnDevice;
+    }
+
+    public static void setMaxReportsStoredOnDevice(int maxReportsStoredOnDevice) {
+        RaygunSettings.maxReportsStoredOnDevice = maxReportsStoredOnDevice;
+    }
+
     public static class IgnoredURLs extends HashSet<String> {
-        public IgnoredURLs(String... defaultIgnoredUrls) {
-            for (String url : defaultIgnoredUrls) {
-                add(url);
-            }
+        IgnoredURLs(String... defaultIgnoredUrls) {
+            this.addAll(Arrays.asList(defaultIgnoredUrls));
         }
     }
 
