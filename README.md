@@ -81,6 +81,61 @@ The above exception handler automatically catches & sends all uncaught exception
 
 For an actual usage example, check out the sample application in the **app** modle of this project
 
+## Raygun and ProGuard
+
+### General
+
+ProGuard is a free Java tool for obfuscation, class file shrinking, optimizing and preverifying. When enabling ProGuard in a native Android application that also uses Raygun, the obfuscation feature requires a bit of attention. By default, your obfuscated class and method names will show up in the stacktraces of exception/error reports submitted to Raygun. This makes the stacktraces difficult to read when looking into the cause of the issues.
+
+ProGuard produces a mapping.txt file that can be used to restore the original class and method names. Such files can be uploaded to Raygun to automatically process all of your exception reports into readable stacktraces. 
+
+### Setup
+
+Add the following lines to your proguard-rules.pro file so that Raygun and ProGuard to play nicely together. Each line is explained below so that you can understand what these changes to your pro file will do.
+
+```
+-keep class com.raygun.raygun4android.** { *; }
+-keepattributes Exceptions, Signature, InnerClasses, SourceFile, LineNumberTable
+-renamesourcefileattribute SourceFile
+```
+**-keep** is required here in order for Raygun4Android to function correctly. This line tells ProGuard not to obfuscate any of the code in Raygun4Android. Some of the classes are used to build up a Json payload, which if obfuscated is going to create a payload that Raygun can’t read.
+
+**-keepattributes** is recommended in order to keep certain bits of information. In particular, Signature is needed to resolve generic type names and LineNumberTable is so that your stack traces have line numbers which is generally what you want. By default, file names will not be available in the stacktraces. The SourceFile entry on the -keepattributes line will cause file names to be available in the stacktraces, but note that they are not obfuscated. Don't include SourceFile on the -keepattributes line if you don't want your file names to be included in your app package.
+
+**-renamesourcefileattribute** is optional. This causes the file names of your code to all appear as “SourceFile” in the stacktrace. This is for added secrecy so that your actual file names can not be seen in the application package. Even with a mapping file, the original file names can not be resolved, which is not so good for debugging. If you don't mind your file names being kept, then feel free to remove this line for the extra debugging help.
+
+### Gradle Task
+
+Instead of uploading mapping.txt manually after each deployment, you can use the **uploadProguardMapping** in the raygun group of Gradle tasks. 
+
+You will find an example of how to do this in the sample app. Go to the **app** module's build.gradle file and look for the **createRaygunProguardTask** function.
+
+```groovy
+def createRaygunProguardTask(token,raygunAppPath,groupName,version) {
+
+    task "uploadProguardMapping" {
+        group "${groupName}"
+
+        doLast {
+            def proguardMappingFileParam = "file=@${project.rootDir}/app/build/outputs/mapping/release/mapping.txt"
+            def versionIdentifierParam = "version=${version}"
+            def raygunProguardEndpointUrlParam = "https://app.raygun.com/upload/proguardsymbols/${raygunAppPath}?authToken=${token}"
+
+            def p = ['curl', '-F', proguardMappingFileParam, '-F', versionIdentifierParam, raygunProguardEndpointUrlParam].execute()
+            p.waitFor()
+
+            def result = p.text
+            println result
+            assert result == "true"
+        }
+    }
+}
+```
+
+This function gets called from within the ```android {...}``` block of the Gradle file at each build in Android Studio and creates the appropriate parameterised task to push the file into the Raygun backend.
+
+The example shown requires curl to be on the PATH of your machine.
+
 ## Documentation (NOT UP TO DATE)
 
 ### Affected user tracking
