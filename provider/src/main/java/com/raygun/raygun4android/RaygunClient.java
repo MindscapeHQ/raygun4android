@@ -411,7 +411,7 @@ public class RaygunClient {
             }
 
             if (RaygunClient.userInfo != null) {
-                msg.getDetails().setUser(RaygunClient.userInfo, RaygunClient.context);
+                msg.getDetails().setUserContext(RaygunClient.userInfo, RaygunClient.context);
             } else if (RaygunClient.user != null) {
                 msg.getDetails().setUserContext(RaygunClient.user);
             } else {
