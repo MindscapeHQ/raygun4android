@@ -25,7 +25,7 @@ Please go back to master, in which you'll find the 3.x stream of the provider th
 
 Ensure Maven Central is present in your **project's** build.gradle:
 
-```
+```gradle
 allprojects {
     repositories {
         mavenCentral()
@@ -35,7 +35,7 @@ allprojects {
 
 Then add the following to your **module's** build.gradle:
 
-```
+```gradle
 dependencies {
 	...
 	compile 'com.raygun:raygun4android:4.0.0'
@@ -43,14 +43,14 @@ dependencies {
 ```
 
 
-In your app's **AndroidManifest.xml**, make sure you have granted Internet permissions. Beneath the **manifest** element add:
+In your app's **AndroidManifest.xml**, make sure you have granted Internet permissions. Beneath the ```<manifest>``` element add:
 
 ```xml
 <uses-permission android:name="android.permission.INTERNET" />
 <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 ```
 
-Inside the **<application>** element, add:
+Inside the ```<application>``` element, add:
 
 ```xml
 <service android:name="com.raygun.raygun4android.RaygunPostService"
@@ -61,7 +61,7 @@ Inside the **<application>** element, add:
            android:value="PASTE_YOUR_API_KEY_HERE" />
 ```
 
-Replace the value in meta-data with your API key, available from your Raygun dashboard.
+Replace the value in ```<meta-data>``` with your API key, available from your Raygun dashboard.
 
 In a central activity, call the following:
 
@@ -77,7 +77,7 @@ import com.raygun.raygun4android.RaygunClient;
 import com.raygun.messages.RaygunUserInfo;
 ```
 
-The above exception handler automatically catches & sends all uncaught exceptions. You can create your own or send from a catch block by calling RaygunClient.send() and passing in the Throwable.
+The above exception handler automatically catches and sends all uncaught exceptions. You can create your own or send from a catch block by calling RaygunClient.send() and passing in the Throwable.
 
 For an actual usage example, check out the sample application in the **app** modle of this project
 
@@ -136,13 +136,13 @@ This function gets called from within the ```android {...}``` block of the Gradl
 
 The example shown requires curl to be on the PATH of your machine.
 
-## Documentation (NOT UP TO DATE)
+## Documentation 
 
 ### Affected user tracking
 
 Raygun supports tracking the unique users who encounter bugs in your apps.
 
-By default the device UUID is transmitted. You can also add the currently logged in user's data like this:
+By default a device-derived UUID is transmitted. You can also add the currently logged in user's data like this:
 
 ```java
 RaygunUserInfo user = new RaygunUserInfo();
@@ -155,11 +155,13 @@ user.setAnonymous(false);
 RaygunClient.setUser(user);
 ```
 
-Any of the properties are optional, for instance you can set just isAnonymous by calling setAnonymous(). There is also a constructor overload if you prefer to specify all in one statement.
+Any of the properties are optional, for instance you can set just isAnonymous by calling setAnonymous(). There is also a constructor overload if you prefer to specify all in one statement and a convenience constructor to only set an identifier.
 
-`identifier` should be a unique representation of the current logged in user - we will assume that messages with the same Identifier are the same user. If you do not set it, it will be automatically set to the device UUID.
+`identifier` should be a unique representation of the current logged in user - we will assume that messages with the same identifier are the same user. If you do not set it, it will be automatically set to the device UUID.
 
-If the user context changes, for instance on log in/out, you should remember to call SetUser again to store the updated username.
+If the user context changes, for instance on log in/out, you should remember to call setUser again to store the updated username.
+
+## Documentation (NOT NECESSARILY UP TO DATE)
 
 ### Version tracking
 
