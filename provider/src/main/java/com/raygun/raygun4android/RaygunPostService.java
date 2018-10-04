@@ -87,13 +87,13 @@ public class RaygunPostService extends JobIntentService {
     }
 
     /**
-     * Raw post method that delivers a pre-built RaygunMessage to the Raygun API. You do not need to call this method directly unless you want to manually build your own message - for most purposes you should call Send().
+     * Raw post method that delivers a pre-built RaygunMessage to the Raygun API.
      *
      * @param apiKey      The API key of the app to deliver to
      * @param jsonPayload The JSON representation of a RaygunMessage to be delivered over HTTPS.
      * @return HTTP result code - 202 if successful, 403 if API key invalid, 400 if bad message (invalid properties)
      */
-    public static int post(String apiKey, String jsonPayload) {
+    private static int post(String apiKey, String jsonPayload) {
         try {
             if (RaygunClient.validateApiKey(apiKey)) {
                 String endpoint = RaygunSettings.getApiEndpoint();
