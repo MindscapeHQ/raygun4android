@@ -2,8 +2,6 @@ package com.raygun.raygun4android;
 
 import android.content.Context;
 import android.content.Intent;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.JobIntentService;
@@ -17,10 +15,18 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.concurrent.TimeUnit;
+
+import okhttp3.MediaType;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
 
 public class RaygunPostService extends JobIntentService {
 
     static final int RAYGUNPOSTSERVICE_JOB_ID = 4711;
+    static final int NETWORK_TIMEOUT = 30;
 
     static void enqueueWork(Context context, Intent intent) {
         RaygunLogger.i("Work for RaygunPostService has been put in the job queue");
@@ -42,7 +48,7 @@ public class RaygunPostService extends JobIntentService {
             if (isPulse && RaygunNetworkUtils.hasInternetConnection(this.getApplicationContext())) {
                 RaygunClient.postPulseMessage(apiKey, message);
             } else if (!isPulse && RaygunNetworkUtils.hasInternetConnection(this.getApplicationContext())) {
-                RaygunClient.post(apiKey, message);
+                post(apiKey, message);
             } else if (!isPulse && !RaygunNetworkUtils.hasInternetConnection(this.getApplicationContext())) {
                 synchronized (this) {
                     int file = 0;
@@ -78,5 +84,47 @@ public class RaygunPostService extends JobIntentService {
     @Override
     public void onDestroy() {
         super.onDestroy();
+    }
+
+    /**
+     * Raw post method that delivers a pre-built RaygunMessage to the Raygun API. You do not need to call this method directly unless you want to manually build your own message - for most purposes you should call Send().
+     *
+     * @param apiKey      The API key of the app to deliver to
+     * @param jsonPayload The JSON representation of a RaygunMessage to be delivered over HTTPS.
+     * @return HTTP result code - 202 if successful, 403 if API key invalid, 400 if bad message (invalid properties)
+     */
+    public static int post(String apiKey, String jsonPayload) {
+        try {
+            if (RaygunClient.validateApiKey(apiKey)) {
+                String endpoint = RaygunSettings.getApiEndpoint();
+                MediaType MEDIA_TYPE_JSON = MediaType.parse("application/json; charset=utf-8");
+
+                OkHttpClient client = new OkHttpClient.Builder()
+                        .connectTimeout(NETWORK_TIMEOUT, TimeUnit.SECONDS)
+                        .writeTimeout(NETWORK_TIMEOUT, TimeUnit.SECONDS)
+                        .readTimeout(NETWORK_TIMEOUT, TimeUnit.SECONDS)
+                        .build();
+
+                RequestBody body = RequestBody.create(MEDIA_TYPE_JSON, jsonPayload);
+
+                Request request = new Request.Builder()
+                        .url(endpoint)
+                        .header("X-ApiKey", apiKey)
+                        .post(body)
+                        .build();
+                try {
+                    Response response = client.newCall(request).execute();
+                    RaygunLogger.d("Exception message HTTP POST result: " + response.code());
+                    return response.code();
+                } catch (IOException ioe) {
+                    RaygunLogger.e("OkHttp POST to Raygun Crash Reporting backend failed - " + ioe.getMessage());
+                    ioe.printStackTrace();
+                }
+            }
+        } catch (Exception e) {
+            RaygunLogger.e("Couldn't post exception - " + e.getMessage());
+            e.printStackTrace();
+        }
+        return -1;
     }
 }

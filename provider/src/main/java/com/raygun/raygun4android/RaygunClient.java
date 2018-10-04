@@ -1,6 +1,7 @@
 package com.raygun.raygun4android;
 
 import android.app.Activity;
+import android.app.Application;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -45,11 +46,11 @@ import okhttp3.Response;
 /**
  * The official Raygun provider for Android. This is the main class that provides functionality for automatically sending exceptions to the Raygun service.
  * <p>
- * You should call Init() on the static RaygunClient instance, passing in the current Context, instead of instantiating this class.
+ * You should call init() on the static RaygunClient instance, passing in the application, instead of instantiating this class.
  */
 public class RaygunClient {
     private static String apiKey;
-    private static Context context;
+    private static Application application;
     private static String version;
     private static String appContextIdentifier;
     private static RaygunUserInfo userInfo;
@@ -62,53 +63,57 @@ public class RaygunClient {
     /**
      * Initializes the Raygun client. This expects that you have placed the API key in your AndroidManifest.xml, in a meta-data element.
      *
-     * @param context The context of the calling Android activity.
+     * @param application The Android application
      */
-    public static void init(Context context) {
-        String apiKey = readApiKey(context);
-        init(context, apiKey);
+    public static void init(Application application) {
+        RaygunClient.application = application;
+        String apiKey = readApiKey(getApplicationContext());
+        init(application, apiKey);
     }
 
     /**
      * Initializes the Raygun client with the version of your application. This expects that you have placed the API key in your AndroidManifest.xml, in a meta-data element.
      *
      * @param version The version of your application, format x.x.x.x, where x is a positive integer.
-     * @param context The context of the calling Android activity.
+     * @param application The Android application
      */
-    public static void init(String version, Context context) {
-        String apiKey = readApiKey(context);
-        init(context, apiKey, version);
+    public static void init(String version, Application application) {
+        RaygunClient.application = application;
+        String apiKey = readApiKey(getApplicationContext());
+        init(application, apiKey, version);
     }
 
     /**
-     * Initializes the Raygun client with your Android application's context and your Raygun API key. The version transmitted will be the value of the versionName attribute in your manifest element.
+     * Initializes the Raygun client with your Android application and your Raygun API key. The version transmitted will be the value of the versionName attribute in your manifest element.
      *
-     * @param context The Android context of your activity
-     * @param apiKey  An API key that belongs to a Raygun application created in your dashboard
+     * @param application The Android application
+     * @param apiKey An API key that belongs to a Raygun application created in your dashboard
      */
-    public static void init(Context context, String apiKey) {
+    public static void init(Application application, String apiKey) {
+        if (RaygunClient.application == null) {
+            RaygunClient.application = application;
+        }
         RaygunClient.apiKey = apiKey;
-        RaygunClient.context = context;
 
         try {
-            RaygunClient.version = context.getPackageManager().getPackageInfo(context.getPackageName(), 0).versionName;
+            RaygunClient.version = getApplicationContext().getPackageManager().getPackageInfo(getApplicationContext().getPackageName(), 0).versionName;
         } catch (PackageManager.NameNotFoundException e) {
             RaygunClient.version = "not provided";
-            RaygunLogger.i("Couldn't read version from calling package");
+            RaygunLogger.i("Couldn't read application version from calling package");
         }
 
         RaygunClient.appContextIdentifier = UUID.randomUUID().toString();
     }
 
     /**
-     * Initializes the Raygun client with your Android application's context, your Raygun API key, and the version of your application
+     * Initializes the Raygun client with your Android application, your Raygun API key, and the version of your application
      *
-     * @param context The Android context of your activity
+     * @param application The Android application
      * @param apiKey  An API key that belongs to a Raygun application created in your dashboard
      * @param version The version of your application, format x.x.x.x, where x is a positive integer.
      */
-    public static void init(Context context, String apiKey, String version) {
-        init(context, apiKey);
+    public static void init(Application application, String apiKey, String version) {
+        init(application, apiKey);
         RaygunClient.version = version;
     }
 
@@ -221,48 +226,6 @@ public class RaygunClient {
         enqueueWorkForService(RaygunClient.apiKey, new Gson().toJson(msg), false);
     }
 
-    /**
-     * Raw post method that delivers a pre-built RaygunMessage to the Raygun API. You do not need to call this method directly unless you want to manually build your own message - for most purposes you should call Send().
-     *
-     * @param apiKey      The API key of the app to deliver to
-     * @param jsonPayload The JSON representation of a RaygunMessage to be delivered over HTTPS.
-     * @return HTTP result code - 202 if successful, 403 if API key invalid, 400 if bad message (invalid properties)
-     */
-    public static int post(String apiKey, String jsonPayload) {
-        try {
-            if (validateApiKey(apiKey)) {
-                String endpoint = RaygunSettings.getApiEndpoint();
-                MediaType MEDIA_TYPE_JSON = MediaType.parse("application/json; charset=utf-8");
-
-                OkHttpClient client = new OkHttpClient.Builder()
-                        .connectTimeout(30, TimeUnit.SECONDS)
-                        .writeTimeout(30, TimeUnit.SECONDS)
-                        .readTimeout(30, TimeUnit.SECONDS)
-                        .build();
-
-                RequestBody body = RequestBody.create(MEDIA_TYPE_JSON, jsonPayload);
-
-                Request request = new Request.Builder()
-                        .url(endpoint)
-                        .header("X-ApiKey", apiKey)
-                        .post(body)
-                        .build();
-                try {
-                    Response response = client.newCall(request).execute();
-                    RaygunLogger.d("Exception message HTTP POST result: " + response.code());
-                    return response.code();
-                } catch (IOException ioe) {
-                    RaygunLogger.e("OkHttp POST to Raygun Crash Reporting backend failed - " + ioe.getMessage());
-                    ioe.printStackTrace();
-                }
-            }
-        } catch (Exception e) {
-            RaygunLogger.e("Couldn't post exception - " + e.getMessage());
-            e.printStackTrace();
-        }
-        return -1;
-    }
-
     protected static void sendPulseEvent(String name) {
         if ("session_start".equals(name)) {
             RaygunClient.sessionId = UUID.randomUUID().toString();
@@ -286,7 +249,7 @@ public class RaygunClient {
         pulseData.setOSVersion(Build.VERSION.RELEASE);
         pulseData.setPlatform(String.format("%s %s", Build.MANUFACTURER, Build.MODEL));
 
-        RaygunUserContext userContext = RaygunClient.userInfo == null ? new RaygunUserContext(new RaygunUserInfo(null, null, null, null, null, true), RaygunClient.context) : new RaygunUserContext(RaygunClient.userInfo, RaygunClient.context);
+        RaygunUserContext userContext = RaygunClient.userInfo == null ? new RaygunUserContext(new RaygunUserInfo(null, null, null, null, null, true), getApplicationContext()) : new RaygunUserContext(RaygunClient.userInfo, getApplicationContext());
         pulseData.setUser(userContext);
 
         pulseData.setSessionId(RaygunClient.sessionId);
@@ -332,7 +295,7 @@ public class RaygunClient {
         dataMessage.setPlatform(String.format("%s %s", Build.MANUFACTURER, Build.MODEL));
         dataMessage.setType("mobile_event_timing");
 
-        RaygunUserContext userContext = RaygunClient.userInfo == null ? new RaygunUserContext(new RaygunUserInfo(null, null, null, null, null, true), RaygunClient.context) : new RaygunUserContext(RaygunClient.userInfo, RaygunClient.context);
+        RaygunUserContext userContext = RaygunClient.userInfo == null ? new RaygunUserContext(new RaygunUserInfo(null, null, null, null, null, true), getApplicationContext()) : new RaygunUserContext(RaygunClient.userInfo, getApplicationContext());
         dataMessage.setUser(userContext);
 
         RaygunPulseData data = new RaygunPulseData();
@@ -389,13 +352,13 @@ public class RaygunClient {
     private static RaygunMessage buildMessage(Throwable throwable) {
         try {
             RaygunMessage msg = RaygunMessageBuilder.instance()
-                    .setEnvironmentDetails(RaygunClient.context)
+                    .setEnvironmentDetails(getApplicationContext())
                     .setMachineName(Build.MODEL)
                     .setExceptionDetails(throwable)
                     .setClientDetails()
                     .setAppContext(RaygunClient.appContextIdentifier)
                     .setVersion(RaygunClient.version)
-                    .setNetworkInfo(RaygunClient.context)
+                    .setNetworkInfo(getApplicationContext())
                     .build();
 
             if (RaygunClient.version != null) {
@@ -403,9 +366,9 @@ public class RaygunClient {
             }
 
             if (RaygunClient.userInfo != null) {
-                msg.getDetails().setUserContext(RaygunClient.userInfo, RaygunClient.context);
+                msg.getDetails().setUserContext(RaygunClient.userInfo, getApplicationContext());
             } else {
-                msg.getDetails().setUserContext(RaygunClient.context);
+                msg.getDetails().setUserContext(getApplicationContext());
             }
             return msg;
         } catch (Exception e) {
@@ -425,7 +388,7 @@ public class RaygunClient {
         return null;
     }
 
-    private static Boolean validateApiKey(String apiKey) {
+    protected static Boolean validateApiKey(String apiKey) {
         if (apiKey.length() == 0) {
             RaygunLogger.e("API key has not been provided, exception will not be logged");
             return false;
@@ -435,8 +398,8 @@ public class RaygunClient {
     }
 
     private static void postCachedMessages() {
-        if (RaygunNetworkUtils.hasInternetConnection(RaygunClient.context)) {
-            File[] fileList = RaygunClient.context.getCacheDir().listFiles();
+        if (RaygunNetworkUtils.hasInternetConnection(getApplicationContext())) {
+            File[] fileList = getApplicationContext().getCacheDir().listFiles();
             for (File f : fileList) {
                 try {
                     String ext = getExtension(f.getName());
@@ -465,16 +428,16 @@ public class RaygunClient {
     }
 
     private static void enqueueWorkForService(String apiKey, String jsonPayload, boolean isPulse) {
-        Intent intent = new Intent(RaygunClient.context, RaygunPostService.class);
+        Intent intent = new Intent(getApplicationContext(), RaygunPostService.class);
         intent.setAction("com.raygun.raygun4android.intent.action.LAUNCH_POST_SERVICE");
         intent.setPackage("com.raygun.raygun4android");
-        intent.setComponent(new ComponentName(RaygunClient.context, RaygunPostService.class));
+        intent.setComponent(new ComponentName(getApplicationContext(), RaygunPostService.class));
 
         intent.putExtra("msg", jsonPayload);
         intent.putExtra("apikey", apiKey);
         intent.putExtra("isPulse", isPulse);
 
-        RaygunPostService.enqueueWork(RaygunClient.context, intent);
+        RaygunPostService.enqueueWork(getApplicationContext(), intent);
     }
 
     private static List mergeTags(List paramTags) {
@@ -635,5 +598,19 @@ public class RaygunClient {
             }
             defaultHandler.uncaughtException(thread, throwable);
         }
+    }
+
+    /**
+     * Returns the current Application's context.
+     *
+     * @return The current application Context.
+     * @throws java.lang.IllegalStateException if init() has not been called.
+     */
+    public static Context getApplicationContext() {
+        if (RaygunClient.application == null) {
+            throw new IllegalStateException("init() must be called first.");
+        }
+
+        return RaygunClient.application.getApplicationContext();
     }
 }
