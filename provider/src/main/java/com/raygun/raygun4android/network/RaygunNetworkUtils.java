@@ -4,13 +4,8 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 
-import com.raygun.raygun4android.RaygunClient;
-
-import java.lang.reflect.Method;
 import java.net.HttpURLConnection;
 import java.net.URLConnection;
-import java.util.Collection;
-import java.util.HashSet;
 
 public class RaygunNetworkUtils {
 
