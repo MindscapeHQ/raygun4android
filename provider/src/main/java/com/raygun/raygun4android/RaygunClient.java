@@ -386,15 +386,6 @@ public class RaygunClient {
         return -1;
     }
 
-    private static boolean hasInternetConnection() {
-        if (RaygunClient.context != null) {
-            ConnectivityManager cm = (ConnectivityManager) RaygunClient.context.getSystemService(Context.CONNECTIVITY_SERVICE);
-            return cm.getActiveNetworkInfo() != null && cm.getActiveNetworkInfo().isConnectedOrConnecting();
-        }
-
-        return false;
-    }
-
     private static RaygunMessage buildMessage(Throwable throwable) {
         try {
             RaygunMessage msg = RaygunMessageBuilder.instance()
