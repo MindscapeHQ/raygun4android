@@ -18,6 +18,7 @@ import com.raygun.raygun4android.messages.RaygunPulseMessage;
 import com.raygun.raygun4android.messages.RaygunPulseTimingMessage;
 import com.raygun.raygun4android.messages.RaygunUserContext;
 import com.raygun.raygun4android.messages.RaygunUserInfo;
+import com.raygun.raygun4android.network.RaygunNetworkUtils;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -87,6 +88,7 @@ public class RaygunClient {
      */
     public static void init(Context context, String apiKey) {
         RaygunClient.apiKey = apiKey;
+        RaygunClient.context = context;
 
         try {
             RaygunClient.version = context.getPackageManager().getPackageInfo(context.getPackageName(), 0).versionName;
@@ -442,7 +444,7 @@ public class RaygunClient {
     }
 
     private static void postCachedMessages() {
-        if (hasInternetConnection()) {
+        if (RaygunNetworkUtils.hasInternetConnection(RaygunClient.context)) {
             File[] fileList = RaygunClient.context.getCacheDir().listFiles();
             for (File f : fileList) {
                 try {

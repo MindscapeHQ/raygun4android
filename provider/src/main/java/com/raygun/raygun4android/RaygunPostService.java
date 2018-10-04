@@ -8,6 +8,8 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.JobIntentService;
 
+import com.raygun.raygun4android.network.RaygunNetworkUtils;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -35,16 +37,16 @@ public class RaygunPostService extends JobIntentService {
             String message = bundle.getString("msg");
             String apiKey = bundle.getString("apikey");
             boolean isPulse = bundle.getBoolean("isPulse");
-            boolean hasInternet = hasInternetConnection();
 
-            if (isPulse && hasInternet) {
+            // Moved the check for internet connection as close as possible to the calls because this can change quite rapidly
+            if (isPulse && RaygunNetworkUtils.hasInternetConnection(this.getApplicationContext())) {
                 RaygunClient.postPulseMessage(apiKey, message);
-            } else if (!isPulse && hasInternet) {
+            } else if (!isPulse && RaygunNetworkUtils.hasInternetConnection(this.getApplicationContext())) {
                 RaygunClient.post(apiKey, message);
-            } else if (!isPulse && !hasInternet) {
+            } else if (!isPulse && !RaygunNetworkUtils.hasInternetConnection(this.getApplicationContext())) {
                 synchronized (this) {
                     int file = 0;
-                    ArrayList<File> files = new ArrayList<File>(Arrays.asList(getCacheDir().listFiles()));
+                    ArrayList<File> files = new ArrayList<>(Arrays.asList(getCacheDir().listFiles()));
                     if (files != null) {
                         for (File f : files) {
                             String fileName = Integer.toString(file) + ".raygun";
@@ -71,18 +73,6 @@ public class RaygunPostService extends JobIntentService {
                 }
             }
         }
-    }
-
-    private boolean hasInternetConnection() {
-
-        ConnectivityManager cm = (ConnectivityManager) this.getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
-
-        if (cm != null) {
-            NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
-            return activeNetwork != null && activeNetwork.isConnectedOrConnecting();
-        }
-
-        return false;
     }
 
     @Override
