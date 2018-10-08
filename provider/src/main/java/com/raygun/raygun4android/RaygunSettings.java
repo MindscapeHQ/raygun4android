@@ -5,23 +5,33 @@ import java.util.HashSet;
 
 public class RaygunSettings {
 
-    private static final int MAX_REPORTS_STORED_ON_DEVICE_DEFAULT = 64;
-    private static final String defaultApiEndpoint = "https://api.raygun.io/entries";
-    private static final String defaultPulseEndpoint = "https://api.raygun.io/events";
+    private static final int DEFAULT_MAX_REPORTS_STORED_ON_DEVICE = 64;
+    private static final String DEFAULT_API_ENDPOINT = "https://api.raygun.io/entries";
+    private static final String DEFAULT_PULSE_ENDPOINT = "https://api.raygun.io/events";
 
     private static IgnoredURLs ignoredURLs = new IgnoredURLs("api.raygun.io");
     private static HashSet<String> ignoredViews = new HashSet<>();
-    private static int maxReportsStoredOnDevice = MAX_REPORTS_STORED_ON_DEVICE_DEFAULT;
+    private static int maxReportsStoredOnDevice = DEFAULT_MAX_REPORTS_STORED_ON_DEVICE;
+    private static String apiEndpoint = DEFAULT_API_ENDPOINT;
+    private static String pulseEndpoint = DEFAULT_PULSE_ENDPOINT;
 
     private RaygunSettings() {
     }
 
     public static String getApiEndpoint() {
-        return defaultApiEndpoint;
+        return apiEndpoint;
+    }
+
+    public static void setApiEndpoint(String apiEndpoint) {
+        RaygunSettings.apiEndpoint = apiEndpoint;
     }
 
     public static String getPulseEndpoint() {
-        return defaultPulseEndpoint;
+        return pulseEndpoint;
+    }
+
+    public static void setPulseEndpoint(String pulseEndpoint) {
+        RaygunSettings.pulseEndpoint = pulseEndpoint;
     }
 
     public static HashSet<String> getIgnoredURLs() {

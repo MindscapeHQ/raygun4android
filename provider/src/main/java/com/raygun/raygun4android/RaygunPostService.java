@@ -44,7 +44,7 @@ public class RaygunPostService extends JobIntentService {
             String apiKey = bundle.getString("apikey");
             boolean isPulse = bundle.getBoolean("isPulse");
 
-            // Moved the check for internet connection as close as possible to the calls because this can change quite rapidly
+            // Moved the check for internet connection as close as possible to the calls because the condition can change quite rapidly
             if (isPulse && RaygunNetworkUtils.hasInternetConnection(this.getApplicationContext())) {
                 RaygunClient.postPulseMessage(apiKey, message);
             } else if (!isPulse && RaygunNetworkUtils.hasInternetConnection(this.getApplicationContext())) {
