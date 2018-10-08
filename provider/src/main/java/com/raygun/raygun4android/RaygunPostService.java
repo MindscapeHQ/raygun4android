@@ -56,8 +56,8 @@ public class RaygunPostService extends JobIntentService {
                     ArrayList<File> files = new ArrayList<>(Arrays.asList(getCacheDir().listFiles()));
                     if (files != null) {
                         for (File f : files) {
-                            String fileName = Integer.toString(file) + ".raygun";
-                            if (RaygunFileUtils.getExtension(f.getName()).equals("raygun") && !f.getName().equals(fileName)) {
+                            String fileName = Integer.toString(file) + "." + RaygunSettings.DEFAULT_FILE_EXTENSION;
+                            if (RaygunFileUtils.getExtension(f.getName()).equals(RaygunSettings.DEFAULT_FILE_EXTENSION) && !f.getName().equals(fileName)) {
                                 break;
                             } else if (file < RaygunSettings.getMaxReportsStoredOnDevice()) {
                                 file++;
@@ -66,7 +66,7 @@ public class RaygunPostService extends JobIntentService {
                             }
                         }
                     }
-                    File fn = new File(getCacheDir(), Integer.toString(file) + ".raygun");
+                    File fn = new File(getCacheDir(), Integer.toString(file) + "." + RaygunSettings.DEFAULT_FILE_EXTENSION);
                     try {
                         SerializedMessage serializedMessage = new SerializedMessage(message);
                         ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(fn));

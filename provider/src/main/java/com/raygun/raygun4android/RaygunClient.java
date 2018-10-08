@@ -409,7 +409,7 @@ public class RaygunClient {
             File[] fileList = getApplicationContext().getCacheDir().listFiles();
             for (File f : fileList) {
                 try {
-                    if (RaygunFileUtils.getExtension(f.getName()).equalsIgnoreCase("raygun")) {
+                    if (RaygunFileUtils.getExtension(f.getName()).equalsIgnoreCase(RaygunSettings.DEFAULT_FILE_EXTENSION)) {
                         ObjectInputStream ois = null;
                         try {
                             ois = new ObjectInputStream(new FileInputStream(f));
