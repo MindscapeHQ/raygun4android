@@ -409,13 +409,12 @@ public class RaygunClient {
             File[] fileList = getApplicationContext().getCacheDir().listFiles();
             for (File f : fileList) {
                 try {
-                    String ext = RaygunFileUtils.getExtension(f.getName());
-                    if (ext.equalsIgnoreCase("raygun")) {
+                    if (RaygunFileUtils.getExtension(f.getName()).equalsIgnoreCase("raygun")) {
                         ObjectInputStream ois = null;
                         try {
                             ois = new ObjectInputStream(new FileInputStream(f));
-                            MessageApiKey messageApiKey = (MessageApiKey) ois.readObject();
-                            enqueueWorkForService(messageApiKey.apiKey, messageApiKey.message, false);
+                            SerializedMessage serializedMessage = (SerializedMessage) ois.readObject();
+                            enqueueWorkForService(RaygunClient.apiKey, serializedMessage.message, false);
                             f.delete();
                         } finally {
                             if (ois != null) {

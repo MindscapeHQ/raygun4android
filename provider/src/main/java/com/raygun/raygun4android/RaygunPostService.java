@@ -68,9 +68,9 @@ public class RaygunPostService extends JobIntentService {
                     }
                     File fn = new File(getCacheDir(), Integer.toString(file) + ".raygun");
                     try {
-                        MessageApiKey messageApiKey = new MessageApiKey(apiKey, message);
+                        SerializedMessage serializedMessage = new SerializedMessage(message);
                         ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(fn));
-                        out.writeObject(messageApiKey);
+                        out.writeObject(serializedMessage);
                         out.close();
                     } catch (FileNotFoundException e) {
                         RaygunLogger.e("Error creating file when caching message to filesystem - " + e.getMessage());
