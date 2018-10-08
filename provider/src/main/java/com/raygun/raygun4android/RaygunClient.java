@@ -19,6 +19,7 @@ import com.raygun.raygun4android.messages.RaygunPulseTimingMessage;
 import com.raygun.raygun4android.messages.RaygunUserContext;
 import com.raygun.raygun4android.messages.RaygunUserInfo;
 import com.raygun.raygun4android.network.RaygunNetworkUtils;
+import com.raygun.raygun4android.utils.RaygunFileUtils;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -43,9 +44,11 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 
 /**
- * The official Raygun provider for Android. This is the main class that provides functionality for automatically sending exceptions to the Raygun service.
- * <p>
- * You should call init() on the static RaygunClient instance, passing in the application, instead of instantiating this class.
+ * The official Raygun provider for Android. This is the main class that provides functionality for
+ * automatically sending exceptions to the Raygun service.
+ *
+ * You should call init() on the static RaygunClient instance, passing in the application, instead
+ * of instantiating this class.
  */
 public class RaygunClient {
     private static String apiKey;
@@ -60,7 +63,8 @@ public class RaygunClient {
     private static String sessionId;
 
     /**
-     * Initializes the Raygun client. This expects that you have placed the API key in your AndroidManifest.xml, in a meta-data element.
+     * Initializes the Raygun client. This expects that you have placed the API key in your
+     * AndroidManifest.xml, in a meta-data element.
      *
      * @param application The Android application
      */
@@ -71,7 +75,8 @@ public class RaygunClient {
     }
 
     /**
-     * Initializes the Raygun client with the version of your application. This expects that you have placed the API key in your AndroidManifest.xml, in a meta-data element.
+     * Initializes the Raygun client with the version of your application. This expects that you have
+     * placed the API key in your AndroidManifest.xml, in a meta-data element.
      *
      * @param version The version of your application, format x.x.x.x, where x is a positive integer.
      * @param application The Android application
@@ -83,7 +88,8 @@ public class RaygunClient {
     }
 
     /**
-     * Initializes the Raygun client with your Android application and your Raygun API key. The version transmitted will be the value of the versionName attribute in your manifest element.
+     * Initializes the Raygun client with your Android application and your Raygun API key. The version
+     * transmitted will be the value of the versionName attribute in your manifest element.
      *
      * @param application The Android application
      * @param apiKey An API key that belongs to a Raygun application created in your dashboard
@@ -105,7 +111,8 @@ public class RaygunClient {
     }
 
     /**
-     * Initializes the Raygun client with your Android application, your Raygun API key, and the version of your application
+     * Initializes the Raygun client with your Android application, your Raygun API key, and the
+     * version of your application
      *
      * @param application The Android application
      * @param apiKey  An API key that belongs to a Raygun application created in your dashboard
@@ -117,7 +124,8 @@ public class RaygunClient {
     }
 
     /**
-     * Attaches a pre-built Raygun exception handler to the thread's DefaultUncaughtExceptionHandler. This automatically sends any exceptions that reaches it to the Raygun API.
+     * Attaches a pre-built Raygun exception handler to the thread's DefaultUncaughtExceptionHandler.
+     * This automatically sends any exceptions that reaches it to the Raygun API.
      */
     public static void attachExceptionHandler() {
         UncaughtExceptionHandler oldHandler = Thread.getDefaultUncaughtExceptionHandler();
@@ -401,7 +409,7 @@ public class RaygunClient {
             File[] fileList = getApplicationContext().getCacheDir().listFiles();
             for (File f : fileList) {
                 try {
-                    String ext = getExtension(f.getName());
+                    String ext = RaygunFileUtils.getExtension(f.getName());
                     if (ext.equalsIgnoreCase("raygun")) {
                         ObjectInputStream ois = null;
                         try {
@@ -456,20 +464,6 @@ public class RaygunClient {
             return merged;
         } else {
             return paramUserCustomData;
-        }
-    }
-
-    protected static String getExtension(String filename) {
-        if (filename == null) {
-            return null;
-        }
-        int separator = Math.max(filename.lastIndexOf('/'), filename.lastIndexOf('\\'));
-        int dotPos = filename.lastIndexOf(".");
-        int index = separator > dotPos ? -1 : dotPos;
-        if (index == -1) {
-            return "";
-        } else {
-            return filename.substring(index + 1);
         }
     }
 
@@ -560,6 +554,44 @@ public class RaygunClient {
      */
     public static void ignoreViews(String[] views) {
         RaygunSettings.ignoreViews(views);
+    }
+
+    /**
+     * Allows the user to set a custom endpoint for Crash Reporting
+     *
+     * @param url String with the URL to be used
+     */
+    public static void setCustomCrashReportingEndpoint(String url) {
+        if (url != null && !url.isEmpty()) {
+            RaygunSettings.setApiEndpoint(url);
+        } else {
+            RaygunLogger.w("A custom crash reporting endpoint can't be null or empty. Custom endpoint has NOT been applied");
+        }
+    }
+
+    /**
+     * Allows the user to set a custom endpoint for Pulse
+     *
+     * @param url String with the URL to be used
+     */
+    public static void setCustomPulseEndpoint(String url) {
+        if (url != null && !url.isEmpty()) {
+            RaygunSettings.setPulseEndpoint(url);
+        } else {
+            RaygunLogger.w("A custom Pulse endpoint can't be null or empty. Custom endpoint has NOT been applied");
+        }
+    }
+
+    /**
+     * Allows the user to set the maximum number of crash reports stored on the device.
+     *
+     * The default and maximum value for this is 64. We do not recommend to change this setting
+     * unless you have a very good reason and use case.
+     *
+     * @param maxReportsStoredOnDevice An int with the new maximum number of crash reports
+     */
+    public static void setMaxReportsStoredOnDevice(int maxReportsStoredOnDevice) {
+        RaygunSettings.setMaxReportsStoredOnDevice(maxReportsStoredOnDevice);
     }
 
     private static boolean shouldIgnoreView(String viewName) {

@@ -47,7 +47,11 @@ public class RaygunSettings {
     }
 
     public static void setMaxReportsStoredOnDevice(int maxReportsStoredOnDevice) {
-        RaygunSettings.maxReportsStoredOnDevice = maxReportsStoredOnDevice;
+        if (maxReportsStoredOnDevice <= DEFAULT_MAX_REPORTS_STORED_ON_DEVICE) {
+            RaygunSettings.maxReportsStoredOnDevice = maxReportsStoredOnDevice;
+        } else {
+            RaygunLogger.w("It's not possible to exceed the value " + DEFAULT_MAX_REPORTS_STORED_ON_DEVICE + " for the number of reports stored on the device. The setting has not been applied.");
+        }
     }
 
     public static class IgnoredURLs extends HashSet<String> {

@@ -7,6 +7,7 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.JobIntentService;
 
 import com.raygun.raygun4android.network.RaygunNetworkUtils;
+import com.raygun.raygun4android.utils.RaygunFileUtils;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -56,7 +57,7 @@ public class RaygunPostService extends JobIntentService {
                     if (files != null) {
                         for (File f : files) {
                             String fileName = Integer.toString(file) + ".raygun";
-                            if (RaygunClient.getExtension(f.getName()).equals("raygun") && !f.getName().equals(fileName)) {
+                            if (RaygunFileUtils.getExtension(f.getName()).equals("raygun") && !f.getName().equals(fileName)) {
                                 break;
                             } else if (file < RaygunSettings.getMaxReportsStoredOnDevice()) {
                                 file++;
