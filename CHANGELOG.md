@@ -15,6 +15,8 @@
   - Build requirements updated to compileSDK 28 and minSDK 16+
   - There is a new convenience constructor on RaygunUserInfo to create a user object that only has an identifier.
   - All deprecated functionality from 3.x has been removed
+  - Custom endpoints are supported now
+  - You can change the default of 64 reports being stored to a lower value now
    
 - v3.0.5: Fixing timing issue from ConnectivityManager in RaygunPostService (#41), adding null checks around intent extras being null that should never be null (XRAY-1898)
 

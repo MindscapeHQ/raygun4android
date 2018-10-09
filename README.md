@@ -161,6 +161,29 @@ Any of the properties are optional, for instance you can set just isAnonymous by
 
 If the user context changes, for instance on log in/out, you should remember to call setUser again to store the updated username.
 
+### Custom endpoints
+
+Raygun supports sending data from Crash Reporting and Real User Monitoring to your own endpoints. If you want to set custom endpoints, could can do so by setting them after you've initialised RaygunClient:
+
+```java
+RaygunClient.init(getApplicationContext());
+RaygunClient.attachExceptionHandler();
+RaygunClient.setCustomCrashReportingEndpoint("http://...");
+RaygunClient.setCustomPulseEndpoint("http://...");
+```
+
+Please note that setting a custom endpoint will stop Crash Report or Real User Monitoring data from being sent to the Raygun backend.
+
+### Storing crash reports on the device
+
+If the device can't connect, Raygun4Android will save the crash report to disk. When the provider is later asked to send another message it will check if the internet is now available, and if it is, send the cached messages. A maximum of 64 messages will be cached and you can change the amount by calling:
+
+```java
+RaygunClient.setMaxReportsStoredOnDevice(amount)
+```
+
+You cannot increase the amount beyond the maximum of 64.
+
 ## Documentation (NOT NECESSARILY UP TO DATE)
 
 ### Version tracking
@@ -314,12 +337,6 @@ The following misc methods are available:
 * Environment Data
 
   A selection of enironment data will be attached and available in the Environment tab in the dashboard, and more in the Raw tab. This data is gathered from android.os.Build - if you wish to see more data you can add them on the userCustomData object.
-
-* What happens when the phone has no internet connection?
-
-  Raygun4Android will save the exception message to disk. When the provider is later asked to send another message it will check if the internet is now available, and if it is, send the cached messages. A maximum of 64 messages will be cached, then overwritten (using a LRU strategy).
-
-  The provider now attaches the device's network connectivity state to the payload when the exception occurs. This is visible under the Request tab in the Raygun dashboard.
 
 * RayGunPostMessage logs an error message about a not found class: Rejecting re-init on previously-failed class java.lang.Class<android.support.v4.app.JobIntentService$JobServiceEngineImpl>
       
