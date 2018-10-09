@@ -234,6 +234,133 @@ public class RaygunClient {
         enqueueWorkForService(RaygunClient.apiKey, new Gson().toJson(msg), false);
     }
 
+    /**
+     * Sets the current user of your application. If user is an email address which is associated with a Gravatar,
+     * their picture will be displayed in the error view. If setUser is not called a random ID will be assigned.
+     * If the user context changes in your application (i.e log in/out), be sure to call this again with the
+     * updated user name/email address.
+     *
+     * If you use an email address to identify the user, please consider using setUser(RaygunUserInfo userInfo)
+     * instead of this method as it would allow you to set the email address into both the identifier and email fields
+     * of the crash data to be sent.
+     *
+     * @param user A user name or email address representing the current user.
+     */
+    public static void setUser(String user) {
+        if (user != null && user.length() > 0) {
+            RaygunClient.userInfo = new RaygunUserInfo(user);
+        }
+    }
+
+    /**
+     * Sets the current user of your application. If user is an email address which is associated with a Gravatar,
+     * their picture will be displayed in the error view. If setUser is not called a random ID will be assigned.
+     * If the user context changes in your application (i.e log in/out), be sure to call this again with the
+     * updated user name/email address.
+     *
+     * @param userInfo A RaygunUserInfo object containing the user data you want to send in its fields.
+     */
+    public static void setUser(RaygunUserInfo userInfo) {
+        RaygunClient.userInfo = userInfo;
+    }
+
+    /**
+     * Manually stores the version of your application to be transmitted with each message, for version
+     * filtering. This is normally read from your AndroidManifest.xml (the versionName attribute on manifest element)
+     * or passed in on init(); this is only provided as a convenience.
+     *
+     * @param version The version of your application, format x.x.x.x, where x is a positive integer.
+     */
+    public static void setVersion(String version) {
+        if (version != null) {
+            RaygunClient.version = version;
+        }
+    }
+
+    public static RaygunUncaughtExceptionHandler getExceptionHandler() {
+        return RaygunClient.handler;
+    }
+
+    public static String getApiKey() {
+        return RaygunClient.apiKey;
+    }
+
+    public static List getTags() {
+        return RaygunClient.tags;
+    }
+
+    public static void setTags(List tags) {
+        RaygunClient.tags = tags;
+    }
+
+    public static Map getUserCustomData() {
+        return RaygunClient.userCustomData;
+    }
+
+    public static void setUserCustomData(Map userCustomData) {
+        RaygunClient.userCustomData = userCustomData;
+    }
+
+    public static void setOnBeforeSend(RaygunOnBeforeSend onBeforeSend) {
+        RaygunClient.onBeforeSend = onBeforeSend;
+    }
+
+    /**
+     * Allows the user to add more URLs to filter out, so network timing events are not sent for them.
+     *
+     * @param urls An array of urls to filter out by.
+     */
+    public static void ignoreURLs(String[] urls) {
+        RaygunSettings.ignoreURLs(urls);
+    }
+
+    /**
+     * Allows the user to add more views to filter out, so load timing events are not sent for them.
+     *
+     * @param views An array of activity names to filter out by.
+     */
+    public static void ignoreViews(String[] views) {
+        RaygunSettings.ignoreViews(views);
+    }
+
+    /**
+     * Allows the user to set a custom endpoint for Crash Reporting
+     *
+     * @param url String with the URL to be used
+     */
+    public static void setCustomCrashReportingEndpoint(String url) {
+        if (url != null && !url.isEmpty()) {
+            RaygunSettings.setApiEndpoint(url);
+        } else {
+            RaygunLogger.w("A custom crash reporting endpoint can't be null or empty. Custom endpoint has NOT been applied");
+        }
+    }
+
+    /**
+     * Allows the user to set a custom endpoint for Pulse
+     *
+     * @param url String with the URL to be used
+     */
+    public static void setCustomPulseEndpoint(String url) {
+        if (url != null && !url.isEmpty()) {
+            RaygunSettings.setPulseEndpoint(url);
+        } else {
+            RaygunLogger.w("A custom Pulse endpoint can't be null or empty. Custom endpoint has NOT been applied");
+        }
+    }
+
+    /**
+     * Allows the user to set the maximum number of crash reports stored on the device.
+     *
+     * The default and maximum value for this is 64. We do not recommend to change this setting
+     * unless you have a very good reason and use case.
+     *
+     * @param maxReportsStoredOnDevice An int with the new maximum number of crash reports
+     */
+    public static void setMaxReportsStoredOnDevice(int maxReportsStoredOnDevice) {
+        RaygunSettings.setMaxReportsStoredOnDevice(maxReportsStoredOnDevice);
+    }
+
     protected static void sendPulseEvent(String name) {
         if ("session_start".equals(name)) {
             RaygunClient.sessionId = UUID.randomUUID().toString();
@@ -467,132 +594,6 @@ public class RaygunClient {
         }
     }
 
-    /**
-     * Sets the current user of your application. If user is an email address which is associated with a Gravatar,
-     * their picture will be displayed in the error view. If setUser is not called a random ID will be assigned.
-     * If the user context changes in your application (i.e log in/out), be sure to call this again with the
-     * updated user name/email address.
-     *
-     * If you use an email address to identify the user, please consider using setUser(RaygunUserInfo userInfo)
-     * instead of this method as it would allow you to set the email address into both the identifier and email fields
-     * of the crash data to be sent.
-     *
-     * @param user A user name or email address representing the current user.
-     */
-    public static void setUser(String user) {
-        if (user != null && user.length() > 0) {
-            RaygunClient.userInfo = new RaygunUserInfo(user);
-        }
-    }
-
-    /**
-     * Sets the current user of your application. If user is an email address which is associated with a Gravatar,
-     * their picture will be displayed in the error view. If setUser is not called a random ID will be assigned.
-     * If the user context changes in your application (i.e log in/out), be sure to call this again with the
-     * updated user name/email address.
-     *
-     * @param userInfo A RaygunUserInfo object containing the user data you want to send in its fields.
-     */
-    public static void setUser(RaygunUserInfo userInfo) {
-        RaygunClient.userInfo = userInfo;
-    }
-
-    /**
-     * Manually stores the version of your application to be transmitted with each message, for version
-     * filtering. This is normally read from your AndroidManifest.xml (the versionName attribute on manifest element)
-     * or passed in on init(); this is only provided as a convenience.
-     *
-     * @param version The version of your application, format x.x.x.x, where x is a positive integer.
-     */
-    public static void setVersion(String version) {
-        if (version != null) {
-            RaygunClient.version = version;
-        }
-    }
-
-    public static RaygunUncaughtExceptionHandler getExceptionHandler() {
-        return RaygunClient.handler;
-    }
-
-    public static String getApiKey() {
-        return RaygunClient.apiKey;
-    }
-
-    public static List getTags() {
-        return RaygunClient.tags;
-    }
-
-    public static void setTags(List tags) {
-        RaygunClient.tags = tags;
-    }
-
-    public static Map getUserCustomData() {
-        return RaygunClient.userCustomData;
-    }
-
-    public static void setUserCustomData(Map userCustomData) {
-        RaygunClient.userCustomData = userCustomData;
-    }
-
-    public static void setOnBeforeSend(RaygunOnBeforeSend onBeforeSend) {
-        RaygunClient.onBeforeSend = onBeforeSend;
-    }
-
-    /**
-     * Allows the user to add more URLs to filter out, so network timing events are not sent for them.
-     *
-     * @param urls An array of urls to filter out by.
-     */
-    public static void ignoreURLs(String[] urls) {
-        RaygunSettings.ignoreURLs(urls);
-    }
-
-    /**
-     * Allows the user to add more views to filter out, so load timing events are not sent for them.
-     *
-     * @param views An array of activity names to filter out by.
-     */
-    public static void ignoreViews(String[] views) {
-        RaygunSettings.ignoreViews(views);
-    }
-
-    /**
-     * Allows the user to set a custom endpoint for Crash Reporting
-     *
-     * @param url String with the URL to be used
-     */
-    public static void setCustomCrashReportingEndpoint(String url) {
-        if (url != null && !url.isEmpty()) {
-            RaygunSettings.setApiEndpoint(url);
-        } else {
-            RaygunLogger.w("A custom crash reporting endpoint can't be null or empty. Custom endpoint has NOT been applied");
-        }
-    }
-
-    /**
-     * Allows the user to set a custom endpoint for Pulse
-     *
-     * @param url String with the URL to be used
-     */
-    public static void setCustomPulseEndpoint(String url) {
-        if (url != null && !url.isEmpty()) {
-            RaygunSettings.setPulseEndpoint(url);
-        } else {
-            RaygunLogger.w("A custom Pulse endpoint can't be null or empty. Custom endpoint has NOT been applied");
-        }
-    }
-
-    /**
-     * Allows the user to set the maximum number of crash reports stored on the device.
-     *
-     * The default and maximum value for this is 64. We do not recommend to change this setting
-     * unless you have a very good reason and use case.
-     *
-     * @param maxReportsStoredOnDevice An int with the new maximum number of crash reports
-     */
-    public static void setMaxReportsStoredOnDevice(int maxReportsStoredOnDevice) {
-        RaygunSettings.setMaxReportsStoredOnDevice(maxReportsStoredOnDevice);
-    }
 
     private static boolean shouldIgnoreView(String viewName) {
         if (viewName == null) {
