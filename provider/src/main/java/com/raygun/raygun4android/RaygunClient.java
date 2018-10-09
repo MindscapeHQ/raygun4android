@@ -19,6 +19,7 @@ import com.raygun.raygun4android.messages.RaygunPulseTimingMessage;
 import com.raygun.raygun4android.messages.RaygunUserContext;
 import com.raygun.raygun4android.messages.RaygunUserInfo;
 import com.raygun.raygun4android.network.RaygunNetworkUtils;
+import com.raygun.raygun4android.utils.RaygunFileFilter;
 import com.raygun.raygun4android.utils.RaygunFileUtils;
 
 import java.io.File;
@@ -406,7 +407,7 @@ public class RaygunClient {
 
     private static void postCachedMessages() {
         if (RaygunNetworkUtils.hasInternetConnection(getApplicationContext())) {
-            File[] fileList = getApplicationContext().getCacheDir().listFiles();
+            File[] fileList = getApplicationContext().getCacheDir().listFiles(new RaygunFileFilter());
             for (File f : fileList) {
                 try {
                     if (RaygunFileUtils.getExtension(f.getName()).equalsIgnoreCase(RaygunSettings.DEFAULT_FILE_EXTENSION)) {

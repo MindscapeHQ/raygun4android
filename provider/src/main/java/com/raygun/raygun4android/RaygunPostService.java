@@ -7,15 +7,18 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.JobIntentService;
 
 import com.raygun.raygun4android.network.RaygunNetworkUtils;
-import com.raygun.raygun4android.utils.RaygunFileUtils;
+import com.raygun.raygun4android.utils.RaygunFileFilter;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.MediaType;
@@ -52,30 +55,26 @@ public class RaygunPostService extends JobIntentService {
                 post(apiKey, message);
             } else if (!isPulse && !RaygunNetworkUtils.hasInternetConnection(this.getApplicationContext())) {
                 synchronized (this) {
-                    int file = 0;
-                    ArrayList<File> files = new ArrayList<>(Arrays.asList(getCacheDir().listFiles()));
-                    if (files != null) {
-                        for (File f : files) {
-                            String fileName = Integer.toString(file) + "." + RaygunSettings.DEFAULT_FILE_EXTENSION;
-                            if (RaygunFileUtils.getExtension(f.getName()).equals(RaygunSettings.DEFAULT_FILE_EXTENSION) && !f.getName().equals(fileName)) {
-                                break;
-                            } else if (file < RaygunSettings.getMaxReportsStoredOnDevice()) {
-                                file++;
-                            } else {
-                                files.get(0).delete();
-                            }
+                    ArrayList<File> cachedFiles = new ArrayList<>(Arrays.asList(getCacheDir().listFiles(new RaygunFileFilter())));
+
+                    if (cachedFiles.size() < RaygunSettings.getMaxReportsStoredOnDevice()) {
+                        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
+                        String uuid = UUID.randomUUID().toString().replace("-", "");
+                        String timestamp = dateFormat.format(new Date(System.currentTimeMillis()));
+                        File fn = new File(getCacheDir(), timestamp + "-" + uuid + "." + RaygunSettings.DEFAULT_FILE_EXTENSION);
+
+                        try {
+                            SerializedMessage serializedMessage = new SerializedMessage(message);
+                            ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(fn));
+                            out.writeObject(serializedMessage);
+                            out.close();
+                        } catch (FileNotFoundException e) {
+                            RaygunLogger.e("Error creating file when caching message to filesystem - " + e.getMessage());
+                        } catch (IOException e) {
+                            RaygunLogger.e("Error writing message to filesystem - " + e.getMessage());
                         }
-                    }
-                    File fn = new File(getCacheDir(), Integer.toString(file) + "." + RaygunSettings.DEFAULT_FILE_EXTENSION);
-                    try {
-                        SerializedMessage serializedMessage = new SerializedMessage(message);
-                        ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(fn));
-                        out.writeObject(serializedMessage);
-                        out.close();
-                    } catch (FileNotFoundException e) {
-                        RaygunLogger.e("Error creating file when caching message to filesystem - " + e.getMessage());
-                    } catch (IOException e) {
-                        RaygunLogger.e("Error writing message to filesystem - " + e.getMessage());
+                    } else {
+                        RaygunLogger.w("Can't write crash report to local disk, maximum number of stored reports reached.");
                     }
                 }
             }
