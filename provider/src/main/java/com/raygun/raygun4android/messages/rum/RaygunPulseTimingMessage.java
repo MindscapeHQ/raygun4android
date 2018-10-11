@@ -1,4 +1,4 @@
-package com.raygun.raygun4android.messages;
+package com.raygun.raygun4android.messages.rum;
 
 public class RaygunPulseTimingMessage {
     private String type;

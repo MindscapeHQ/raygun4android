@@ -12,10 +12,10 @@ import android.os.Bundle;
 
 import com.google.gson.Gson;
 import com.raygun.raygun4android.messages.crashreporting.RaygunMessage;
-import com.raygun.raygun4android.messages.RaygunPulseData;
-import com.raygun.raygun4android.messages.RaygunPulseDataMessage;
-import com.raygun.raygun4android.messages.RaygunPulseMessage;
-import com.raygun.raygun4android.messages.RaygunPulseTimingMessage;
+import com.raygun.raygun4android.messages.rum.RaygunPulseData;
+import com.raygun.raygun4android.messages.rum.RaygunPulseDataMessage;
+import com.raygun.raygun4android.messages.rum.RaygunPulseMessage;
+import com.raygun.raygun4android.messages.rum.RaygunPulseTimingMessage;
 import com.raygun.raygun4android.messages.crashreporting.RaygunUserContext;
 import com.raygun.raygun4android.messages.RaygunUserInfo;
 import com.raygun.raygun4android.network.RaygunNetworkUtils;
