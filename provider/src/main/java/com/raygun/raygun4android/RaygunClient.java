@@ -355,38 +355,41 @@ public class RaygunClient {
         // TODO Add function call to delete any existing stored reports
     }
 
-    protected static void sendRUMEvent(String name) {
-        if (RaygunSettings.RUM_EVENT_SESSION_START.equals(name)) {
+    /**
+     * Sends a RUM event to Raygun. The message is sent on a background thread.
+     *
+     * @param eventName Tracks if this is a session start or session end event.
+     */
+    protected static void sendRUMEvent(String eventName) {
+        if (RaygunSettings.RUM_EVENT_SESSION_START.equals(eventName)) {
             RaygunClient.sessionId = UUID.randomUUID().toString();
         }
 
         RaygunRUMMessage message = new RaygunRUMMessage();
-        RaygunRUMDataMessage rumData = new RaygunRUMDataMessage();
+        RaygunRUMDataMessage dataMessage = new RaygunRUMDataMessage();
+
+        dataMessage.setType(eventName);
 
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
         df.setTimeZone(TimeZone.getTimeZone("UTC"));
         Calendar c = Calendar.getInstance();
-
-        if (RaygunSettings.RUM_EVENT_SESSION_END.equals(name)) {
+        if (RaygunSettings.RUM_EVENT_SESSION_END.equals(eventName)) {
             c.add(Calendar.SECOND, 2);
         }
-
         String timestamp = df.format(c.getTime());
-        rumData.setTimestamp(timestamp);
+        dataMessage.setTimestamp(timestamp);
 
-        rumData.setVersion(RaygunClient.version);
-        rumData.setOS("Android");
+        dataMessage.setSessionId(RaygunClient.sessionId);
+        dataMessage.setVersion(RaygunClient.version);
+        dataMessage.setOS("Android");
         // TODO This looks fishy
-        rumData.setOSVersion(Build.VERSION.RELEASE);
-        rumData.setPlatform(String.format("%s %s", Build.MANUFACTURER, Build.MODEL));
+        dataMessage.setOSVersion(Build.VERSION.RELEASE);
+        dataMessage.setPlatform(String.format("%s %s", Build.MANUFACTURER, Build.MODEL));
 
         RaygunUserContext userContext = RaygunClient.userInfo == null ? new RaygunUserContext(new RaygunUserInfo(null, null, null, null, null, true), getApplicationContext()) : new RaygunUserContext(RaygunClient.userInfo, getApplicationContext());
-        rumData.setUser(userContext);
+        dataMessage.setUser(userContext);
 
-        rumData.setSessionId(RaygunClient.sessionId);
-        rumData.setType(name);
-
-        message.setEventData(new RaygunRUMDataMessage[]{rumData});
+        message.setEventData(new RaygunRUMDataMessage[]{dataMessage});
 
         enqueueWorkForService(RaygunClient.apiKey, new Gson().toJson(message), true);
     }
@@ -412,19 +415,21 @@ public class RaygunClient {
         RaygunRUMMessage message = new RaygunRUMMessage();
         RaygunRUMDataMessage dataMessage = new RaygunRUMDataMessage();
 
+        dataMessage.setType(RaygunSettings.RUM_EVENT_TIMING);
+
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
         df.setTimeZone(TimeZone.getTimeZone("UTC"));
         Calendar c = Calendar.getInstance();
         c.add(Calendar.MILLISECOND, -(int) milliseconds);
         String timestamp = df.format(c.getTime());
-
         dataMessage.setTimestamp(timestamp);
+
         dataMessage.setSessionId(RaygunClient.sessionId);
         dataMessage.setVersion(RaygunClient.version);
         dataMessage.setOS("Android");
+        // TODO This looks fishy
         dataMessage.setOSVersion(Build.VERSION.RELEASE);
         dataMessage.setPlatform(String.format("%s %s", Build.MANUFACTURER, Build.MODEL));
-        dataMessage.setType("mobile_event_timing");
 
         RaygunUserContext userContext = RaygunClient.userInfo == null ? new RaygunUserContext(new RaygunUserInfo(null, null, null, null, null, true), getApplicationContext()) : new RaygunUserContext(RaygunClient.userInfo, getApplicationContext());
         dataMessage.setUser(userContext);

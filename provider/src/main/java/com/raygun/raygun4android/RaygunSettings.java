@@ -12,6 +12,7 @@ public class RaygunSettings {
     public static final String DEFAULT_FILE_EXTENSION = "raygun4";
     public static final String RUM_EVENT_SESSION_START = "session_start";
     public static final String RUM_EVENT_SESSION_END = "session_end";
+    public static final String RUM_EVENT_TIMING = "mobile_event_timing";
 
     private static IgnoredURLs ignoredURLs = new IgnoredURLs("api.raygun.io");
     private static HashSet<String> ignoredViews = new HashSet<>();
