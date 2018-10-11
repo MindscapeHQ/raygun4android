@@ -17,7 +17,8 @@
   - All deprecated functionality from 3.x has been removed
   - Custom endpoints are supported now
   - You can change the default of 64 reports being stored to a lower value now
-   
+  - General API cleanup and changes to Pulse -> all RUM now
+  
 - v3.0.5: Fixing timing issue from ConnectivityManager in RaygunPostService (#41), adding null checks around intent extras being null that should never be null (XRAY-1898)
 
 - v3.0.4: Fixing NPE in RaygunPostService (#34, PR #37); RaygunErrorMessage can now accept any Throwable (PR #33); Pulse now checks for connectivity (PR #38)

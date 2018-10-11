@@ -342,10 +342,3 @@ The following misc methods are available:
       
   The message above stems from certain versions of the Android support libraries. JobServiceEngineImpl is part of Android Oreo (8, SDK 26) and newer only. The support library catering for supporting services on earlier versions of Android runs internal checks for which implementation is available to it. As part of the checks, it outputs the message as an informational feedback only.
 
-### Contributing
-
-Clone this repository, then run `mvn install` to grab the dependencies and install the library to your local Maven repo. Issues and pull requests are welcome.
-
-### Changelog
-
-[View the changelog here](CHANGELOG.md)
