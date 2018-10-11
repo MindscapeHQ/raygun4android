@@ -382,7 +382,6 @@ public class RaygunClient {
         dataMessage.setSessionId(RaygunClient.sessionId);
         dataMessage.setVersion(RaygunClient.version);
         dataMessage.setOS("Android");
-        // TODO This looks fishy
         dataMessage.setOSVersion(Build.VERSION.RELEASE);
         dataMessage.setPlatform(String.format("%s %s", Build.MANUFACTURER, Build.MODEL));
 
@@ -427,7 +426,6 @@ public class RaygunClient {
         dataMessage.setSessionId(RaygunClient.sessionId);
         dataMessage.setVersion(RaygunClient.version);
         dataMessage.setOS("Android");
-        // TODO This looks fishy
         dataMessage.setOSVersion(Build.VERSION.RELEASE);
         dataMessage.setPlatform(String.format("%s %s", Build.MANUFACTURER, Build.MODEL));
 

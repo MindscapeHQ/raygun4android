@@ -60,8 +60,7 @@ def createRaygunNotifyDeploymentTask(token,key,groupName,version,userName,userEm
  * Setup a sample Gradle task for upload proguard mapping files
  * This is done as a function so that there's more flexibility when it comes to dealing with creating the tasks for multiple flavours etc.
  *
- * TODO:
- * The function as of now requires curl to be available on the PATH of the machine running it and probably doesn't work out of the box on Windows. Should be refactored to using the Groovy HTTP library
+ * TODO The function as of now requires curl to be available on the PATH of the machine running it and probably doesn't work out of the box on Windows. Should be refactored to using the Groovy HTTP library
  */
 def createRaygunProguardTask(token,raygunAppPath,groupName,version) {
 
