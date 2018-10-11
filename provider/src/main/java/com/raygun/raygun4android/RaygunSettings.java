@@ -6,7 +6,7 @@ import java.util.HashSet;
 public class RaygunSettings {
 
     private static final int DEFAULT_MAX_REPORTS_STORED_ON_DEVICE = 64;
-    private static final String DEFAULT_API_ENDPOINT = "https://api.raygun.io/entries";
+    private static final String DEFAULT_CRASHREPORTING_ENDPOINT = "https://api.raygun.io/entries";
     private static final String DEFAULT_RUM_ENDPOINT = "https://api.raygun.io/events";
 
     public static final String DEFAULT_FILE_EXTENSION = "raygun4";
@@ -15,19 +15,20 @@ public class RaygunSettings {
 
     private static IgnoredURLs ignoredURLs = new IgnoredURLs("api.raygun.io");
     private static HashSet<String> ignoredViews = new HashSet<>();
+
     private static int maxReportsStoredOnDevice = DEFAULT_MAX_REPORTS_STORED_ON_DEVICE;
-    private static String apiEndpoint = DEFAULT_API_ENDPOINT;
+    private static String crashReportingEndpoint = DEFAULT_CRASHREPORTING_ENDPOINT;
     private static String rumEndpoint = DEFAULT_RUM_ENDPOINT;
 
     private RaygunSettings() {
     }
 
-    public static String getApiEndpoint() {
-        return apiEndpoint;
+    public static String getCrashReportingEndpoint() {
+        return crashReportingEndpoint;
     }
 
-    public static void setApiEndpoint(String apiEndpoint) {
-        RaygunSettings.apiEndpoint = apiEndpoint;
+    public static void setCrashReportingEndpoint(String crashReportingEndpoint) {
+        RaygunSettings.crashReportingEndpoint = crashReportingEndpoint;
     }
 
     public static String getRUMEndpoint() {

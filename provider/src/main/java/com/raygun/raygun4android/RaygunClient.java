@@ -36,13 +36,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
 import java.util.UUID;
-import java.util.concurrent.TimeUnit;
-
-import okhttp3.MediaType;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.RequestBody;
-import okhttp3.Response;
 
 /**
  * The official Raygun provider for Android. This is the main class that provides functionality for
@@ -330,7 +323,7 @@ public class RaygunClient {
      */
     public static void setCustomCrashReportingEndpoint(String url) {
         if (url != null && !url.isEmpty()) {
-            RaygunSettings.setApiEndpoint(url);
+            RaygunSettings.setCrashReportingEndpoint(url);
         } else {
             RaygunLogger.w("A custom crash reporting endpoint can't be null or empty. Custom endpoint has NOT been applied");
         }
@@ -380,8 +373,10 @@ public class RaygunClient {
 
         String timestamp = df.format(c.getTime());
         rumData.setTimestamp(timestamp);
+
         rumData.setVersion(RaygunClient.version);
         rumData.setOS("Android");
+        // TODO This looks fishy
         rumData.setOSVersion(Build.VERSION.RELEASE);
         rumData.setPlatform(String.format("%s %s", Build.MANUFACTURER, Build.MODEL));
 
@@ -450,41 +445,6 @@ public class RaygunClient {
         enqueueWorkForService(RaygunClient.apiKey, new Gson().toJson(message), true);
     }
 
-    protected static int postRUMMessage(String apiKey, String jsonPayload) {
-        try {
-            if (validateApiKey(apiKey)) {
-                String endpoint = RaygunSettings.getRUMEndpoint();
-                MediaType MEDIA_TYPE_JSON = MediaType.parse("application/json; charset=utf-8");
-
-                OkHttpClient client = new OkHttpClient.Builder()
-                        .connectTimeout(30, TimeUnit.SECONDS)
-                        .writeTimeout(30, TimeUnit.SECONDS)
-                        .readTimeout(30, TimeUnit.SECONDS)
-                        .build();
-
-                RequestBody body = RequestBody.create(MEDIA_TYPE_JSON, jsonPayload);
-
-                Request request = new Request.Builder()
-                        .url(endpoint)
-                        .header("X-ApiKey", apiKey)
-                        .post(body)
-                        .build();
-                try {
-                    Response response = client.newCall(request).execute();
-                    RaygunLogger.d("RUM HTTP POST result: " + response.code());
-                    return response.code();
-                } catch (IOException ioe) {
-                    RaygunLogger.e("OkHttp POST to Raygun RUM backend failed - " + ioe.getMessage());
-                    ioe.printStackTrace();
-                }
-            }
-        } catch (Exception e) {
-            RaygunLogger.e("Couldn't post exception - " + e.getMessage());
-            e.printStackTrace();
-        }
-        return -1;
-    }
-
     private static RaygunMessage buildMessage(Throwable throwable) {
         try {
             RaygunMessage msg = RaygunMessageBuilder.instance()
@@ -522,15 +482,6 @@ public class RaygunClient {
             RaygunLogger.e("Couldn't read API key from your AndroidManifest.xml <meta-data /> element; cannot send. Detailed error: " + e.getMessage());
         }
         return null;
-    }
-
-    protected static Boolean validateApiKey(String apiKey) {
-        if (apiKey.length() == 0) {
-            RaygunLogger.e("API key has not been provided, nothing will be logged");
-            return false;
-        } else {
-            return true;
-        }
     }
 
     private static void postCachedMessages() {

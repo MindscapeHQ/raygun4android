@@ -46,14 +46,14 @@ public class RaygunPostService extends JobIntentService {
 
             String message = bundle.getString("msg");
             String apiKey = bundle.getString("apikey");
-            boolean isPulse = bundle.getBoolean("isPulse");
+            boolean isRUM = bundle.getBoolean("isRUM");
 
             // Moved the check for internet connection as close as possible to the calls because the condition can change quite rapidly
-            if (isPulse && RaygunNetworkUtils.hasInternetConnection(this.getApplicationContext())) {
-                RaygunClient.postRUMMessage(apiKey, message);
-            } else if (!isPulse && RaygunNetworkUtils.hasInternetConnection(this.getApplicationContext())) {
-                post(apiKey, message);
-            } else if (!isPulse && !RaygunNetworkUtils.hasInternetConnection(this.getApplicationContext())) {
+            if (isRUM && RaygunNetworkUtils.hasInternetConnection(this.getApplicationContext())) {
+                postRUM(apiKey, message);
+            } else if (!isRUM && RaygunNetworkUtils.hasInternetConnection(this.getApplicationContext())) {
+                postCrashReporting(apiKey, message);
+            } else if (!isRUM && !RaygunNetworkUtils.hasInternetConnection(this.getApplicationContext())) {
                 synchronized (this) {
                     ArrayList<File> cachedFiles = new ArrayList<>(Arrays.asList(getCacheDir().listFiles(new RaygunFileFilter())));
 
@@ -87,16 +87,16 @@ public class RaygunPostService extends JobIntentService {
     }
 
     /**
-     * Raw post method that delivers a pre-built RaygunMessage to the Raygun API.
+     * Raw post method that delivers a pre-built Crash Reporting payload to the Raygun API.
      *
      * @param apiKey      The API key of the app to deliver to
      * @param jsonPayload The JSON representation of a RaygunMessage to be delivered over HTTPS.
      * @return HTTP result code - 202 if successful, 403 if API key invalid, 400 if bad message (invalid properties)
      */
-    private static int post(String apiKey, String jsonPayload) {
+    private static int postCrashReporting(String apiKey, String jsonPayload) {
         try {
-            if (RaygunClient.validateApiKey(apiKey)) {
-                String endpoint = RaygunSettings.getApiEndpoint();
+            if (validateApiKey(apiKey)) {
+                String endpoint = RaygunSettings.getCrashReportingEndpoint();
                 MediaType MEDIA_TYPE_JSON = MediaType.parse("application/json; charset=utf-8");
 
                 OkHttpClient client = new OkHttpClient.Builder()
@@ -112,19 +112,80 @@ public class RaygunPostService extends JobIntentService {
                         .header("X-ApiKey", apiKey)
                         .post(body)
                         .build();
+
+                Response response = null;
+
                 try {
-                    Response response = client.newCall(request).execute();
+                    response = client.newCall(request).execute();
                     RaygunLogger.d("Exception message HTTP POST result: " + response.code());
                     return response.code();
                 } catch (IOException ioe) {
                     RaygunLogger.e("OkHttp POST to Raygun Crash Reporting backend failed - " + ioe.getMessage());
                     ioe.printStackTrace();
+                } finally {
+                    if (response != null) response.body().close();
                 }
             }
         } catch (Exception e) {
-            RaygunLogger.e("Couldn't post exception - " + e.getMessage());
+            RaygunLogger.e("Can't postCrashReporting exception - " + e.getMessage());
             e.printStackTrace();
         }
         return -1;
+    }
+
+    /**
+     * Raw post method that delivers a pre-built RUM payload to the Raygun API.
+     *
+     * @param apiKey      The API key of the app to deliver to
+     * @param jsonPayload The JSON representation of a ??? to be delivered over HTTPS.
+     * @return HTTP result code - 202 if successful, 403 if API key invalid, 400 if bad message (invalid properties)
+     */
+    private static int postRUM(String apiKey, String jsonPayload) {
+        try {
+            if (validateApiKey(apiKey)) {
+                String endpoint = RaygunSettings.getRUMEndpoint();
+                MediaType MEDIA_TYPE_JSON = MediaType.parse("application/json; charset=utf-8");
+
+                OkHttpClient client = new OkHttpClient.Builder()
+                        .connectTimeout(30, TimeUnit.SECONDS)
+                        .writeTimeout(30, TimeUnit.SECONDS)
+                        .readTimeout(30, TimeUnit.SECONDS)
+                        .build();
+
+                RequestBody body = RequestBody.create(MEDIA_TYPE_JSON, jsonPayload);
+
+                Request request = new Request.Builder()
+                        .url(endpoint)
+                        .header("X-ApiKey", apiKey)
+                        .post(body)
+                        .build();
+
+                Response response = null;
+
+                try {
+                    response = client.newCall(request).execute();
+                    RaygunLogger.d("RUM HTTP POST result: " + response.code());
+                    return response.code();
+                } catch (IOException ioe) {
+                    RaygunLogger.e("OkHttp POST to Raygun RUM backend failed - " + ioe.getMessage());
+                    ioe.printStackTrace();
+                } finally {
+                    if (response != null) response.body().close();
+                }
+            }
+        } catch (Exception e) {
+            RaygunLogger.e("Can't postCrashReporting exception - " + e.getMessage());
+            e.printStackTrace();
+        }
+        return -1;
+    }
+
+    private static Boolean validateApiKey(String apiKey) {
+        if (apiKey.length() == 0) {
+            RaygunLogger.e("API key has not been provided, nothing will be logged");
+            return false;
+        } else {
+            return true;
+        }
     }
 }
