@@ -3,6 +3,7 @@ package com.raygun.raygun4android.messages.crashreporting;
 import android.content.Context;
 
 import com.raygun.raygun4android.messages.RaygunUserInfo;
+import com.raygun.raygun4android.messages.shared.RaygunUserContext;
 
 import java.util.List;
 import java.util.Map;

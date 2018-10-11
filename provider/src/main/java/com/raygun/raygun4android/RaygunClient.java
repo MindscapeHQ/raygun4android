@@ -16,7 +16,7 @@ import com.raygun.raygun4android.messages.rum.RaygunPulseData;
 import com.raygun.raygun4android.messages.rum.RaygunPulseDataMessage;
 import com.raygun.raygun4android.messages.rum.RaygunPulseMessage;
 import com.raygun.raygun4android.messages.rum.RaygunPulseTimingMessage;
-import com.raygun.raygun4android.messages.crashreporting.RaygunUserContext;
+import com.raygun.raygun4android.messages.shared.RaygunUserContext;
 import com.raygun.raygun4android.messages.RaygunUserInfo;
 import com.raygun.raygun4android.network.RaygunNetworkUtils;
 import com.raygun.raygun4android.utils.RaygunFileFilter;

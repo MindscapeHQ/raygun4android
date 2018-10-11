@@ -1,10 +1,11 @@
-package com.raygun.raygun4android.messages.crashreporting;
+package com.raygun.raygun4android.messages.shared;
 
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.provider.Settings;
 
 import com.raygun.raygun4android.messages.RaygunUserInfo;
+import com.raygun.raygun4android.messages.crashreporting.RaygunAppContext;
 
 import java.io.UnsupportedEncodingException;
 import java.util.UUID;

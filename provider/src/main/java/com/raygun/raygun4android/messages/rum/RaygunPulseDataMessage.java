@@ -1,6 +1,6 @@
 package com.raygun.raygun4android.messages.rum;
 
-import com.raygun.raygun4android.messages.crashreporting.RaygunUserContext;
+import com.raygun.raygun4android.messages.shared.RaygunUserContext;
 
 public class RaygunPulseDataMessage {
   private String sessionId;
