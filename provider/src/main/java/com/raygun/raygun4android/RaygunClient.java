@@ -562,6 +562,20 @@ public class RaygunClient {
         return false;
     }
 
+    /**
+     * Returns the current Application's context.
+     *
+     * @return The current application Context.
+     * @throws java.lang.IllegalStateException if init() has not been called.
+     */
+    private static Context getApplicationContext() {
+        if (RaygunClient.application == null) {
+            throw new IllegalStateException("init() must be called first.");
+        }
+
+        return RaygunClient.application.getApplicationContext();
+    }
+
     public static class RaygunUncaughtExceptionHandler implements Thread.UncaughtExceptionHandler {
         private UncaughtExceptionHandler defaultHandler;
         private List tags;
@@ -587,17 +601,5 @@ public class RaygunClient {
         }
     }
 
-    /**
-     * Returns the current Application's context.
-     *
-     * @return The current application Context.
-     * @throws java.lang.IllegalStateException if init() has not been called.
-     */
-    public static Context getApplicationContext() {
-        if (RaygunClient.application == null) {
-            throw new IllegalStateException("init() must be called first.");
-        }
 
-        return RaygunClient.application.getApplicationContext();
-    }
 }
