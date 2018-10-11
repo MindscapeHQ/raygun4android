@@ -1,6 +1,5 @@
 package com.raygun.raygun4android.sample
 
-import android.app.Application
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import com.raygun.raygun4android.RaygunClient
@@ -19,7 +18,7 @@ class MainActivity : AppCompatActivity() {
 
         RaygunClient.init(application)             // This sets up the client with the API key as provided in your AndroidManifest.xml
         RaygunClient.attachExceptionHandler()      // This attaches a pre-made exception handler to catch all uncaught exceptions, and send them to Raygun
-        RaygunClient.attachPulse(this)
+        RaygunClient.attachRUM(this)
 
         RaygunClient.setUserCustomData(initialCustomData)
 

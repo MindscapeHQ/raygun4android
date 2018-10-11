@@ -50,7 +50,7 @@ public class RaygunPostService extends JobIntentService {
 
             // Moved the check for internet connection as close as possible to the calls because the condition can change quite rapidly
             if (isPulse && RaygunNetworkUtils.hasInternetConnection(this.getApplicationContext())) {
-                RaygunClient.postPulseMessage(apiKey, message);
+                RaygunClient.postRUMMessage(apiKey, message);
             } else if (!isPulse && RaygunNetworkUtils.hasInternetConnection(this.getApplicationContext())) {
                 post(apiKey, message);
             } else if (!isPulse && !RaygunNetworkUtils.hasInternetConnection(this.getApplicationContext())) {

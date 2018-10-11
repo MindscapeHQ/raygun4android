@@ -7,7 +7,7 @@ public class RaygunSettings {
 
     private static final int DEFAULT_MAX_REPORTS_STORED_ON_DEVICE = 64;
     private static final String DEFAULT_API_ENDPOINT = "https://api.raygun.io/entries";
-    private static final String DEFAULT_PULSE_ENDPOINT = "https://api.raygun.io/events";
+    private static final String DEFAULT_RUM_ENDPOINT = "https://api.raygun.io/events";
 
     public static final String DEFAULT_FILE_EXTENSION = "raygun4";
     public static final String RUM_EVENT_SESSION_START = "session_start";
@@ -17,7 +17,7 @@ public class RaygunSettings {
     private static HashSet<String> ignoredViews = new HashSet<>();
     private static int maxReportsStoredOnDevice = DEFAULT_MAX_REPORTS_STORED_ON_DEVICE;
     private static String apiEndpoint = DEFAULT_API_ENDPOINT;
-    private static String pulseEndpoint = DEFAULT_PULSE_ENDPOINT;
+    private static String rumEndpoint = DEFAULT_RUM_ENDPOINT;
 
     private RaygunSettings() {
     }
@@ -30,12 +30,12 @@ public class RaygunSettings {
         RaygunSettings.apiEndpoint = apiEndpoint;
     }
 
-    public static String getPulseEndpoint() {
-        return pulseEndpoint;
+    public static String getRUMEndpoint() {
+        return rumEndpoint;
     }
 
-    public static void setPulseEndpoint(String pulseEndpoint) {
-        RaygunSettings.pulseEndpoint = pulseEndpoint;
+    public static void setRUMEndpoint(String rumEndpoint) {
+        RaygunSettings.rumEndpoint = rumEndpoint;
     }
 
     public static HashSet<String> getIgnoredURLs() {

@@ -6,7 +6,7 @@ import java.util.Iterator;
 import java.util.Map;
 
 import com.raygun.raygun4android.RaygunClient;
-import com.raygun.raygun4android.RaygunPulseEventType;
+import com.raygun.raygun4android.RaygunRUMEventType;
 import com.raygun.raygun4android.RaygunSettings;
 import com.raygun.raygun4android.network.http.RaygunUrlStreamHandlerFactory;
 
@@ -70,7 +70,7 @@ public class RaygunNetworkLogger {
   public static synchronized void sendNetworkTimingEvent(String url, String requestMethod, long startTime, long endTime, int statusCode, String exception) {
     if (!shouldIgnoreURL(url) && loggingEnabled) {
       url = sanitiseURL(url);
-      RaygunClient.sendPulseTimingEvent(RaygunPulseEventType.NETWORK_CALL, requestMethod+" "+url, endTime - startTime);
+      RaygunClient.sendRUMTimingEvent(RaygunRUMEventType.NETWORK_CALL, requestMethod+" "+url, endTime - startTime);
     }
   }
 

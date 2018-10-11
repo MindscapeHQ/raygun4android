@@ -41,8 +41,7 @@ public class RaygunUserInfo {
         this.identifier = identifier;
     }
 
-    public RaygunUserInfo() {
-    }
+    public RaygunUserInfo() { }
 
     public Boolean getIsAnonymous() {
         return this.isAnonymous;

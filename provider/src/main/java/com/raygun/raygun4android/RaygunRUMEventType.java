@@ -1,6 +1,6 @@
 package com.raygun.raygun4android;
 
-public enum RaygunPulseEventType {
+public enum RaygunRUMEventType {
   ACTIVITY_LOADED,
   NETWORK_CALL
 }

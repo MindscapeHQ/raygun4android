@@ -141,7 +141,7 @@ public class RaygunClient {
      *
      * @param activity The main/entry activity of the Android app.
      */
-    public static void attachPulse(Activity activity) {
+    public static void attachRUM(Activity activity) {
         RUM.attach(activity);
     }
 
@@ -151,7 +151,7 @@ public class RaygunClient {
      * @param activity       The main/entry activity of the Android app.
      * @param networkLogging Automatically report the performance of network requests.
      */
-    public static void attachPulse(Activity activity, boolean networkLogging) {
+    public static void attachRUM(Activity activity, boolean networkLogging) {
         RUM.attach(activity, networkLogging);
     }
 
@@ -341,9 +341,9 @@ public class RaygunClient {
      *
      * @param url String with the URL to be used
      */
-    public static void setCustomPulseEndpoint(String url) {
+    public static void setCustomRUMEndpoint(String url) {
         if (url != null && !url.isEmpty()) {
-            RaygunSettings.setPulseEndpoint(url);
+            RaygunSettings.setRUMEndpoint(url);
         } else {
             RaygunLogger.w("A custom RUM endpoint can't be null or empty. Custom endpoint has NOT been applied");
         }
@@ -359,55 +359,56 @@ public class RaygunClient {
      */
     public static void setMaxReportsStoredOnDevice(int maxReportsStoredOnDevice) {
         RaygunSettings.setMaxReportsStoredOnDevice(maxReportsStoredOnDevice);
+        // TODO Add function call to delete any existing stored reports
     }
 
-    protected static void sendPulseEvent(String name) {
-        if ("session_start".equals(name)) {
+    protected static void sendRUMEvent(String name) {
+        if (RaygunSettings.RUM_EVENT_SESSION_START.equals(name)) {
             RaygunClient.sessionId = UUID.randomUUID().toString();
         }
 
         RaygunRUMMessage message = new RaygunRUMMessage();
-        RaygunRUMDataMessage pulseData = new RaygunRUMDataMessage();
+        RaygunRUMDataMessage rumData = new RaygunRUMDataMessage();
 
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
         df.setTimeZone(TimeZone.getTimeZone("UTC"));
         Calendar c = Calendar.getInstance();
 
-        if ("session_end".equals(name)) {
+        if (RaygunSettings.RUM_EVENT_SESSION_END.equals(name)) {
             c.add(Calendar.SECOND, 2);
         }
 
         String timestamp = df.format(c.getTime());
-        pulseData.setTimestamp(timestamp);
-        pulseData.setVersion(RaygunClient.version);
-        pulseData.setOS("Android");
-        pulseData.setOSVersion(Build.VERSION.RELEASE);
-        pulseData.setPlatform(String.format("%s %s", Build.MANUFACTURER, Build.MODEL));
+        rumData.setTimestamp(timestamp);
+        rumData.setVersion(RaygunClient.version);
+        rumData.setOS("Android");
+        rumData.setOSVersion(Build.VERSION.RELEASE);
+        rumData.setPlatform(String.format("%s %s", Build.MANUFACTURER, Build.MODEL));
 
         RaygunUserContext userContext = RaygunClient.userInfo == null ? new RaygunUserContext(new RaygunUserInfo(null, null, null, null, null, true), getApplicationContext()) : new RaygunUserContext(RaygunClient.userInfo, getApplicationContext());
-        pulseData.setUser(userContext);
+        rumData.setUser(userContext);
 
-        pulseData.setSessionId(RaygunClient.sessionId);
-        pulseData.setType(name);
+        rumData.setSessionId(RaygunClient.sessionId);
+        rumData.setType(name);
 
-        message.setEventData(new RaygunRUMDataMessage[]{pulseData});
+        message.setEventData(new RaygunRUMDataMessage[]{rumData});
 
         enqueueWorkForService(RaygunClient.apiKey, new Gson().toJson(message), true);
     }
 
     /**
-     * Sends a pulse timing event to Raygun. The message is sent on a background thread.
+     * Sends a RUM timing event to Raygun. The message is sent on a background thread.
      *
      * @param eventType    The type of event that occurred.
      * @param name         The name of the event resource such as the activity name or URL of a network call.
      * @param milliseconds The duration of the event in milliseconds.
      */
-    public static void sendPulseTimingEvent(RaygunPulseEventType eventType, String name, long milliseconds) {
+    public static void sendRUMTimingEvent(RaygunRUMEventType eventType, String name, long milliseconds) {
         if (RaygunClient.sessionId == null) {
-            sendPulseEvent("session_start");
+            sendRUMEvent(RaygunSettings.RUM_EVENT_SESSION_START);
         }
 
-        if (eventType == RaygunPulseEventType.ACTIVITY_LOADED) {
+        if (eventType == RaygunRUMEventType.ACTIVITY_LOADED) {
             if (RaygunClient.shouldIgnoreView(name)) {
                 return;
             }
@@ -435,7 +436,7 @@ public class RaygunClient {
 
         RaygunRUMData data = new RaygunRUMData();
         RaygunRUMTimingMessage timingMessage = new RaygunRUMTimingMessage();
-        timingMessage.setType(eventType == RaygunPulseEventType.ACTIVITY_LOADED ? "p" : "n");
+        timingMessage.setType(eventType == RaygunRUMEventType.ACTIVITY_LOADED ? "p" : "n");
         timingMessage.setDuration(milliseconds);
         data.setName(name);
         data.setTiming(timingMessage);
@@ -449,10 +450,10 @@ public class RaygunClient {
         enqueueWorkForService(RaygunClient.apiKey, new Gson().toJson(message), true);
     }
 
-    protected static int postPulseMessage(String apiKey, String jsonPayload) {
+    protected static int postRUMMessage(String apiKey, String jsonPayload) {
         try {
             if (validateApiKey(apiKey)) {
-                String endpoint = RaygunSettings.getPulseEndpoint();
+                String endpoint = RaygunSettings.getRUMEndpoint();
                 MediaType MEDIA_TYPE_JSON = MediaType.parse("application/json; charset=utf-8");
 
                 OkHttpClient client = new OkHttpClient.Builder()
@@ -561,7 +562,7 @@ public class RaygunClient {
         }
     }
 
-    private static void enqueueWorkForService(String apiKey, String jsonPayload, boolean isPulse) {
+    private static void enqueueWorkForService(String apiKey, String jsonPayload, boolean isRUM) {
         Intent intent = new Intent(getApplicationContext(), RaygunPostService.class);
         intent.setAction("com.raygun.raygun4android.intent.action.LAUNCH_POST_SERVICE");
         intent.setPackage("com.raygun.raygun4android");
@@ -569,7 +570,7 @@ public class RaygunClient {
 
         intent.putExtra("msg", jsonPayload);
         intent.putExtra("apikey", apiKey);
-        intent.putExtra("isPulse", isPulse);
+        intent.putExtra("isRUM", isRUM);
 
         RaygunPostService.enqueueWork(getApplicationContext(), intent);
     }
