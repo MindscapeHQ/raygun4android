@@ -19,6 +19,7 @@ class MainActivity : AppCompatActivity() {
 
         RaygunClient.init(application)             // This sets up the client with the API key as provided in your AndroidManifest.xml
         RaygunClient.attachExceptionHandler()      // This attaches a pre-made exception handler to catch all uncaught exceptions, and send them to Raygun
+        RaygunClient.attachPulse(this)
 
         RaygunClient.setUserCustomData(initialCustomData)
 
@@ -38,11 +39,14 @@ class MainActivity : AppCompatActivity() {
             tw.put("secondkey", "secondvalue")
 
             // Example 1: Manual exception creation & sending
-            RaygunClient.setUser(user)
             RaygunClient.send(Exception("Congratulations, you have sent errors with Raygun4Android"), null, tw)
 
-            // Example 2: A real exception will be thrown here, which will be caught & sent by RaygunClient
-            val i = 3 / 0
+            // Example 2: Manual exception creation & sending
+            RaygunClient.setUser(user)
+            RaygunClient.send(Exception("Congratulations, you have sent errors with Raygun4Android, now with a user"), null, tw)
+
+            // Example 3: A real exception will be thrown here, which will be caught & sent by RaygunClient
+            // val i = 3 / 0
         }
     }
 }
