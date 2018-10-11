@@ -1,19 +1,17 @@
 package com.raygun.raygun4android.messages.crashreporting;
 
-import java.util.UUID;
-
 public class RaygunAppContext {
-  private String identifier;
+    private String identifier;
 
-  public RaygunAppContext(String uuid) {
-    identifier = uuid;
-  }
+    public RaygunAppContext(String uuid) {
+        identifier = uuid;
+    }
 
-  public String getIdentifier() {
-    return identifier;
-  }
+    public String getIdentifier() {
+        return identifier;
+    }
 
-  public void setIdentifier(String identifier) {
-    this.identifier = identifier;
-  }
+    public void setIdentifier(String identifier) {
+        this.identifier = identifier;
+    }
 }

@@ -1,56 +1,56 @@
 package com.raygun.raygun4android.messages.crashreporting;
 
 public class RaygunErrorMessage {
-  private RaygunErrorMessage innerError;
-  private String message;
-  private String className;
-  private RaygunErrorStackTraceLineMessage[] stackTrace;
+    private RaygunErrorMessage innerError;
+    private String message;
+    private String className;
+    private RaygunErrorStackTraceLineMessage[] stackTrace;
 
-  public RaygunErrorMessage(Throwable throwable) {
-    message = throwable.getClass().getSimpleName() + ": " + throwable.getMessage();
-    className = throwable.getClass().getCanonicalName();
+    public RaygunErrorMessage(Throwable throwable) {
+        message = throwable.getClass().getSimpleName() + ": " + throwable.getMessage();
+        className = throwable.getClass().getCanonicalName();
 
-    if (throwable.getCause() != null) {
-      innerError = new RaygunErrorMessage(throwable.getCause());
+        if (throwable.getCause() != null) {
+            innerError = new RaygunErrorMessage(throwable.getCause());
+        }
+
+        StackTraceElement[] ste = throwable.getStackTrace();
+        stackTrace = new RaygunErrorStackTraceLineMessage[ste.length];
+
+        for (int i = 0; i < ste.length; i++) {
+            stackTrace[i] = new RaygunErrorStackTraceLineMessage(ste[i]);
+        }
     }
 
-    StackTraceElement[] ste = throwable.getStackTrace();
-    stackTrace = new RaygunErrorStackTraceLineMessage[ste.length];
-
-    for (int i = 0; i < ste.length; i++) {
-      stackTrace[i] = new RaygunErrorStackTraceLineMessage(ste[i]);
+    public RaygunErrorMessage getInnerError() {
+        return innerError;
     }
-  }
 
-  public RaygunErrorMessage getInnerError() {
-    return innerError;
-  }
+    public void setInnerError(RaygunErrorMessage innerError) {
+        this.innerError = innerError;
+    }
 
-  public void setInnerError(RaygunErrorMessage innerError) {
-    this.innerError = innerError;
-  }
+    public String getMessage() {
+        return message;
+    }
 
-  public String getMessage() {
-    return message;
-  }
+    public void setMessage(String message) {
+        this.message = message;
+    }
 
-  public void setMessage(String message) {
-    this.message = message;
-  }
+    public String getClassName() {
+        return className;
+    }
 
-  public String getClassName() {
-    return className;
-  }
+    public void setClassName(String className) {
+        this.className = className;
+    }
 
-  public void setClassName(String className) {
-    this.className = className;
-  }
+    public RaygunErrorStackTraceLineMessage[] getStackTrace() {
+        return stackTrace;
+    }
 
-  public RaygunErrorStackTraceLineMessage[] getStackTrace() {
-    return stackTrace;
-  }
-
-  public void setStackTrace(RaygunErrorStackTraceLineMessage[] stackTrace) {
-    this.stackTrace = stackTrace;
-  }
+    public void setStackTrace(RaygunErrorStackTraceLineMessage[] stackTrace) {
+        this.stackTrace = stackTrace;
+    }
 }
