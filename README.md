@@ -169,7 +169,7 @@ Raygun supports sending data from Crash Reporting and Real User Monitoring to yo
 RaygunClient.init(getApplicationContext());
 RaygunClient.attachExceptionHandler();
 RaygunClient.setCustomCrashReportingEndpoint("http://...");
-RaygunClient.setCustomPulseEndpoint("http://...");
+RaygunClient.setCustomRUMEndpoint("http://...");
 ```
 
 Please note that setting a custom endpoint will stop Crash Report or Real User Monitoring data from being sent to the Raygun backend.
