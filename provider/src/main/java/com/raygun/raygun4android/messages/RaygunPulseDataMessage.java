@@ -1,5 +1,7 @@
 package com.raygun.raygun4android.messages;
 
+import com.raygun.raygun4android.messages.crashreporting.RaygunUserContext;
+
 public class RaygunPulseDataMessage {
   private String sessionId;
   private String timestamp;

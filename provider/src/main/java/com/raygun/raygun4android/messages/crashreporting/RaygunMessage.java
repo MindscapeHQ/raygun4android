@@ -1,8 +1,7 @@
-package com.raygun.raygun4android.messages;
+package com.raygun.raygun4android.messages.crashreporting;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Locale;
 import java.util.TimeZone;
 
 public class RaygunMessage {

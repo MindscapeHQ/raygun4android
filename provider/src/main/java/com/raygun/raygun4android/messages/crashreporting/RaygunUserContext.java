@@ -1,9 +1,10 @@
-package com.raygun.raygun4android.messages;
+package com.raygun.raygun4android.messages.crashreporting;
 
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.provider.Settings;
-import android.telephony.TelephonyManager;
+
+import com.raygun.raygun4android.messages.RaygunUserInfo;
 
 import java.io.UnsupportedEncodingException;
 import java.util.UUID;

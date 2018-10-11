@@ -1,4 +1,4 @@
-package com.raygun.raygun4android.messages;
+package com.raygun.raygun4android.messages.crashreporting;
 
 import android.app.ActivityManager;
 import android.content.Context;

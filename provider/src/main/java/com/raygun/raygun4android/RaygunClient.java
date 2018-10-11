@@ -11,12 +11,12 @@ import android.os.Build;
 import android.os.Bundle;
 
 import com.google.gson.Gson;
-import com.raygun.raygun4android.messages.RaygunMessage;
+import com.raygun.raygun4android.messages.crashreporting.RaygunMessage;
 import com.raygun.raygun4android.messages.RaygunPulseData;
 import com.raygun.raygun4android.messages.RaygunPulseDataMessage;
 import com.raygun.raygun4android.messages.RaygunPulseMessage;
 import com.raygun.raygun4android.messages.RaygunPulseTimingMessage;
-import com.raygun.raygun4android.messages.RaygunUserContext;
+import com.raygun.raygun4android.messages.crashreporting.RaygunUserContext;
 import com.raygun.raygun4android.messages.RaygunUserInfo;
 import com.raygun.raygun4android.network.RaygunNetworkUtils;
 import com.raygun.raygun4android.utils.RaygunFileFilter;
@@ -105,7 +105,7 @@ public class RaygunClient {
             RaygunClient.version = getApplicationContext().getPackageManager().getPackageInfo(getApplicationContext().getPackageName(), 0).versionName;
         } catch (PackageManager.NameNotFoundException e) {
             RaygunClient.version = "not provided";
-            RaygunLogger.i("Couldn't read application version from calling package");
+            RaygunLogger.w("Couldn't read application version from calling package");
         }
 
         RaygunClient.appContextIdentifier = UUID.randomUUID().toString();
@@ -525,7 +525,7 @@ public class RaygunClient {
 
     protected static Boolean validateApiKey(String apiKey) {
         if (apiKey.length() == 0) {
-            RaygunLogger.e("API key has not been provided, exception will not be logged");
+            RaygunLogger.e("API key has not been provided, nothing will be logged");
             return false;
         } else {
             return true;

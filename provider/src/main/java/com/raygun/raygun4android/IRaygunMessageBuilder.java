@@ -5,7 +5,7 @@ import android.content.Context;
 import java.util.List;
 import java.util.Map;
 
-import com.raygun.raygun4android.messages.RaygunMessage;
+import com.raygun.raygun4android.messages.crashreporting.RaygunMessage;
 
 public interface IRaygunMessageBuilder {
   RaygunMessage build();

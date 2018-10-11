@@ -5,10 +5,10 @@ import android.content.Context;
 import java.util.List;
 import java.util.Map;
 
-import com.raygun.raygun4android.messages.RaygunClientMessage;
-import com.raygun.raygun4android.messages.RaygunEnvironmentMessage;
-import com.raygun.raygun4android.messages.RaygunErrorMessage;
-import com.raygun.raygun4android.messages.RaygunMessage;
+import com.raygun.raygun4android.messages.crashreporting.RaygunClientMessage;
+import com.raygun.raygun4android.messages.crashreporting.RaygunEnvironmentMessage;
+import com.raygun.raygun4android.messages.crashreporting.RaygunErrorMessage;
+import com.raygun.raygun4android.messages.crashreporting.RaygunMessage;
 
 public class RaygunMessageBuilder implements IRaygunMessageBuilder {
   private RaygunMessage raygunMessage;

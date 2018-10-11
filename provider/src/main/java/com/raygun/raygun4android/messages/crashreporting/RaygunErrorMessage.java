@@ -1,4 +1,4 @@
-package com.raygun.raygun4android.messages;
+package com.raygun.raygun4android.messages.crashreporting;
 
 public class RaygunErrorMessage {
   private RaygunErrorMessage innerError;
