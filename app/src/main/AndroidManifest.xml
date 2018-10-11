@@ -23,7 +23,7 @@
             android:process=":raygunpostservice"/>
         <meta-data
             android:name="com.raygun.raygun4android.apikey"
-            android:value="PASTE_YOUR_API_KEY_HERE" />
+            android:value="9j2f+p4ufvUfka6xrk6sGQ==" />
     </application>
 
     <uses-permission android:name="android.permission.INTERNET" />

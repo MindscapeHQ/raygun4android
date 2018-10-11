@@ -137,22 +137,22 @@ public class RaygunClient {
     }
 
     /**
-     * Attaches the Raygun Pulse feature which will automatically report session and view events.
+     * Attaches the Raygun RUM feature which will automatically report session and view events.
      *
      * @param activity The main/entry activity of the Android app.
      */
     public static void attachPulse(Activity activity) {
-        Pulse.attach(activity);
+        RUM.attach(activity);
     }
 
     /**
-     * Attaches the Raygun Pulse feature which will automatically report session and view events.
+     * Attaches the Raygun RUM feature which will automatically report session and view events.
      *
      * @param activity       The main/entry activity of the Android app.
      * @param networkLogging Automatically report the performance of network requests.
      */
     public static void attachPulse(Activity activity, boolean networkLogging) {
-        Pulse.attach(activity, networkLogging);
+        RUM.attach(activity, networkLogging);
     }
 
     /**
@@ -337,7 +337,7 @@ public class RaygunClient {
     }
 
     /**
-     * Allows the user to set a custom endpoint for Pulse
+     * Allows the user to set a custom endpoint for RUM
      *
      * @param url String with the URL to be used
      */
@@ -345,7 +345,7 @@ public class RaygunClient {
         if (url != null && !url.isEmpty()) {
             RaygunSettings.setPulseEndpoint(url);
         } else {
-            RaygunLogger.w("A custom Pulse endpoint can't be null or empty. Custom endpoint has NOT been applied");
+            RaygunLogger.w("A custom RUM endpoint can't be null or empty. Custom endpoint has NOT been applied");
         }
     }
 
@@ -470,10 +470,10 @@ public class RaygunClient {
                         .build();
                 try {
                     Response response = client.newCall(request).execute();
-                    RaygunLogger.d("Pulse HTTP POST result: " + response.code());
+                    RaygunLogger.d("RUM HTTP POST result: " + response.code());
                     return response.code();
                 } catch (IOException ioe) {
-                    RaygunLogger.e("OkHttp POST to Raygun Pulse backend failed - " + ioe.getMessage());
+                    RaygunLogger.e("OkHttp POST to Raygun RUM backend failed - " + ioe.getMessage());
                     ioe.printStackTrace();
                 }
             }
@@ -626,7 +626,7 @@ public class RaygunClient {
                 List tags = new ArrayList();
                 tags.add("UnhandledException");
                 RaygunClient.send(throwable, tags);
-                Pulse.sendRemainingActivity();
+                RUM.sendRemainingActivity();
             }
             defaultHandler.uncaughtException(thread, throwable);
         }

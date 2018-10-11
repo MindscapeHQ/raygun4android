@@ -8,7 +8,10 @@ public class RaygunSettings {
     private static final int DEFAULT_MAX_REPORTS_STORED_ON_DEVICE = 64;
     private static final String DEFAULT_API_ENDPOINT = "https://api.raygun.io/entries";
     private static final String DEFAULT_PULSE_ENDPOINT = "https://api.raygun.io/events";
+
     public static final String DEFAULT_FILE_EXTENSION = "raygun4";
+    public static final String RUM_EVENT_SESSION_START = "session_start";
+    public static final String RUM_EVENT_SESSION_END = "session_end";
 
     private static IgnoredURLs ignoredURLs = new IgnoredURLs("api.raygun.io");
     private static HashSet<String> ignoredViews = new HashSet<>();

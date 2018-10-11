@@ -9,26 +9,26 @@ import java.util.concurrent.TimeUnit;
 
 import com.raygun.raygun4android.network.RaygunNetworkLogger;
 
-public class Pulse implements ActivityLifecycleCallbacks {
-  private static Pulse pulse;
+public class RUM implements ActivityLifecycleCallbacks {
+  private static RUM rum;
   private static Activity mainActivity;
   private static Activity currentActivity;
   private static Activity loadingActivity;
   private static long startTime;
 
   protected static void attach(Activity mainActivity) {
-    if (Pulse.pulse == null && mainActivity != null) {
+    if (rum.rum == null && mainActivity != null) {
       Application application = mainActivity.getApplication();
 
       if (application != null) {
-        Pulse.mainActivity = mainActivity;
-        Pulse.currentActivity = mainActivity;
-        Pulse.startTime = System.nanoTime();
+        rum.mainActivity = mainActivity;
+        rum.currentActivity = mainActivity;
+        rum.startTime = System.nanoTime();
 
-        Pulse.pulse = new Pulse();
-        application.registerActivityLifecycleCallbacks(Pulse.pulse);
+        rum.rum = new RUM();
+        application.registerActivityLifecycleCallbacks(rum.rum);
 
-        RaygunClient.sendPulseEvent("session_start");
+        RaygunClient.sendPulseEvent(RaygunSettings.RUM_EVENT_SESSION_START);
         RaygunNetworkLogger.init();
       }
     }
@@ -40,69 +40,69 @@ public class Pulse implements ActivityLifecycleCallbacks {
   }
 
   protected static void detach() {
-    if (Pulse.pulse != null && Pulse.mainActivity != null && Pulse.mainActivity.getApplication() != null) {
-      Pulse.mainActivity.getApplication().unregisterActivityLifecycleCallbacks(Pulse.pulse);
-      Pulse.mainActivity = null;
-      Pulse.currentActivity = null;
-      Pulse.pulse = null;
+    if (rum.rum != null && rum.mainActivity != null && rum.mainActivity.getApplication() != null) {
+      rum.mainActivity.getApplication().unregisterActivityLifecycleCallbacks(rum.rum);
+      rum.mainActivity = null;
+      rum.currentActivity = null;
+      rum.rum = null;
     }
   }
 
   protected static void sendRemainingActivity() {
-    if (Pulse.pulse != null) {
-      if (Pulse.loadingActivity != null) {
-        String activityName = getActivityName(Pulse.loadingActivity);
+    if (rum.rum != null) {
+      if (rum.loadingActivity != null) {
+        String activityName = getActivityName(rum.loadingActivity);
 
-        long diff = System.nanoTime() - Pulse.startTime;
+        long diff = System.nanoTime() - rum.startTime;
         long duration = TimeUnit.NANOSECONDS.toMillis(diff);
         RaygunClient.sendPulseTimingEvent(RaygunPulseEventType.ACTIVITY_LOADED, activityName, duration);
       }
-      RaygunClient.sendPulseEvent("session_end");
+      RaygunClient.sendPulseEvent(RaygunSettings.RUM_EVENT_SESSION_END);
     }
   }
 
   @Override
   public void onActivityCreated(Activity activity, Bundle bundle) {
-    if (Pulse.currentActivity == null) {
-      RaygunClient.sendPulseEvent("session_start");
+    if (rum.currentActivity == null) {
+      RaygunClient.sendPulseEvent(RaygunSettings.RUM_EVENT_SESSION_START);
     }
 
-    if (activity != Pulse.currentActivity) {
-      Pulse.currentActivity = activity;
-      Pulse.loadingActivity = activity;
-      Pulse.startTime = System.nanoTime();
+    if (activity != rum.currentActivity) {
+      rum.currentActivity = activity;
+      rum.loadingActivity = activity;
+      rum.startTime = System.nanoTime();
     }
   }
 
   @Override
   public void onActivityStarted(Activity activity) {
-    if (Pulse.currentActivity == null) {
-      RaygunClient.sendPulseEvent("session_start");
+    if (rum.currentActivity == null) {
+      RaygunClient.sendPulseEvent(RaygunSettings.RUM_EVENT_SESSION_START);
     }
 
-    if (activity != Pulse.currentActivity) {
-      Pulse.currentActivity = activity;
-      Pulse.loadingActivity = activity;
-      Pulse.startTime = System.nanoTime();
+    if (activity != rum.currentActivity) {
+      rum.currentActivity = activity;
+      rum.loadingActivity = activity;
+      rum.startTime = System.nanoTime();
     }
   }
 
   @Override
   public void onActivityResumed(Activity activity) {
-    if (Pulse.currentActivity == null) {
-      RaygunClient.sendPulseEvent("session_start");
+    if (rum.currentActivity == null) {
+      RaygunClient.sendPulseEvent(RaygunSettings.RUM_EVENT_SESSION_START);
     }
 
     String activityName = getActivityName(activity);
     long duration = 0;
 
-    if (activity == Pulse.currentActivity) {
-      long diff = System.nanoTime() - Pulse.startTime;
+    if (activity == rum.currentActivity) {
+      long diff = System.nanoTime() - rum.startTime;
       duration = TimeUnit.NANOSECONDS.toMillis(diff);
     }
 
-    Pulse.currentActivity = activity;
-    Pulse.loadingActivity = null;
+    rum.currentActivity = activity;
+    rum.loadingActivity = null;
 
     RaygunClient.sendPulseTimingEvent(RaygunPulseEventType.ACTIVITY_LOADED, activityName, duration);
   }
@@ -113,10 +113,10 @@ public class Pulse implements ActivityLifecycleCallbacks {
 
   @Override
   public void onActivityStopped(Activity activity) {
-    if (activity == Pulse.currentActivity) {
-      Pulse.currentActivity = null;
-      Pulse.loadingActivity = null;
-      RaygunClient.sendPulseEvent("session_end");
+    if (activity == rum.currentActivity) {
+      rum.currentActivity = null;
+      rum.loadingActivity = null;
+      RaygunClient.sendPulseEvent(RaygunSettings.RUM_EVENT_SESSION_END);
     }
   }
 
