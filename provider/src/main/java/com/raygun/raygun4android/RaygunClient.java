@@ -12,10 +12,10 @@ import android.os.Bundle;
 
 import com.google.gson.Gson;
 import com.raygun.raygun4android.messages.crashreporting.RaygunMessage;
-import com.raygun.raygun4android.messages.rum.RaygunPulseData;
-import com.raygun.raygun4android.messages.rum.RaygunPulseDataMessage;
-import com.raygun.raygun4android.messages.rum.RaygunPulseMessage;
-import com.raygun.raygun4android.messages.rum.RaygunPulseTimingMessage;
+import com.raygun.raygun4android.messages.rum.RaygunRUMData;
+import com.raygun.raygun4android.messages.rum.RaygunRUMDataMessage;
+import com.raygun.raygun4android.messages.rum.RaygunRUMMessage;
+import com.raygun.raygun4android.messages.rum.RaygunRUMTimingMessage;
 import com.raygun.raygun4android.messages.shared.RaygunUserContext;
 import com.raygun.raygun4android.messages.RaygunUserInfo;
 import com.raygun.raygun4android.network.RaygunNetworkUtils;
@@ -366,8 +366,8 @@ public class RaygunClient {
             RaygunClient.sessionId = UUID.randomUUID().toString();
         }
 
-        RaygunPulseMessage message = new RaygunPulseMessage();
-        RaygunPulseDataMessage pulseData = new RaygunPulseDataMessage();
+        RaygunRUMMessage message = new RaygunRUMMessage();
+        RaygunRUMDataMessage pulseData = new RaygunRUMDataMessage();
 
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
         df.setTimeZone(TimeZone.getTimeZone("UTC"));
@@ -390,7 +390,7 @@ public class RaygunClient {
         pulseData.setSessionId(RaygunClient.sessionId);
         pulseData.setType(name);
 
-        message.setEventData(new RaygunPulseDataMessage[]{pulseData});
+        message.setEventData(new RaygunRUMDataMessage[]{pulseData});
 
         enqueueWorkForService(RaygunClient.apiKey, new Gson().toJson(message), true);
     }
@@ -413,8 +413,8 @@ public class RaygunClient {
             }
         }
 
-        RaygunPulseMessage message = new RaygunPulseMessage();
-        RaygunPulseDataMessage dataMessage = new RaygunPulseDataMessage();
+        RaygunRUMMessage message = new RaygunRUMMessage();
+        RaygunRUMDataMessage dataMessage = new RaygunRUMDataMessage();
 
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
         df.setTimeZone(TimeZone.getTimeZone("UTC"));
@@ -433,18 +433,18 @@ public class RaygunClient {
         RaygunUserContext userContext = RaygunClient.userInfo == null ? new RaygunUserContext(new RaygunUserInfo(null, null, null, null, null, true), getApplicationContext()) : new RaygunUserContext(RaygunClient.userInfo, getApplicationContext());
         dataMessage.setUser(userContext);
 
-        RaygunPulseData data = new RaygunPulseData();
-        RaygunPulseTimingMessage timingMessage = new RaygunPulseTimingMessage();
+        RaygunRUMData data = new RaygunRUMData();
+        RaygunRUMTimingMessage timingMessage = new RaygunRUMTimingMessage();
         timingMessage.setType(eventType == RaygunPulseEventType.ACTIVITY_LOADED ? "p" : "n");
         timingMessage.setDuration(milliseconds);
         data.setName(name);
         data.setTiming(timingMessage);
 
-        RaygunPulseData[] dataArray = new RaygunPulseData[]{data};
+        RaygunRUMData[] dataArray = new RaygunRUMData[]{data};
         String dataStr = new Gson().toJson(dataArray);
         dataMessage.setData(dataStr);
 
-        message.setEventData(new RaygunPulseDataMessage[]{dataMessage});
+        message.setEventData(new RaygunRUMDataMessage[]{dataMessage});
 
         enqueueWorkForService(RaygunClient.apiKey, new Gson().toJson(message), true);
     }

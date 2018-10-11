@@ -2,7 +2,7 @@ package com.raygun.raygun4android.messages.rum;
 
 import com.raygun.raygun4android.messages.shared.RaygunUserContext;
 
-public class RaygunPulseDataMessage {
+public class RaygunRUMDataMessage {
   private String sessionId;
   private String timestamp;
   private String type;

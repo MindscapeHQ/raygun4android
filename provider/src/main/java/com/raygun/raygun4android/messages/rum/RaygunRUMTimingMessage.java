@@ -1,6 +1,6 @@
 package com.raygun.raygun4android.messages.rum;
 
-public class RaygunPulseTimingMessage {
+public class RaygunRUMTimingMessage {
     private String type;
     private long duration;
 
