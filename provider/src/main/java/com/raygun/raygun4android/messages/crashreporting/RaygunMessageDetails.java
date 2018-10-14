@@ -2,8 +2,7 @@ package com.raygun.raygun4android.messages.crashreporting;
 
 import android.content.Context;
 
-import com.raygun.raygun4android.messages.RaygunUserInfo;
-import com.raygun.raygun4android.messages.shared.RaygunUserContext;
+import com.raygun.raygun4android.messages.shared.RaygunUserInfo;
 
 import java.util.List;
 import java.util.Map;
@@ -18,7 +17,7 @@ public class RaygunMessageDetails {
     private List tags;
     private Map userCustomData;
     private RaygunAppContext context;
-    private RaygunUserContext user;
+    private RaygunUserInfo user;
     private NetworkInfo request;
 
     // Machine Name
@@ -94,16 +93,16 @@ public class RaygunMessageDetails {
     }
 
     // User
-    public RaygunUserContext getUserContext() {
+    public RaygunUserInfo getUserInfo() {
         return user;
     }
 
-    public void setUserContext(Context context) {
-        this.user = new RaygunUserContext(context);
+    public void setUserInfo() {
+        this.user = new RaygunUserInfo();
     }
 
-    public void setUserContext(RaygunUserInfo userInfo, Context context) {
-        this.user = new RaygunUserContext(userInfo, context);
+    public void setUserInfo(RaygunUserInfo userInfo) {
+        this.user = userInfo;
     }
 
     // Network Info

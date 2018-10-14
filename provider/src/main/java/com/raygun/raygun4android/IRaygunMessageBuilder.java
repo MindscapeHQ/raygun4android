@@ -26,7 +26,7 @@ public interface IRaygunMessageBuilder {
 
     IRaygunMessageBuilder setAppContext(String identifier);
 
-    IRaygunMessageBuilder setUserContext(Context context);
+    IRaygunMessageBuilder setUserInfo();
 
     IRaygunMessageBuilder setNetworkInfo(Context context);
 

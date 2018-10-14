@@ -1,31 +1,33 @@
-package com.raygun.raygun4android.messages;
+package com.raygun.raygun4android.messages.shared;
+
+import com.raygun.raygun4android.RaygunClient;
+import com.raygun.raygun4android.network.RaygunNetworkUtils;
 
 public class RaygunUserInfo {
+
     private Boolean isAnonymous;
     private String email;
     private String fullName;
     private String firstName;
-    private String uuid;
     private String identifier;
 
     /**
-     * Set the current user's info to be transmitted - any parameters can be null if the data is not available or you do not wish to send it.
+     * Set the current user's info to be transmitted - any parameter can be null if the data is not available or you do not wish to send it.
      *
      * @param firstName    The user's first name
      * @param fullName     The user's full name - if setting the first name you should set this too
      * @param emailAddress User's email address
-     * @param uuid         Device identifier - if this is null we will attempt to generate it automatically (legacy behavior).
      * @param isAnonymous  Whether this user data represents an anonymous user
      * @param identifier   Unique identifier for this user. Set this to the internal identifier you use to look up users,
      *                     or a correlation ID for anonymous users if you have one. It doesn't have to be unique, but we will treat
-     *                     any duplicated values as  the same user. If you use their email address here, pass it in as the 'emailAddress' parameter too.
+     *                     any duplicated values as the same user. If you use their email address here, pass it in as the 'emailAddress' parameter too.
+     *                     If identifier is not set and/or null, a uuid will be assigned to this field.
      */
-    public RaygunUserInfo(String identifier, String firstName, String fullName, String emailAddress, String uuid, Boolean isAnonymous) {
-        this.identifier = identifier;
+    public RaygunUserInfo(String identifier, String firstName, String fullName, String emailAddress, Boolean isAnonymous) {
+        validateIdentifier(identifier);
         this.firstName = firstName;
         this.fullName = fullName;
         this.email = emailAddress;
-        this.uuid = uuid;
         this.isAnonymous = isAnonymous;
     }
 
@@ -34,14 +36,17 @@ public class RaygunUserInfo {
      *
      * @param identifier   Unique identifier for this user. Set this to the internal identifier you use to look up users,
      *                     or a correlation ID for anonymous users if you have one. It doesn't have to be unique, but we will treat
-     *                     any duplicated values as the same user. If you use their email address, please use the full constructor and pass it
+     *                     any duplicated values as the same user. If you use their email address here, please use the full constructor and pass it
      *                     in as the 'emailAddress' parameter too.
+     *                     If identifier is not set and/or null, a uuid will be assigned to this field.
      */
     public RaygunUserInfo(String identifier) {
-        this.identifier = identifier;
+        validateIdentifier(identifier);
     }
 
-    public RaygunUserInfo() { }
+    public RaygunUserInfo() {
+        this.identifier = RaygunNetworkUtils.getDeviceUuid(RaygunClient.getApplicationContext());
+    }
 
     public Boolean getIsAnonymous() {
         return this.isAnonymous;
@@ -75,19 +80,19 @@ public class RaygunUserInfo {
         this.firstName = firstName;
     }
 
-    public String getUuid() {
-        return this.uuid;
-    }
-
-    public void setUuid(String uuid) {
-        this.uuid = uuid;
-    }
-
     public String getIdentifier() {
         return this.identifier;
     }
 
     public void setIdentifier(String identifier) {
-        this.identifier = identifier;
+        validateIdentifier(identifier);
+    }
+
+    private void validateIdentifier(String identifier) {
+        if (identifier == null) {
+            this.identifier = RaygunNetworkUtils.getDeviceUuid(RaygunClient.getApplicationContext());
+        } else {
+            this.identifier = identifier;
+        }
     }
 }

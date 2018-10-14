@@ -16,8 +16,7 @@ import com.raygun.raygun4android.messages.rum.RaygunRUMData;
 import com.raygun.raygun4android.messages.rum.RaygunRUMDataMessage;
 import com.raygun.raygun4android.messages.rum.RaygunRUMMessage;
 import com.raygun.raygun4android.messages.rum.RaygunRUMTimingMessage;
-import com.raygun.raygun4android.messages.shared.RaygunUserContext;
-import com.raygun.raygun4android.messages.RaygunUserInfo;
+import com.raygun.raygun4android.messages.shared.RaygunUserInfo;
 import com.raygun.raygun4android.network.RaygunNetworkUtils;
 import com.raygun.raygun4android.utils.RaygunFileFilter;
 import com.raygun.raygun4android.utils.RaygunFileUtils;
@@ -54,7 +53,8 @@ public class RaygunClient {
     private static RaygunOnBeforeSend onBeforeSend;
     private static List tags;
     private static Map userCustomData;
-    private static String sessionId;
+    private static boolean crashReportingEnabled = false;
+    private static boolean RUMEnabled = false;
 
     /**
      * Initializes the Raygun client. This expects that you have placed the API key in your
@@ -127,25 +127,6 @@ public class RaygunClient {
             RaygunClient.handler = new RaygunUncaughtExceptionHandler(oldHandler);
             Thread.setDefaultUncaughtExceptionHandler(RaygunClient.handler);
         }
-    }
-
-    /**
-     * Attaches the Raygun RUM feature which will automatically report session and view events.
-     *
-     * @param activity The main/entry activity of the Android app.
-     */
-    public static void attachRUM(Activity activity) {
-        RUM.attach(activity);
-    }
-
-    /**
-     * Attaches the Raygun RUM feature which will automatically report session and view events.
-     *
-     * @param activity       The main/entry activity of the Android app.
-     * @param networkLogging Automatically report the performance of network requests.
-     */
-    public static void attachRUM(Activity activity, boolean networkLogging) {
-        RUM.attach(activity, networkLogging);
     }
 
     /**
@@ -229,7 +210,7 @@ public class RaygunClient {
 
     /**
      * Sets the current user of your application. If user is an email address which is associated with a Gravatar,
-     * their picture will be displayed in the error view. If setUser is not called a random ID will be assigned.
+     * their picture will be displayed in the error view. If setUser is not called, a random ID will be assigned.
      * If the user context changes in your application (i.e log in/out), be sure to call this again with the
      * updated user name/email address.
      *
@@ -241,20 +222,31 @@ public class RaygunClient {
      */
     public static void setUser(String user) {
         if (user != null && user.length() > 0) {
-            RaygunClient.userInfo = new RaygunUserInfo(user);
+            RaygunUserInfo newUser = new RaygunUserInfo(user);
+            if (isRUMEnabled()) {
+                RUM.updateCurrentSessionUser(newUser);
+            }
+            RaygunClient.userInfo = newUser;
         }
     }
 
     /**
      * Sets the current user of your application. If user is an email address which is associated with a Gravatar,
-     * their picture will be displayed in the error view. If setUser is not called a random ID will be assigned.
+     * their picture will be displayed in the error view. If setUser is not called, a random ID will be assigned.
      * If the user context changes in your application (i.e log in/out), be sure to call this again with the
      * updated user name/email address.
      *
      * @param userInfo A RaygunUserInfo object containing the user data you want to send in its fields.
      */
     public static void setUser(RaygunUserInfo userInfo) {
+        if (isRUMEnabled()) {
+            RUM.updateCurrentSessionUser(userInfo);
+        }
         RaygunClient.userInfo = userInfo;
+    }
+
+    protected static RaygunUserInfo getUser() {
+        return RaygunClient.userInfo;
     }
 
     /**
@@ -355,16 +347,52 @@ public class RaygunClient {
         // TODO Add function call to delete any existing stored reports
     }
 
+    protected static boolean isCrashReportingEnabled() {
+        return crashReportingEnabled;
+    }
+
+    public static void enableCrashReporting() {
+        RaygunClient.crashReportingEnabled = true;
+        attachExceptionHandler();
+    }
+
+    protected static boolean isRUMEnabled() {
+        return RUMEnabled;
+    }
+
+    /**
+     * Enables the Raygun RUM feature which will automatically report session and view events.
+     *
+     * @param activity The main/entry activity of the Android app.
+     */
+    public static void enableRUM(Activity activity) {
+        RaygunClient.RUMEnabled = true;
+        RUM.attach(activity);
+        if (RaygunClient.userInfo != null) {
+            RUM.updateCurrentSessionUser(RaygunClient.userInfo);
+        }
+    }
+
+    /**
+     * Enables the Raygun RUM feature which will automatically report session and view events.
+     *
+     * @param activity       The main/entry activity of the Android app.
+     * @param networkLogging Automatically report the performance of network requests.
+     */
+    public static void enableRUM(Activity activity, boolean networkLogging) {
+        RaygunClient.RUMEnabled = true;
+        RUM.attach(activity, networkLogging);
+        if (RaygunClient.userInfo != null) {
+            RUM.updateCurrentSessionUser(RaygunClient.userInfo);
+        }
+    }
+
     /**
      * Sends a RUM event to Raygun. The message is sent on a background thread.
      *
      * @param eventName Tracks if this is a session start or session end event.
      */
-    protected static void sendRUMEvent(String eventName) {
-        if (RaygunSettings.RUM_EVENT_SESSION_START.equals(eventName)) {
-            RaygunClient.sessionId = UUID.randomUUID().toString();
-        }
-
+    protected static void sendRUMEvent(String eventName, RaygunUserInfo userInfo) {
         RaygunRUMMessage message = new RaygunRUMMessage();
         RaygunRUMDataMessage dataMessage = new RaygunRUMDataMessage();
 
@@ -379,18 +407,20 @@ public class RaygunClient {
         String timestamp = df.format(c.getTime());
         dataMessage.setTimestamp(timestamp);
 
-        dataMessage.setSessionId(RaygunClient.sessionId);
+        dataMessage.setSessionId(RUM.sessionId);
         dataMessage.setVersion(RaygunClient.version);
         dataMessage.setOS("Android");
         dataMessage.setOSVersion(Build.VERSION.RELEASE);
         dataMessage.setPlatform(String.format("%s %s", Build.MANUFACTURER, Build.MODEL));
 
-        RaygunUserContext userContext = RaygunClient.userInfo == null ? new RaygunUserContext(new RaygunUserInfo(null, null, null, null, null, true), getApplicationContext()) : new RaygunUserContext(RaygunClient.userInfo, getApplicationContext());
-        dataMessage.setUser(userContext);
+        RaygunUserInfo user = userInfo == null ? new RaygunUserInfo(null, null, null, null, true) : userInfo;
+        dataMessage.setUser(user);
 
         message.setEventData(new RaygunRUMDataMessage[]{dataMessage});
 
         enqueueWorkForService(RaygunClient.apiKey, new Gson().toJson(message), true);
+
+        RaygunLogger.v(new Gson().toJson(message));
     }
 
     /**
@@ -401,7 +431,8 @@ public class RaygunClient {
      * @param milliseconds The duration of the event in milliseconds.
      */
     public static void sendRUMTimingEvent(RaygunRUMEventType eventType, String name, long milliseconds) {
-        if (RaygunClient.sessionId == null) {
+        if (RUM.sessionId == null) {
+            RUM.sessionId = UUID.randomUUID().toString();
             sendRUMEvent(RaygunSettings.RUM_EVENT_SESSION_START);
         }
 
@@ -423,14 +454,14 @@ public class RaygunClient {
         String timestamp = df.format(c.getTime());
         dataMessage.setTimestamp(timestamp);
 
-        dataMessage.setSessionId(RaygunClient.sessionId);
+        dataMessage.setSessionId(RUM.sessionId);
         dataMessage.setVersion(RaygunClient.version);
         dataMessage.setOS("Android");
         dataMessage.setOSVersion(Build.VERSION.RELEASE);
         dataMessage.setPlatform(String.format("%s %s", Build.MANUFACTURER, Build.MODEL));
 
-        RaygunUserContext userContext = RaygunClient.userInfo == null ? new RaygunUserContext(new RaygunUserInfo(null, null, null, null, null, true), getApplicationContext()) : new RaygunUserContext(RaygunClient.userInfo, getApplicationContext());
-        dataMessage.setUser(userContext);
+        RaygunUserInfo user = RaygunClient.userInfo == null ? new RaygunUserInfo(null, null, null, null, true) : RaygunClient.userInfo;
+        dataMessage.setUser(user);
 
         RaygunRUMData data = new RaygunRUMData();
         RaygunRUMTimingMessage timingMessage = new RaygunRUMTimingMessage();
@@ -446,6 +477,13 @@ public class RaygunClient {
         message.setEventData(new RaygunRUMDataMessage[]{dataMessage});
 
         enqueueWorkForService(RaygunClient.apiKey, new Gson().toJson(message), true);
+
+        RaygunLogger.v(new Gson().toJson(message));
+    }
+
+    private static void sendRUMEvent(String eventName) {
+        RaygunUserInfo user = RaygunClient.userInfo == null ? new RaygunUserInfo(null, null, null, null, true) : RaygunClient.userInfo;
+        sendRUMEvent(eventName, user);
     }
 
     private static RaygunMessage buildMessage(Throwable throwable) {
@@ -465,9 +503,9 @@ public class RaygunClient {
             }
 
             if (RaygunClient.userInfo != null) {
-                msg.getDetails().setUserContext(RaygunClient.userInfo, getApplicationContext());
+                msg.getDetails().setUserInfo(RaygunClient.userInfo);
             } else {
-                msg.getDetails().setUserContext(getApplicationContext());
+                msg.getDetails().setUserInfo();
             }
             return msg;
         } catch (Exception e) {
@@ -568,7 +606,7 @@ public class RaygunClient {
      * @return The current application Context.
      * @throws java.lang.IllegalStateException if init() has not been called.
      */
-    private static Context getApplicationContext() {
+    public static Context getApplicationContext() {
         if (RaygunClient.application == null) {
             throw new IllegalStateException("init() must be called first.");
         }

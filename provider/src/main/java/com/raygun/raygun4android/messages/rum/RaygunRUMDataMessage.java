@@ -1,12 +1,12 @@
 package com.raygun.raygun4android.messages.rum;
 
-import com.raygun.raygun4android.messages.shared.RaygunUserContext;
+import com.raygun.raygun4android.messages.shared.RaygunUserInfo;
 
 public class RaygunRUMDataMessage {
     private String sessionId;
     private String timestamp;
     private String type;
-    private RaygunUserContext user;
+    private RaygunUserInfo user;
     private String version;
     private String os;
     private String osVersion;
@@ -37,11 +37,11 @@ public class RaygunRUMDataMessage {
         this.type = type;
     }
 
-    public RaygunUserContext getUser() {
+    public RaygunUserInfo getUser() {
         return user;
     }
 
-    public void setUser(RaygunUserContext user) {
+    public void setUser(RaygunUserInfo user) {
         this.user = user;
     }
 

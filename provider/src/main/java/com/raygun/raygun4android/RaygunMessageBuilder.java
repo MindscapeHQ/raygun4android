@@ -71,8 +71,8 @@ public class RaygunMessageBuilder implements IRaygunMessageBuilder {
     }
 
     @Override
-    public IRaygunMessageBuilder setUserContext(Context context) {
-        raygunMessage.getDetails().setUserContext(context);
+    public IRaygunMessageBuilder setUserInfo() {
+        raygunMessage.getDetails().setUserInfo();
         return this;
     }
 

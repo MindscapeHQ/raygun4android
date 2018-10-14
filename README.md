@@ -67,14 +67,10 @@ In a central activity, call the following:
 
 ```java
 RaygunClient.init(getApplicationContext());
-RaygunClient.attachExceptionHandler();
-```
-
-You might need to add the following specific imports to your class, where you wish to use RaygunClient:
-
-```java
-import com.raygun.raygun4android.RaygunClient;
-import com.raygun.messages.RaygunUserInfo;
+// Crash Reporting
+RaygunClient.enableCrashReporting();
+// RUM
+RaygunClient.enableRUM(activity);
 ```
 
 The above exception handler automatically catches and sends all uncaught exceptions. You can create your own or send from a catch block by calling RaygunClient.send() and passing in the Throwable.
@@ -150,7 +146,6 @@ user.setIdentifier("a@b.com");
 user.setFirstName("User");
 user.setFullName("User Name");
 user.setEmail("a@b.com");
-user.setUuid("a uuid");
 user.setAnonymous(false);
 RaygunClient.setUser(user);
 ```
@@ -159,16 +154,16 @@ Any of the properties are optional, for instance you can set just isAnonymous by
 
 `identifier` should be a unique representation of the current logged in user - we will assume that messages with the same identifier are the same user. If you do not set it, it will be automatically set to the device UUID.
 
-If the user context changes, for instance on log in/out, you should remember to call setUser again to store the updated username.
+If the user context changes, for instance on log in/out, you should remember to call setUser again to store the updated user identifier. If a user logs out and you want to use the default device identifier again, just set the `identifier` property to null.
 
 ### Custom endpoints
 
 Raygun supports sending data from Crash Reporting and Real User Monitoring to your own endpoints. If you want to set custom endpoints, could can do so by setting them after you've initialised RaygunClient:
 
 ```java
-RaygunClient.init(getApplicationContext());
-RaygunClient.attachExceptionHandler();
+// Crash Reporting
 RaygunClient.setCustomCrashReportingEndpoint("http://...");
+// RUM
 RaygunClient.setCustomRUMEndpoint("http://...");
 ```
 
