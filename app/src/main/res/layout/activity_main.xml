@@ -17,12 +17,48 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <Button
-        android:id="@+id/button"
+        android:id="@+id/button_send"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Button"
+        android:text="Send an error"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView" />
+
+    <Button
+        android:id="@+id/button_crash"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Crash app"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/button_send" />
+
+    <Button
+        android:id="@+id/button_set_user_anon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Set user anonymous"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/button_crash" />
+
+    <Button
+        android:id="@+id/button_set_user_A"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Set user A"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/button_set_user_anon" />
+
+    <Button
+        android:id="@+id/button_set_user_B"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Set user B"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/button_set_user_A" />
 
 </android.support.constraint.ConstraintLayout>
