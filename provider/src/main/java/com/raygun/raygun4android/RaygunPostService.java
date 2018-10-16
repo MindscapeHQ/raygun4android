@@ -182,7 +182,7 @@ public class RaygunPostService extends JobIntentService {
 
     private static Boolean validateApiKey(String apiKey) {
         if (apiKey.length() == 0) {
-            RaygunLogger.e("API key has not been provided, nothing will be logged");
+            RaygunLogger.e("API key is empty, nothing will be logged or reported");
             return false;
         } else {
             return true;
