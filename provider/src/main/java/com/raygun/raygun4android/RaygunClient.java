@@ -92,7 +92,9 @@ public class RaygunClient {
         if (RaygunClient.application == null) {
             RaygunClient.application = application;
         }
+
         RaygunClient.apiKey = apiKey;
+        RaygunClient.appContextIdentifier = UUID.randomUUID().toString();
 
         try {
             RaygunClient.version = getApplicationContext().getPackageManager().getPackageInfo(getApplicationContext().getPackageName(), 0).versionName;
@@ -101,7 +103,7 @@ public class RaygunClient {
             RaygunLogger.w("Couldn't read application version from calling package");
         }
 
-        RaygunClient.appContextIdentifier = UUID.randomUUID().toString();
+        postCachedMessages();
     }
 
     /**
@@ -135,25 +137,29 @@ public class RaygunClient {
      * @param throwable The Throwable object that occurred in your application that will be sent to Raygun.
      */
     public static void send(Throwable throwable) {
-        RaygunMessage msg = buildMessage(throwable);
-        postCachedMessages();
+        if (RaygunClient.isCrashReportingEnabled()) {
 
-        if (RaygunClient.tags != null) {
-            msg.getDetails().setTags(RaygunClient.tags);
-        }
+            RaygunMessage msg = buildMessage(throwable);
 
-        if (RaygunClient.userCustomData != null) {
-            msg.getDetails().setUserCustomData(RaygunClient.userCustomData);
-        }
-
-        if (RaygunClient.onBeforeSend != null) {
-            msg = RaygunClient.onBeforeSend.onBeforeSend(msg);
-            if (msg == null) {
-                return;
+            if (RaygunClient.tags != null) {
+                msg.getDetails().setTags(RaygunClient.tags);
             }
-        }
 
-        enqueueWorkForService(RaygunClient.apiKey, new Gson().toJson(msg), false);
+            if (RaygunClient.userCustomData != null) {
+                msg.getDetails().setUserCustomData(RaygunClient.userCustomData);
+            }
+
+            if (RaygunClient.onBeforeSend != null) {
+                msg = RaygunClient.onBeforeSend.onBeforeSend(msg);
+                if (msg == null) {
+                    return;
+                }
+            }
+
+            enqueueWorkForService(RaygunClient.apiKey, new Gson().toJson(msg), false);
+        } else {
+            RaygunLogger.w("Crash Reporting is not enabled, please enable to use the send() function");
+        }
     }
 
     /**
@@ -164,22 +170,26 @@ public class RaygunClient {
      *                  This could be a build tag, lifecycle state, debug/production version etc.
      */
     public static void send(Throwable throwable, List tags) {
-        RaygunMessage msg = buildMessage(throwable);
-        msg.getDetails().setTags(mergeTags(tags));
+        if (RaygunClient.isCrashReportingEnabled()) {
 
-        if (RaygunClient.userCustomData != null) {
-            msg.getDetails().setUserCustomData(RaygunClient.userCustomData);
-        }
+            RaygunMessage msg = buildMessage(throwable);
+            msg.getDetails().setTags(mergeTags(tags));
 
-        if (RaygunClient.onBeforeSend != null) {
-            msg = RaygunClient.onBeforeSend.onBeforeSend(msg);
-            if (msg == null) {
-                return;
+            if (RaygunClient.userCustomData != null) {
+                msg.getDetails().setUserCustomData(RaygunClient.userCustomData);
             }
-        }
 
-        postCachedMessages();
-        enqueueWorkForService(RaygunClient.apiKey, new Gson().toJson(msg), false);
+            if (RaygunClient.onBeforeSend != null) {
+                msg = RaygunClient.onBeforeSend.onBeforeSend(msg);
+                if (msg == null) {
+                    return;
+                }
+            }
+
+            enqueueWorkForService(RaygunClient.apiKey, new Gson().toJson(msg), false);
+        } else {
+            RaygunLogger.w("Crash Reporting is not enabled, please enable to use the send() function");
+        }
     }
 
     /**
@@ -192,20 +202,24 @@ public class RaygunClient {
      *                       where you can attach any related data you want to see to the error.
      */
     public static void send(Throwable throwable, List tags, Map userCustomData) {
-        RaygunMessage msg = buildMessage(throwable);
+        if (RaygunClient.isCrashReportingEnabled()) {
 
-        msg.getDetails().setTags(mergeTags(tags));
-        msg.getDetails().setUserCustomData(mergeUserCustomData(userCustomData));
+            RaygunMessage msg = buildMessage(throwable);
 
-        if (RaygunClient.onBeforeSend != null) {
-            msg = RaygunClient.onBeforeSend.onBeforeSend(msg);
-            if (msg == null) {
-                return;
+            msg.getDetails().setTags(mergeTags(tags));
+            msg.getDetails().setUserCustomData(mergeUserCustomData(userCustomData));
+
+            if (RaygunClient.onBeforeSend != null) {
+                msg = RaygunClient.onBeforeSend.onBeforeSend(msg);
+                if (msg == null) {
+                    return;
+                }
             }
-        }
 
-        postCachedMessages();
-        enqueueWorkForService(RaygunClient.apiKey, new Gson().toJson(msg), false);
+            enqueueWorkForService(RaygunClient.apiKey, new Gson().toJson(msg), false);
+        } else {
+            RaygunLogger.w("Crash Reporting is not enabled, please enable to use the send() function");
+        }
     }
 
     /**
@@ -245,7 +259,7 @@ public class RaygunClient {
         RaygunClient.userInfo = userInfo;
     }
 
-    protected static RaygunUserInfo getUser() {
+    public static RaygunUserInfo getUser() {
         return RaygunClient.userInfo;
     }
 
@@ -340,14 +354,21 @@ public class RaygunClient {
      * The default and maximum value for this is 64. We do not recommend to change this setting
      * unless you have a very good reason and use case.
      *
+     * If you decrease the value of maxReportsStoredOnDevice, all currently cached reports will be deleted.
+     *
      * @param maxReportsStoredOnDevice An int with the new maximum number of crash reports
      */
     public static void setMaxReportsStoredOnDevice(int maxReportsStoredOnDevice) {
+        int currentMaxReportsStoredOnDevice = RaygunSettings.getMaxReportsStoredOnDevice();
+
+        if (maxReportsStoredOnDevice < currentMaxReportsStoredOnDevice) {
+            RaygunFileUtils.clearCachedReports(getApplicationContext());
+        }
+
         RaygunSettings.setMaxReportsStoredOnDevice(maxReportsStoredOnDevice);
-        // TODO Add function call to delete any existing stored reports
     }
 
-    protected static boolean isCrashReportingEnabled() {
+    private static boolean isCrashReportingEnabled() {
         return crashReportingEnabled;
     }
 
@@ -356,7 +377,7 @@ public class RaygunClient {
         attachExceptionHandler();
     }
 
-    protected static boolean isRUMEnabled() {
+    private static boolean isRUMEnabled() {
         return RUMEnabled;
     }
 
@@ -374,7 +395,7 @@ public class RaygunClient {
     }
 
     /**
-     * Enables the Raygun RUM feature which will automatically report session and view events.
+     * Enables the Raygun RUM feature which will automatically report session and view events AND network performance.
      *
      * @param activity       The main/entry activity of the Android app.
      * @param networkLogging Automatically report the performance of network requests.
@@ -393,34 +414,45 @@ public class RaygunClient {
      * @param eventName Tracks if this is a session start or session end event.
      */
     protected static void sendRUMEvent(String eventName, RaygunUserInfo userInfo) {
-        RaygunRUMMessage message = new RaygunRUMMessage();
-        RaygunRUMDataMessage dataMessage = new RaygunRUMDataMessage();
 
-        dataMessage.setType(eventName);
+        if (RaygunClient.isRUMEnabled()) {
 
-        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-        df.setTimeZone(TimeZone.getTimeZone("UTC"));
-        Calendar c = Calendar.getInstance();
-        if (RaygunSettings.RUM_EVENT_SESSION_END.equals(eventName)) {
-            c.add(Calendar.SECOND, 2);
+            RaygunRUMMessage message = new RaygunRUMMessage();
+            RaygunRUMDataMessage dataMessage = new RaygunRUMDataMessage();
+
+            dataMessage.setType(eventName);
+
+            SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+            df.setTimeZone(TimeZone.getTimeZone("UTC"));
+            Calendar c = Calendar.getInstance();
+            if (RaygunSettings.RUM_EVENT_SESSION_END.equals(eventName)) {
+                c.add(Calendar.SECOND, 2);
+            }
+            String timestamp = df.format(c.getTime());
+            dataMessage.setTimestamp(timestamp);
+
+            dataMessage.setSessionId(RUM.sessionId);
+            dataMessage.setVersion(RaygunClient.version);
+            dataMessage.setOS("Android");
+            dataMessage.setOSVersion(Build.VERSION.RELEASE);
+            dataMessage.setPlatform(String.format("%s %s", Build.MANUFACTURER, Build.MODEL));
+
+            RaygunUserInfo user = userInfo == null ? new RaygunUserInfo(null, null, null, null, true) : userInfo;
+            dataMessage.setUser(user);
+
+            message.setEventData(new RaygunRUMDataMessage[]{dataMessage});
+
+            enqueueWorkForService(RaygunClient.apiKey, new Gson().toJson(message), true);
+
+            RaygunLogger.v(new Gson().toJson(message));
+        } else {
+            RaygunLogger.w("RUM is not enabled, please enable to use the sendRUMEvent() function");
         }
-        String timestamp = df.format(c.getTime());
-        dataMessage.setTimestamp(timestamp);
+    }
 
-        dataMessage.setSessionId(RUM.sessionId);
-        dataMessage.setVersion(RaygunClient.version);
-        dataMessage.setOS("Android");
-        dataMessage.setOSVersion(Build.VERSION.RELEASE);
-        dataMessage.setPlatform(String.format("%s %s", Build.MANUFACTURER, Build.MODEL));
-
-        RaygunUserInfo user = userInfo == null ? new RaygunUserInfo(null, null, null, null, true) : userInfo;
-        dataMessage.setUser(user);
-
-        message.setEventData(new RaygunRUMDataMessage[]{dataMessage});
-
-        enqueueWorkForService(RaygunClient.apiKey, new Gson().toJson(message), true);
-
-        RaygunLogger.v(new Gson().toJson(message));
+    private static void sendRUMEvent(String eventName) {
+        RaygunUserInfo user = RaygunClient.userInfo == null ? new RaygunUserInfo(null, null, null, null, true) : RaygunClient.userInfo;
+        sendRUMEvent(eventName, user);
     }
 
     /**
@@ -431,72 +463,72 @@ public class RaygunClient {
      * @param milliseconds The duration of the event in milliseconds.
      */
     public static void sendRUMTimingEvent(RaygunRUMEventType eventType, String name, long milliseconds) {
-        if (RUM.sessionId == null) {
-            RUM.sessionId = UUID.randomUUID().toString();
-            sendRUMEvent(RaygunSettings.RUM_EVENT_SESSION_START);
-        }
 
-        if (eventType == RaygunRUMEventType.ACTIVITY_LOADED) {
-            if (RaygunClient.shouldIgnoreView(name)) {
-                return;
+        if (RaygunClient.isRUMEnabled()) {
+            if (RUM.sessionId == null) {
+                RUM.sessionId = UUID.randomUUID().toString();
+                sendRUMEvent(RaygunSettings.RUM_EVENT_SESSION_START);
             }
+
+            if (eventType == RaygunRUMEventType.ACTIVITY_LOADED) {
+                if (RaygunClient.shouldIgnoreView(name)) {
+                    return;
+                }
+            }
+
+            RaygunRUMMessage message = new RaygunRUMMessage();
+            RaygunRUMDataMessage dataMessage = new RaygunRUMDataMessage();
+
+            dataMessage.setType(RaygunSettings.RUM_EVENT_TIMING);
+
+            SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+            df.setTimeZone(TimeZone.getTimeZone("UTC"));
+            Calendar c = Calendar.getInstance();
+            c.add(Calendar.MILLISECOND, -(int) milliseconds);
+            String timestamp = df.format(c.getTime());
+            dataMessage.setTimestamp(timestamp);
+
+            dataMessage.setSessionId(RUM.sessionId);
+            dataMessage.setVersion(RaygunClient.version);
+            dataMessage.setOS("Android");
+            dataMessage.setOSVersion(Build.VERSION.RELEASE);
+            dataMessage.setPlatform(String.format("%s %s", Build.MANUFACTURER, Build.MODEL));
+
+            RaygunUserInfo user = RaygunClient.userInfo == null ? new RaygunUserInfo(null, null, null, null, true) : RaygunClient.userInfo;
+            dataMessage.setUser(user);
+
+            RaygunRUMData data = new RaygunRUMData();
+            RaygunRUMTimingMessage timingMessage = new RaygunRUMTimingMessage();
+            timingMessage.setType(eventType == RaygunRUMEventType.ACTIVITY_LOADED ? "p" : "n");
+            timingMessage.setDuration(milliseconds);
+            data.setName(name);
+            data.setTiming(timingMessage);
+
+            RaygunRUMData[] dataArray = new RaygunRUMData[]{data};
+            String dataStr = new Gson().toJson(dataArray);
+            dataMessage.setData(dataStr);
+
+            message.setEventData(new RaygunRUMDataMessage[]{dataMessage});
+
+            enqueueWorkForService(RaygunClient.apiKey, new Gson().toJson(message), true);
+
+            RaygunLogger.v(new Gson().toJson(message));
+        } else {
+            RaygunLogger.w("RUM is not enabled, please enable to use the sendRUMTimingEvent() function");
         }
-
-        RaygunRUMMessage message = new RaygunRUMMessage();
-        RaygunRUMDataMessage dataMessage = new RaygunRUMDataMessage();
-
-        dataMessage.setType(RaygunSettings.RUM_EVENT_TIMING);
-
-        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-        df.setTimeZone(TimeZone.getTimeZone("UTC"));
-        Calendar c = Calendar.getInstance();
-        c.add(Calendar.MILLISECOND, -(int) milliseconds);
-        String timestamp = df.format(c.getTime());
-        dataMessage.setTimestamp(timestamp);
-
-        dataMessage.setSessionId(RUM.sessionId);
-        dataMessage.setVersion(RaygunClient.version);
-        dataMessage.setOS("Android");
-        dataMessage.setOSVersion(Build.VERSION.RELEASE);
-        dataMessage.setPlatform(String.format("%s %s", Build.MANUFACTURER, Build.MODEL));
-
-        RaygunUserInfo user = RaygunClient.userInfo == null ? new RaygunUserInfo(null, null, null, null, true) : RaygunClient.userInfo;
-        dataMessage.setUser(user);
-
-        RaygunRUMData data = new RaygunRUMData();
-        RaygunRUMTimingMessage timingMessage = new RaygunRUMTimingMessage();
-        timingMessage.setType(eventType == RaygunRUMEventType.ACTIVITY_LOADED ? "p" : "n");
-        timingMessage.setDuration(milliseconds);
-        data.setName(name);
-        data.setTiming(timingMessage);
-
-        RaygunRUMData[] dataArray = new RaygunRUMData[]{data};
-        String dataStr = new Gson().toJson(dataArray);
-        dataMessage.setData(dataStr);
-
-        message.setEventData(new RaygunRUMDataMessage[]{dataMessage});
-
-        enqueueWorkForService(RaygunClient.apiKey, new Gson().toJson(message), true);
-
-        RaygunLogger.v(new Gson().toJson(message));
-    }
-
-    private static void sendRUMEvent(String eventName) {
-        RaygunUserInfo user = RaygunClient.userInfo == null ? new RaygunUserInfo(null, null, null, null, true) : RaygunClient.userInfo;
-        sendRUMEvent(eventName, user);
     }
 
     private static RaygunMessage buildMessage(Throwable throwable) {
         try {
             RaygunMessage msg = RaygunMessageBuilder.instance()
-                    .setEnvironmentDetails(getApplicationContext())
-                    .setMachineName(Build.MODEL)
-                    .setExceptionDetails(throwable)
-                    .setClientDetails()
-                    .setAppContext(RaygunClient.appContextIdentifier)
-                    .setVersion(RaygunClient.version)
-                    .setNetworkInfo(getApplicationContext())
-                    .build();
+                .setEnvironmentDetails(getApplicationContext())
+                .setMachineName(Build.MODEL)
+                .setExceptionDetails(throwable)
+                .setClientDetails()
+                .setAppContext(RaygunClient.appContextIdentifier)
+                .setVersion(RaygunClient.version)
+                .setNetworkInfo(getApplicationContext())
+                .build();
 
             if (RaygunClient.version != null) {
                 msg.getDetails().setVersion(RaygunClient.version);
@@ -518,7 +550,7 @@ public class RaygunClient {
         try {
             ApplicationInfo ai = context.getPackageManager().getApplicationInfo(context.getPackageName(), PackageManager.GET_META_DATA);
             Bundle bundle = ai.metaData;
-            return bundle.getString("com.raygun.raygun4android.apikey");
+            return bundle.getString(RaygunSettings.APIKEY_MANIFEST_FIELD);
         } catch (PackageManager.NameNotFoundException e) {
             RaygunLogger.e("Couldn't read API key from your AndroidManifest.xml <meta-data /> element; cannot send. Detailed error: " + e.getMessage());
         }

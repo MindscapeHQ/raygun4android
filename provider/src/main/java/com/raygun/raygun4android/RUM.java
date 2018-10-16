@@ -22,6 +22,7 @@ public class RUM implements ActivityLifecycleCallbacks {
     private static RaygunUserInfo currentSessionUser;
 
     protected static void attach(Activity mainActivity) {
+
         RaygunLogger.v("attach");
         if (RUM.rum == null && mainActivity != null) {
             Application application = mainActivity.getApplication();
