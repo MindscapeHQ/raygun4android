@@ -43,27 +43,22 @@ class MainActivity : AppCompatActivity() {
 
         button_set_user_anon.setOnClickListener {
             var user = RaygunUserInfo()
-            user.setAnonymous(true)
             RaygunClient.setUser(user)
         }
 
         button_set_user_A.setOnClickListener {
-            var user = RaygunUserInfo()
-            user.identifier = "superuser1"
-            user.fullName = "User Name A"
-            user.firstName = "User A"
-            user.email = "a@b.com"
-            user.setAnonymous(false)
+            var user = RaygunUserInfo("superuser3")
+            user.fullName = "User Name C"
+            user.firstName = "User C"
+            user.email = "e@f.com.com"
             RaygunClient.setUser(user)
         }
 
         button_set_user_B.setOnClickListener{
-            var user = RaygunUserInfo()
-            user.identifier = "superuser2"
-            user.fullName = "User Name B"
-            user.firstName = "User B"
-            user.email = "b@c.com"
-            user.setAnonymous(false)
+            var user = RaygunUserInfo("superuser4")
+            user.fullName = "User Name D"
+            user.firstName = "User D"
+            user.email = "g@h.com"
             RaygunClient.setUser(user)
         }
     }
