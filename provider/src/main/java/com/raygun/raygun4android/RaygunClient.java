@@ -18,6 +18,8 @@ import com.raygun.raygun4android.messages.rum.RaygunRUMMessage;
 import com.raygun.raygun4android.messages.rum.RaygunRUMTimingMessage;
 import com.raygun.raygun4android.messages.shared.RaygunUserInfo;
 import com.raygun.raygun4android.network.RaygunNetworkUtils;
+import com.raygun.raygun4android.services.CrashReportingPostService;
+import com.raygun.raygun4android.services.RUMPostService;
 import com.raygun.raygun4android.utils.RaygunFileFilter;
 import com.raygun.raygun4android.utils.RaygunFileUtils;
 
@@ -156,7 +158,7 @@ public class RaygunClient {
                 }
             }
 
-            enqueueWorkForService(RaygunClient.apiKey, new Gson().toJson(msg), false);
+            enqueueWorkForCrashReportingService(RaygunClient.apiKey, new Gson().toJson(msg));
             postCachedMessages();
         } else {
             RaygunLogger.w("Crash Reporting is not enabled, please enable to use the send() function");
@@ -187,7 +189,7 @@ public class RaygunClient {
                 }
             }
 
-            enqueueWorkForService(RaygunClient.apiKey, new Gson().toJson(msg), false);
+            enqueueWorkForCrashReportingService(RaygunClient.apiKey, new Gson().toJson(msg));
             postCachedMessages();
         } else {
             RaygunLogger.w("Crash Reporting is not enabled, please enable to use the send() function");
@@ -218,7 +220,7 @@ public class RaygunClient {
                 }
             }
 
-            enqueueWorkForService(RaygunClient.apiKey, new Gson().toJson(msg), false);
+            enqueueWorkForCrashReportingService(RaygunClient.apiKey, new Gson().toJson(msg));
             postCachedMessages();
         } else {
             RaygunLogger.w("Crash Reporting is not enabled, please enable to use the send() function");
@@ -440,7 +442,7 @@ public class RaygunClient {
 
             message.setEventData(new RaygunRUMDataMessage[]{dataMessage});
 
-            enqueueWorkForService(RaygunClient.apiKey, new Gson().toJson(message), true);
+            enqueueWorkForRUMService(RaygunClient.apiKey, new Gson().toJson(message));
 
             RaygunLogger.v(new Gson().toJson(message));
         } else {
@@ -508,7 +510,7 @@ public class RaygunClient {
 
             message.setEventData(new RaygunRUMDataMessage[]{dataMessage});
 
-            enqueueWorkForService(RaygunClient.apiKey, new Gson().toJson(message), true);
+            enqueueWorkForRUMService(RaygunClient.apiKey, new Gson().toJson(message));
 
             RaygunLogger.v(new Gson().toJson(message));
         } else {
@@ -565,7 +567,7 @@ public class RaygunClient {
                         try {
                             ois = new ObjectInputStream(new FileInputStream(f));
                             SerializedMessage serializedMessage = (SerializedMessage) ois.readObject();
-                            enqueueWorkForService(RaygunClient.apiKey, serializedMessage.message, false);
+                            enqueueWorkForCrashReportingService(RaygunClient.apiKey, serializedMessage.message);
                             f.delete();
                         } finally {
                             if (ois != null) {
@@ -584,17 +586,28 @@ public class RaygunClient {
         }
     }
 
-    private static void enqueueWorkForService(String apiKey, String jsonPayload, boolean isRUM) {
-        Intent intent = new Intent(getApplicationContext(), RaygunPostService.class);
-        intent.setAction("com.raygun.raygun4android.intent.action.LAUNCH_POST_SERVICE");
+    private static void enqueueWorkForRUMService(String apiKey, String jsonPayload) {
+        Intent intent = new Intent(getApplicationContext(), RUMPostService.class);
+        intent.setAction("com.raygun.raygun4android.intent.action.LAUNCH_RUM_POST_SERVICE");
         intent.setPackage("com.raygun.raygun4android");
-        intent.setComponent(new ComponentName(getApplicationContext(), RaygunPostService.class));
+        intent.setComponent(new ComponentName(getApplicationContext(), RUMPostService.class));
 
         intent.putExtra("msg", jsonPayload);
         intent.putExtra("apikey", apiKey);
-        intent.putExtra("isRUM", isRUM);
 
-        RaygunPostService.enqueueWork(getApplicationContext(), intent);
+        RUMPostService.enqueueWork(getApplicationContext(), intent);
+    }
+
+    private static void enqueueWorkForCrashReportingService(String apiKey, String jsonPayload) {
+        Intent intent = new Intent(getApplicationContext(), CrashReportingPostService.class);
+        intent.setAction("com.raygun.raygun4android.intent.action.LAUNCH_CRASHREPORTING_POST_SERVICE");
+        intent.setPackage("com.raygun.raygun4android");
+        intent.setComponent(new ComponentName(getApplicationContext(), CrashReportingPostService.class));
+
+        intent.putExtra("msg", jsonPayload);
+        intent.putExtra("apikey", apiKey);
+
+        CrashReportingPostService.enqueueWork(getApplicationContext(), intent);
     }
 
     private static List mergeTags(List paramTags) {
