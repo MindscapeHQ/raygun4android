@@ -1,6 +1,7 @@
 package com.raygun.raygun4android.messages.shared;
 
 import com.raygun.raygun4android.RaygunClient;
+import com.raygun.raygun4android.RaygunLogger;
 import com.raygun.raygun4android.network.RaygunNetworkUtils;
 
 public class RaygunUserInfo {
@@ -16,20 +17,21 @@ public class RaygunUserInfo {
      *
      * @param firstName    The user's first name
      * @param fullName     The user's full name - if setting the first name you should set this too
-     * @param emailAddress User's email address
-     * @param isAnonymous  Whether this user data represents an anonymous user
+     * @param email        User's email address
      * @param identifier   Unique identifier for this user. Set this to the internal identifier you use to look up users,
      *                     or a correlation ID for anonymous users if you have one. It doesn't have to be unique, but we will treat
      *                     any duplicated values as the same user. If you use their email address here, pass it in as the 'emailAddress' parameter too.
      *                     If identifier is not set and/or null, a uuid will be assigned to this field.
      */
-    public RaygunUserInfo(String identifier, String firstName, String fullName, String emailAddress, Boolean isAnonymous) {
-        validateIdentifier(identifier);
-        this.firstName = firstName;
-        this.fullName = fullName;
-        this.email = emailAddress;
-        this.isAnonymous = isAnonymous;
-    }
+    public RaygunUserInfo(String identifier, String firstName, String fullName, String email) {
+        if (isValidUser(identifier)) {
+            this.firstName = firstName;
+            this.fullName = fullName;
+            this.email = email;
+        } else {
+            RaygunLogger.i("Ignored firstName, fullName and email because created user was deemed anonymous");
+        }
+      }
 
     /**
      * Convenience constructor to be used if you only want to supply an identifier string for the user.
@@ -41,19 +43,16 @@ public class RaygunUserInfo {
      *                     If identifier is not set and/or null, a uuid will be assigned to this field.
      */
     public RaygunUserInfo(String identifier) {
-        validateIdentifier(identifier);
+        isValidUser(identifier);
     }
 
     public RaygunUserInfo() {
         this.identifier = RaygunNetworkUtils.getDeviceUuid(RaygunClient.getApplicationContext());
+        this.isAnonymous = true;
     }
 
     public Boolean getIsAnonymous() {
         return this.isAnonymous;
-    }
-
-    public void setAnonymous(Boolean anonymous) {
-        isAnonymous = anonymous;
     }
 
     public String getEmail() {
@@ -61,7 +60,11 @@ public class RaygunUserInfo {
     }
 
     public void setEmail(String email) {
-        this.email = email;
+        if (!getIsAnonymous()) {
+            this.email = email;
+        } else {
+            RaygunLogger.i("Ignored email because current user was deemed anonymous");
+        }
     }
 
     public String getFullName() {
@@ -69,7 +72,11 @@ public class RaygunUserInfo {
     }
 
     public void setFullName(String fullName) {
-        this.fullName = fullName;
+        if (!getIsAnonymous()) {
+            this.fullName = fullName;
+        } else {
+            RaygunLogger.i("Ignored fullName because current user was deemed anonymous");
+        }
     }
 
     public String getFirstName() {
@@ -77,22 +84,27 @@ public class RaygunUserInfo {
     }
 
     public void setFirstName(String firstName) {
-        this.firstName = firstName;
+        if (!getIsAnonymous()) {
+            this.firstName = firstName;
+        } else {
+            RaygunLogger.i("Ignored firstName because current user was deemed anonymous");
+        }
     }
 
     public String getIdentifier() {
         return this.identifier;
     }
 
-    public void setIdentifier(String identifier) {
-        validateIdentifier(identifier);
-    }
-
-    private void validateIdentifier(String identifier) {
-        if (identifier == null) {
+    private Boolean isValidUser(String identifier) {
+        if (identifier == null || identifier.isEmpty()) {
             this.identifier = RaygunNetworkUtils.getDeviceUuid(RaygunClient.getApplicationContext());
+            this.isAnonymous = true;
+            RaygunLogger.i("Created anonymous user");
+            return false;
         } else {
             this.identifier = identifier;
+            this.isAnonymous = false;
+            return true;
         }
     }
 }

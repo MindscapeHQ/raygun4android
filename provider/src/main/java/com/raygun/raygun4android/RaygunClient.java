@@ -235,13 +235,8 @@ public class RaygunClient {
      * @param user A user name or email address representing the current user.
      */
     public static void setUser(String user) {
-        if (user != null && user.length() > 0) {
-            RaygunUserInfo newUser = new RaygunUserInfo(user);
-            if (isRUMEnabled()) {
-                RUM.updateCurrentSessionUser(newUser);
-            }
-            RaygunClient.userInfo = newUser;
-        }
+        RaygunUserInfo newUser = new RaygunUserInfo(user);
+        setUser(newUser);
     }
 
     /**
@@ -437,7 +432,7 @@ public class RaygunClient {
             dataMessage.setOSVersion(Build.VERSION.RELEASE);
             dataMessage.setPlatform(String.format("%s %s", Build.MANUFACTURER, Build.MODEL));
 
-            RaygunUserInfo user = userInfo == null ? new RaygunUserInfo(null, null, null, null, true) : userInfo;
+            RaygunUserInfo user = userInfo == null ? new RaygunUserInfo(null, null, null, null) : userInfo;
             dataMessage.setUser(user);
 
             message.setEventData(new RaygunRUMDataMessage[]{dataMessage});
@@ -451,7 +446,7 @@ public class RaygunClient {
     }
 
     private static void sendRUMEvent(String eventName) {
-        RaygunUserInfo user = RaygunClient.userInfo == null ? new RaygunUserInfo(null, null, null, null, true) : RaygunClient.userInfo;
+        RaygunUserInfo user = RaygunClient.userInfo == null ? new RaygunUserInfo(null, null, null, null) : RaygunClient.userInfo;
         sendRUMEvent(eventName, user);
     }
 
@@ -494,7 +489,7 @@ public class RaygunClient {
             dataMessage.setOSVersion(Build.VERSION.RELEASE);
             dataMessage.setPlatform(String.format("%s %s", Build.MANUFACTURER, Build.MODEL));
 
-            RaygunUserInfo user = RaygunClient.userInfo == null ? new RaygunUserInfo(null, null, null, null, true) : RaygunClient.userInfo;
+            RaygunUserInfo user = RaygunClient.userInfo == null ? new RaygunUserInfo(null, null, null, null) : RaygunClient.userInfo;
             dataMessage.setUser(user);
 
             RaygunRUMData data = new RaygunRUMData();
