@@ -157,6 +157,7 @@ public class RaygunClient {
             }
 
             enqueueWorkForService(RaygunClient.apiKey, new Gson().toJson(msg), false);
+            postCachedMessages();
         } else {
             RaygunLogger.w("Crash Reporting is not enabled, please enable to use the send() function");
         }
@@ -187,6 +188,7 @@ public class RaygunClient {
             }
 
             enqueueWorkForService(RaygunClient.apiKey, new Gson().toJson(msg), false);
+            postCachedMessages();
         } else {
             RaygunLogger.w("Crash Reporting is not enabled, please enable to use the send() function");
         }
@@ -217,6 +219,7 @@ public class RaygunClient {
             }
 
             enqueueWorkForService(RaygunClient.apiKey, new Gson().toJson(msg), false);
+            postCachedMessages();
         } else {
             RaygunLogger.w("Crash Reporting is not enabled, please enable to use the send() function");
         }
