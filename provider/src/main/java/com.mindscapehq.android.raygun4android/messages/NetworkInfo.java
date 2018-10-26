@@ -4,13 +4,12 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.telephony.TelephonyManager;
 
+import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
-import org.apache.http.conn.util.InetAddressUtils;
 
 public class NetworkInfo {
   private List<String> iPAddress = new ArrayList<String>();
@@ -114,14 +113,13 @@ public class NetworkInfo {
         for (InetAddress addr : addrs) {
           if (!addr.isLoopbackAddress()) {
             String sAddr = addr.getHostAddress().toUpperCase();
-            boolean isIPv4 = InetAddressUtils.isIPv4Address(sAddr);
+            boolean isIPv4 = addr instanceof Inet4Address;
 
             if (isIPv4) {
               if (!iPAddress.contains(sAddr)) {
                 iPAddress.add(sAddr);
               }
-            }
-            else {
+            } else {
               if (!isIPv4) {
                 int delim = sAddr.indexOf('%'); // drop ip6 port suffix
                 String delimited = delim < 0 ? sAddr : sAddr.substring(0, delim);
@@ -134,8 +132,7 @@ public class NetworkInfo {
           }
         }
       }
-    }
-    catch (Exception ex) {
+    } catch (Exception ex) {
     }
   }
 }
