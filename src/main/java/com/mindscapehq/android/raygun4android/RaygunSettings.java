@@ -3,20 +3,43 @@ package main.java.com.mindscapehq.android.raygun4android;
 import java.util.HashSet;
 
 public class RaygunSettings {
+  // General
+  public static final String APIKEY_MANIFEST_FIELD = "com.mindscapehq.android.raygun4android.apikey";
+
+  // Crash Reporting
+  private static final String DEFAULT_CRASHREPORTING_ENDPOINT = "https://api.raygun.io/entries";
+  public static final String DEFAULT_FILE_EXTENSION = "raygun";
+  private static final int DEFAULT_MAX_REPORTS_STORED_ON_DEVICE = 64;
+
+  // RUM
+  public  static final String RUM_EVENT_SESSION_START = "session_start";
+  public  static final String RUM_EVENT_SESSION_END   = "session_end";
+  public  static final String RUM_EVENT_TIMING        = "mobile_event_timing";
+  private static final String DEFAULT_RUM_ENDPOINT    = "https://api.raygun.io/events";
+
+  private static IgnoredURLs ignoredURLs = new IgnoredURLs("api.raygun.io");
+  private static HashSet<String> ignoredViews = new HashSet<String>();
+  private static int maxReportsStoredOnDevice = DEFAULT_MAX_REPORTS_STORED_ON_DEVICE;
+  private static String crashReportingEndpoint = DEFAULT_CRASHREPORTING_ENDPOINT;
+  private static String rumEndpoint = DEFAULT_RUM_ENDPOINT;
+
   private RaygunSettings() {
   }
 
-  private static final String defaultApiEndpoint = "https://api.raygun.io/entries";
-  private static final String defaultPulseEndpoint = "https://api.raygun.io/events";
-  private static IgnoredURLs ignoredURLs = new IgnoredURLs("api.raygun.io");
-  private static HashSet<String> ignoredViews = new HashSet<String>();
-
-  public static String getApiEndpoint() {
-    return defaultApiEndpoint;
+  public static String getCrashReportingEndpoint() {
+    return crashReportingEndpoint;
   }
 
-  public static String getPulseEndpoint() {
-    return defaultPulseEndpoint;
+  public static void setCrashReportingEndpoint(String crashReportingEndpoint) {
+    RaygunSettings.crashReportingEndpoint = crashReportingEndpoint;
+  }
+
+  public static String getRUMEndpoint() {
+    return rumEndpoint;
+  }
+
+  public static void setRUMEndpoint(String rumEndpoint) {
+    RaygunSettings.rumEndpoint = rumEndpoint;
   }
 
   public static HashSet<String> getIgnoredURLs() {
@@ -25,6 +48,18 @@ public class RaygunSettings {
 
   public static HashSet<String> getIgnoredViews() {
     return ignoredViews;
+  }
+
+  public static int getMaxReportsStoredOnDevice() {
+    return maxReportsStoredOnDevice;
+  }
+
+  public static void setMaxReportsStoredOnDevice(int maxReportsStoredOnDevice) {
+    if (maxReportsStoredOnDevice <= DEFAULT_MAX_REPORTS_STORED_ON_DEVICE) {
+      RaygunSettings.maxReportsStoredOnDevice = maxReportsStoredOnDevice;
+    } else {
+      RaygunLogger.w("It's not possible to exceed the value " + DEFAULT_MAX_REPORTS_STORED_ON_DEVICE + " for the number of reports stored on the device. The setting has not been applied.");
+    }
   }
 
   public static class IgnoredURLs extends HashSet<String> {

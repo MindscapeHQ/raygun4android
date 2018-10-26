@@ -9,7 +9,7 @@ import java.net.URLConnection;
 import java.net.URLStreamHandler;
 
 import main.java.com.mindscapehq.android.raygun4android.RaygunLogger;
-import main.java.com.mindscapehq.android.raygun4android.network.RaygunNetworkUtils;
+import main.java.com.mindscapehq.android.raygun4android.utils.RaygunReflectionUtils;
 
 public final class RaygunHttpUrlStreamHandler extends URLStreamHandler {
   private static final int PORT = 80;
@@ -22,7 +22,7 @@ public final class RaygunHttpUrlStreamHandler extends URLStreamHandler {
 
   protected URLConnection openConnection(URL url) throws IOException {
     try {
-      Method method = RaygunNetworkUtils.findMethod(originalHandler.getClass(), "openConnection", new Class<?>[]{ URL.class });
+      Method method = RaygunReflectionUtils.findMethod(originalHandler.getClass(), "openConnection", new Class<?>[]{ URL.class });
       method.setAccessible(true);
 
       URLConnection urlConnection = (URLConnection) method.invoke(originalHandler, url);
@@ -48,7 +48,7 @@ public final class RaygunHttpUrlStreamHandler extends URLStreamHandler {
 
   protected URLConnection openConnection(URL url, Proxy proxy) throws IOException {
     try {
-      Method method = RaygunNetworkUtils.findMethod(originalHandler.getClass(), "openConnection", new Class<?>[]{ URL.class, Proxy.class });
+      Method method = RaygunReflectionUtils.findMethod(originalHandler.getClass(), "openConnection", new Class<?>[]{ URL.class, Proxy.class });
       method.setAccessible(true);
 
       URLConnection urlConnection = (URLConnection) method.invoke(originalHandler, url, proxy);

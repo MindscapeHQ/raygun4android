@@ -28,7 +28,7 @@ public class Pulse implements ActivityLifecycleCallbacks {
         Pulse.pulse = new Pulse();
         application.registerActivityLifecycleCallbacks(Pulse.pulse);
 
-        RaygunClient.sendPulseEvent("session_start");
+        RaygunClient.sendPulseEvent(RaygunSettings.RUM_EVENT_SESSION_START);
         RaygunNetworkLogger.init();
       }
     }
@@ -57,14 +57,14 @@ public class Pulse implements ActivityLifecycleCallbacks {
         long duration = TimeUnit.NANOSECONDS.toMillis(diff);
         RaygunClient.sendPulseTimingEvent(RaygunPulseEventType.ACTIVITY_LOADED, activityName, duration);
       }
-      RaygunClient.sendPulseEvent("session_end");
+      RaygunClient.sendPulseEvent(RaygunSettings.RUM_EVENT_SESSION_END);
     }
   }
 
   @Override
   public void onActivityCreated(Activity activity, Bundle bundle) {
     if (Pulse.currentActivity == null) {
-      RaygunClient.sendPulseEvent("session_start");
+      RaygunClient.sendPulseEvent(RaygunSettings.RUM_EVENT_SESSION_START);
     }
 
     if (activity != Pulse.currentActivity) {
@@ -77,7 +77,7 @@ public class Pulse implements ActivityLifecycleCallbacks {
   @Override
   public void onActivityStarted(Activity activity) {
     if (Pulse.currentActivity == null) {
-      RaygunClient.sendPulseEvent("session_start");
+      RaygunClient.sendPulseEvent(RaygunSettings.RUM_EVENT_SESSION_START);
     }
 
     if (activity != Pulse.currentActivity) {
@@ -90,7 +90,7 @@ public class Pulse implements ActivityLifecycleCallbacks {
   @Override
   public void onActivityResumed(Activity activity) {
     if (Pulse.currentActivity == null) {
-      RaygunClient.sendPulseEvent("session_start");
+      RaygunClient.sendPulseEvent(RaygunSettings.RUM_EVENT_SESSION_START);
     }
 
     String activityName = getActivityName(activity);
@@ -116,7 +116,7 @@ public class Pulse implements ActivityLifecycleCallbacks {
     if (activity == Pulse.currentActivity) {
       Pulse.currentActivity = null;
       Pulse.loadingActivity = null;
-      RaygunClient.sendPulseEvent("session_end");
+      RaygunClient.sendPulseEvent(RaygunSettings.RUM_EVENT_SESSION_END);
     }
   }
 

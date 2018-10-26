@@ -2,7 +2,7 @@
 
 The world's best Android crash and exception reporter.
 
-Supports Android 2.3.1 (API 9 Gingerbread) through Android 8+
+Supports Android 4.1 (API 16 Jelly Bean) through Android 8+
 
 ## Installation
 
@@ -24,7 +24,7 @@ Then add the following to your **module's** build.gradle:
 dependencies {
 	...
 	compile 'com.google.code.gson:gson:2.1'
-	compile 'com.mindscapehq.android:raygun4android:3.0.5'
+	compile 'com.mindscapehq.android:raygun4android:3.0.6'
 }
 ```
 
@@ -45,7 +45,7 @@ To your pom.xml, add:
 <dependency>
     <groupId>com.mindscapehq.android</groupId>
     <artifactId>raygun4android</artifactId>
-    <version>3.0.5</version>
+    <version>3.0.6</version>
 </dependency>
 ```
 
@@ -62,6 +62,7 @@ In your IDE, build your project (or run `mvn compile`), then see the configurati
 	```xml
 	<uses-permission android:name="android.permission.INTERNET" />
 	<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+  <uses-permission android:name="android.permission.WAKE_LOCK" />
 	```
 
 2. Inside the **<application>** element, add:

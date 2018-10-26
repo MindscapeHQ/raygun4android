@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
-import android.net.ConnectivityManager;
 import android.os.Build;
 import android.os.Bundle;
 
@@ -26,6 +25,12 @@ import main.java.com.mindscapehq.android.raygun4android.messages.RaygunPulseMess
 import main.java.com.mindscapehq.android.raygun4android.messages.RaygunPulseTimingMessage;
 import main.java.com.mindscapehq.android.raygun4android.messages.RaygunUserContext;
 import main.java.com.mindscapehq.android.raygun4android.messages.RaygunUserInfo;
+import main.java.com.mindscapehq.android.raygun4android.network.RaygunNetworkUtils;
+import main.java.com.mindscapehq.android.raygun4android.services.CrashReportingPostService;
+import main.java.com.mindscapehq.android.raygun4android.services.RUMPostService;
+import main.java.com.mindscapehq.android.raygun4android.utils.RaygunFileUtils;
+import main.java.com.mindscapehq.android.raygun4android.utils.RaygunUtils;
+import main.java.com.mindscapehq.android.raygun4android.utils.RaygunFileFilter;
 
 /**
  * User: Mindscape
@@ -39,7 +44,6 @@ public class RaygunClient {
   private static String apiKey;
   private static Context context;
   private static String version;
-  private static Intent service;
   private static String appContextIdentifier;
   private static String user;
   private static RaygunUserInfo userInfo;
@@ -49,6 +53,9 @@ public class RaygunClient {
   private static Map userCustomData;
   private static String sessionId;
 
+  // region # Initialisation
+  //---------------------------------------------------------------------------------------
+
   /**
    * Initializes the Raygun client. This expects that you have placed the API key in your
    * AndroidManifest.xml, in a meta-data element.
@@ -57,7 +64,6 @@ public class RaygunClient {
   public static void init(Context context) {
     String apiKey = readApiKey(context);
     init(context, apiKey);
-    RaygunClient.appContextIdentifier = UUID.randomUUID().toString();
   }
 
   /**
@@ -94,20 +100,13 @@ public class RaygunClient {
   public static void init(Context context, String apiKey) {
     RaygunClient.apiKey = apiKey;
     RaygunClient.context = context;
+    RaygunClient.appContextIdentifier = UUID.randomUUID().toString();
 
-    String version = null;
     try {
-      version = context.getPackageManager().getPackageInfo(context.getPackageName(), 0).versionName;
-    }
-    catch (PackageManager.NameNotFoundException e) {
-      RaygunLogger.i("Couldn't read version from calling package");
-    }
-
-    if (version != null) {
-      RaygunClient.version = version;
-    }
-    else {
+      RaygunClient.version = context.getPackageManager().getPackageInfo(context.getPackageName(), 0).versionName;
+    } catch (PackageManager.NameNotFoundException e) {
       RaygunClient.version = "Not provided";
+      RaygunLogger.w("Couldn't read application version from calling package");
     }
   }
 
@@ -136,6 +135,107 @@ public class RaygunClient {
   @Deprecated public static void Init(Context context, String apiKey, String version) {
     init(context, apiKey, version);
   }
+
+  private static String readApiKey(Context context)
+  {
+    try {
+      ApplicationInfo ai = context.getPackageManager().getApplicationInfo(context.getPackageName(), PackageManager.GET_META_DATA);
+      Bundle bundle = ai.metaData;
+      return bundle.getString(RaygunSettings.APIKEY_MANIFEST_FIELD);
+    } catch (PackageManager.NameNotFoundException e) {
+      RaygunLogger.e("Couldn't read API key from your AndroidManifest.xml <meta-data /> element; cannot send: " + e.getMessage());
+    }
+    return null;
+  }
+
+  //---------------------------------------------------------------------------------------
+  // endregion
+
+  // region # Getters/Setters
+  //---------------------------------------------------------------------------------------
+
+  public static String getApiKey() {
+    return RaygunClient.apiKey;
+  }
+
+  /**
+   * Manually stores the version of your application to be transmitted with each message, for version
+   * filtering. This is normally read from your AndroidManifest.xml (the versionName attribute on manifest element)
+   * or passed in on init(); this is only provided as a convenience.
+   * @param version The version of your application, format x.x.x.x, where x is a positive integer.
+   */
+  public static void setVersion(String version) {
+    if (version != null) {
+      RaygunClient.version = version;
+    }
+  }
+
+  /**
+   * @deprecated As of release 3.0.0, replaced by {@link #setVersion(String)}
+   */
+  @Deprecated public static void SetVersion(String version) {
+    setVersion(version);
+  }
+
+  public static RaygunUncaughtExceptionHandler getExceptionHandler() { return RaygunClient.handler; }
+
+  /**
+   * @deprecated As of release 3.0.0, replaced by {@link #getExceptionHandler()}
+   */
+  @Deprecated public static RaygunUncaughtExceptionHandler GetExceptionHandler() { return getExceptionHandler(); }
+
+  public static List getTags() {
+    return RaygunClient.tags;
+  }
+
+  /**
+   * @deprecated As of release 3.0.0, replaced by {@link #getTags()}
+   */
+  @Deprecated public static List GetTags() {
+    return getTags();
+  }
+
+  public static void setTags(List tags) {
+    RaygunClient.tags = tags;
+  }
+
+  /**
+   * @deprecated As of release 3.0.0, replaced by {@link #setTags(List)}
+   */
+  @Deprecated public static void SetTags(List tags) {
+    setTags(tags);
+  }
+
+  public static Map getUserCustomData() {
+    return RaygunClient.userCustomData;
+  }
+
+  /**
+   * @deprecated As of release 3.0.0, replaced by {@link #getUserCustomData()}
+   */
+  @Deprecated public static Map GetUserCustomData() {
+    return getUserCustomData();
+  }
+
+  public static void setUserCustomData(Map userCustomData) { RaygunClient.userCustomData = userCustomData; }
+
+  /**
+   * @deprecated As of release 3.0.0, replaced by {@link #setUserCustomData(Map)}
+   */
+  @Deprecated public static void SetUserCustomData(Map userCustomData) {  setUserCustomData(userCustomData); }
+
+  public static void setOnBeforeSend(RaygunOnBeforeSend onBeforeSend) { RaygunClient.onBeforeSend = onBeforeSend; }
+
+  /**
+   * @deprecated As of release 3.0.0, replaced by {@link #setOnBeforeSend(RaygunOnBeforeSend)}
+   */
+  @Deprecated public static void SetOnBeforeSend(RaygunOnBeforeSend onBeforeSend) { setOnBeforeSend(onBeforeSend); }
+
+  //---------------------------------------------------------------------------------------
+  // endregion
+
+  // region # Attach Products
+  //---------------------------------------------------------------------------------------
 
   /**
    * Attaches a pre-built Raygun exception handler to the thread's DefaultUncaughtExceptionHandler.
@@ -213,30 +313,18 @@ public class RaygunClient {
     }
   }
 
+  //---------------------------------------------------------------------------------------
+  // endregion
+
+  // region # Send Exceptions
+  //---------------------------------------------------------------------------------------
+
   /**
    * Sends an exception-type object to Raygun.
    * @param throwable The Throwable object that occurred in your application that will be sent to Raygun.
    */
   public static void send(Throwable throwable) {
-    RaygunMessage msg = buildMessage(throwable);
-    postCachedMessages();
-
-    if (RaygunClient.tags != null) {
-      msg.getDetails().setTags(RaygunClient.tags);
-    }
-
-    if (RaygunClient.userCustomData != null) {
-      msg.getDetails().setUserCustomData(RaygunClient.userCustomData);
-    }
-
-    if (RaygunClient.onBeforeSend != null) {
-      msg = RaygunClient.onBeforeSend.onBeforeSend(msg);
-      if (msg == null) {
-        return;
-      }
-    }
-
-    spinUpService(RaygunClient.apiKey, new Gson().toJson(msg), false);
+    send(throwable, null, null);
   }
 
   /**
@@ -253,22 +341,7 @@ public class RaygunClient {
    *             This could be a build tag, lifecycle state, debug/production version etc.
    */
   public static void send(Throwable throwable, List tags) {
-    RaygunMessage msg = buildMessage(throwable);
-    msg.getDetails().setTags(mergeTags(tags));
-
-    if (RaygunClient.userCustomData != null) {
-      msg.getDetails().setUserCustomData(RaygunClient.userCustomData);
-    }
-
-    if (RaygunClient.onBeforeSend != null) {
-      msg = RaygunClient.onBeforeSend.onBeforeSend(msg);
-      if (msg == null) {
-        return;
-      }
-    }
-
-    postCachedMessages();
-    spinUpService(RaygunClient.apiKey, new Gson().toJson(msg), false);
+    send(throwable, tags, null);
   }
 
   /**
@@ -290,8 +363,13 @@ public class RaygunClient {
   public static void send(Throwable throwable, List tags, Map userCustomData) {
     RaygunMessage msg = buildMessage(throwable);
 
-    msg.getDetails().setTags(mergeTags(tags));
-    msg.getDetails().setUserCustomData(mergeUserCustomData(userCustomData));
+    if (msg == null) {
+      RaygunLogger.e("Failed to send RaygunMessage - due to invalid message being built");
+      return;
+    }
+
+    msg.getDetails().setTags(RaygunUtils.mergeLists(RaygunClient.tags, tags));
+    msg.getDetails().setUserCustomData(RaygunUtils.mergeMaps(RaygunClient.userCustomData, userCustomData));
 
     if (RaygunClient.onBeforeSend != null) {
       msg = RaygunClient.onBeforeSend.onBeforeSend(msg);
@@ -300,8 +378,8 @@ public class RaygunClient {
       }
     }
 
+    enqueueWorkForCrashReportingService(RaygunClient.apiKey, new Gson().toJson(msg));
     postCachedMessages();
-    spinUpService(RaygunClient.apiKey, new Gson().toJson(msg), false);
   }
 
   /**
@@ -310,6 +388,255 @@ public class RaygunClient {
   @Deprecated public static void Send(Throwable throwable, List tags, Map userCustomData) {
     send(throwable, tags, userCustomData);
   }
+
+  private static RaygunMessage buildMessage(Throwable throwable) {
+    try {
+      RaygunMessage msg =  RaygunMessageBuilder.instance()
+          .setEnvironmentDetails(RaygunClient.context)
+          .setMachineName(Build.MODEL)
+          .setExceptionDetails(throwable)
+          .setClientDetails()
+          .setAppContext(RaygunClient.appContextIdentifier)
+          .setVersion(RaygunClient.version)
+          .setNetworkInfo(RaygunClient.context)
+          .build();
+
+      if (RaygunClient.version != null) {
+        msg.getDetails().setVersion(RaygunClient.version);
+      }
+
+      if (RaygunClient.userInfo != null) {
+        msg.getDetails().setUserContext(RaygunClient.userInfo, RaygunClient.context);
+      }
+      else if (RaygunClient.user != null) {
+        msg.getDetails().setUserContext(RaygunClient.user);
+      }
+      else {
+        msg.getDetails().setUserContext(RaygunClient.context);
+      }
+      return msg;
+    }
+    catch (Exception e) {
+      RaygunLogger.e("Failed to build RaygunMessage - " + e);
+    }
+    return null;
+  }
+
+  private static void enqueueWorkForCrashReportingService(String apiKey, String jsonPayload) {
+    Intent intent = new Intent(RaygunClient.context, CrashReportingPostService.class);
+    intent.setAction("main.java.com.mindscapehq.android.raygun4android.intent.action.LAUNCH_CRASHREPORTING_POST_SERVICE");
+    intent.setPackage("main.java.com.mindscapehq.android.raygun4android");
+    intent.setComponent(new ComponentName(RaygunClient.context, CrashReportingPostService.class));
+
+    intent.putExtra("msg", jsonPayload);
+    intent.putExtra("apikey", apiKey);
+
+    CrashReportingPostService.enqueueWork(RaygunClient.context, intent);
+  }
+
+  //---------------------------------------------------------------------------------------
+  // endregion
+
+  // region # RUM Methods
+  //---------------------------------------------------------------------------------------
+
+  protected static void sendPulseEvent(String name) {
+    if (RaygunSettings.RUM_EVENT_SESSION_START.equals(name)) {
+      RaygunClient.sessionId = UUID.randomUUID().toString();
+    }
+
+    RaygunPulseMessage message = new RaygunPulseMessage();
+    RaygunPulseDataMessage pulseData = new RaygunPulseDataMessage();
+
+    SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+    df.setTimeZone(TimeZone.getTimeZone("UTC"));
+    Calendar c = Calendar.getInstance();
+
+    if (RaygunSettings.RUM_EVENT_SESSION_END.equals(name)) {
+      c.add(Calendar.SECOND, 2);
+    }
+
+    String timestamp = df.format(c.getTime());
+    pulseData.setTimestamp(timestamp);
+    pulseData.setVersion(RaygunClient.version);
+    pulseData.setOS("Android");
+    pulseData.setOSVersion(Build.VERSION.RELEASE);
+    pulseData.setPlatform(String.format("%s %s", Build.MANUFACTURER, Build.MODEL));
+
+    RaygunUserContext userContext;
+
+    if (RaygunClient.userInfo == null) {
+      userContext = new RaygunUserContext(new RaygunUserInfo(null, null, null, null, null, true), RaygunClient.context);
+    } else {
+      userContext = new RaygunUserContext(RaygunClient.userInfo, RaygunClient.context);
+    }
+
+    pulseData.setUser(userContext);
+
+    pulseData.setSessionId(RaygunClient.sessionId);
+    pulseData.setType(name);
+
+    message.setEventData(new RaygunPulseDataMessage[]{ pulseData });
+
+    enqueueWorkForRUMService(RaygunClient.apiKey, new Gson().toJson(message));
+    RaygunLogger.v(new Gson().toJson(message));
+  }
+
+  /**
+   * Sends a pulse timing event to Raygun. The message is sent on a background thread.
+   * @param eventType The type of event that occurred.
+   * @param name The name of the event resource such as the activity name or URL of a network call.
+   * @param milliseconds The duration of the event in milliseconds.
+   */
+  public static void sendPulseTimingEvent(RaygunPulseEventType eventType, String name, long milliseconds) {
+    if (RaygunClient.sessionId == null) {
+      sendPulseEvent(RaygunSettings.RUM_EVENT_SESSION_START);
+    }
+
+    if (eventType == RaygunPulseEventType.ACTIVITY_LOADED) {
+      if (RaygunClient.shouldIgnoreView(name)) {
+        return;
+      }
+    }
+
+    RaygunPulseMessage message = new RaygunPulseMessage();
+    RaygunPulseDataMessage dataMessage = new RaygunPulseDataMessage();
+
+    SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+    df.setTimeZone(TimeZone.getTimeZone("UTC"));
+    Calendar c = Calendar.getInstance();
+    c.add(Calendar.MILLISECOND, -(int)milliseconds);
+    String timestamp = df.format(c.getTime());
+
+    dataMessage.setTimestamp(timestamp);
+    dataMessage.setSessionId(RaygunClient.sessionId);
+    dataMessage.setVersion(RaygunClient.version);
+    dataMessage.setOS("Android");
+    dataMessage.setOSVersion(Build.VERSION.RELEASE);
+    dataMessage.setPlatform(String.format("%s %s", Build.MANUFACTURER, Build.MODEL));
+    dataMessage.setType("mobile_event_timing");
+
+    RaygunUserContext userContext;
+
+    if (RaygunClient.userInfo == null) {
+      userContext = new RaygunUserContext(new RaygunUserInfo(null, null, null, null, null, true), RaygunClient.context);
+    } else {
+      userContext = new RaygunUserContext(RaygunClient.userInfo, RaygunClient.context);
+    }
+
+    dataMessage.setUser(userContext);
+
+    RaygunPulseData data = new RaygunPulseData();
+    RaygunPulseTimingMessage timingMessage = new RaygunPulseTimingMessage();
+    timingMessage.setType(eventType == RaygunPulseEventType.ACTIVITY_LOADED ? "p" : "n");
+    timingMessage.setDuration(milliseconds);
+    data.setName(name);
+    data.setTiming(timingMessage);
+
+    RaygunPulseData[] dataArray = new RaygunPulseData[]{ data };
+    String dataStr = new Gson().toJson(dataArray);
+    dataMessage.setData(dataStr);
+
+    message.setEventData(new RaygunPulseDataMessage[]{ dataMessage });
+
+    enqueueWorkForRUMService(RaygunClient.apiKey, new Gson().toJson(message));
+
+    RaygunLogger.v(new Gson().toJson(message));
+  }
+
+  /**
+   * @deprecated As of release 3.0.0, replaced by {@link #sendPulseTimingEvent(RaygunPulseEventType,String,long)}
+   */
+  @Deprecated public static void SendPulseTimingEvent(RaygunPulseEventType eventType, String name, long milliseconds) {
+    sendPulseTimingEvent(eventType, name, milliseconds);
+  }
+
+  private static void enqueueWorkForRUMService(String apiKey, String jsonPayload) {
+    Intent intent = new Intent(RaygunClient.context, RUMPostService.class);
+    intent.setAction("main.java.com.mindscapehq.android.raygun4android.intent.action.LAUNCH_RUM_POST_SERVICE");
+    intent.setPackage("main.java.com.mindscapehq.android.raygun4android");
+    intent.setComponent(new ComponentName(RaygunClient.context, RUMPostService.class));
+
+    intent.putExtra("msg", jsonPayload);
+    intent.putExtra("apikey", apiKey);
+
+    RUMPostService.enqueueWork(RaygunClient.context, intent);
+  }
+
+  /**
+   * Allows the user to add more URLs to filter out, so network timing events are not sent for them.
+   * @param urls An array of urls to filter out by.
+   */
+  public static void ignoreURLs(String[] urls) {
+    RaygunSettings.ignoreURLs(urls);
+  }
+
+  /**
+   * Allows the user to add more views to filter out, so load timing events are not sent for them.
+   * @param views An array of activity names to filter out by.
+   */
+  public static void ignoreViews(String[] views) {
+    RaygunSettings.ignoreViews(views);
+  }
+
+  private static boolean shouldIgnoreView(String viewName) {
+    if (viewName == null) {
+      return true;
+    }
+
+    for (String ignoredView : RaygunSettings.getIgnoredViews()) {
+      if (viewName.contains(ignoredView) || ignoredView.contains(viewName)) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  //---------------------------------------------------------------------------------------
+  // endregion
+
+  private static Boolean validateApiKey(String apiKey) throws Exception {
+    if (apiKey.length() == 0) {
+      RaygunLogger.e("API key has not been provided, exception will not be logged");
+      return false;
+    }
+    else {
+      return true;
+    }
+  }
+
+  private static void postCachedMessages() {
+    if (RaygunNetworkUtils.hasInternetConnection(RaygunClient.context)) {
+      File[] fileList = RaygunClient.context.getCacheDir().listFiles(new RaygunFileFilter());
+      for (File f : fileList) {
+        try {
+          if (RaygunFileUtils.getExtension(f.getName()).equalsIgnoreCase(RaygunSettings.DEFAULT_FILE_EXTENSION)) {
+            ObjectInputStream ois = null;
+            try {
+              ois = new ObjectInputStream(new FileInputStream(f));
+              SerializedMessage serializedMessage = (SerializedMessage) ois.readObject();
+              enqueueWorkForCrashReportingService(RaygunClient.apiKey, serializedMessage.message);
+              f.delete();
+            } finally {
+              if (ois != null) {
+                ois.close();
+              }
+            }
+          }
+        } catch (FileNotFoundException e) {
+          RaygunLogger.e("Error loading cached message from filesystem - " + e.getMessage());
+        } catch (IOException e) {
+          RaygunLogger.e("Error reading cached message from filesystem - " + e.getMessage());
+        } catch (ClassNotFoundException e) {
+          RaygunLogger.e("Error in cached message from filesystem - " + e.getMessage());
+        }
+      }
+    }
+  }
+
+  // region # Post Methods
+  //---------------------------------------------------------------------------------------
 
   /**
    * Raw post method that delivers a pre-built RaygunMessage to the Raygun API. You do not need to call this method
@@ -321,7 +648,7 @@ public class RaygunClient {
   public static int post(String apiKey, String jsonPayload) {
     try {
       if (validateApiKey(apiKey)) {
-        URL endpoint = new URL(RaygunSettings.getApiEndpoint());
+        URL endpoint = new URL(RaygunSettings.getCrashReportingEndpoint());
         HttpURLConnection connection = (HttpURLConnection) endpoint.openConnection();
 
         try {
@@ -359,296 +686,11 @@ public class RaygunClient {
     return post(apiKey, jsonPayload);
   }
 
-  protected static void sendPulseEvent(String name) {
-    if ("session_start".equals(name)) {
-      RaygunClient.sessionId = UUID.randomUUID().toString();
-    }
+  //---------------------------------------------------------------------------------------
+  // endregion
 
-    RaygunPulseMessage message = new RaygunPulseMessage();
-    RaygunPulseDataMessage pulseData = new RaygunPulseDataMessage();
-
-    SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-    df.setTimeZone(TimeZone.getTimeZone("UTC"));
-    Calendar c = Calendar.getInstance();
-
-    if ("session_end".equals(name)) {
-      c.add(Calendar.SECOND, 2);
-    }
-
-    String timestamp = df.format(c.getTime());
-    pulseData.setTimestamp(timestamp);
-    pulseData.setVersion(RaygunClient.version);
-    pulseData.setOS("Android");
-    pulseData.setOSVersion(Build.VERSION.RELEASE);
-    pulseData.setPlatform(String.format("%s %s", Build.MANUFACTURER, Build.MODEL));
-
-    RaygunUserContext userContext = RaygunClient.userInfo == null ? new RaygunUserContext(new RaygunUserInfo(null, null, null, null, null, true), RaygunClient.context) : new RaygunUserContext(RaygunClient.userInfo, RaygunClient.context);
-    pulseData.setUser(userContext);
-
-    pulseData.setSessionId(RaygunClient.sessionId);
-    pulseData.setType(name);
-
-    message.setEventData(new RaygunPulseDataMessage[]{ pulseData });
-
-    spinUpService(RaygunClient.apiKey, new Gson().toJson(message), true);
-  }
-
-  /**
-   * Sends a pulse timing event to Raygun. The message is sent on a background thread.
-   * @param eventType The type of event that occurred.
-   * @param name The name of the event resource such as the activity name or URL of a network call.
-   * @param milliseconds The duration of the event in milliseconds.
-   */
-  public static void sendPulseTimingEvent(RaygunPulseEventType eventType, String name, long milliseconds) {
-    if (RaygunClient.sessionId == null) {
-      sendPulseEvent("session_start");
-    }
-
-    if (eventType == RaygunPulseEventType.ACTIVITY_LOADED) {
-      if (RaygunClient.shouldIgnoreView(name)) {
-        return;
-      }
-    }
-
-    RaygunPulseMessage message = new RaygunPulseMessage();
-    RaygunPulseDataMessage dataMessage = new RaygunPulseDataMessage();
-
-    SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-    df.setTimeZone(TimeZone.getTimeZone("UTC"));
-    Calendar c = Calendar.getInstance();
-    c.add(Calendar.MILLISECOND, -(int)milliseconds);
-    String timestamp = df.format(c.getTime());
-
-    dataMessage.setTimestamp(timestamp);
-    dataMessage.setSessionId(RaygunClient.sessionId);
-    dataMessage.setVersion(RaygunClient.version);
-    dataMessage.setOS("Android");
-    dataMessage.setOSVersion(Build.VERSION.RELEASE);
-    dataMessage.setPlatform(String.format("%s %s", Build.MANUFACTURER, Build.MODEL));
-    dataMessage.setType("mobile_event_timing");
-
-    RaygunUserContext userContext = RaygunClient.userInfo == null ? new RaygunUserContext(new RaygunUserInfo(null, null, null, null, null, true), RaygunClient.context) : new RaygunUserContext(RaygunClient.userInfo, RaygunClient.context);
-    dataMessage.setUser(userContext);
-
-    RaygunPulseData data = new RaygunPulseData();
-    RaygunPulseTimingMessage timingMessage = new RaygunPulseTimingMessage();
-    timingMessage.setType(eventType == RaygunPulseEventType.ACTIVITY_LOADED ? "p" : "n");
-    timingMessage.setDuration(milliseconds);
-    data.setName(name);
-    data.setTiming(timingMessage);
-
-    RaygunPulseData[] dataArray = new RaygunPulseData[]{ data };
-    String dataStr = new Gson().toJson(dataArray);
-    dataMessage.setData(dataStr);
-
-    message.setEventData(new RaygunPulseDataMessage[]{ dataMessage });
-
-    spinUpService(RaygunClient.apiKey, new Gson().toJson(message), true);
-  }
-
-  /**
-   * @deprecated As of release 3.0.0, replaced by {@link #sendPulseTimingEvent(RaygunPulseEventType,String,long)}
-   */
-  @Deprecated public static void SendPulseTimingEvent(RaygunPulseEventType eventType, String name, long milliseconds) {
-    sendPulseTimingEvent(eventType, name, milliseconds);
-  }
-
-  protected static int postPulseMessage(String apiKey, String jsonPayload) {
-    try {
-      if (validateApiKey(apiKey)) {
-        URL endpoint = new URL(RaygunSettings.getPulseEndpoint());
-        HttpURLConnection connection = (HttpURLConnection) endpoint.openConnection();
-
-        try {
-          connection.setRequestMethod("POST");
-          connection.setRequestProperty("X-ApiKey", apiKey);
-          connection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
-
-          OutputStream outputStream = connection.getOutputStream();
-          outputStream.write(jsonPayload.getBytes("UTF-8"));
-          outputStream.close();
-
-          int responseCode = connection.getResponseCode();
-          RaygunLogger.d("Pulse HTTP POST result: " + responseCode);
-
-          return responseCode;
-        }
-        finally {
-          if (connection != null) {
-            connection.disconnect();
-          }
-        }
-      }
-    }
-    catch (Exception e) {
-      RaygunLogger.e("Couldn't post exception - " + e.getMessage());
-      e.printStackTrace();
-    }
-    return -1;
-  }
-
-  private static boolean hasInternetConnection() {
-    if (RaygunClient.context != null) {
-      ConnectivityManager cm = (ConnectivityManager) RaygunClient.context.getSystemService(Context.CONNECTIVITY_SERVICE);
-      return cm.getActiveNetworkInfo() != null && cm.getActiveNetworkInfo().isConnectedOrConnecting();
-    }
-
-    return false;
-  }
-
-  private static RaygunMessage buildMessage(Throwable throwable) {
-    try {
-      RaygunMessage msg =  RaygunMessageBuilder.instance()
-          .setEnvironmentDetails(RaygunClient.context)
-          .setMachineName(Build.MODEL)
-          .setExceptionDetails(throwable)
-          .setClientDetails()
-          .setAppContext(RaygunClient.appContextIdentifier)
-          .setVersion(RaygunClient.version)
-          .setNetworkInfo(RaygunClient.context)
-          .build();
-
-      if (RaygunClient.version != null) {
-        msg.getDetails().setVersion(RaygunClient.version);
-      }
-
-      if (RaygunClient.userInfo != null) {
-        msg.getDetails().setUserContext(RaygunClient.userInfo, RaygunClient.context);
-      }
-      else if (RaygunClient.user != null) {
-        msg.getDetails().setUserContext(RaygunClient.user);
-      }
-      else {
-        msg.getDetails().setUserContext(RaygunClient.context);
-      }
-      return msg;
-    }
-    catch (Exception e) {
-      RaygunLogger.e("Failed to build RaygunMessage - " + e);
-    }
-    return null;
-  }
-
-  private static String readApiKey(Context context)
-  {
-    try {
-      ApplicationInfo ai = context.getPackageManager().getApplicationInfo(context.getPackageName(), PackageManager.GET_META_DATA);
-      Bundle bundle = ai.metaData;
-      return bundle.getString("com.mindscapehq.android.raygun4android.apikey");
-    }
-    catch (PackageManager.NameNotFoundException e) {
-      RaygunLogger.e("Couldn't read API key from your AndroidManifest.xml <meta-data /> element; cannot send: " + e.getMessage());
-    }
-    return null;
-  }
-
-  private static Boolean validateApiKey(String apiKey) throws Exception {
-    if (apiKey.length() == 0) {
-      RaygunLogger.e("API key has not been provided, exception will not be logged");
-      return false;
-    }
-    else {
-      return true;
-    }
-  }
-
-  private static void postCachedMessages() {
-    if (hasInternetConnection()) {
-      File[] fileList = RaygunClient.context.getCacheDir().listFiles();
-      for (File f : fileList) {
-        try {
-          String ext = getExtension(f.getName());
-          if (ext.equalsIgnoreCase("raygun")) {
-            ObjectInputStream ois = null;
-            try {
-              ois = new ObjectInputStream(new FileInputStream(f));
-              MessageApiKey messageApiKey = (MessageApiKey) ois.readObject();
-              spinUpService(messageApiKey.apiKey, messageApiKey.message, false);
-              f.delete();
-            }
-            finally {
-              if (ois != null)
-              {
-                ois.close();
-              }
-            }
-          }
-        }
-        catch (FileNotFoundException e) {
-          RaygunLogger.e("Error loading cached message from filesystem - " + e.getMessage());
-        }
-        catch (IOException e) {
-          RaygunLogger.e("Error reading cached message from filesystem - " + e.getMessage());
-        }
-        catch (ClassNotFoundException e) {
-          RaygunLogger.e("Error in cached message from filesystem - " + e.getMessage());
-        }
-      }
-    }
-  }
-
-  private static void spinUpService(String apiKey, String jsonPayload, boolean isPulse) {
-    Intent intent;
-    if (RaygunClient.service == null) {
-      intent = new Intent(RaygunClient.context, RaygunPostService.class);
-      intent.setAction("main.java.com.mindscapehq.android.raygun4android.RaygunClient.RaygunPostService");
-      intent.setPackage("main.java.com.mindscapehq.android.raygun4android.RaygunClient");
-      intent.setComponent(new ComponentName(RaygunClient.context, RaygunPostService.class));
-    }
-    else {
-      intent = RaygunClient.service;
-    }
-
-    intent.putExtra("msg", jsonPayload);
-    intent.putExtra("apikey", apiKey);
-    intent.putExtra("isPulse", isPulse ? "True" : "False");
-    RaygunClient.service = intent;
-    RaygunClient.context.startService(RaygunClient.service);
-  }
-
-  public static void closePostService() {
-    if (RaygunClient.service != null) {
-      RaygunClient.context.stopService(RaygunClient.service);
-      RaygunClient.service = null;
-    }
-  }
-
-  private static List mergeTags(List paramTags) {
-    if (RaygunClient.tags != null) {
-      List merged = new ArrayList(RaygunClient.tags);
-      merged.addAll(paramTags);
-      return merged;
-    }
-    else {
-      return paramTags;
-    }
-  }
-
-  private static Map mergeUserCustomData(Map paramUserCustomData) {
-    if (RaygunClient.userCustomData != null) {
-      Map merged = new HashMap(RaygunClient.userCustomData);
-      merged.putAll(paramUserCustomData);
-      return merged;
-    }
-    else {
-      return paramUserCustomData;
-    }
-  }
-
-  protected static String getExtension(String filename) {
-    if (filename == null) {
-      return null;
-    }
-    int separator = Math.max(filename.lastIndexOf('/'), filename.lastIndexOf('\\'));
-    int dotPos = filename.lastIndexOf(".");
-    int index =  separator > dotPos ? -1 : dotPos;
-    if (index == -1) {
-      return "";
-    }
-    else {
-      return filename.substring(index + 1);
-    }
-  }
+  // region # Unique User Tracking
+  //---------------------------------------------------------------------------------------
 
   /**
    * Sets the current user of your application. If user is an email address which is associated with a Gravatar,
@@ -674,122 +716,8 @@ public class RaygunClient {
     RaygunClient.userInfo = userInfo;
   }
 
-  /**
-   * Manually stores the version of your application to be transmitted with each message, for version
-   * filtering. This is normally read from your AndroidManifest.xml (the versionName attribute on manifest element)
-   * or passed in on init(); this is only provided as a convenience.
-   * @param version The version of your application, format x.x.x.x, where x is a positive integer.
-   */
-  public static void setVersion(String version) {
-    if (version != null) {
-      RaygunClient.version = version;
-    }
-  }
-
-  /**
-   * @deprecated As of release 3.0.0, replaced by {@link #setVersion(String)}
-   */
-  @Deprecated public static void SetVersion(String version) {
-    setVersion(version);
-  }
-
-  public static RaygunUncaughtExceptionHandler getExceptionHandler() {
-    return RaygunClient.handler;
-  }
-
-  /**
-   * @deprecated As of release 3.0.0, replaced by {@link #getExceptionHandler()}
-   */
-  @Deprecated public static RaygunUncaughtExceptionHandler GetExceptionHandler() {
-    return getExceptionHandler();
-  }
-
-  public static String getApiKey() {
-    return RaygunClient.apiKey;
-  }
-
-  public static List getTags() {
-    return RaygunClient.tags;
-  }
-
-  /**
-   * @deprecated As of release 3.0.0, replaced by {@link #getTags()}
-   */
-  @Deprecated public static List GetTags() {
-    return getTags();
-  }
-
-  public static void setTags(List tags) {
-    RaygunClient.tags = tags;
-  }
-
-  /**
-   * @deprecated As of release 3.0.0, replaced by {@link #setTags(List)}
-   */
-  @Deprecated public static void SetTags(List tags) {
-    setTags(tags);
-  }
-
-  public static Map getUserCustomData() {
-    return RaygunClient.userCustomData;
-  }
-
-  /**
-   * @deprecated As of release 3.0.0, replaced by {@link #getUserCustomData()}
-   */
-  @Deprecated public static Map GetUserCustomData() {
-    return getUserCustomData();
-  }
-
-  public static void setUserCustomData(Map userCustomData) {
-    RaygunClient.userCustomData = userCustomData;
-  }
-
-  /**
-   * @deprecated As of release 3.0.0, replaced by {@link #setUserCustomData(Map)}
-   */
-  @Deprecated public static void SetUserCustomData(Map userCustomData) {
-    setUserCustomData(userCustomData);
-  }
-
-  public static void setOnBeforeSend(RaygunOnBeforeSend onBeforeSend) {
-    RaygunClient.onBeforeSend = onBeforeSend;
-  }
-
-  /**
-   * @deprecated As of release 3.0.0, replaced by {@link #setOnBeforeSend(RaygunOnBeforeSend)}
-   */
-  @Deprecated public static void SetOnBeforeSend(RaygunOnBeforeSend onBeforeSend) {
-    setOnBeforeSend(onBeforeSend);
-  }
-
-  /**
-   * Allows the user to add more URLs to filter out, so network timing events are not sent for them.
-   * @param urls An array of urls to filter out by.
-   */
-  public static void ignoreURLs(String[] urls) {
-    RaygunSettings.ignoreURLs(urls);
-  }
-
-  /**
-   * Allows the user to add more views to filter out, so load timing events are not sent for them.
-   * @param views An array of activity names to filter out by.
-   */
-  public static void ignoreViews(String[] views) {
-    RaygunSettings.ignoreViews(views);
-  }
-
-  private static boolean shouldIgnoreView(String viewName) {
-    if (viewName == null) {
-      return true;
-    }
-    for (String ignoredView : RaygunSettings.getIgnoredViews()) {
-      if (viewName.contains(ignoredView) || ignoredView.contains(viewName)) {
-        return true;
-      }
-    }
-    return false;
-  }
+  //---------------------------------------------------------------------------------------
+  // endregion
 
   public static class RaygunUncaughtExceptionHandler implements Thread.UncaughtExceptionHandler {
     private UncaughtExceptionHandler defaultHandler;

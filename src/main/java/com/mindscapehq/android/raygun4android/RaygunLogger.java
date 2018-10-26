@@ -27,4 +27,10 @@ public class RaygunLogger {
       Log.e("Raygun4Android", string);
     }
   }
+
+  public static void v(String string) {
+    if (string != null) {
+      Log.v("Raygun4Android", string);
+    }
+  }
 }
