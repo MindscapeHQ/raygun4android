@@ -9,7 +9,6 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-
     }
 
     buildTypes {
@@ -28,9 +27,19 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_7
         targetCompatibility JavaVersion.VERSION_1_7
     }
+
+    libraryVariants.all { variant ->
+        variant.outputs.all { output ->
+            if (outputFile != null && outputFileName.endsWith('.aar')) {
+                if (variant.buildType.debuggable) {
+                    outputFileName = "raygun4android-debug.aar"
+                } else {
+                    outputFileName = "raygun4android.aar"
+                }
+            }
+        }
+    }
 }
-
-
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
