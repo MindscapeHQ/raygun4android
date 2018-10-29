@@ -2,7 +2,7 @@
 
 The world's best Android crash and exception reporter.
 
-Supports Android 4.1 (API 16 Jelly Bean) through Android 8+
+Supports Android 4.1 (Jelly Bean) through Android 8+ (Oreo)
 
 ## Installation
 
