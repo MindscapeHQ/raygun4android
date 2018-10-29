@@ -31,7 +31,6 @@ import main.java.com.mindscapehq.android.raygun4android.services.RUMPostService;
 import main.java.com.mindscapehq.android.raygun4android.utils.RaygunFileUtils;
 import main.java.com.mindscapehq.android.raygun4android.utils.RaygunUtils;
 import main.java.com.mindscapehq.android.raygun4android.utils.RaygunFileFilter;
-import main.java.com.mindscapehq.android.raygun4android.RaygunSettings;
 
 /**
  * User: Mindscape
