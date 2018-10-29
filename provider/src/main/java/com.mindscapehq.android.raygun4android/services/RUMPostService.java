@@ -38,6 +38,8 @@ public class RUMPostService extends RaygunPostService {
       String message = bundle.getString("msg");
       String apiKey = bundle.getString("apikey");
 
+      RaygunLogger.v(message);
+
       // Moved the check for internet connection as close as possible to the calls because the condition can change quite rapidly
       if (RaygunNetworkUtils.hasInternetConnection(this.getApplicationContext())) {
         postRUM(apiKey, message);

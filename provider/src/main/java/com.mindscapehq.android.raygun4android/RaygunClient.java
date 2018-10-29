@@ -481,7 +481,6 @@ public class RaygunClient {
     message.setEventData(new RaygunPulseDataMessage[]{ pulseData });
 
     enqueueWorkForRUMService(RaygunClient.apiKey, new Gson().toJson(message));
-    RaygunLogger.v(new Gson().toJson(message));
   }
 
   /**
@@ -542,8 +541,6 @@ public class RaygunClient {
     message.setEventData(new RaygunPulseDataMessage[]{ dataMessage });
 
     enqueueWorkForRUMService(RaygunClient.apiKey, new Gson().toJson(message));
-
-    RaygunLogger.v(new Gson().toJson(message));
   }
 
   /**
