@@ -1,5 +1,7 @@
 package main.java.com.mindscapehq.android.raygun4android.messages;
 
+import main.java.com.mindscapehq.android.raygun4android.RaygunSettings;
+
 public class RaygunClientMessage {
   private String version;
   private String clientUrl;
@@ -7,7 +9,7 @@ public class RaygunClientMessage {
 
   public RaygunClientMessage() {
     setName("Raygun4Android");
-    setVersion("3.0.5");
+    setVersion(RaygunSettings.RAYGUN_CLIENT_VERSION);
     setClientUrl("https://github.com/MindscapeHQ/raygun4android");
   }
 

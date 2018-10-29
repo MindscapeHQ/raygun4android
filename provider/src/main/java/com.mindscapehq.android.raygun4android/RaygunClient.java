@@ -31,6 +31,7 @@ import main.java.com.mindscapehq.android.raygun4android.services.RUMPostService;
 import main.java.com.mindscapehq.android.raygun4android.utils.RaygunFileUtils;
 import main.java.com.mindscapehq.android.raygun4android.utils.RaygunUtils;
 import main.java.com.mindscapehq.android.raygun4android.utils.RaygunFileFilter;
+import main.java.com.mindscapehq.android.raygun4android.RaygunSettings;
 
 /**
  * User: Mindscape
@@ -101,6 +102,8 @@ public class RaygunClient {
     RaygunClient.apiKey = apiKey;
     RaygunClient.context = context;
     RaygunClient.appContextIdentifier = UUID.randomUUID().toString();
+
+    RaygunLogger.d("Configuring Raygun (v"+RaygunSettings.RAYGUN_CLIENT_VERSION+")");
 
     try {
       RaygunClient.version = context.getPackageManager().getPackageInfo(context.getPackageName(), 0).versionName;

@@ -4,6 +4,7 @@ import java.util.HashSet;
 
 public class RaygunSettings {
   // General
+  public static final String RAYGUN_CLIENT_VERSION = "3.0.6";
   public static final String APIKEY_MANIFEST_FIELD = "com.mindscapehq.android.raygun4android.apikey";
 
   // Crash Reporting
