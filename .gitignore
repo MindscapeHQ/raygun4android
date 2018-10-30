@@ -39,3 +39,6 @@ output.json
 # NDK
 obj/
 .externalNativeBuild
+
+# Gradle
+gradle.properties
