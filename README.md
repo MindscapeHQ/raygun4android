@@ -23,7 +23,8 @@ Then add the following to your **module's** build.gradle:
 ```
 dependencies {
 	...
-	compile 'com.google.code.gson:gson:2.1'
+	compile 'com.google.code.gson:gson:2.8.5'
+    compile 'com.squareup.okhttp3:okhttp:3.11.0'
 	compile 'com.mindscapehq.android:raygun4android:3.0.6'
 }
 ```
@@ -51,26 +52,33 @@ To your pom.xml, add:
 
 In your IDE, build your project (or run `mvn compile`), then see the configuration section below.
 
-### With Ant, other build tools, or manually
+### With Ant, other build tools or manually
 
-[Download the JAR for the latest version](http://search.maven.org/#search%7Cga%7C1%7Ca%3A%22raygun4android%22), as well as [the Gson library](http://search.maven.org/remotecontent?filepath=com/google/code/gson/gson/2.1/gson-2.1.jar) (if you do not already use it). Place both of these in a /lib folder in your project, add them to your project's classpath, then see below.
+[Download the latest version](http://search.maven.org/#search%7Cga%7C1%7Ca%3A%22raygun4android%22), as well as the[Gson library](http://search.maven.org/remotecontent?filepath=com/google/code/gson/gson/2.8.5/gson-2.8.5.jar)and[OkHttp3 library](https://search.maven.org/remotecontent?filepath=com/squareup/okhttp3/okhttp/3.11.0/okhttp-3.11.0.jar)(if you do not already use it). Place both of these in a /lib folder in your project, add them to your project's classpath, then see below.
 
-## Configuration & Usage
+## Configuration and Usage
 
 1. In your **AndroidManifest.xml**, make sure you have granted Internet permissions. Beneath the **manifest** element add:
 
 	```xml
 	<uses-permission android:name="android.permission.INTERNET" />
 	<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-  <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
 	```
 
 2. Inside the **<application>** element, add:
 
 	```xml
-	<service android:name="main.java.com.mindscapehq.android.raygun4android.RaygunPostService"
-             android:exported="false"
-             android:process=":raygunpostservice"/>
+	<service
+        android:name="main.java.com.mindscapehq.android.raygun4android.services.CrashReportingPostService"
+        android:exported="false"
+        android:permission="android.permission.BIND_JOB_SERVICE"
+        android:process=":crashreportingpostservice"/>
+    <service
+        android:name="main.java.com.mindscapehq.android.raygun4android.services.RUMPostService"
+        android:exported="false"
+        android:permission="android.permission.BIND_JOB_SERVICE"
+        android:process=":rumpostservice"/>
     <meta-data android:name="com.mindscapehq.android.raygun4android.apikey"
                android:value="PASTE_YOUR_API_KEY_HERE" />
 	```
