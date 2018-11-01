@@ -22,10 +22,10 @@ Then add the following to your **module's** build.gradle:
 
 ```
 dependencies {
-	...
-	compile 'com.google.code.gson:gson:2.8.5'
+    // Existing dependencies may go here
+    compile 'com.google.code.gson:gson:2.8.5'
     compile 'com.squareup.okhttp3:okhttp:3.11.0'
-	compile 'com.mindscapehq.android:raygun4android:3.0.6'
+    compile 'com.mindscapehq.android:raygun4android:3.0.6'
 }
 ```
 
@@ -61,15 +61,15 @@ In your IDE, build your project (or run `mvn compile`), then see the configurati
 1. In your **AndroidManifest.xml**, make sure you have granted Internet permissions. Beneath the **manifest** element add:
 
 	```xml
-	<uses-permission android:name="android.permission.INTERNET" />
-	<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
 	```
 
 2. Inside the **<application>** element, add:
 
 	```xml
-	<service
+    <service
         android:name="main.java.com.mindscapehq.android.raygun4android.services.CrashReportingPostService"
         android:exported="false"
         android:permission="android.permission.BIND_JOB_SERVICE"
