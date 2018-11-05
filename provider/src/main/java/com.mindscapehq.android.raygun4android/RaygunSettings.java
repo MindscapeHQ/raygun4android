@@ -7,6 +7,12 @@ public class RaygunSettings {
   public static final String RAYGUN_CLIENT_VERSION = "3.0.6";
   public static final String APIKEY_MANIFEST_FIELD = "com.mindscapehq.android.raygun4android.apikey";
 
+  public static final int RESPONSE_CODE_ACCEPTED = 202;
+  public static final int RESPONSE_CODE_BAD_MESSAGE = 400;
+  public static final int RESPONSE_CODE_INVALID_API_KEY = 403;
+  public static final int RESPONSE_CODE_LARGE_PAYLOAD = 413;
+  public static final int RESPONSE_CODE_RATE_LIMITED = 429;
+
   // Crash Reporting
   private static final String DEFAULT_CRASHREPORTING_ENDPOINT = "https://api.raygun.io/entries";
   public static final String DEFAULT_FILE_EXTENSION = "raygun";
