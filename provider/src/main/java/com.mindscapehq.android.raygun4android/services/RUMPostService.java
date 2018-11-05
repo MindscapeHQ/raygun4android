@@ -42,7 +42,8 @@ public class RUMPostService extends RaygunPostService {
 
       // Moved the check for internet connection as close as possible to the calls because the condition can change quite rapidly
       if (RaygunNetworkUtils.hasInternetConnection(this.getApplicationContext())) {
-        postRUM(apiKey, message);
+        int responseCode = postRUM(apiKey, message);
+        RaygunLogger.responseCode(responseCode);
       }
     }
   }
