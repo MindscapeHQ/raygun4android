@@ -67,7 +67,7 @@ public class CrashReportingPostService extends RaygunPostService {
     }
   }
 
-  private static void SaveMessage(String message) {
+  private void SaveMessage(String message) {
     synchronized (this) {
       ArrayList<File> cachedFiles = new ArrayList<>(Arrays.asList(getCacheDir().listFiles(new RaygunFileFilter())));
 
