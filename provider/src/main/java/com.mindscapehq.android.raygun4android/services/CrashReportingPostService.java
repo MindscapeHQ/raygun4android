@@ -125,7 +125,7 @@ public class CrashReportingPostService extends RaygunPostService {
         }
       }
     } catch (Exception e) {
-      RaygunLogger.e("Can't postCrashReporting exception - " + e.getMessage());
+      RaygunLogger.e("Can't post to Crash Reporting. Exception - " + e.getMessage());
       e.printStackTrace();
     }
     return -1;
