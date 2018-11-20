@@ -23,12 +23,12 @@ Please go back to master, in which you'll find the 3.x stream of the provider th
 
 ### With Android Studio and Gradle
 
-Ensure Maven Central is present in your **project's** build.gradle:
+Ensure jcenter() is present in your **project's** build.gradle:
 
 ```gradle
 allprojects {
     repositories {
-        mavenCentral()
+        jcenter()
     }
 }
 ```
