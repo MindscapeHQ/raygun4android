@@ -50,6 +50,8 @@ public class CrashReportingPostService extends RaygunPostService {
             String message = bundle.getString("msg");
             String apiKey = bundle.getString("apikey");
 
+            RaygunLogger.v(message);
+
             // Moved the check for internet connection as close as possible to the calls because the condition can change quite rapidly
             // TODO Check for the 429 coming back from post CR
            if (RaygunNetworkUtils.hasInternetConnection(this.getApplicationContext())) {

@@ -447,8 +447,6 @@ public class RaygunClient {
             message.setEventData(new RaygunRUMDataMessage[]{dataMessage});
 
             enqueueWorkForRUMService(RaygunClient.apiKey, new Gson().toJson(message));
-
-            RaygunLogger.v(new Gson().toJson(message));
         } else {
             RaygunLogger.w("RUM is not enabled, please enable to use the sendRUMEvent() function");
         }
@@ -515,8 +513,6 @@ public class RaygunClient {
             message.setEventData(new RaygunRUMDataMessage[]{dataMessage});
 
             enqueueWorkForRUMService(RaygunClient.apiKey, new Gson().toJson(message));
-
-            RaygunLogger.v(new Gson().toJson(message));
         } else {
             RaygunLogger.w("RUM is not enabled, please enable to use the sendRUMTimingEvent() function");
         }
