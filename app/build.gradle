@@ -106,6 +106,10 @@ android {
             versionNameSuffix '-DEBUG'
         }
     }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
 
     // Setup RG tasks
     createRaygunNotifyDeploymentTask(RAYGUN_API_TOKEN, RAYGUN_API_KEY, RAYGUN_GROUP, defaultConfig.versionName, localUserName, localUserEmail)
