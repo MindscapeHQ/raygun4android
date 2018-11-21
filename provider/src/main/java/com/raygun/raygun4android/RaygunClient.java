@@ -98,11 +98,15 @@ public class RaygunClient {
         RaygunClient.apiKey = apiKey;
         RaygunClient.appContextIdentifier = UUID.randomUUID().toString();
 
-        try {
-            RaygunClient.version = getApplicationContext().getPackageManager().getPackageInfo(getApplicationContext().getPackageName(), 0).versionName;
-        } catch (PackageManager.NameNotFoundException e) {
-            RaygunClient.version = "not provided";
-            RaygunLogger.w("Couldn't read application version from calling package");
+        RaygunLogger.d("Configuring Raygun4Android (v" + RaygunSettings.RAYGUN_CLIENT_VERSION + ")");
+
+        if (RaygunClient.version == null || RaygunClient.version.trim().isEmpty()) {
+            try {
+                RaygunClient.version = getApplicationContext().getPackageManager().getPackageInfo(getApplicationContext().getPackageName(), 0).versionName;
+            } catch (PackageManager.NameNotFoundException e) {
+                RaygunClient.version = "not provided";
+                RaygunLogger.w("Couldn't read application version from calling package");
+            }
         }
 
         postCachedMessages();
@@ -117,8 +121,8 @@ public class RaygunClient {
      * @param version The version of your application, format x.x.x.x, where x is a positive integer.
      */
     public static void init(Application application, String apiKey, String version) {
-        init(application, apiKey);
         RaygunClient.version = version;
+        init(application, apiKey);
     }
 
     /**

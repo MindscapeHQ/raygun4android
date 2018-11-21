@@ -7,8 +7,9 @@ public class RaygunSettings {
 
     // General
     public static final String APIKEY_MANIFEST_FIELD = "com.raygun.raygun4android.apikey";
+    public static final String RAYGUN_CLIENT_VERSION = "4.0.0";
 
-    // Crash Reporting
+    // Crash Reportig
     private static final String DEFAULT_CRASHREPORTING_ENDPOINT = "https://api.raygun.io/entries";
     public static final String DEFAULT_FILE_EXTENSION = "raygun4";
     private static final int DEFAULT_MAX_REPORTS_STORED_ON_DEVICE = 64;

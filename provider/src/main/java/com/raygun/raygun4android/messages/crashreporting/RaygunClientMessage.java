@@ -1,5 +1,7 @@
 package com.raygun.raygun4android.messages.crashreporting;
 
+import com.raygun.raygun4android.RaygunSettings;
+
 public class RaygunClientMessage {
     private String version;
     private String clientUrl;
@@ -7,7 +9,7 @@ public class RaygunClientMessage {
 
     public RaygunClientMessage() {
         setName("Raygun4Android");
-        setVersion("4.0.0");
+        setVersion(RaygunSettings.RAYGUN_CLIENT_VERSION);
         setClientUrl("https://github.com/MindscapeHQ/raygun4android");
     }
 
