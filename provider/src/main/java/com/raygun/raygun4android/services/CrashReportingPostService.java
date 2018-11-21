@@ -53,33 +53,42 @@ public class CrashReportingPostService extends RaygunPostService {
             RaygunLogger.v(message);
 
             // Moved the check for internet connection as close as possible to the calls because the condition can change quite rapidly
-            // TODO Check for the 429 coming back from post CR
            if (RaygunNetworkUtils.hasInternetConnection(this.getApplicationContext())) {
-                postCrashReporting(apiKey, message);
+               int responseCode = postCrashReporting(apiKey, message);
+               RaygunLogger.responseCode(responseCode);
+
+               if (responseCode == RaygunSettings.RESPONSE_CODE_RATE_LIMITED) {
+                   saveMessage(message);
+               }
+
             } else if (!RaygunNetworkUtils.hasInternetConnection(this.getApplicationContext())) {
-                synchronized (this) {
-                    ArrayList<File> cachedFiles = new ArrayList<>(Arrays.asList(getCacheDir().listFiles(new RaygunFileFilter())));
+               saveMessage(message);
+           }
+        }
+    }
 
-                    if (cachedFiles.size() < RaygunSettings.getMaxReportsStoredOnDevice()) {
-                        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
-                        String uuid = UUID.randomUUID().toString().replace("-", "");
-                        String timestamp = dateFormat.format(new Date(System.currentTimeMillis()));
-                        File fn = new File(getCacheDir(), timestamp + "-" + uuid + "." + RaygunSettings.DEFAULT_FILE_EXTENSION);
+    private void saveMessage(String message) {
+        synchronized (this) {
+            ArrayList<File> cachedFiles = new ArrayList<>(Arrays.asList(getCacheDir().listFiles(new RaygunFileFilter())));
 
-                        try {
-                            SerializedMessage serializedMessage = new SerializedMessage(message);
-                            ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(fn));
-                            out.writeObject(serializedMessage);
-                            out.close();
-                        } catch (FileNotFoundException e) {
-                            RaygunLogger.e("Error creating file when caching message to filesystem - " + e.getMessage());
-                        } catch (IOException e) {
-                            RaygunLogger.e("Error writing message to filesystem - " + e.getMessage());
-                        }
-                    } else {
-                        RaygunLogger.w("Can't write crash report to local disk, maximum number of stored reports reached.");
-                    }
+            if (cachedFiles.size() < RaygunSettings.getMaxReportsStoredOnDevice()) {
+                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
+                String uuid = UUID.randomUUID().toString().replace("-", "");
+                String timestamp = dateFormat.format(new Date(System.currentTimeMillis()));
+                File fn = new File(getCacheDir(), timestamp + "-" + uuid + "." + RaygunSettings.DEFAULT_FILE_EXTENSION);
+
+                try {
+                    SerializedMessage serializedMessage = new SerializedMessage(message);
+                    ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(fn));
+                    out.writeObject(serializedMessage);
+                    out.close();
+                } catch (FileNotFoundException e) {
+                    RaygunLogger.e("Error creating file when caching message to filesystem - " + e.getMessage());
+                } catch (IOException e) {
+                    RaygunLogger.e("Error writing message to filesystem - " + e.getMessage());
                 }
+            } else {
+                RaygunLogger.w("Can't write crash report to local disk, maximum number of stored reports reached.");
             }
         }
     }
