@@ -39,3 +39,6 @@ output.json
 # NDK
 obj/
 .externalNativeBuild
+
+# Release build
+releasing/secring.gpg
