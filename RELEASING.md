@@ -7,7 +7,7 @@ The release process uses Chris Banes' library for pushing to Maven with Gradle: 
 ## Preparation
 
 Create a local `gradle.properties` file in your home directory or add to an existing one. The default is `<HOME>/.gradle/gradle.properties. It is important that the content of this file
-does not get added to any repository.
+does not get added to any repository. The file specified in the secretKeyRingFile property should also never be add to and shared in a repository.
 
 The structure to be added is:
 
@@ -31,7 +31,7 @@ VERSION_NAME=4.0.0-ALPHA1-SNAPSHOT
 VERSION_CODE=40000000
 ```
 
-It might be appropriate to also update the fields for POM_DEVELOPER_ID and POM_DEVELOPER_NAME.
+It might be appropriate to also update the fields for POM_DEVELOPER_ID and POM_DEVELOPER_NAME in certain instances. Please check with the Raygun team if you feel the need to do so.
 
 2. Run `gradle clean build uploadArchives`.
 
