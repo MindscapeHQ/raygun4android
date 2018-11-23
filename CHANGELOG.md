@@ -1,6 +1,6 @@
 ## Changelog
 
-- v4.0.0: This is major release. Overview of the most important and visible changes:
+- v4.0.0: This is a major release. Overview of the most important and visible changes:
 
   - Maven groupID for loading RG4A has changed to com.raygun
   - The build process now uses Gradle, the Maven build process has been removed without replacement
