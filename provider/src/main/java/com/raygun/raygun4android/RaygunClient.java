@@ -12,10 +12,6 @@ import android.os.Bundle;
 
 import com.google.gson.Gson;
 import com.raygun.raygun4android.messages.crashreporting.RaygunMessage;
-import com.raygun.raygun4android.messages.rum.RaygunRUMData;
-import com.raygun.raygun4android.messages.rum.RaygunRUMDataMessage;
-import com.raygun.raygun4android.messages.rum.RaygunRUMMessage;
-import com.raygun.raygun4android.messages.rum.RaygunRUMTimingMessage;
 import com.raygun.raygun4android.messages.shared.RaygunUserInfo;
 import com.raygun.raygun4android.network.RaygunNetworkUtils;
 import com.raygun.raygun4android.services.CrashReportingPostService;
@@ -29,13 +25,10 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.lang.Thread.UncaughtExceptionHandler;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.TimeZone;
 import java.util.UUID;
 
 /**
@@ -280,6 +273,10 @@ public class RaygunClient {
         }
     }
 
+    public static String getVersion() {
+        return RaygunClient.version;
+    }
+
     public static RaygunUncaughtExceptionHandler getExceptionHandler() {
         return RaygunClient.handler;
     }
@@ -372,7 +369,7 @@ public class RaygunClient {
         RaygunSettings.setMaxReportsStoredOnDevice(maxReportsStoredOnDevice);
     }
 
-    private static boolean isCrashReportingEnabled() {
+    public static boolean isCrashReportingEnabled() {
         return crashReportingEnabled;
     }
 
@@ -381,7 +378,7 @@ public class RaygunClient {
         attachExceptionHandler();
     }
 
-    private static boolean isRUMEnabled() {
+    public static boolean isRUMEnabled() {
         return RUMEnabled;
     }
 
@@ -409,112 +406,6 @@ public class RaygunClient {
         RUM.attach(activity, networkLogging);
         if (RaygunClient.userInfo != null) {
             RUM.updateCurrentSessionUser(RaygunClient.userInfo);
-        }
-    }
-
-    /**
-     * Sends a RUM event to Raygun. The message is sent on a background thread.
-     *
-     * @param eventName Tracks if this is a session start or session end event.
-     */
-    protected static void sendRUMEvent(String eventName, RaygunUserInfo userInfo) {
-
-        if (RaygunClient.isRUMEnabled()) {
-
-            RaygunRUMMessage message = new RaygunRUMMessage();
-            RaygunRUMDataMessage dataMessage = new RaygunRUMDataMessage();
-
-            dataMessage.setType(eventName);
-
-            SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-            df.setTimeZone(TimeZone.getTimeZone("UTC"));
-            Calendar c = Calendar.getInstance();
-            if (RaygunSettings.RUM_EVENT_SESSION_END.equals(eventName)) {
-                c.add(Calendar.SECOND, 2);
-            }
-            String timestamp = df.format(c.getTime());
-            dataMessage.setTimestamp(timestamp);
-
-            dataMessage.setSessionId(RUM.sessionId);
-            dataMessage.setVersion(RaygunClient.version);
-            dataMessage.setOS("Android");
-            dataMessage.setOSVersion(Build.VERSION.RELEASE);
-            dataMessage.setPlatform(String.format("%s %s", Build.MANUFACTURER, Build.MODEL));
-
-            RaygunUserInfo user = userInfo == null ? new RaygunUserInfo(null, null, null, null) : userInfo;
-            dataMessage.setUser(user);
-
-            message.setEventData(new RaygunRUMDataMessage[]{dataMessage});
-
-            enqueueWorkForRUMService(RaygunClient.apiKey, new Gson().toJson(message));
-        } else {
-            RaygunLogger.w("RUM is not enabled, please enable to use the sendRUMEvent() function");
-        }
-    }
-
-    private static void sendRUMEvent(String eventName) {
-        RaygunUserInfo user = RaygunClient.userInfo == null ? new RaygunUserInfo(null, null, null, null) : RaygunClient.userInfo;
-        sendRUMEvent(eventName, user);
-    }
-
-    /**
-     * Sends a RUM timing event to Raygun. The message is sent on a background thread.
-     *
-     * @param eventType    The type of event that occurred.
-     * @param name         The name of the event resource such as the activity name or URL of a network call.
-     * @param milliseconds The duration of the event in milliseconds.
-     */
-    public static void sendRUMTimingEvent(RaygunRUMEventType eventType, String name, long milliseconds) {
-
-        if (RaygunClient.isRUMEnabled()) {
-            if (RUM.sessionId == null) {
-                RUM.sessionId = UUID.randomUUID().toString();
-                sendRUMEvent(RaygunSettings.RUM_EVENT_SESSION_START);
-            }
-
-            if (eventType == RaygunRUMEventType.ACTIVITY_LOADED) {
-                if (RaygunClient.shouldIgnoreView(name)) {
-                    return;
-                }
-            }
-
-            RaygunRUMMessage message = new RaygunRUMMessage();
-            RaygunRUMDataMessage dataMessage = new RaygunRUMDataMessage();
-
-            dataMessage.setType(RaygunSettings.RUM_EVENT_TIMING);
-
-            SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-            df.setTimeZone(TimeZone.getTimeZone("UTC"));
-            Calendar c = Calendar.getInstance();
-            c.add(Calendar.MILLISECOND, -(int) milliseconds);
-            String timestamp = df.format(c.getTime());
-            dataMessage.setTimestamp(timestamp);
-
-            dataMessage.setSessionId(RUM.sessionId);
-            dataMessage.setVersion(RaygunClient.version);
-            dataMessage.setOS("Android");
-            dataMessage.setOSVersion(Build.VERSION.RELEASE);
-            dataMessage.setPlatform(String.format("%s %s", Build.MANUFACTURER, Build.MODEL));
-
-            RaygunUserInfo user = RaygunClient.userInfo == null ? new RaygunUserInfo(null, null, null, null) : RaygunClient.userInfo;
-            dataMessage.setUser(user);
-
-            RaygunRUMData data = new RaygunRUMData();
-            RaygunRUMTimingMessage timingMessage = new RaygunRUMTimingMessage();
-            timingMessage.setType(eventType == RaygunRUMEventType.ACTIVITY_LOADED ? "p" : "n");
-            timingMessage.setDuration(milliseconds);
-            data.setName(name);
-            data.setTiming(timingMessage);
-
-            RaygunRUMData[] dataArray = new RaygunRUMData[]{data};
-            String dataStr = new Gson().toJson(dataArray);
-            dataMessage.setData(dataStr);
-
-            message.setEventData(new RaygunRUMDataMessage[]{dataMessage});
-
-            enqueueWorkForRUMService(RaygunClient.apiKey, new Gson().toJson(message));
-        } else {
-            RaygunLogger.w("RUM is not enabled, please enable to use the sendRUMTimingEvent() function");
         }
     }
 
@@ -586,7 +477,7 @@ public class RaygunClient {
         }
     }
 
-    private static void enqueueWorkForRUMService(String apiKey, String jsonPayload) {
+    static void enqueueWorkForRUMService(String apiKey, String jsonPayload) {
         Intent intent = new Intent(getApplicationContext(), RUMPostService.class);
         intent.setAction("com.raygun.raygun4android.intent.action.LAUNCH_RUM_POST_SERVICE");
         intent.setPackage("com.raygun.raygun4android");
@@ -598,7 +489,7 @@ public class RaygunClient {
         RUMPostService.enqueueWork(getApplicationContext(), intent);
     }
 
-    private static void enqueueWorkForCrashReportingService(String apiKey, String jsonPayload) {
+    static void enqueueWorkForCrashReportingService(String apiKey, String jsonPayload) {
         Intent intent = new Intent(getApplicationContext(), CrashReportingPostService.class);
         intent.setAction("com.raygun.raygun4android.intent.action.LAUNCH_CRASHREPORTING_POST_SERVICE");
         intent.setPackage("com.raygun.raygun4android");
@@ -630,18 +521,6 @@ public class RaygunClient {
         }
     }
 
-
-    private static boolean shouldIgnoreView(String viewName) {
-        if (viewName == null) {
-            return true;
-        }
-        for (String ignoredView : RaygunSettings.getIgnoredViews()) {
-            if (viewName.contains(ignoredView) || ignoredView.contains(viewName)) {
-                return true;
-            }
-        }
-        return false;
-    }
 
     /**
      * Returns the current Application's context.
