@@ -84,124 +84,6 @@ public class RUM implements ActivityLifecycleCallbacks {
         RUM.lastSeenTime = System.currentTimeMillis();
     }
 
-    /**
-     * Sends a RUM event to Raygun. The message is sent on a background thread.
-     *
-     * @param eventName Tracks if this is a session start or session end event.
-     */
-    private static void sendRUMEvent(String eventName, RaygunUserInfo userInfo) {
-
-        if (RaygunClient.isRUMEnabled()) {
-
-            RaygunRUMMessage message = new RaygunRUMMessage();
-            RaygunRUMDataMessage dataMessage = new RaygunRUMDataMessage();
-
-            dataMessage.setType(eventName);
-
-            SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-            df.setTimeZone(TimeZone.getTimeZone("UTC"));
-            Calendar c = Calendar.getInstance();
-            if (RaygunSettings.RUM_EVENT_SESSION_END.equals(eventName)) {
-                c.add(Calendar.SECOND, 2);
-            }
-            String timestamp = df.format(c.getTime());
-            dataMessage.setTimestamp(timestamp);
-
-            dataMessage.setSessionId(sessionId);
-            dataMessage.setVersion(RaygunClient.getVersion());
-            dataMessage.setOS("Android");
-            dataMessage.setOSVersion(Build.VERSION.RELEASE);
-            dataMessage.setPlatform(String.format("%s %s", Build.MANUFACTURER, Build.MODEL));
-
-            RaygunUserInfo user = userInfo == null ? new RaygunUserInfo(null, null, null, null) : userInfo;
-            dataMessage.setUser(user);
-
-            message.setEventData(new RaygunRUMDataMessage[]{dataMessage});
-
-            RaygunClient.enqueueWorkForRUMService(RaygunClient.getApiKey(), new Gson().toJson(message));
-        } else {
-            RaygunLogger.w("RUM is not enabled, please enable to use the sendRUMEvent() function");
-        }
-    }
-
-    private static void sendRUMEvent(String eventName) {
-        RaygunUserInfo user = RaygunClient.getUser() == null ? new RaygunUserInfo(null, null, null, null) : RaygunClient.getUser();
-        sendRUMEvent(eventName, user);
-    }
-
-    /**
-     * Sends a RUM timing event to Raygun. The message is sent on a background thread.
-     *
-     * @param eventType    The type of event that occurred.
-     * @param name         The name of the event resource such as the activity name or URL of a network call.
-     * @param milliseconds The duration of the event in milliseconds.
-     */
-    public static void sendRUMTimingEvent(RaygunRUMEventType eventType, String name, long milliseconds) {
-
-        if (RaygunClient.isRUMEnabled()) {
-            if (sessionId == null) {
-                sessionId = UUID.randomUUID().toString();
-                sendRUMEvent(RaygunSettings.RUM_EVENT_SESSION_START);
-            }
-
-            if (eventType == RaygunRUMEventType.ACTIVITY_LOADED) {
-                if (shouldIgnoreView(name)) {
-                    return;
-                }
-            }
-
-            RaygunRUMMessage message = new RaygunRUMMessage();
-            RaygunRUMDataMessage dataMessage = new RaygunRUMDataMessage();
-
-            dataMessage.setType(RaygunSettings.RUM_EVENT_TIMING);
-
-            SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-            df.setTimeZone(TimeZone.getTimeZone("UTC"));
-            Calendar c = Calendar.getInstance();
-            c.add(Calendar.MILLISECOND, -(int) milliseconds);
-            String timestamp = df.format(c.getTime());
-            dataMessage.setTimestamp(timestamp);
-
-            dataMessage.setSessionId(sessionId);
-            dataMessage.setVersion(RaygunClient.getVersion());
-            dataMessage.setOS("Android");
-            dataMessage.setOSVersion(Build.VERSION.RELEASE);
-            dataMessage.setPlatform(String.format("%s %s", Build.MANUFACTURER, Build.MODEL));
-
-            RaygunUserInfo user = RaygunClient.getUser() == null ? new RaygunUserInfo(null, null, null, null) : RaygunClient.getUser();
-            dataMessage.setUser(user);
-
-            RaygunRUMData data = new RaygunRUMData();
-            RaygunRUMTimingMessage timingMessage = new RaygunRUMTimingMessage();
-            timingMessage.setType(eventType == RaygunRUMEventType.ACTIVITY_LOADED ? "p" : "n");
-            timingMessage.setDuration(milliseconds);
-            data.setName(name);
-            data.setTiming(timingMessage);
-
-            RaygunRUMData[] dataArray = new RaygunRUMData[]{data};
-            String dataStr = new Gson().toJson(dataArray);
-            dataMessage.setData(dataStr);
-
-            message.setEventData(new RaygunRUMDataMessage[]{dataMessage});
-
-            RaygunClient.enqueueWorkForRUMService(RaygunClient.getApiKey(), new Gson().toJson(message));
-        } else {
-            RaygunLogger.w("RUM is not enabled, please enable to use the sendRUMTimingEvent() function");
-        }
-    }
-
-    private static boolean shouldIgnoreView(String viewName) {
-        if (viewName == null) {
-            return true;
-        }
-        for (String ignoredView : RaygunSettings.getIgnoredViews()) {
-            if (viewName.contains(ignoredView) || ignoredView.contains(viewName)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     @Override
     public void onActivityCreated(Activity activity, Bundle bundle) {
         RaygunLogger.v("onActivityCreated");
@@ -315,5 +197,119 @@ public class RUM implements ActivityLifecycleCallbacks {
             }
         }
         RUM.currentSessionUser = userInfo;
+    }
+
+    /**
+     * Sends a RUM event to Raygun. The message is sent on a background thread.
+     *
+     * @param eventName Tracks if this is a session start or session end event.
+     */
+    private static void sendRUMEvent(String eventName, RaygunUserInfo userInfo) {
+
+        if (RaygunClient.isRUMEnabled()) {
+
+            SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+            df.setTimeZone(TimeZone.getTimeZone("UTC"));
+            Calendar c = Calendar.getInstance();
+            if (RaygunSettings.RUM_EVENT_SESSION_END.equals(eventName)) {
+                c.add(Calendar.SECOND, 2);
+            }
+            String timestamp = df.format(c.getTime());
+
+            RaygunUserInfo user = userInfo == null ? new RaygunUserInfo(null, null, null, null) : userInfo;
+
+            RaygunRUMDataMessage dataMessage = new RaygunRUMDataMessage.Builder(eventName)
+                .timestamp(timestamp)
+                .sessionId(sessionId)
+                .version(RaygunClient.getVersion())
+                .os("Android")
+                .osVersion(Build.VERSION.RELEASE)
+                .platform(String.format("%s %s", Build.MANUFACTURER, Build.MODEL))
+                .user(user)
+                .build();
+
+            RaygunRUMMessage message = new RaygunRUMMessage();
+            message.setEventData(new RaygunRUMDataMessage[]{dataMessage});
+
+            RaygunClient.enqueueWorkForRUMService(RaygunClient.getApiKey(), new Gson().toJson(message));
+        } else {
+            RaygunLogger.w("RUM is not enabled, please enable to use the sendRUMEvent() function");
+        }
+    }
+
+    private static void sendRUMEvent(String eventName) {
+        RaygunUserInfo user = RaygunClient.getUser() == null ? new RaygunUserInfo(null, null, null, null) : RaygunClient.getUser();
+        sendRUMEvent(eventName, user);
+    }
+
+    /**
+     * Sends a RUM timing event to Raygun. The message is sent on a background thread.
+     *
+     * @param eventType    The type of event that occurred.
+     * @param name         The name of the event resource such as the activity name or URL of a network call.
+     * @param milliseconds The duration of the event in milliseconds.
+     */
+    public static void sendRUMTimingEvent(RaygunRUMEventType eventType, String name, long milliseconds) {
+
+        if (RaygunClient.isRUMEnabled()) {
+            if (sessionId == null) {
+                sessionId = UUID.randomUUID().toString();
+                sendRUMEvent(RaygunSettings.RUM_EVENT_SESSION_START);
+            }
+
+            if (eventType == RaygunRUMEventType.ACTIVITY_LOADED) {
+                if (shouldIgnoreView(name)) {
+                    return;
+                }
+            }
+
+            SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+            df.setTimeZone(TimeZone.getTimeZone("UTC"));
+            Calendar c = Calendar.getInstance();
+            c.add(Calendar.MILLISECOND, -(int) milliseconds);
+            String timestamp = df.format(c.getTime());
+
+            RaygunUserInfo user = RaygunClient.getUser() == null ? new RaygunUserInfo(null, null, null, null) : RaygunClient.getUser();
+
+            RaygunRUMData data = new RaygunRUMData();
+            RaygunRUMTimingMessage timingMessage = new RaygunRUMTimingMessage();
+            timingMessage.setType(eventType == RaygunRUMEventType.ACTIVITY_LOADED ? "p" : "n");
+            timingMessage.setDuration(milliseconds);
+            data.setName(name);
+            data.setTiming(timingMessage);
+
+            RaygunRUMData[] dataArray = new RaygunRUMData[]{data};
+            String dataStr = new Gson().toJson(dataArray);
+
+            RaygunRUMDataMessage dataMessage = new RaygunRUMDataMessage.Builder(RaygunSettings.RUM_EVENT_TIMING)
+                .timestamp(timestamp)
+                .sessionId(sessionId)
+                .version(RaygunClient.getVersion())
+                .os("Android")
+                .osVersion(Build.VERSION.RELEASE)
+                .platform(String.format("%s %s", Build.MANUFACTURER, Build.MODEL))
+                .user(user)
+                .data(dataStr)
+                .build();
+
+            RaygunRUMMessage message = new RaygunRUMMessage();
+            message.setEventData(new RaygunRUMDataMessage[]{dataMessage});
+
+            RaygunClient.enqueueWorkForRUMService(RaygunClient.getApiKey(), new Gson().toJson(message));
+        } else {
+            RaygunLogger.w("RUM is not enabled, please enable to use the sendRUMTimingEvent() function");
+        }
+    }
+
+    private static boolean shouldIgnoreView(String viewName) {
+        if (viewName == null) {
+            return true;
+        }
+        for (String ignoredView : RaygunSettings.getIgnoredViews()) {
+            if (viewName.contains(ignoredView) || ignoredView.contains(viewName)) {
+                return true;
+            }
+        }
+        return false;
     }
 }
