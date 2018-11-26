@@ -335,7 +335,7 @@ public class RaygunClient {
         if (url != null && !url.isEmpty()) {
             RaygunSettings.setCrashReportingEndpoint(url);
         } else {
-            RaygunLogger.w("A custom crash reporting endpoint can't be null or empty. Custom endpoint has NOT been applied");
+            RaygunLogger.w("A custom crash reporting endpoint can't be null or empty. Custom endpoint has NOT been applied and default will be used.");
         }
     }
 
@@ -348,7 +348,7 @@ public class RaygunClient {
         if (url != null && !url.isEmpty()) {
             RaygunSettings.setRUMEndpoint(url);
         } else {
-            RaygunLogger.w("A custom RUM endpoint can't be null or empty. Custom endpoint has NOT been applied");
+            RaygunLogger.w("A custom RUM endpoint can't be null or empty. Custom endpoint has NOT been applied and default will be used.");
         }
     }
 
