@@ -45,7 +45,7 @@ EMAIL: {to be provided}
 PASSWORD: {to be provided}
 ````
 
-3. Click generate key and do not upload the public key. To export the secring file needed to sign the archives run the following command:
+3. Click generate key and do upload the public key. To export the secring file needed to sign the archives run the following command:
 
 ````
 gpg --export-secret-keys -o secring.gpg
