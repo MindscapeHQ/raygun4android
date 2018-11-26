@@ -4,19 +4,27 @@ public class RaygunRUMTimingMessage {
     private String type;
     private long duration;
 
-    public String getType() {
-        return type;
+    public static class Builder {
+
+        private String type;
+        private long duration;
+
+        public Builder(String type) {
+            this.type = type;
+        }
+
+        public Builder duration(long duration) {
+            this.duration = duration;
+            return this;
+        }
+
+        public RaygunRUMTimingMessage build() {
+            return new RaygunRUMTimingMessage(this);
+        }
     }
 
-    public void setType(String type) {
-        this.type = type;
-    }
-
-    public long getDuration() {
-        return duration;
-    }
-
-    public void setDuration(long milliseconds) {
-        this.duration = milliseconds;
+    private RaygunRUMTimingMessage(Builder builder) {
+        type = builder.type;
+        duration = builder.duration;
     }
 }

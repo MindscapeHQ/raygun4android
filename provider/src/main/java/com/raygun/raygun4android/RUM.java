@@ -271,12 +271,13 @@ public class RUM implements ActivityLifecycleCallbacks {
 
             RaygunUserInfo user = RaygunClient.getUser() == null ? new RaygunUserInfo(null, null, null, null) : RaygunClient.getUser();
 
-            RaygunRUMData data = new RaygunRUMData();
-            RaygunRUMTimingMessage timingMessage = new RaygunRUMTimingMessage();
-            timingMessage.setType(eventType == RaygunRUMEventType.ACTIVITY_LOADED ? "p" : "n");
-            timingMessage.setDuration(milliseconds);
-            data.setName(name);
-            data.setTiming(timingMessage);
+            RaygunRUMTimingMessage timingMessage = new RaygunRUMTimingMessage.Builder(eventType == RaygunRUMEventType.ACTIVITY_LOADED ? "p" : "n")
+                .duration(milliseconds)
+                .build();
+
+            RaygunRUMData data = new RaygunRUMData.Builder(name)
+                .timing(timingMessage)
+                .build();
 
             RaygunRUMData[] dataArray = new RaygunRUMData[]{data};
             String dataStr = new Gson().toJson(dataArray);

@@ -4,19 +4,27 @@ public class RaygunRUMData {
     private String name;
     private RaygunRUMTimingMessage timing;
 
-    public String getName() {
-        return name;
+    public static class Builder {
+
+        private String name;
+        private RaygunRUMTimingMessage timing;
+
+        public Builder(String name) {
+            this.name = name;
+        }
+
+        public Builder timing(RaygunRUMTimingMessage timing) {
+            this.timing = timing;
+            return this;
+        }
+
+        public RaygunRUMData build() {
+            return new RaygunRUMData(this);
+        }
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public RaygunRUMTimingMessage getTiming() {
-        return timing;
-    }
-
-    public void setTiming(RaygunRUMTimingMessage timing) {
-        this.timing = timing;
+    private RaygunRUMData(Builder builder) {
+        name = builder.name;
+        timing = builder.timing;
     }
 }
