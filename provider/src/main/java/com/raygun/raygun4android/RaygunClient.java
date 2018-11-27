@@ -18,6 +18,7 @@ import com.raygun.raygun4android.services.CrashReportingPostService;
 import com.raygun.raygun4android.services.RUMPostService;
 import com.raygun.raygun4android.utils.RaygunFileFilter;
 import com.raygun.raygun4android.utils.RaygunFileUtils;
+import com.raygun.raygun4android.utils.RaygunUtils;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -136,30 +137,7 @@ public class RaygunClient {
      * @param throwable The Throwable object that occurred in your application that will be sent to Raygun.
      */
     public static void send(Throwable throwable) {
-        if (RaygunClient.isCrashReportingEnabled()) {
-
-            RaygunMessage msg = buildMessage(throwable);
-
-            if (RaygunClient.tags != null) {
-                msg.getDetails().setTags(RaygunClient.tags);
-            }
-
-            if (RaygunClient.userCustomData != null) {
-                msg.getDetails().setUserCustomData(RaygunClient.userCustomData);
-            }
-
-            if (RaygunClient.onBeforeSend != null) {
-                msg = RaygunClient.onBeforeSend.onBeforeSend(msg);
-                if (msg == null) {
-                    return;
-                }
-            }
-
-            enqueueWorkForCrashReportingService(RaygunClient.apiKey, new Gson().toJson(msg));
-            postCachedMessages();
-        } else {
-            RaygunLogger.w("Crash Reporting is not enabled, please enable to use the send() function");
-        }
+        send(throwable, null, null);
     }
 
     /**
@@ -170,27 +148,7 @@ public class RaygunClient {
      *                  This could be a build tag, lifecycle state, debug/production version etc.
      */
     public static void send(Throwable throwable, List tags) {
-        if (RaygunClient.isCrashReportingEnabled()) {
-
-            RaygunMessage msg = buildMessage(throwable);
-            msg.getDetails().setTags(mergeTags(tags));
-
-            if (RaygunClient.userCustomData != null) {
-                msg.getDetails().setUserCustomData(RaygunClient.userCustomData);
-            }
-
-            if (RaygunClient.onBeforeSend != null) {
-                msg = RaygunClient.onBeforeSend.onBeforeSend(msg);
-                if (msg == null) {
-                    return;
-                }
-            }
-
-            enqueueWorkForCrashReportingService(RaygunClient.apiKey, new Gson().toJson(msg));
-            postCachedMessages();
-        } else {
-            RaygunLogger.w("Crash Reporting is not enabled, please enable to use the send() function");
-        }
+        send(throwable, tags, null);
     }
 
     /**
@@ -207,8 +165,13 @@ public class RaygunClient {
 
             RaygunMessage msg = buildMessage(throwable);
 
-            msg.getDetails().setTags(mergeTags(tags));
-            msg.getDetails().setUserCustomData(mergeUserCustomData(userCustomData));
+            if (msg == null) {
+                RaygunLogger.e("Failed to send RaygunMessage - due to invalid message being built");
+                return;
+            }
+
+            msg.getDetails().setTags(RaygunUtils.mergeLists(RaygunClient.tags, tags));
+            msg.getDetails().setUserCustomData(RaygunUtils.mergeMaps(RaygunClient.userCustomData, userCustomData));
 
             if (RaygunClient.onBeforeSend != null) {
                 msg = RaygunClient.onBeforeSend.onBeforeSend(msg);
