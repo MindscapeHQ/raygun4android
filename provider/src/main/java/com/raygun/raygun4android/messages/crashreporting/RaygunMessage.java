@@ -1,6 +1,10 @@
 package com.raygun.raygun4android.messages.crashreporting;
 
+import android.os.Build;
+
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Calendar;
 import java.util.TimeZone;
 
@@ -10,9 +14,15 @@ public class RaygunMessage {
 
     public RaygunMessage() {
         details = new RaygunMessageDetails();
-        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-        df.setTimeZone(TimeZone.getTimeZone("UTC"));
-        occurredOn = df.format(Calendar.getInstance().getTime());
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            LocalDateTime utcDateTime = LocalDateTime.now(ZoneId.of("UTC"));
+            occurredOn = utcDateTime.toString();
+        } else {
+            SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+            df.setTimeZone(TimeZone.getTimeZone("UTC"));
+            occurredOn = df.format(Calendar.getInstance().getTime());
+        }
     }
 
     public RaygunMessageDetails getDetails() {
@@ -27,7 +37,7 @@ public class RaygunMessage {
         return occurredOn;
     }
 
-    public void setOccurredOn(String _occurredOn) {
-        this.occurredOn = _occurredOn;
+    public void setOccurredOn(String occurredOn) {
+        this.occurredOn = occurredOn;
     }
 }

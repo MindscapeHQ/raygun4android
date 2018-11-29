@@ -7,6 +7,9 @@ import android.os.Build;
 import android.os.Bundle;
 
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 import java.util.Calendar;
 import java.util.TimeZone;
 import java.util.UUID;
@@ -208,13 +211,23 @@ public class RUM implements ActivityLifecycleCallbacks {
 
         if (RaygunClient.isRUMEnabled()) {
 
-            SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-            df.setTimeZone(TimeZone.getTimeZone("UTC"));
-            Calendar c = Calendar.getInstance();
-            if (RaygunSettings.RUM_EVENT_SESSION_END.equals(eventName)) {
-                c.add(Calendar.SECOND, 2);
+            String timestamp;
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                LocalDateTime utcDateTime = LocalDateTime.now(ZoneId.of("UTC"));
+                if (RaygunSettings.RUM_EVENT_SESSION_END.equals(eventName)) {
+                    utcDateTime.plus(2, ChronoUnit.SECONDS);
+                }
+                timestamp = utcDateTime.toString();
+            } else {
+                SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+                df.setTimeZone(TimeZone.getTimeZone("UTC"));
+                Calendar c = Calendar.getInstance();
+                if (RaygunSettings.RUM_EVENT_SESSION_END.equals(eventName)) {
+                    c.add(Calendar.SECOND, 2);
+                }
+                timestamp = df.format(c.getTime());
             }
-            String timestamp = df.format(c.getTime());
 
             RaygunUserInfo user = userInfo == null ? new RaygunUserInfo(null, null, null, null) : userInfo;
 
@@ -263,11 +276,19 @@ public class RUM implements ActivityLifecycleCallbacks {
                 }
             }
 
-            SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-            df.setTimeZone(TimeZone.getTimeZone("UTC"));
-            Calendar c = Calendar.getInstance();
-            c.add(Calendar.MILLISECOND, -(int) milliseconds);
-            String timestamp = df.format(c.getTime());
+            String timestamp;
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                LocalDateTime utcDateTime = LocalDateTime.now(ZoneId.of("UTC"));
+                utcDateTime.minus(milliseconds, ChronoUnit.MILLIS);
+                timestamp = utcDateTime.toString();
+            } else {
+                SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+                df.setTimeZone(TimeZone.getTimeZone("UTC"));
+                Calendar c = Calendar.getInstance();
+                c.add(Calendar.MILLISECOND, -(int) milliseconds);
+                timestamp = df.format(c.getTime());
+            }
 
             RaygunUserInfo user = RaygunClient.getUser() == null ? new RaygunUserInfo(null, null, null, null) : RaygunClient.getUser();
 
