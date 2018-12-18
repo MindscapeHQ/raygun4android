@@ -3,6 +3,8 @@ package com.raygun.raygun4android;
 import android.app.Activity;
 import android.app.Application;
 import android.app.Application.ActivityLifecycleCallbacks;
+import android.content.ComponentName;
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 
@@ -22,6 +24,7 @@ import com.raygun.raygun4android.messages.rum.RaygunRUMMessage;
 import com.raygun.raygun4android.messages.rum.RaygunRUMTimingMessage;
 import com.raygun.raygun4android.messages.shared.RaygunUserInfo;
 import com.raygun.raygun4android.network.RaygunNetworkLogger;
+import com.raygun.raygun4android.services.RUMPostService;
 
 public class RUM implements ActivityLifecycleCallbacks {
     private static RUM rum;
@@ -85,6 +88,18 @@ public class RUM implements ActivityLifecycleCallbacks {
         }
 
         RUM.lastSeenTime = System.currentTimeMillis();
+    }
+
+    private static void enqueueWorkForRUMService(String apiKey, String jsonPayload) {
+        Intent intent = new Intent(RaygunClient.getApplicationContext(), RUMPostService.class);
+        intent.setAction("com.raygun.raygun4android.intent.action.LAUNCH_RUM_POST_SERVICE");
+        intent.setPackage("com.raygun.raygun4android");
+        intent.setComponent(new ComponentName(RaygunClient.getApplicationContext(), RUMPostService.class));
+
+        intent.putExtra("msg", jsonPayload);
+        intent.putExtra("apikey", apiKey);
+
+        RUMPostService.enqueueWork(RaygunClient.getApplicationContext(), intent);
     }
 
     @Override
@@ -244,7 +259,7 @@ public class RUM implements ActivityLifecycleCallbacks {
             RaygunRUMMessage message = new RaygunRUMMessage();
             message.setEventData(new RaygunRUMDataMessage[]{dataMessage});
 
-            RaygunClient.enqueueWorkForRUMService(RaygunClient.getApiKey(), new Gson().toJson(message));
+            enqueueWorkForRUMService(RaygunClient.getApiKey(), new Gson().toJson(message));
         } else {
             RaygunLogger.w("RUM is not enabled, please enable to use the sendRUMEvent() function");
         }
@@ -317,7 +332,7 @@ public class RUM implements ActivityLifecycleCallbacks {
             RaygunRUMMessage message = new RaygunRUMMessage();
             message.setEventData(new RaygunRUMDataMessage[]{dataMessage});
 
-            RaygunClient.enqueueWorkForRUMService(RaygunClient.getApiKey(), new Gson().toJson(message));
+            enqueueWorkForRUMService(RaygunClient.getApiKey(), new Gson().toJson(message));
         } else {
             RaygunLogger.w("RUM is not enabled, please enable to use the sendRUMTimingEvent() function");
         }

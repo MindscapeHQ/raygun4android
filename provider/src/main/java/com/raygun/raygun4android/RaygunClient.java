@@ -7,25 +7,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
-import android.os.Build;
 import android.os.Bundle;
 
-import com.google.gson.Gson;
-import com.raygun.raygun4android.messages.crashreporting.RaygunMessage;
 import com.raygun.raygun4android.messages.shared.RaygunUserInfo;
-import com.raygun.raygun4android.network.RaygunNetworkUtils;
 import com.raygun.raygun4android.services.CrashReportingPostService;
 import com.raygun.raygun4android.services.RUMPostService;
-import com.raygun.raygun4android.utils.RaygunFileFilter;
 import com.raygun.raygun4android.utils.RaygunFileUtils;
-import com.raygun.raygun4android.utils.RaygunUtils;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.lang.Thread.UncaughtExceptionHandler;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -45,10 +33,7 @@ public class RaygunClient {
     private static String version;
     private static String appContextIdentifier;
     private static RaygunUserInfo userInfo;
-    private static RaygunUncaughtExceptionHandler handler;
-    private static RaygunOnBeforeSend onBeforeSend;
-    private static List tags;
-    private static Map userCustomData;
+
     private static boolean crashReportingEnabled = false;
     private static boolean RUMEnabled = false;
 
@@ -103,7 +88,7 @@ public class RaygunClient {
             }
         }
 
-        postCachedMessages();
+        CrashReporting.postCachedMessages();
     }
 
     /**
@@ -120,24 +105,12 @@ public class RaygunClient {
     }
 
     /**
-     * Attaches a pre-built Raygun exception handler to the thread's DefaultUncaughtExceptionHandler.
-     * This automatically sends any exceptions that reaches it to the Raygun API.
-     */
-    public static void attachExceptionHandler() {
-        UncaughtExceptionHandler oldHandler = Thread.getDefaultUncaughtExceptionHandler();
-        if (!(oldHandler instanceof RaygunUncaughtExceptionHandler)) {
-            RaygunClient.handler = new RaygunUncaughtExceptionHandler(oldHandler);
-            Thread.setDefaultUncaughtExceptionHandler(RaygunClient.handler);
-        }
-    }
-
-    /**
      * Sends an exception-type object to Raygun.
      *
      * @param throwable The Throwable object that occurred in your application that will be sent to Raygun.
      */
     public static void send(Throwable throwable) {
-        send(throwable, null, null);
+        CrashReporting.send(throwable, null, null);
     }
 
     /**
@@ -148,7 +121,7 @@ public class RaygunClient {
      *                  This could be a build tag, lifecycle state, debug/production version etc.
      */
     public static void send(Throwable throwable, List tags) {
-        send(throwable, tags, null);
+        CrashReporting.send(throwable, tags, null);
     }
 
     /**
@@ -161,30 +134,7 @@ public class RaygunClient {
      *                       where you can attach any related data you want to see to the error.
      */
     public static void send(Throwable throwable, List tags, Map userCustomData) {
-        if (RaygunClient.isCrashReportingEnabled()) {
-
-            RaygunMessage msg = buildMessage(throwable);
-
-            if (msg == null) {
-                RaygunLogger.e("Failed to send RaygunMessage - due to invalid message being built");
-                return;
-            }
-
-            msg.getDetails().setTags(RaygunUtils.mergeLists(RaygunClient.tags, tags));
-            msg.getDetails().setUserCustomData(RaygunUtils.mergeMaps(RaygunClient.userCustomData, userCustomData));
-
-            if (RaygunClient.onBeforeSend != null) {
-                msg = RaygunClient.onBeforeSend.onBeforeSend(msg);
-                if (msg == null) {
-                    return;
-                }
-            }
-
-            enqueueWorkForCrashReportingService(RaygunClient.apiKey, new Gson().toJson(msg));
-            postCachedMessages();
-        } else {
-            RaygunLogger.w("Crash Reporting is not enabled, please enable to use the send() function");
-        }
+        CrashReporting.send(throwable, tags, userCustomData);
     }
 
     /**
@@ -219,14 +169,14 @@ public class RaygunClient {
         RaygunClient.userInfo = userInfo;
     }
 
-    public static RaygunUserInfo getUser() {
+    static RaygunUserInfo getUser() {
         return RaygunClient.userInfo;
     }
 
     /**
      * Manually stores the version of your application to be transmitted with each message, for version
-     * filtering. This is normally read from your AndroidManifest.xml (the versionName attribute on manifest element)
-     * or passed in on init(); this is only provided as a convenience.
+     * filtering. This is normally read from your AndroidManifest.xml (the versionName attribute
+     * on manifest element) or passed in on init(); this is only provided as a convenience.
      *
      * @param version The version of your application, format x.x.x.x, where x is a positive integer.
      */
@@ -236,36 +186,47 @@ public class RaygunClient {
         }
     }
 
-    public static String getVersion() {
+    static String getVersion() {
         return RaygunClient.version;
     }
 
-    public static RaygunUncaughtExceptionHandler getExceptionHandler() {
-        return RaygunClient.handler;
-    }
-
-    public static String getApiKey() {
+    static String getApiKey() {
         return RaygunClient.apiKey;
     }
 
-    public static List getTags() {
-        return RaygunClient.tags;
+    static String getAppContextIdentifier() {
+        return appContextIdentifier;
     }
 
+    /**
+     * Sets a List of tags which will be sent along with every exception. This will be merged
+     * with any other tags passed as the second param of send().
+     *
+     * @param tags List object containing tags to be sent to Raygun
+     */
     public static void setTags(List tags) {
-        RaygunClient.tags = tags;
+        CrashReporting.setTags(tags);
     }
 
-    public static Map getUserCustomData() {
-        return RaygunClient.userCustomData;
-    }
-
+    /**
+     * Sets a key-value Map which, like the tags, will be sent along with every exception.
+     * This will be merged with any other tags passed as the third param of send().
+     *
+     * @param userCustomData Map with custom user data to be sent to Raygun
+     */
     public static void setUserCustomData(Map userCustomData) {
-        RaygunClient.userCustomData = userCustomData;
+        CrashReporting.setUserCustomData(userCustomData);
     }
 
-    public static void setOnBeforeSend(RaygunOnBeforeSend onBeforeSend) {
-        RaygunClient.onBeforeSend = onBeforeSend;
+    /**
+     * Sets an instance of a class which has an onBeforeSend method that can be used to inspect,
+     * mutate or cancel the send to the Raygun API immediately before it happens. Can be used to
+     * filter arbitrary data.
+     *
+     * @param onBeforeSend Instance of type CrashReportingOnBeforeSend
+     */
+    public static void setOnBeforeSend(CrashReportingOnBeforeSend onBeforeSend) {
+        CrashReporting.setOnBeforeSend(onBeforeSend);
     }
 
     /**
@@ -351,11 +312,7 @@ public class RaygunClient {
      * @param activity The main/entry activity of the Android app.
      */
     public static void enableRUM(Activity activity) {
-        RaygunClient.RUMEnabled = true;
-        RUM.attach(activity);
-        if (RaygunClient.userInfo != null) {
-            RUM.updateCurrentSessionUser(RaygunClient.userInfo);
-        }
+        enableRUM(activity, false);
     }
 
     /**
@@ -372,34 +329,6 @@ public class RaygunClient {
         }
     }
 
-    private static RaygunMessage buildMessage(Throwable throwable) {
-        try {
-            RaygunMessage msg = RaygunMessageBuilder.instance()
-                .setEnvironmentDetails(getApplicationContext())
-                .setMachineName(Build.MODEL)
-                .setExceptionDetails(throwable)
-                .setClientDetails()
-                .setAppContext(RaygunClient.appContextIdentifier)
-                .setVersion(RaygunClient.version)
-                .setNetworkInfo(getApplicationContext())
-                .build();
-
-            if (RaygunClient.version != null) {
-                msg.getDetails().setVersion(RaygunClient.version);
-            }
-
-            if (RaygunClient.userInfo != null) {
-                msg.getDetails().setUserInfo(RaygunClient.userInfo);
-            } else {
-                msg.getDetails().setUserInfo();
-            }
-            return msg;
-        } catch (Exception e) {
-            RaygunLogger.e("Failed to build RaygunMessage - " + e);
-        }
-        return null;
-    }
-
     private static String readApiKey(Context context) {
         try {
             ApplicationInfo ai = context.getPackageManager().getApplicationInfo(context.getPackageName(), PackageManager.GET_META_DATA);
@@ -411,79 +340,9 @@ public class RaygunClient {
         return null;
     }
 
-    private static void postCachedMessages() {
-        if (RaygunNetworkUtils.hasInternetConnection(getApplicationContext())) {
-            File[] fileList = getApplicationContext().getCacheDir().listFiles(new RaygunFileFilter());
-            for (File f : fileList) {
-                try {
-                    if (RaygunFileUtils.getExtension(f.getName()).equalsIgnoreCase(RaygunSettings.DEFAULT_FILE_EXTENSION)) {
-                        ObjectInputStream ois = null;
-                        try {
-                            ois = new ObjectInputStream(new FileInputStream(f));
-                            SerializedMessage serializedMessage = (SerializedMessage) ois.readObject();
-                            enqueueWorkForCrashReportingService(RaygunClient.apiKey, serializedMessage.message);
-                            f.delete();
-                        } finally {
-                            if (ois != null) {
-                                ois.close();
-                            }
-                        }
-                    }
-                } catch (FileNotFoundException e) {
-                    RaygunLogger.e("Error loading cached message from filesystem - " + e.getMessage());
-                } catch (IOException e) {
-                    RaygunLogger.e("Error reading cached message from filesystem - " + e.getMessage());
-                } catch (ClassNotFoundException e) {
-                    RaygunLogger.e("Error in cached message from filesystem - " + e.getMessage());
-                }
-            }
-        }
+    private static void attachExceptionHandler() {
+        CrashReporting.attachExceptionHandler();
     }
-
-    static void enqueueWorkForRUMService(String apiKey, String jsonPayload) {
-        Intent intent = new Intent(getApplicationContext(), RUMPostService.class);
-        intent.setAction("com.raygun.raygun4android.intent.action.LAUNCH_RUM_POST_SERVICE");
-        intent.setPackage("com.raygun.raygun4android");
-        intent.setComponent(new ComponentName(getApplicationContext(), RUMPostService.class));
-
-        intent.putExtra("msg", jsonPayload);
-        intent.putExtra("apikey", apiKey);
-
-        RUMPostService.enqueueWork(getApplicationContext(), intent);
-    }
-
-    static void enqueueWorkForCrashReportingService(String apiKey, String jsonPayload) {
-        Intent intent = new Intent(getApplicationContext(), CrashReportingPostService.class);
-        intent.setAction("com.raygun.raygun4android.intent.action.LAUNCH_CRASHREPORTING_POST_SERVICE");
-        intent.setPackage("com.raygun.raygun4android");
-        intent.setComponent(new ComponentName(getApplicationContext(), CrashReportingPostService.class));
-
-        intent.putExtra("msg", jsonPayload);
-        intent.putExtra("apikey", apiKey);
-
-        CrashReportingPostService.enqueueWork(getApplicationContext(), intent);
-    }
-
-    private static List mergeTags(List paramTags) {
-        if (RaygunClient.tags != null) {
-            List merged = new ArrayList(RaygunClient.tags);
-            merged.addAll(paramTags);
-            return merged;
-        } else {
-            return paramTags;
-        }
-    }
-
-    private static Map mergeUserCustomData(Map paramUserCustomData) {
-        if (RaygunClient.userCustomData != null) {
-            Map merged = new HashMap(RaygunClient.userCustomData);
-            merged.putAll(paramUserCustomData);
-            return merged;
-        } else {
-            return paramUserCustomData;
-        }
-    }
-
 
     /**
      * Returns the current Application's context.
@@ -498,31 +357,4 @@ public class RaygunClient {
 
         return RaygunClient.application.getApplicationContext();
     }
-
-    public static class RaygunUncaughtExceptionHandler implements Thread.UncaughtExceptionHandler {
-        private UncaughtExceptionHandler defaultHandler;
-        private List tags;
-        private Map userCustomData;
-
-        public RaygunUncaughtExceptionHandler(UncaughtExceptionHandler defaultHandler) {
-            this.defaultHandler = defaultHandler;
-        }
-
-        @Override
-        public void uncaughtException(Thread thread, Throwable throwable) {
-            if (userCustomData != null) {
-                RaygunClient.send(throwable, tags, userCustomData);
-            } else if (tags != null) {
-                RaygunClient.send(throwable, tags);
-            } else {
-                List tags = new ArrayList();
-                tags.add("UnhandledException");
-                RaygunClient.send(throwable, tags);
-                RUM.sendRemainingActivity();
-            }
-            defaultHandler.uncaughtException(thread, throwable);
-        }
-    }
-
-
 }
