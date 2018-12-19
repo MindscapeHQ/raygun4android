@@ -52,10 +52,6 @@ public class CrashReporting {
         CrashReporting.userCustomData = userCustomData;
     }
 
-    static void send(Throwable throwable) {
-        send(throwable, null, null);
-    }
-
     static void send(Throwable throwable, List tags) {
         send(throwable, tags, null);
     }

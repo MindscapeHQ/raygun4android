@@ -44,22 +44,11 @@ public class RaygunClient {
      * @param application The Android application
      */
     public static void init(Application application) {
+        // This is being set at this stage so that getApplicationContext has RaygunClient.application available
         RaygunClient.application = application;
         String apiKey = readApiKey(getApplicationContext());
-        init(application, apiKey);
-    }
 
-    /**
-     * Initializes the Raygun client with the version of your application. This expects that you have
-     * placed the API key in your AndroidManifest.xml, in a meta-data element.
-     *
-     * @param version The version of your application, format x.x.x.x, where x is a positive integer.
-     * @param application The Android application
-     */
-    public static void init(String version, Application application) {
-        RaygunClient.application = application;
-        String apiKey = readApiKey(getApplicationContext());
-        init(application, apiKey, version);
+        init(application, apiKey, null);
     }
 
     /**
@@ -70,25 +59,7 @@ public class RaygunClient {
      * @param apiKey An API key that belongs to a Raygun application created in your dashboard
      */
     public static void init(Application application, String apiKey) {
-        if (RaygunClient.application == null) {
-            RaygunClient.application = application;
-        }
-
-        RaygunClient.apiKey = apiKey;
-        RaygunClient.appContextIdentifier = UUID.randomUUID().toString();
-
-        RaygunLogger.d("Configuring Raygun4Android (v" + RaygunSettings.RAYGUN_CLIENT_VERSION + ")");
-
-        if (RaygunClient.version == null || RaygunClient.version.trim().isEmpty()) {
-            try {
-                RaygunClient.version = getApplicationContext().getPackageManager().getPackageInfo(getApplicationContext().getPackageName(), 0).versionName;
-            } catch (PackageManager.NameNotFoundException e) {
-                RaygunClient.version = "not provided";
-                RaygunLogger.w("Couldn't read application version from calling package");
-            }
-        }
-
-        CrashReporting.postCachedMessages();
+        init(application, apiKey, null);
     }
 
     /**
@@ -100,8 +71,25 @@ public class RaygunClient {
      * @param version The version of your application, format x.x.x.x, where x is a positive integer.
      */
     public static void init(Application application, String apiKey, String version) {
-        RaygunClient.version = version;
-        init(application, apiKey);
+
+        RaygunClient.application = application;
+        RaygunClient.apiKey = apiKey;
+        RaygunClient.appContextIdentifier = UUID.randomUUID().toString();
+
+        RaygunLogger.d("Configuring Raygun4Android (v" + RaygunSettings.RAYGUN_CLIENT_VERSION + ")");
+
+        if (version == null || version.trim().isEmpty()) {
+            try {
+                RaygunClient.version = getApplicationContext().getPackageManager().getPackageInfo(getApplicationContext().getPackageName(), 0).versionName;
+            } catch (PackageManager.NameNotFoundException e) {
+                RaygunClient.version = "Not Provided";
+                RaygunLogger.w("Couldn't read application version from calling package");
+            }
+        } else {
+            RaygunClient.version = version;
+        }
+
+        CrashReporting.postCachedMessages();
     }
 
     /**
@@ -297,9 +285,17 @@ public class RaygunClient {
         return crashReportingEnabled;
     }
 
+
     public static void enableCrashReporting() {
+        enableCrashReporting(true);
+    }
+
+    public static void enableCrashReporting(boolean attachDefaultHandler) {
         RaygunClient.crashReportingEnabled = true;
-        attachExceptionHandler();
+
+        if (attachDefaultHandler) {
+            attachExceptionHandler();
+        }
     }
 
     public static boolean isRUMEnabled() {
@@ -312,7 +308,7 @@ public class RaygunClient {
      * @param activity The main/entry activity of the Android app.
      */
     public static void enableRUM(Activity activity) {
-        enableRUM(activity, false);
+        enableRUM(activity, true);
     }
 
     /**
