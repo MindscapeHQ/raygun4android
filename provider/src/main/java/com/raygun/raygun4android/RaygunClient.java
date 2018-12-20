@@ -44,11 +44,7 @@ public class RaygunClient {
      * @param application The Android application
      */
     public static void init(Application application) {
-        // This is being set at this stage so that getApplicationContext has RaygunClient.application available
-        RaygunClient.application = application;
-        String apiKey = readApiKey(getApplicationContext());
-
-        init(application, apiKey, null);
+        init(application, null, null);
     }
 
     /**
@@ -72,11 +68,17 @@ public class RaygunClient {
      */
     public static void init(Application application, String apiKey, String version) {
 
-        RaygunClient.application = application;
-        RaygunClient.apiKey = apiKey;
-        RaygunClient.appContextIdentifier = UUID.randomUUID().toString();
-
         RaygunLogger.d("Configuring Raygun4Android (v" + RaygunSettings.RAYGUN_CLIENT_VERSION + ")");
+
+        RaygunClient.application = application;
+
+        if (apiKey == null || apiKey.trim().isEmpty()) {
+           RaygunClient.apiKey = readApiKey(getApplicationContext());
+        } else {
+            RaygunClient.apiKey = apiKey;
+        }
+
+        RaygunClient.appContextIdentifier = UUID.randomUUID().toString();
 
         if (version == null || version.trim().isEmpty()) {
             try {
@@ -281,15 +283,27 @@ public class RaygunClient {
         RaygunSettings.setMaxReportsStoredOnDevice(maxReportsStoredOnDevice);
     }
 
+    /**
+     * Returns the status of Crash Reporting
+     *
+     * @return true or false, indicating if Crash Reporting is enabled or not.
+     */
     public static boolean isCrashReportingEnabled() {
         return crashReportingEnabled;
     }
 
-
+    /**
+     * Enables the Raygun Crash Reporting feature with the default exception handler enabled.
+     */
     public static void enableCrashReporting() {
         enableCrashReporting(true);
     }
 
+    /**
+     * Enables the Raygun Crash Reporting feature. The default exception handler can be toggled with an additional parameter.
+     *
+     * @param attachDefaultHandler Automatically report all unhandled exceptions.
+     */
     public static void enableCrashReporting(boolean attachDefaultHandler) {
         RaygunClient.crashReportingEnabled = true;
 
@@ -298,12 +312,17 @@ public class RaygunClient {
         }
     }
 
+    /**
+     * Returns the status of RUM
+     *
+     * @return true or false, indicating if RUM is enabled or not.
+     */
     public static boolean isRUMEnabled() {
         return RUMEnabled;
     }
 
     /**
-     * Enables the Raygun RUM feature which will automatically report session and view events.
+     * Enables the Raygun RUM feature which will automatically report session and view events. Network logging will be enabled for RUM by default.
      *
      * @param activity The main/entry activity of the Android app.
      */
@@ -312,7 +331,7 @@ public class RaygunClient {
     }
 
     /**
-     * Enables the Raygun RUM feature which will automatically report session and view events AND network performance.
+     * Enables the Raygun RUM feature which will automatically report session and view events. Network logging can be toggled with an additional parameter.
      *
      * @param activity       The main/entry activity of the Android app.
      * @param networkLogging Automatically report the performance of network requests.
