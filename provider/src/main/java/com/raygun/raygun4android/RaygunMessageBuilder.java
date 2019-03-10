@@ -2,6 +2,7 @@ package com.raygun.raygun4android;
 
 import android.content.Context;
 
+import com.raygun.raygun4android.messages.crashreporting.RaygunBreadcrumbMessage;
 import com.raygun.raygun4android.messages.crashreporting.RaygunClientMessage;
 import com.raygun.raygun4android.messages.crashreporting.RaygunEnvironmentMessage;
 import com.raygun.raygun4android.messages.crashreporting.RaygunErrorMessage;
@@ -85,6 +86,11 @@ public class RaygunMessageBuilder implements IRaygunMessageBuilder {
     @Override
     public IRaygunMessageBuilder setGroupingKey(String groupingKey) {
         raygunMessage.getDetails().setGroupingKey(groupingKey);
+        return this;
+    }
+
+    public IRaygunMessageBuilder setBreadrumbs(List<RaygunBreadcrumbMessage> breadcrumbs) {
+        raygunMessage.getDetails().setBreadcrumbs(breadcrumbs);
         return this;
     }
 

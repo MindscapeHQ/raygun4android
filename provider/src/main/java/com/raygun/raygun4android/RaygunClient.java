@@ -9,6 +9,7 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 
+import com.raygun.raygun4android.messages.crashreporting.RaygunBreadcrumbMessage;
 import com.raygun.raygun4android.messages.shared.RaygunUserInfo;
 import com.raygun.raygun4android.services.CrashReportingPostService;
 import com.raygun.raygun4android.services.RUMPostService;
@@ -206,6 +207,34 @@ public class RaygunClient {
      */
     public static void setUserCustomData(Map userCustomData) {
         CrashReporting.setUserCustomData(userCustomData);
+    }
+
+    /**
+     * Records a breadcrump via a string message
+     *
+     * @param message Message for the breadcrump
+     */
+    public static void recordBreadcrump(String message) {
+        CrashReporting.recordBreadcrump(message);
+    }
+
+    /**
+     * Records a breadcrump as a RaygunBreadcrumpMessage
+     *
+     * @param breadcrump RaygunBreadcrumpMessage object containing the breadcrump
+     */
+    public static void recordBreadcrump(RaygunBreadcrumbMessage breadcrump) {
+        CrashReporting.recordBreadcrump(breadcrump);
+    }
+
+    /**
+     * Enables the processing of the full location of breadcrump messages. This defaults to false and please
+     * be aware that setting this to true could seriously degrade the performance of your application.
+     *
+     * @param shouldProcessBreadcrumbLocation enable or disable the full location processing of breadcrump messages
+     */
+    public static void shouldProcessBreadcrumbLocation(boolean shouldProcessBreadcrumbLocation) {
+        CrashReporting.shouldProcessBreadcrumbLocation(shouldProcessBreadcrumbLocation);
     }
 
     /**

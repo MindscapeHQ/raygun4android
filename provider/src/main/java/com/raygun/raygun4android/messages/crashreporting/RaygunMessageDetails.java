@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 public class RaygunMessageDetails {
+
     private String groupingKey;
     private String machineName;
     private String version = "Not supplied";
@@ -19,6 +20,7 @@ public class RaygunMessageDetails {
     private RaygunAppContext context;
     private RaygunUserInfo user;
     private NetworkInfo request;
+    private List<RaygunBreadcrumbMessage> breadcrumbs;
 
     // Machine Name
     public String getMachineName() {
@@ -121,5 +123,13 @@ public class RaygunMessageDetails {
 
     public void setGroupingKey(String groupingKey) {
         this.groupingKey = groupingKey;
+    }
+
+    public void setBreadcrumbs(List<RaygunBreadcrumbMessage> breadcrumbs) {
+        this.breadcrumbs = breadcrumbs;
+    }
+
+    public List<RaygunBreadcrumbMessage> getBreadcrumbs() {
+        return breadcrumbs;
     }
 }
