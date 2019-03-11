@@ -20,6 +20,7 @@ public class RaygunSettings {
     private static final String DEFAULT_CRASHREPORTING_ENDPOINT = "https://api.raygun.io/entries";
     public static final String DEFAULT_FILE_EXTENSION = "raygun4";
     private static final int DEFAULT_MAX_REPORTS_STORED_ON_DEVICE = 64;
+    public static final String CRASH_REPORTING_UNHANDLED_EXCEPTION_TAG = "UnhandledException";
 
     // RUM
     public static final String RUM_EVENT_SESSION_START = "session_start";

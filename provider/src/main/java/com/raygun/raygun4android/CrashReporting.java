@@ -204,8 +204,6 @@ public class CrashReporting {
 
     public static class RaygunUncaughtExceptionHandler implements Thread.UncaughtExceptionHandler {
         private Thread.UncaughtExceptionHandler defaultHandler;
-        private List tags;
-        private Map userCustomData;
 
         public RaygunUncaughtExceptionHandler(Thread.UncaughtExceptionHandler defaultHandler) {
             this.defaultHandler = defaultHandler;
@@ -213,16 +211,14 @@ public class CrashReporting {
 
         @Override
         public void uncaughtException(Thread thread, Throwable throwable) {
-            if (userCustomData != null) {
-                CrashReporting.send(throwable, tags, userCustomData);
-            } else if (tags != null) {
-                CrashReporting.send(throwable, tags);
-            } else {
-                List tags = new ArrayList();
-                tags.add("UnhandledException");
-                CrashReporting.send(throwable, tags);
-                RUM.sendRemainingActivity();
-            }
+
+            List tags = new ArrayList();
+            tags.add(RaygunSettings.CRASH_REPORTING_UNHANDLED_EXCEPTION_TAG);
+
+            CrashReporting.send(throwable, tags);
+
+            RUM.sendRemainingActivity();
+
             defaultHandler.uncaughtException(thread, throwable);
         }
     }
