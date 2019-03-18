@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.v4.app.JobIntentService;
 
 import com.raygun.raygun4android.RaygunLogger;
 import com.raygun.raygun4android.RaygunSettings;
