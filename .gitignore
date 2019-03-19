@@ -44,3 +44,4 @@ obj/
 
 # Release build
 releasing/secring.gpg
+*.jks
