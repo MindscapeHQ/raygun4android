@@ -5,6 +5,7 @@ import android.os.Bundle
 import com.raygun.raygun4android.RaygunClient
 import com.raygun.raygun4android.messages.shared.RaygunUserInfo
 import android.widget.Button
+import android.widget.TextView
 
 
 class MainActivity : AppCompatActivity() {
@@ -27,6 +28,7 @@ class MainActivity : AppCompatActivity() {
         val button_set_user_anon = findViewById(R.id.button_set_user_anon) as Button
         val button_set_user_A = findViewById(R.id.button_set_user_A) as Button
         val button_set_user_B = findViewById(R.id.button_set_user_B) as Button
+        val textView_version = findViewById(R.id.textView_version) as TextView
 
         button_send.setOnClickListener {
             val tw = HashMap<String,String>()
@@ -61,5 +63,7 @@ class MainActivity : AppCompatActivity() {
             user.email = "g@h.com"
             RaygunClient.setUser(user)
         }
+
+        textView_version.text = "Provider ${com.raygun.raygun4android.BuildConfig.VERSION_NAME} (${com.raygun.raygun4android.BuildConfig.VERSION_CODE})";
     }
 }

@@ -7,7 +7,7 @@ public class RaygunSettings {
 
     // General
     public static final String APIKEY_MANIFEST_FIELD = "com.raygun.raygun4android.apikey";
-    public static final String RAYGUN_CLIENT_VERSION = "4.0.0";
+    public static final String RAYGUN_CLIENT_VERSION = BuildConfig.VERSION_NAME;
 
     // HTTP error response codes
     public static final int RESPONSE_CODE_ACCEPTED = 202;

@@ -24,10 +24,10 @@ of access by the Raygun team.
 
 ## Publish a build
 
-1. Edit `gradle.properties` in the root of the project and change the version name and code. If you add `-SNAPSHOT` to the version name, your release will be published to the snapshot server of Maven Central. It might be appropriate to also update the fields for `POM_DEVELOPER_ID` and `POM_DEVELOPER_NAME` in certain instances. Please check with the Raygun team if you feel the need to do so.
+1. Edit `gradle.properties` in the root of the project and change the version name and code according to the guidelines in the file. If you add `-SNAPSHOT` to the version name, your release will be published to the snapshot server of Maven Central. It might be appropriate to also update the fields for `POM_DEVELOPER_ID` and `POM_DEVELOPER_NAME` in certain instances. Please check with the Raygun team if you feel the need to do so.
 
 ```
-VERSION_NAME=4.0.0-ALPHA1-SNAPSHOT
+VERSION_NAME=4.0.0-alpha1-SNAPSHOT
 VERSION_CODE=40000000
 ```
 
