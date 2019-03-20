@@ -39,6 +39,16 @@ android {
             }
         }
     }
+
+    libraryVariants.all { variant ->
+        if (variant.name == 'release') {
+            task androidJavadocs(type: Javadoc) {
+                source = variant.javaCompiler.source
+                classpath = files(((Object) android.bootClasspath.join(File.pathSeparator)))
+                classpath += variant.javaCompiler.classpath
+            }
+        }
+    }
 }
 
 dependencies {
@@ -56,4 +66,4 @@ dependencies {
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
 }
 
-apply from: 'https://raw.github.com/chrisbanes/gradle-mvn-push/master/gradle-mvn-push.gradle'
+apply from: 'gradle-mvn-push.gradle'
