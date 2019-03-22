@@ -56,6 +56,11 @@ public class RaygunNetworkLogger {
     /**
      * When a network request is cancelled we stop tracking it and do not send the information through.
      * Future updates may include sending the cancelled request timing through with information showing it was cancelled.
+     *
+     * @param url               URL to cancel
+     * @param requestMethod     URL to cancel
+     * @param endTime           URL to cancel
+     * @param exception         URL to cancel
      */
     public static synchronized void cancelNetworkCall(String url, String requestMethod, long endTime, String exception) {
         if (url != null) {
