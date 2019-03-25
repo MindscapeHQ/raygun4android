@@ -18,7 +18,7 @@ android {
         }
         release {
             debuggable false
-            minifyEnabled true
+            minifyEnabled false
             consumerProguardFiles 'proguard-rules.pro'
         }
     }
@@ -41,7 +41,6 @@ android {
     }
 
     libraryVariants.all { variant ->
-        println variant.name
         if (variant.name == 'release') {
             task androidJavadocs(type: Javadoc) {
                 source = android.sourceSets.main.java.srcDirs
