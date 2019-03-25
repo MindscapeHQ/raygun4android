@@ -28,7 +28,8 @@ class MainActivity : AppCompatActivity() {
         val button_set_user_anon = findViewById(R.id.button_set_user_anon) as Button
         val button_set_user_A = findViewById(R.id.button_set_user_A) as Button
         val button_set_user_B = findViewById(R.id.button_set_user_B) as Button
-        val textView_version = findViewById(R.id.textView_version) as TextView
+        val textView_appVersion = findViewById(R.id.textView_appVersion) as TextView
+        val textView_providerVersion = findViewById(R.id.textView_providerVersion) as TextView
 
         button_send.setOnClickListener {
             val tw = HashMap<String,String>()
@@ -64,6 +65,7 @@ class MainActivity : AppCompatActivity() {
             RaygunClient.setUser(user)
         }
 
-        textView_version.text = "Provider ${com.raygun.raygun4android.BuildConfig.VERSION_NAME} (${com.raygun.raygun4android.BuildConfig.VERSION_CODE})";
+        textView_appVersion.text = "App ${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE} ${BuildConfig.BUILD_TYPE})";
+        textView_providerVersion.text = "Provider ${com.raygun.raygun4android.BuildConfig.VERSION_NAME} (${com.raygun.raygun4android.BuildConfig.VERSION_CODE} ${BuildConfig.BUILD_TYPE})";
     }
 }
