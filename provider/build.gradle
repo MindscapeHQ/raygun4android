@@ -41,11 +41,13 @@ android {
     }
 
     libraryVariants.all { variant ->
+        println variant.name
         if (variant.name == 'release') {
             task androidJavadocs(type: Javadoc) {
-                source = variant.javaCompiler.source
-                classpath = files(((Object) android.bootClasspath.join(File.pathSeparator)))
+                source = android.sourceSets.main.java.srcDirs
+                classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
                 classpath += variant.javaCompiler.classpath
+                classpath += files("build/generated/source/buildConfig/release")
             }
         }
     }
