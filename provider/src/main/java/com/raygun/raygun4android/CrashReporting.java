@@ -133,7 +133,7 @@ public class CrashReporting {
                 .setAppContext(RaygunClient.getAppContextIdentifier())
                 .setVersion(RaygunClient.getVersion())
                 .setNetworkInfo(RaygunClient.getApplicationContext())
-                .setBreadrumbs(breadcrumps)
+                .setBreadcrumbs(breadcrumps)
                 .build();
 
             if (RaygunClient.getVersion() != null) {

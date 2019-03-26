@@ -89,7 +89,7 @@ public class RaygunMessageBuilder implements IRaygunMessageBuilder {
         return this;
     }
 
-    public IRaygunMessageBuilder setBreadrumbs(List<RaygunBreadcrumbMessage> breadcrumbs) {
+    public IRaygunMessageBuilder setBreadcrumbs(List<RaygunBreadcrumbMessage> breadcrumbs) {
         raygunMessage.getDetails().setBreadcrumbs(breadcrumbs);
         return this;
     }

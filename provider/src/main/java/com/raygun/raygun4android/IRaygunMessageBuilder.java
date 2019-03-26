@@ -33,6 +33,6 @@ public interface IRaygunMessageBuilder {
 
     IRaygunMessageBuilder setGroupingKey(String groupingKey);
 
-    IRaygunMessageBuilder setBreadrumbs(List<RaygunBreadcrumbMessage> breadcrumbs);
+    IRaygunMessageBuilder setBreadcrumbs(List<RaygunBreadcrumbMessage> breadcrumbs);
 
 }
