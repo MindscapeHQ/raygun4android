@@ -28,7 +28,7 @@
 
 - v3.0.4: Fixing NPE in RaygunPostService (#34, PR #37); RaygunErrorMessage can now accept any Throwable (PR #33); Pulse now checks for connectivity (PR #38)
 
-- v3.0.3: Bugfix: removing println from code (PR #36)
+- v3.0.3: Bug fix: removing println from code (PR #36)
 
 - v3.0.2: Allowing all properties of the RaygunMessageDetails to be modifiable during the onBeforeSend callback.
 
@@ -58,7 +58,7 @@
 
 - v1.0.2: Added SetUser method for unique user tracking.
 
-- v1.0.1: Added caching of messages to disk when network unavailable & post them when it becomes available again; several bugfixes relating to the posting service. This version is recommended; do not use 1.0.0.
+- v1.0.1: Added caching of messages to disk when network unavailable & post them when it becomes available again; several bug fixes relating to the posting service. This version is recommended; do not use 1.0.0.
 
 - v1.0.0: Completed initial version with background service for performing posting, API key read from AndroidManifest and more.
 
