@@ -1,7 +1,9 @@
 package com.raygun.raygun4android.sample
 
+import android.app.Application
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import com.raygun.raygun4android.RaygunClient
 import com.raygun.raygun4android.messages.shared.RaygunUserInfo
 import android.widget.Button
@@ -17,7 +19,8 @@ class MainActivity : AppCompatActivity() {
         val initialCustomData = HashMap<String,String>()
         initialCustomData.put("firstkey", "firstvalue")
 
-        RaygunClient.init(application)             // This sets up the client with the API key as provided in your AndroidManifest.xml
+        // This sets up the client with the API key as provided in your AndroidManifest.xml
+        RaygunClient.init(applicationContext as Application)
         RaygunClient.enableCrashReporting()
         RaygunClient.enableRUM(this)
 
@@ -42,6 +45,7 @@ class MainActivity : AppCompatActivity() {
         button_crash.setOnClickListener {
             // A real exception will be thrown here, which will be caught & sent by RaygunClient
             val i = 3 / 0
+            Log.d("Raygun4Android-Sample", "This is here purely so that our division by zero calculation in i gets used and not optimised away in a release build: $i")
         }
 
         button_set_user_anon.setOnClickListener {
