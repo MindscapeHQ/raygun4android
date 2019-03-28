@@ -69,7 +69,7 @@ public class CrashReporting {
         if(shouldProcessBreadcrumbLocation && breadcrump.getClassName() == null) {
             StackTraceElement frame = Thread.currentThread().getStackTrace()[stackFrame];
 
-            RaygunBreadcrumbMessage processedBreadcrump = new RaygunBreadcrumbMessage.Builder(breadcrump.getMessage())
+            return new RaygunBreadcrumbMessage.Builder(breadcrump.getMessage())
                 .category(breadcrump.getCategory())
                 .customData(breadcrump.getCustomData())
                 .level(breadcrump.getLevel())
@@ -77,8 +77,6 @@ public class CrashReporting {
                 .methodName(frame.getMethodName())
                 .lineNumber(frame.getLineNumber())
                 .build();
-
-            return processedBreadcrump;
         }
 
         return breadcrump;
