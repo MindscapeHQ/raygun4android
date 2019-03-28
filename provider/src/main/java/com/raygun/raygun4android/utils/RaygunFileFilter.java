@@ -10,10 +10,7 @@ public class RaygunFileFilter implements FileFilter {
     public boolean accept(File pathname) {
 
         String extension = "." + RaygunSettings.DEFAULT_FILE_EXTENSION;
-        if (pathname.getName().toLowerCase().endsWith(extension)) {
-            return true;
-        }
+        return pathname.getName().toLowerCase().endsWith(extension);
 
-        return false;
     }
 }
