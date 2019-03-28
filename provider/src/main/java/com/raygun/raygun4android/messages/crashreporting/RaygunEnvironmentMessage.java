@@ -5,6 +5,7 @@ import android.content.Context;
 import android.os.Build;
 import android.os.Environment;
 import android.os.StatFs;
+import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.WindowManager;
 
@@ -63,10 +64,10 @@ public class RaygunEnvironmentMessage {
                 currentOrientation = "Undefined";
             }
 
-            WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
-            Display d = wm.getDefaultDisplay();
-            windowsBoundWidth = d.getWidth();
-            windowsBoundHeight = d.getHeight();
+            DisplayMetrics metrics = new DisplayMetrics();
+            ((WindowManager) context.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay().getMetrics(metrics);
+            windowsBoundWidth = metrics.widthPixels;
+            windowsBoundHeight = metrics.heightPixels;
 
             TimeZone tz = TimeZone.getDefault();
             Date now = new Date();
