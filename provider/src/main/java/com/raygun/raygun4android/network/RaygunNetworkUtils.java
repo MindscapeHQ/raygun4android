@@ -62,7 +62,7 @@ public class RaygunNetworkUtils {
                     throw new RuntimeException(e);
                 }
 
-                prefs.edit().putString(PREFS_DEVICE_ID, id.toString()).commit();
+                prefs.edit().putString(PREFS_DEVICE_ID, id).apply();
                 return id;
             }
         }
