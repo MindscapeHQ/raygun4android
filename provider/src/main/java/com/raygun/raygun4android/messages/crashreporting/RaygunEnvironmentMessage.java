@@ -75,7 +75,7 @@ public class RaygunEnvironmentMessage {
             locale = context.getResources().getConfiguration().locale.toString();
 
             ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
-            ActivityManager am = (ActivityManager) context.getSystemService(context.ACTIVITY_SERVICE);
+            ActivityManager am = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
             am.getMemoryInfo(mi);
             availablePhysicalMemory = mi.availMem / 0x100000;
 
