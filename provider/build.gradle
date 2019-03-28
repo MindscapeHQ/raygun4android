@@ -47,6 +47,8 @@ android {
                 classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
                 classpath += variant.javaCompiler.classpath
                 classpath += files("build/generated/source/buildConfig/release")
+
+                options.windowTitle = "Raygun4Android"
             }
         }
     }
