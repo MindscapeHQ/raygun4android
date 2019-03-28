@@ -28,7 +28,7 @@ public class CrashReporting {
     private static CrashReportingOnBeforeSend onBeforeSend;
     private static List tags;
     private static Map userCustomData;
-    private static List<RaygunBreadcrumbMessage> breadcrumps;
+    private static List<RaygunBreadcrumbMessage> breadcrumbs;
     private static boolean shouldProcessBreadcrumbLocation = false;
 
     static RaygunUncaughtExceptionHandler getExceptionHandler() {
@@ -55,31 +55,31 @@ public class CrashReporting {
         CrashReporting.userCustomData = userCustomData;
     }
 
-    static void recordBreadcrump(String message) {
-        RaygunBreadcrumbMessage breadcrump = new RaygunBreadcrumbMessage.Builder(message).build();
-        recordBreadcrump(breadcrump);
+    static void recordBreadcrumb(String message) {
+        RaygunBreadcrumbMessage breadcrumb = new RaygunBreadcrumbMessage.Builder(message).build();
+        recordBreadcrumb(breadcrumb);
     }
 
-    static void recordBreadcrump(RaygunBreadcrumbMessage breadcrump) {
-        breadcrumps.add(processBreadcrumpLocation(breadcrump, shouldProcessBreadcrumbLocation(),3));
+    static void recordBreadcrumb(RaygunBreadcrumbMessage breadcrumb) {
+        breadcrumbs.add(processBreadcrumbLocation(breadcrumb, shouldProcessBreadcrumbLocation(),3));
     }
 
-    private static RaygunBreadcrumbMessage processBreadcrumpLocation(RaygunBreadcrumbMessage breadcrump, boolean shouldProcessBreadcrumbLocation, int stackFrame) {
+    private static RaygunBreadcrumbMessage processBreadcrumbLocation(RaygunBreadcrumbMessage breadcrumb, boolean shouldProcessBreadcrumbLocation, int stackFrame) {
 
-        if(shouldProcessBreadcrumbLocation && breadcrump.getClassName() == null) {
+        if(shouldProcessBreadcrumbLocation && breadcrumb.getClassName() == null) {
             StackTraceElement frame = Thread.currentThread().getStackTrace()[stackFrame];
 
-            return new RaygunBreadcrumbMessage.Builder(breadcrump.getMessage())
-                .category(breadcrump.getCategory())
-                .customData(breadcrump.getCustomData())
-                .level(breadcrump.getLevel())
+            return new RaygunBreadcrumbMessage.Builder(breadcrumb.getMessage())
+                .category(breadcrumb.getCategory())
+                .customData(breadcrumb.getCustomData())
+                .level(breadcrumb.getLevel())
                 .className(frame.getClassName())
                 .methodName(frame.getMethodName())
                 .lineNumber(frame.getLineNumber())
                 .build();
         }
 
-        return breadcrump;
+        return breadcrumb;
     }
 
     private static boolean shouldProcessBreadcrumbLocation() {
@@ -131,7 +131,7 @@ public class CrashReporting {
                 .setAppContext(RaygunClient.getAppContextIdentifier())
                 .setVersion(RaygunClient.getVersion())
                 .setNetworkInfo(RaygunClient.getApplicationContext())
-                .setBreadcrumbs(breadcrumps)
+                .setBreadcrumbs(breadcrumbs)
                 .build();
 
             if (RaygunClient.getVersion() != null) {

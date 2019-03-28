@@ -2,21 +2,15 @@ package com.raygun.raygun4android;
 
 import android.app.Activity;
 import android.app.Application;
-import android.content.ComponentName;
 import android.content.Context;
-import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 
 import com.raygun.raygun4android.messages.crashreporting.RaygunBreadcrumbMessage;
 import com.raygun.raygun4android.messages.shared.RaygunUserInfo;
-import com.raygun.raygun4android.services.CrashReportingPostService;
-import com.raygun.raygun4android.services.RUMPostService;
 import com.raygun.raygun4android.utils.RaygunFileUtils;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -210,28 +204,28 @@ public class RaygunClient {
     }
 
     /**
-     * Records a breadcrump via a string message
+     * Records a breadcrumb via a string message
      *
-     * @param message Message for the breadcrump
+     * @param message Message for the breadcrumb
      */
-    public static void recordBreadcrump(String message) {
-        CrashReporting.recordBreadcrump(message);
+    public static void recordBreadcrumb(String message) {
+        CrashReporting.recordBreadcrumb(message);
     }
 
     /**
-     * Records a breadcrump as a RaygunBreadcrumpMessage
+     * Records a breadcrumb as a RaygunBreadcrumbMessage
      *
-     * @param breadcrump RaygunBreadcrumpMessage object containing the breadcrump
+     * @param breadcrumb RaygunBreadcrumbMessage object containing the breadcrumb
      */
-    public static void recordBreadcrump(RaygunBreadcrumbMessage breadcrump) {
-        CrashReporting.recordBreadcrump(breadcrump);
+    public static void recordBreadcrumb(RaygunBreadcrumbMessage breadcrumb) {
+        CrashReporting.recordBreadcrumb(breadcrumb);
     }
 
     /**
-     * Enables the processing of the full location of breadcrump messages. This defaults to false and please
+     * Enables the processing of the full location of breadcrumb messages. This defaults to false and please
      * be aware that setting this to true could seriously degrade the performance of your application.
      *
-     * @param shouldProcessBreadcrumbLocation enable or disable the full location processing of breadcrump messages
+     * @param shouldProcessBreadcrumbLocation enable or disable the full location processing of breadcrumb messages
      */
     public static void shouldProcessBreadcrumbLocation(boolean shouldProcessBreadcrumbLocation) {
         CrashReporting.shouldProcessBreadcrumbLocation(shouldProcessBreadcrumbLocation);
