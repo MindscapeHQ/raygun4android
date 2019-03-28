@@ -1,5 +1,6 @@
 package com.raygun.raygun4android.services;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -71,7 +72,7 @@ public class CrashReportingPostService extends RaygunPostService {
             ArrayList<File> cachedFiles = new ArrayList<>(Arrays.asList(getCacheDir().listFiles(new RaygunFileFilter())));
 
             if (cachedFiles.size() < RaygunSettings.getMaxReportsStoredOnDevice()) {
-                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
+                @SuppressLint("SimpleDateFormat") SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
                 String uuid = UUID.randomUUID().toString().replace("-", "");
                 String timestamp = dateFormat.format(new Date(System.currentTimeMillis()));
                 File fn = new File(getCacheDir(), timestamp + "-" + uuid + "." + RaygunSettings.DEFAULT_FILE_EXTENSION);

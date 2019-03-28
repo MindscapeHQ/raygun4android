@@ -17,19 +17,18 @@ public class RaygunSettings {
     public static final int RESPONSE_CODE_RATE_LIMITED = 429;
 
     // Crash Reporting
-    private static final String DEFAULT_CRASHREPORTING_ENDPOINT = "https://api.raygun.io/entries";
+    public static final String DEFAULT_CRASHREPORTING_ENDPOINT = "https://api.raygun.io/entries";
     public static final String DEFAULT_FILE_EXTENSION = "raygun4";
-    private static final int DEFAULT_MAX_REPORTS_STORED_ON_DEVICE = 64;
+    public static final int DEFAULT_MAX_REPORTS_STORED_ON_DEVICE = 64;
     public static final String CRASH_REPORTING_UNHANDLED_EXCEPTION_TAG = "UnhandledException";
 
     // RUM
     public static final String RUM_EVENT_SESSION_START = "session_start";
     public static final String RUM_EVENT_SESSION_END = "session_end";
     public static final String RUM_EVENT_TIMING = "mobile_event_timing";
-    private static final String DEFAULT_RUM_ENDPOINT = "https://api.raygun.io/events";
+    public static final String DEFAULT_RUM_ENDPOINT = "https://api.raygun.io/events";
     // 30 minutes in milliseconds
-    // TODO Set back to 30 * 60 * 1000 when done
-    public static final int RUM_SESSION_EXPIRY = 1 * 60 * 1000;
+    public static final int RUM_SESSION_EXPIRY = 30 * 60 * 1000;
 
     private static IgnoredURLs ignoredURLs = new IgnoredURLs("api.raygun.io");
     private static HashSet<String> ignoredViews = new HashSet<>();
@@ -44,7 +43,7 @@ public class RaygunSettings {
         return crashReportingEndpoint;
     }
 
-    public static void setCrashReportingEndpoint(String crashReportingEndpoint) {
+    static void setCrashReportingEndpoint(String crashReportingEndpoint) {
         RaygunSettings.crashReportingEndpoint = crashReportingEndpoint;
     }
 
@@ -52,7 +51,7 @@ public class RaygunSettings {
         return rumEndpoint;
     }
 
-    public static void setRUMEndpoint(String rumEndpoint) {
+    static void setRUMEndpoint(String rumEndpoint) {
         RaygunSettings.rumEndpoint = rumEndpoint;
     }
 
@@ -60,7 +59,7 @@ public class RaygunSettings {
         return ignoredURLs;
     }
 
-    public static HashSet<String> getIgnoredViews() {
+    static HashSet<String> getIgnoredViews() {
         return ignoredViews;
     }
 
@@ -68,7 +67,7 @@ public class RaygunSettings {
         return maxReportsStoredOnDevice;
     }
 
-    public static void setMaxReportsStoredOnDevice(int maxReportsStoredOnDevice) {
+    static void setMaxReportsStoredOnDevice(int maxReportsStoredOnDevice) {
         if (maxReportsStoredOnDevice <= DEFAULT_MAX_REPORTS_STORED_ON_DEVICE) {
             RaygunSettings.maxReportsStoredOnDevice = maxReportsStoredOnDevice;
         } else {
@@ -82,7 +81,7 @@ public class RaygunSettings {
         }
     }
 
-    public static void ignoreURLs(String[] urls) {
+    static void ignoreURLs(String[] urls) {
         if (urls != null) {
             for (String url : urls) {
                 if (url != null) {
@@ -92,7 +91,7 @@ public class RaygunSettings {
         }
     }
 
-    public static void ignoreViews(String[] views) {
+    static void ignoreViews(String[] views) {
         if (views != null) {
             for (String view : views) {
                 if (view != null) {
