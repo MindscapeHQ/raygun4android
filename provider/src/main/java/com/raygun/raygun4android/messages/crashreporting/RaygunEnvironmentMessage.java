@@ -18,6 +18,7 @@ import java.util.regex.Pattern;
 
 import com.raygun.raygun4android.RaygunLogger;
 
+@SuppressWarnings("FieldCanBeLocal")
 public class RaygunEnvironmentMessage {
   private String cpu;
   private String architecture;
