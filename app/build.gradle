@@ -11,7 +11,7 @@ def getVersionBuild = { ->
         return 2
     }
     catch (error) {
-        return -1;
+        return -1
     }
 }
 
