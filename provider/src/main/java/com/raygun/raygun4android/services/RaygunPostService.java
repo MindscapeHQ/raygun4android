@@ -14,7 +14,7 @@ public abstract class RaygunPostService extends JobIntentService {
      * @param apiKey      The API key of the app to deliver to
      * @return true or false
      */
-    protected static Boolean validateApiKey(String apiKey) {
+    static Boolean validateApiKey(String apiKey) {
         if (apiKey.length() == 0) {
             RaygunLogger.e("API key is empty, nothing will be logged or reported");
             return false;

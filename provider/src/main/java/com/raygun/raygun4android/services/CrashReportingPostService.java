@@ -32,8 +32,8 @@ import okhttp3.Response;
 
 public class CrashReportingPostService extends RaygunPostService {
 
-    static final int CRASHREPORTING_POSTSERVICE_JOB_ID = 4711;
-    static final int NETWORK_TIMEOUT = 30;
+    private static final int CRASHREPORTING_POSTSERVICE_JOB_ID = 4711;
+    private static final int NETWORK_TIMEOUT = 30;
 
     public static void enqueueWork(Context context, Intent intent) {
         RaygunLogger.i("Work for CrashReportingPostService has been put in the job queue");
@@ -65,6 +65,11 @@ public class CrashReportingPostService extends RaygunPostService {
                saveMessage(message);
            }
         }
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
     }
 
     private void saveMessage(String message) {

@@ -14,10 +14,10 @@ import java.security.Permission;
 import java.util.List;
 import java.util.Map;
 
-public final class RaygunHttpUrlConnection extends HttpURLConnection {
-    private URLConnection connectionInstance;
+final class RaygunHttpUrlConnection extends HttpURLConnection {
+    private final URLConnection connectionInstance;
 
-    public RaygunHttpUrlConnection(URLConnection connection) {
+    RaygunHttpUrlConnection(URLConnection connection) {
         super(connection.getURL());
         connectionInstance = connection;
         RaygunNetworkLogger.startNetworkCall(connectionInstance.getURL().toExternalForm(), System.currentTimeMillis());

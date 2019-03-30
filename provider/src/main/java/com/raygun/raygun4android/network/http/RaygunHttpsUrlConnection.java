@@ -18,8 +18,8 @@ import java.util.Map;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLPeerUnverifiedException;
 
-public final class RaygunHttpsUrlConnection extends HttpsURLConnection {
-    private URLConnection connectionInstance;
+final class RaygunHttpsUrlConnection extends HttpsURLConnection {
+    private final URLConnection connectionInstance;
 
     public RaygunHttpsUrlConnection(URLConnection connection) {
         super(connection.getURL());

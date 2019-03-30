@@ -200,10 +200,10 @@ public class CrashReporting {
         CrashReportingPostService.enqueueWork(RaygunClient.getApplicationContext(), intent);
     }
 
-    public static class RaygunUncaughtExceptionHandler implements Thread.UncaughtExceptionHandler {
-        private Thread.UncaughtExceptionHandler defaultHandler;
+    static class RaygunUncaughtExceptionHandler implements Thread.UncaughtExceptionHandler {
+        private final Thread.UncaughtExceptionHandler defaultHandler;
 
-        public RaygunUncaughtExceptionHandler(Thread.UncaughtExceptionHandler defaultHandler) {
+        RaygunUncaughtExceptionHandler(Thread.UncaughtExceptionHandler defaultHandler) {
             this.defaultHandler = defaultHandler;
         }
 

@@ -12,7 +12,7 @@ import java.util.Map;
 
 public class RaygunNetworkLogger {
     private static final long CONNECTION_TIMEOUT = 60000L; // 1 min
-    private static volatile HashMap<String, RaygunNetworkRequestInfo> connections = new HashMap<String, RaygunNetworkRequestInfo>();
+    private static final HashMap<String, RaygunNetworkRequestInfo> connections = new HashMap<String, RaygunNetworkRequestInfo>();
     private static boolean loggingEnabled = true;
     private static boolean loggingInitialized = false;
 
@@ -71,7 +71,7 @@ public class RaygunNetworkLogger {
         }
     }
 
-    public static synchronized void sendNetworkTimingEvent(String url, String requestMethod, long startTime, long endTime, int statusCode, String exception) {
+    private static synchronized void sendNetworkTimingEvent(String url, String requestMethod, long startTime, long endTime, int statusCode, String exception) {
         if (!shouldIgnoreURL(url) && loggingEnabled) {
             url = sanitiseURL(url);
             RUM.sendRUMTimingEvent(RaygunRUMEventType.NETWORK_CALL, requestMethod + " " + url, endTime - startTime);

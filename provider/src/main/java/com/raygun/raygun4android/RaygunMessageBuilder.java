@@ -14,7 +14,7 @@ import java.util.Map;
 public class RaygunMessageBuilder implements IRaygunMessageBuilder {
     private RaygunMessage raygunMessage;
 
-    public RaygunMessageBuilder() {
+    private RaygunMessageBuilder() {
         raygunMessage = new RaygunMessage();
     }
 

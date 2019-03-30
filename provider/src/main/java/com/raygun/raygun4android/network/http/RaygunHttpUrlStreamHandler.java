@@ -11,12 +11,12 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLStreamHandler;
 
-public final class RaygunHttpUrlStreamHandler extends URLStreamHandler {
+final class RaygunHttpUrlStreamHandler extends URLStreamHandler {
     private static final int PORT = 80;
     private static final String PROTOCOL = "http";
     private URLStreamHandler originalHandler;
 
-    public RaygunHttpUrlStreamHandler(URLStreamHandler handler) {
+    RaygunHttpUrlStreamHandler(URLStreamHandler handler) {
         originalHandler = handler;
     }
 
