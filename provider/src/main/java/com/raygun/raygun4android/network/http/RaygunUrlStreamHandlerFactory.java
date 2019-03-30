@@ -42,10 +42,7 @@ public class RaygunUrlStreamHandlerFactory implements URLStreamHandlerFactory {
                 try {
                     Class<?> c = contextClassLoader.loadClass(className);
                     streamHandler = (URLStreamHandler) c.newInstance();
-
-                    if (streamHandler != null) {
-                        return streamHandler;
-                    }
+                    return streamHandler;
                 } catch (IllegalAccessException ignore) {
                 } catch (InstantiationException ignore) {
                 } catch (ClassNotFoundException ignore) {

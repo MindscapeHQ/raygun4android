@@ -89,7 +89,11 @@ public class RUMPostService extends RaygunPostService {
                     RaygunLogger.e("OkHttp POST to Raygun RUM backend failed - " + ioe.getMessage());
                     ioe.printStackTrace();
                 } finally {
-                    if (response != null) response.body().close();
+                    if (response != null) {
+                        if (response.body() != null) {
+                            response.body().close();
+                        }
+                    }
                 }
             }
         } catch (Exception e) {

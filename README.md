@@ -6,13 +6,13 @@ Supports Android 4.1+ (API 16+).
 
 ## IMPORTANT
 
-### 21/09/2018
+### 26 March 2019
 
-Raygun4Android is currently actively being worked on for a release of version 4 and a lot of the documentation below is outdated and has not been updated (yet).
+Raygun4Android is currently actively being worked on for a release of version 4.
 
-If you found this branch (4.0.0) - it's probably not where you want to be and things will most likely break for you. Sorry.
+If you found this branch (4.0.0), you found the area that we're working on at the moment. The code is quite stable and we encourage you to use the 4.0.0-alpha2 release.
 
-Please go back to master, in which you'll find the 3.x stream of the provider that we actively encourage you to use.
+If you want the fully stable version go back to master, in which you'll find the 3.x stream of the provider.
 
 ## Requirements
 
@@ -23,12 +23,13 @@ Please go back to master, in which you'll find the 3.x stream of the provider th
 
 ### With Android Studio and Gradle
 
-Ensure jcenter() is present in your **project's** build.gradle:
+Ensure jcenter() or mavenCentral() are present in your **project's** build.gradle:
 
 ```gradle
 allprojects {
     repositories {
         jcenter()
+        mavenCentral()
     }
 }
 ```
@@ -37,8 +38,8 @@ Then add the following to your **module's** build.gradle:
 
 ```gradle
 dependencies {
-	...
-	compile 'com.raygun:raygun4android:4.0.0'
+    ...
+    compile 'com.raygun:raygun4android:4.0.0-alpha2'
 }
 ```
 
@@ -67,10 +68,10 @@ Inside the ```<application>``` element, add:
 
 Replace the value in ```<meta-data>``` with your API key, available from your Raygun dashboard.
 
-In a central activity, call the following:
+In a central activity (we suggest to use your common launch activity), call the following:
 
 ```java
-RaygunClient.init(getApplicationContext());
+RaygunClient.init(application);
 // Crash Reporting
 RaygunClient.enableCrashReporting();
 // RUM
@@ -79,13 +80,13 @@ RaygunClient.enableRUM(activity);
 
 The above exception handler automatically catches and sends all uncaught exceptions. You can create your own or send from a catch block by calling RaygunClient.send() and passing in the Throwable.
 
-For an actual usage example, check out the sample application in the **app** modle of this project
+For an actual usage example, check out the sample application in the **app** module of this project
 
 ## Raygun and ProGuard
 
 ### General
 
-ProGuard is a free Java tool for obfuscation, class file shrinking, optimizing and preverifying. When enabling ProGuard in a native Android application that also uses Raygun, the obfuscation feature requires a bit of attention. By default, your obfuscated class and method names will show up in the stacktraces of exception/error reports submitted to Raygun. This makes the stacktraces difficult to read when looking into the cause of the issues.
+ProGuard is a free Java tool for obfuscation, class file shrinking, optimizing and pre-verifying. When enabling ProGuard in a native Android application that also uses Raygun, the obfuscation feature requires a bit of attention. By default, your obfuscated class and method names will show up in the stacktraces of exception/error reports submitted to Raygun. This makes the stacktraces difficult to read when looking into the cause of the issues.
 
 ProGuard produces a mapping.txt file that can be used to restore the original class and method names. Such files can be uploaded to Raygun to automatically process all of your exception reports into readable stacktraces. 
 
@@ -106,7 +107,7 @@ Add the following lines to your proguard-rules.pro file so that Raygun and ProGu
 
 ### Gradle Task
 
-Instead of uploading mapping.txt manually after each deployment, you can use the **uploadProguardMapping** in the raygun group of Gradle tasks. 
+Instead of uploading mapping.txt manually after each deployment, you can use the **uploadProguardMapping** task in the yaygun group of Gradle tasks.
 
 You will find an example of how to do this in the sample app. Go to the **app** module's build.gradle file and look for the **createRaygunProguardTask** function.
 
@@ -134,7 +135,7 @@ def createRaygunProguardTask(token,raygunAppPath,groupName,version) {
 
 This function gets called from within the ```android {...}``` block of the Gradle file at each build in Android Studio and creates the appropriate parameterised task to push the file into the Raygun backend.
 
-The example shown requires curl to be on the PATH of your machine.
+The example shown requires curl to be on the PATH of your machine. Depending on your project structure and module names you also might have to adjust the path used in **proguardMappingFileParam**.
 
 ## Documentation 
 
@@ -154,11 +155,11 @@ user.setAnonymous(false);
 RaygunClient.setUser(user);
 ```
 
-Any of the properties are optional, for instance you can set just isAnonymous by calling setAnonymous(). There is also a constructor overload if you prefer to specify all in one statement and a convenience constructor to only set an identifier.
+Any of the properties are optional, for instance you could set only isAnonymous by calling the setAnonymous() method. There is also a constructor overload if you prefer to specify all in one statement and a convenience constructor to only set an identifier.
 
 `identifier` should be a unique representation of the current logged in user - we will assume that messages with the same identifier are the same user. If you do not set it, it will be automatically set to the device UUID.
 
-If the user context changes, for instance on log in/out, you should remember to call setUser again to store the updated user identifier. If a user logs out and you want to use the default device identifier again, just set the `identifier` property to null.
+If the user context changes, for instance on log in/out, you should remember to call setUser again to store the updated user identifier. If a user logs out and you want to use the default device identifier again, just create an empty `RaygunUserInfo` object.
 
 ### Custom endpoints
 

@@ -6,7 +6,6 @@ import android.os.Build;
 import android.os.Environment;
 import android.os.StatFs;
 import android.util.DisplayMetrics;
-import android.view.Display;
 import android.view.WindowManager;
 
 import com.raygun.raygun4android.RaygunLogger;
@@ -102,7 +101,9 @@ public class RaygunEnvironmentMessage {
             reader = new RandomAccessFile("/proc/meminfo", "r");
             load = reader.readLine();
         } finally {
-            reader.close();
+            if (reader != null) {
+                reader.close();
+            }
         }
         return load;
     }
