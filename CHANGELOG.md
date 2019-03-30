@@ -21,6 +21,7 @@
   - Removed uuid field from RaygunUserInfo
   - You have to enable individual products now before being able to use them.
   - Changes to RUM and Pulse APIs
+  - RaygunClient.post is not available anymore
   
 - v3.0.6: Fixed null reference exception when building crash report messages. We now send messages using a JobIntentService to improve compatibility with the latest Android versions. IMPORTANT: Support for API versions 9 to 15 has been discontinued from this release due to that. 
 

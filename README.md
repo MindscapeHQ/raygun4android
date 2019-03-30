@@ -137,7 +137,7 @@ This function gets called from within the ```android {...}``` block of the Gradl
 
 The example shown requires curl to be on the PATH of your machine. Depending on your project structure and module names you also might have to adjust the path used in **proguardMappingFileParam**.
 
-## Documentation 
+## Advanced features
 
 ### Affected user tracking
 
@@ -184,20 +184,24 @@ RaygunClient.setMaxReportsStoredOnDevice(amount)
 
 You cannot increase the amount beyond the maximum of 64. If you decrease the amount, any currently stored cached reports will be deleted.
 
-## Documentation (NOT NECESSARILY UP TO DATE)
-
 ### Version tracking
 
-Set the versionName attribute on <manifest> in your AndroidManifest.xml to be of the form x.x.x.x, where x is a positive integer, and it will be sent with each message. You can then filter by version in the Raygun dashboard.
+If you want track the version of your app with a crash report, you can do that in different ways:
+
+1. Set the versionName attribute on `<manifest>` in your AndroidManifest.xml to be of the form x.x.x.x, where x is a positive integer
+2. Set the version in the overloaded `init` method when initialising RaygunClient: `public static voide init(Application application, String apiKey, String version)`
+3. Use the `setVersion` method in RaygunClient: `public static void setVersion(String version)`
+
+The app's version will then be sent with each message and you can then filter by version in the Raygun dashboard.
 
 ### Getting/setting/cancelling the error before it is sent
 
-This provider has an onBeforeSend API to support accessing or mutating the candidate error payload immediately before it is sent, or cancelling the send outright. This is provided as the public method `RaygunClient.setOnBeforeSend(RaygunOnBeforeSend)`, which takes an instance of a class that implements the `RaygunOnBeforeSend` interface. Your class needs a public `onBeforeSend` method that takes a `RaygunMessage` parameter, and returns the same.
+This provider has an onBeforeSend API to support accessing or mutating the candidate error payload immediately before it is sent, or cancelling the send outright. This is provided as the public method `RaygunClient.setOnBeforeSend(RaygunOnBeforeSend)`, which takes an instance of a class that implements the `CrashReportingOnBeforeSend` interface. Your class needs a public `onBeforeSend` method that takes a `RaygunMessage` parameter, and returns the same.
 
 By example:
 
 ```java
-class BeforeSendImplementation implements RaygunOnBeforeSend {
+class BeforeSendImplementation implements CrashReportingOnBeforeSend {
     @Override
     public RaygunMessage onBeforeSend(RaygunMessage message) {
         Log.i("onBeforeSend", "About to post to Raygun, returning the payload as is...");
@@ -211,8 +215,11 @@ public class FullscreenActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         // Initialize the activity as normal
 
-        RaygunClient.init(getApplicationContext());
-        RaygunClient.attachExceptionHandler();
+        RaygunClient.init((Application)getApplicationContext());
+
+        RaygunClient.enableCrashReporting();
+        RaygunClient.enableRUM(this);
+
         RaygunClient.setOnBeforeSend(new BeforeSendImplementation());
     }
 }
@@ -262,83 +269,85 @@ public RaygunMessage onBeforeSend(RaygunMessage message) {
 
 Any error instances with a certain key will be grouped together. The example above will place all errors within one group (as the key is hardcoded to 'foo'). The grouping key is a String and must be between 1 and 100 characters long. You should send all data you care about (for instance, parts of the exception message, stacktrace frames, class names etc) to a hash function (for instance MD5), then pass that to `setGroupingKey`.
 
-### API
+## API Overview
+
+#### Initialisation
 
 The following method overloads are available for initializing RaygunClient:
 
-* RaygunClient.init(Context context)
+* `RaygunClient.init(Application application)`
+* `RaygunClient.init(Application application, String apiKey)`
+* `RaygunClient.init(Application application, String apiKey, String version)`
 
-* RaygunClient.init(String version, Context context)
+The first method reads the API key from the application's AndroidManifest.xml. If you want to specify your API key programmatically, use one of the latter two methods.
 
-* RaygunClient.init(Context context, String apiKey)
+#### Enabling features
 
-* RaygunClient.init(Context context, String apiKey, String version)
+Crash Reporting:
 
-	The first two read the API key from the application's AndroidManifest.xml. Whichever Context you pass in will have its API key read. If you want to specify your API key programmatically, use one of the latter two methods.
+* `RaygunClient.enableCrashReporting()`
+* `RaygunClient.enableCrashReporting(boolean attachDefaultHandler)`
 
-The following method is available for setting up a pre-made Uncaught Exception Handler, which will automatically send an exception when one reaches it (ie. just before your app crashes):
+Both methods will enable crash reporting. By default, a pre-made Uncaught Exception Handler, which will automatically send an exception when one reaches it (ie. just before your app crashes), will be setup. If you want to have control over this behaviour, use the second method.
 
-* RaygunClient.attachExceptionHandler()
+Tags and custom data will be attached to all exceptions that reaches it. This allows you to automatically send crash data when your app crashes. The handler will call any other pre-existing exception handlers you have set up before it sends to Raygun. After it is complete, it will call the default handler, which will crash the app and display the 'close app' user dialog. Exceptions are guaranteed to be sent if your app crashes.
 
-	The tags and custom data will be attached to all exceptions that reaches it. This allows you to automatically send crash data when your app crashes.
+RUM:
 
-	The handler will call any other pre-existing exception handlers you have set up before it sends to Raygun. After it is complete, it will call the default handler, which will crash the app and display the 'close app' user dialog. Exceptions are guaranteed to be sent if your app crashes.
+* `RaygunClient.enableRUM(Activity activity)`
+* `RaygunClient.enableRUM(Activity activity, boolean networkLogging)`
+
+Both methods enable RUM. By default, network activity details are being logged. If you want to change this behaviour, please use the second method.
+
+#### Sending crash reports manually
 
 The following methods are available for sending manually; pick one depending on how much extra data you'd like to send:
 
-* RaygunClient.send(Throwable throwable)
+* `RaygunClient.send(Throwable throwable)`
+* `RaygunClient.send(Throwable throwable, List tags)`
+* `RaygunClient.send(Throwable throwable, List tags, Map userCustomData)`
 
-* RaygunClient.send(Throwable throwable, List tags)
+The `send` function builds a RaygunMessage for you and then sends it.
 
-* RaygunClient.send(Throwable throwable, List tags, Map userCustomData)
+#### User management
 
-These build a RaygunMessage for you then send it. If you'd like to build a message manually you can use:
+* `RaygunClient.setUser(String user)`
+* `RaygunClient.setUser(RaygunUserInfo userInfo)`
 
-* RaygunClient.post(RaygunMessage raygunMessage)
+The first method internally builds a `RaygunUserInfo` with `user` being used at the identifier field. Ensure you call again if the user context changes (usually login/logout).
 
-	Note that this will require certain fields to be present - documentation is available at http://raygun.io/raygun-providers/rest-json-api
+* `RaygunClient.setUserCustomData(Map userCustomData)`
 
-The following misc methods are available:
+Sets a key-value Map which will be sent along with every exception. This will be merged with any other custom data passed as the third param of send().
 
-* RaygunClient.setUser(RaygunUserInfo userInfo)
+#### Misc
 
-	An object containing data about the currently logged in user - see above for details. Ensure you call this again if the user context changes.
+* `RaygunClient.setVersion(String version)`
 
-* RaygunClient.setVersion(String version)
+Stores the version of your application manually. Normally, this is automatically read from AndroidManifest (the versionName attribute on <manifest>) and is provided as a convenience.
 
-	Stores the version of your application manually. Normally, this is automatically read from AndroidManifest (the versionName attribute on <manifest>) and is provided as a convenience.
+* `RaygunClient.setTags(List tags)`
 
-* RaygunClient.setTags(List tags)
+Sets a list of tags which will be sent along with every exception. This will be merged with any other tags passed as the second param of send().
 
-  Sets a list of tags which will be sent along with every exception. This will be merged with any other tags passed as the second param of Send().
+* `RaygunClient.setOnBeforeSend(CrashReportingOnBeforeSend onBeforeSendImplementation)`
 
-* RaygunClient.setUserCustomData(Map userCustomData)
+Provides an instance of a class which has an onBeforeSend method that can be used to inspect, mutate or cancel the send to the Raygun API immediately before it happens. Can be used to filter arbitrary data.
 
-  Sets a key-value Map which, like the tags above, will be sent along with every exception. This will be merged with any other tags passed as the third param of send().
+## Frequently Asked Questions
 
-* RaygunClient.setOnBeforeSend(RaygunOnBeforeSend onBeforeSendImplementation)
+* Is there an example app?
 
-  Provides an instance of a class which has an onBeforeSend method that can be used to inspect, mutate or cancel the send to the Raygun API immediately before it happens. Can be used to filter arbitrary data.
-
-* RaygunMessageDetails.setGroupingKey(String groupingKey)
-
-  Provides a way to override the default grouping algorithm (see above for details). Any error instances with this key will be grouped together.
-
-### Frequently Asked Questions
-
-* Is there an example project?
-
-  Yup - clone this repository then run the **app** module of the project. 
+  Yup - clone this repository then run the **app** module of the project.
 
 * Not seeing errors in the dashboard?
 
-  Raygun4Android outputs Logcat messages - look for the the logcat tag **Raygun4Android** in raygunpostservice. HTTP Status 403 will indicate an invalid API key, 400 a bad message, and 202 will indicate received successfully.
+  Raygun4Android outputs Logcat messages - look for the the logcat tag **Raygun4Android**. HTTP Status 403 will indicate an invalid API key, 400 a bad message, and 202 will indicate received successfully.
 
 * Environment Data
 
-  A selection of enironment data will be attached and available in the Environment tab in the dashboard, and more in the Raw tab. This data is gathered from android.os.Build - if you wish to see more data you can add them on the userCustomData object.
+  A selection of environment data will be attached and available in the Environment tab in the dashboard, and more in the Raw tab. This data is gathered from android.os.Build - if you wish to see more data you can add them on the userCustomData object.
 
-* RayGunPostMessage logs an error message about a not found class: Rejecting re-init on previously-failed class java.lang.Class<android.support.v4.app.JobIntentService$JobServiceEngineImpl>
-      
+* The library logs an error message about a not found class: Rejecting re-init on previously-failed class java.lang.Class<android.support.v4.app.JobIntentService$JobServiceEngineImpl>
+
   The message above stems from certain versions of the Android support libraries. JobServiceEngineImpl is part of Android Oreo (8, SDK 26) and newer only. The support library catering for supporting services on earlier versions of Android runs internal checks for which implementation is available to it. As part of the checks, it outputs the message as an informational feedback only.
-
