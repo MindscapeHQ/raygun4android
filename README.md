@@ -344,6 +344,12 @@ Provides an instance of a class which has an onBeforeSend method that can be use
 
   Raygun4Android outputs Logcat messages - look for the the logcat tag **Raygun4Android**. HTTP Status 403 will indicate an invalid API key, 400 a bad message, and 202 will indicate received successfully.
 
+* There's something weird going on - I checked the logs and the Raygun servers can't be reached!
+
+  We found that certain apps in the category of ad- and tracking blockers on Android devices can stop Raygun messages from going through to our servers. One example of this is Blockada, a well-known and root-less Adblocker on Android. Unfortunately there is nothing we can directly do to stop problems arising from this to occur.
+
+  One possible workaround would be to implement a check in your app to see if api.raygun.io is reachable and if not, post this user's crash reports or RUM events to your own backend via custom endpoints.
+
 * Environment Data
 
   A selection of environment data will be attached and available in the Environment tab in the dashboard, and more in the Raw tab. This data is gathered from android.os.Build - if you wish to see more data you can add them on the userCustomData object.
