@@ -11,7 +11,7 @@ def getVersionBuild = { ->
         return 2
     }
     catch (error) {
-        return -1;
+        return -1
     }
 }
 
@@ -126,7 +126,10 @@ android {
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
+    // Build from local provider library src
     implementation project(':provider')
+    // Build from external repo
+    //implementation 'com.raygun:raygun4android:4.0.0-alpha1'
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation 'com.android.support:appcompat-v7:28.0.0'
     implementation 'com.android.support.constraint:constraint-layout:1.1.3'

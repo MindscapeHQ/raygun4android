@@ -1,5 +1,6 @@
 package com.raygun.raygun4android.services;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -31,8 +32,8 @@ import okhttp3.Response;
 
 public class CrashReportingPostService extends RaygunPostService {
 
-    static final int CRASHREPORTING_POSTSERVICE_JOB_ID = 4711;
-    static final int NETWORK_TIMEOUT = 30;
+    private static final int CRASHREPORTING_POSTSERVICE_JOB_ID = 4711;
+    private static final int NETWORK_TIMEOUT = 30;
 
     public static void enqueueWork(Context context, Intent intent) {
         RaygunLogger.i("Work for CrashReportingPostService has been put in the job queue");
@@ -66,12 +67,17 @@ public class CrashReportingPostService extends RaygunPostService {
         }
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+    }
+
     private void saveMessage(String message) {
         synchronized (this) {
             ArrayList<File> cachedFiles = new ArrayList<>(Arrays.asList(getCacheDir().listFiles(new RaygunFileFilter())));
 
             if (cachedFiles.size() < RaygunSettings.getMaxReportsStoredOnDevice()) {
-                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
+                @SuppressLint("SimpleDateFormat") SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
                 String uuid = UUID.randomUUID().toString().replace("-", "");
                 String timestamp = dateFormat.format(new Date(System.currentTimeMillis()));
                 File fn = new File(getCacheDir(), timestamp + "-" + uuid + "." + RaygunSettings.DEFAULT_FILE_EXTENSION);
@@ -129,7 +135,11 @@ public class CrashReportingPostService extends RaygunPostService {
                     RaygunLogger.e("OkHttp POST to Raygun Crash Reporting backend failed - " + ioe.getMessage());
                     ioe.printStackTrace();
                 } finally {
-                    if (response != null) response.body().close();
+                    if (response != null) {
+                        if (response.body() != null) {
+                            response.body().close();
+                        }
+                    }
                 }
             }
         } catch (Exception e) {

@@ -1,5 +1,6 @@
 package com.raygun.raygun4android;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Application;
 import android.app.Application.ActivityLifecycleCallbacks;
@@ -36,7 +37,7 @@ public class RUM implements ActivityLifecycleCallbacks {
     private static String sessionId;
     private static RaygunUserInfo currentSessionUser;
 
-    static void attach(Activity mainActivity) {
+    private static void attach(Activity mainActivity) {
 
         RaygunLogger.v("attach");
         if (RUM.rum == null && mainActivity != null) {
@@ -235,7 +236,7 @@ public class RUM implements ActivityLifecycleCallbacks {
                 }
                 timestamp = utcDateTime.toString();
             } else {
-                SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+                @SuppressLint("SimpleDateFormat") SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
                 df.setTimeZone(TimeZone.getTimeZone("UTC"));
                 Calendar c = Calendar.getInstance();
                 if (RaygunSettings.RUM_EVENT_SESSION_END.equals(eventName)) {
@@ -298,7 +299,7 @@ public class RUM implements ActivityLifecycleCallbacks {
                 utcDateTime.minus(milliseconds, ChronoUnit.MILLIS);
                 timestamp = utcDateTime.toString();
             } else {
-                SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+                @SuppressLint("SimpleDateFormat") SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
                 df.setTimeZone(TimeZone.getTimeZone("UTC"));
                 Calendar c = Calendar.getInstance();
                 c.add(Calendar.MILLISECOND, -(int) milliseconds);

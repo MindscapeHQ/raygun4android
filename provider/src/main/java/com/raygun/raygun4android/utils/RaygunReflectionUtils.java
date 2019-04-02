@@ -1,6 +1,7 @@
 package com.raygun.raygun4android.utils;
 
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 
@@ -44,14 +45,10 @@ public class RaygunReflectionUtils {
     private static Collection<Method> getAllMethods(Class<?> clazz) {
         HashSet<Method> methods = new HashSet<Method>();
 
-        for (Method m : clazz.getDeclaredMethods()) {
-            methods.add(m);
-        }
+        methods.addAll(Arrays.asList(clazz.getDeclaredMethods()));
 
         for (Class<?> s : getAllSuperClasses(clazz)) {
-            for (Method m : s.getDeclaredMethods()) {
-                methods.add(m);
-            }
+            methods.addAll(Arrays.asList(s.getDeclaredMethods()));
         }
 
         return methods;

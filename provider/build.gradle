@@ -17,8 +17,8 @@ android {
             minifyEnabled false
         }
         release {
-            debuggable false
-            minifyEnabled true
+            debuggable true
+            minifyEnabled false
             consumerProguardFiles 'proguard-rules.pro'
         }
     }
@@ -43,9 +43,12 @@ android {
     libraryVariants.all { variant ->
         if (variant.name == 'release') {
             task androidJavadocs(type: Javadoc) {
-                source = variant.javaCompiler.source
-                classpath = files(((Object) android.bootClasspath.join(File.pathSeparator)))
+                source = android.sourceSets.main.java.srcDirs
+                classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
                 classpath += variant.javaCompiler.classpath
+                classpath += files("build/generated/source/buildConfig/release")
+
+                options.windowTitle = "Raygun4Android"
             }
         }
     }

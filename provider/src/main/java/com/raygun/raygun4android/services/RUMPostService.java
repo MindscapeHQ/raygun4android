@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.v4.app.JobIntentService;
 
 import com.raygun.raygun4android.RaygunLogger;
 import com.raygun.raygun4android.RaygunSettings;
@@ -21,8 +20,8 @@ import okhttp3.Response;
 
 public class RUMPostService extends RaygunPostService {
 
-    static final int RUM_POSTSERVICE_JOB_ID = 815;
-    static final int NETWORK_TIMEOUT = 30;
+    private static final int RUM_POSTSERVICE_JOB_ID = 815;
+    private static final int NETWORK_TIMEOUT = 30;
 
     public static void enqueueWork(Context context, Intent intent) {
         RaygunLogger.i("Work for RUMPostService has been put in the job queue");
@@ -90,7 +89,11 @@ public class RUMPostService extends RaygunPostService {
                     RaygunLogger.e("OkHttp POST to Raygun RUM backend failed - " + ioe.getMessage());
                     ioe.printStackTrace();
                 } finally {
-                    if (response != null) response.body().close();
+                    if (response != null) {
+                        if (response.body() != null) {
+                            response.body().close();
+                        }
+                    }
                 }
             }
         } catch (Exception e) {

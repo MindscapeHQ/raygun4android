@@ -2,6 +2,7 @@ package com.raygun.raygun4android.messages.rum;
 
 import com.raygun.raygun4android.messages.shared.RaygunUserInfo;
 
+@SuppressWarnings("FieldCanBeLocal")
 public class RaygunRUMDataMessage {
     private String sessionId;
     private String timestamp;

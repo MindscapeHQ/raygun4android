@@ -13,6 +13,7 @@ import java.util.List;
 
 public class NetworkInfo {
     private List<String> iPAddress = new ArrayList<String>();
+    @SuppressWarnings("FieldCanBeLocal")
     private String networkConnectivityState;
 
     public NetworkInfo(Context context) {
