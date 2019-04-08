@@ -13,7 +13,8 @@ Ensure Maven Central is present in your **project's** build.gradle:
 ```
 allprojects {
     repositories {
-        mavenCentral()
+        google()
+	jcenter()
     }
 }
 ```
