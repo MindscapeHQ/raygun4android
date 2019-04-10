@@ -18,6 +18,16 @@ Setup the app or provider module in Run - Edit Configurations. Select the module
 
 Building the app module will also resolve the dependency to the provider module.
 
+build.gradle in the app module defines which version of the library is being used:
+
+````
+// Build from local provider library src
+implementation project(':provider')
+
+// Build from external repo
+//implementation 'com.raygun:raygun4android:4.0.0-alpha2'
+````
+
 ### Building from command-line with Gradle
 
 When building through the terminal inside of Android Studio and you receive the error message:

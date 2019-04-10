@@ -47,3 +47,4 @@ obj/
 releasing/secring.gpg
 *.jks
 /.idea/encodings.xml
+/.idea/dictionaries

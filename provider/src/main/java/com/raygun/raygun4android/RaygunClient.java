@@ -374,7 +374,10 @@ public class RaygunClient {
             return bundle.getString(RaygunSettings.APIKEY_MANIFEST_FIELD);
         } catch (PackageManager.NameNotFoundException e) {
             RaygunLogger.e("Couldn't read API key from your AndroidManifest.xml <meta-data /> element; cannot send. Detailed error: " + e.getMessage());
+        } catch (NullPointerException e) {
+            RaygunLogger.e("Couldn't find <meta-data /> element for your API key in the AndroidManifest.xml element; cannot send. Detailed error: " + e.getMessage());
         }
+
         return null;
     }
 

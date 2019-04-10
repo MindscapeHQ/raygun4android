@@ -6,7 +6,7 @@ Supports Android 4.1+ (API 16+).
 
 ## IMPORTANT
 
-### 26 March 2019
+### 03 April 2019
 
 Raygun4Android is currently actively being worked on for a release of version 4.
 
@@ -39,7 +39,7 @@ Then add the following to your **module's** build.gradle:
 ```gradle
 dependencies {
     ...
-    compile 'com.raygun:raygun4android:4.0.0-alpha2'
+    implementation 'com.raygun:raygun4android:4.0.0-alpha2'
 }
 ```
 
@@ -321,6 +321,11 @@ The first method internally builds a `RaygunUserInfo` with `user` being used at 
 Sets a key-value Map which will be sent along with every exception. This will be merged with any other custom data passed as the third param of send().
 
 #### Misc
+
+* `RaygunClient.setCustomCrashReportingEndpoint(String url)`
+* `RaygunClient.setCustomRUMEndpoint(String url)`
+
+The above methods allow setting custom reporting endpoints for Crash Reporting resp. RUM.
 
 * `RaygunClient.setVersion(String version)`
 
