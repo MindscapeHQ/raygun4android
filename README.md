@@ -146,20 +146,21 @@ Raygun supports tracking the unique users who encounter bugs in your apps.
 By default a device-derived UUID is transmitted. You can also add the currently logged in user's data like this:
 
 ```java
-RaygunUserInfo user = new RaygunUserInfo();
-user.setIdentifier("a@b.com");
+String userIdentifier = "12345";
+...
+RaygunUserInfo user = new RaygunUserInfo(userIdentifier);
 user.setFirstName("User");
 user.setFullName("User Name");
 user.setEmail("a@b.com");
-user.setAnonymous(false);
+...
 RaygunClient.setUser(user);
 ```
 
-Any of the properties are optional, for instance you could set only isAnonymous by calling the setAnonymous() method. There is also a constructor overload if you prefer to specify all in one statement and a convenience constructor to only set an identifier.
+Any of the properties but `identifier` and `isAnonymous` are optional. `isAnonymous` will be set to true if the identifier is null or an empty string. There is also a constructor overload if you prefer to specify all in one statement and a convenience constructor to only set an identifier.
 
 `identifier` should be a unique representation of the current logged in user - we will assume that messages with the same identifier are the same user. If you do not set it, it will be automatically set to the device UUID.
 
-If the user context changes, for instance on log in/out, you should remember to call setUser again to store the updated user identifier. If a user logs out and you want to use the default device identifier again, just create an empty `RaygunUserInfo` object.
+If the user context changes, for instance on log in/out, you should remember to call setUser again to store the updated user identifier. If a user logs out and you want to use the default device identifier again, just create an empty `RaygunUserInfo` object without an identifier. In this case `isAnonymous` will be set to true.
 
 ### Custom endpoints
 
