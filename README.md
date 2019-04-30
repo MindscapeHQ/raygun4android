@@ -6,11 +6,11 @@ Supports Android 4.1+ (API 16+).
 
 ## IMPORTANT
 
-### 03 April 2019
+### 30 April 2019
 
 Raygun4Android is currently actively being worked on for a release of version 4.
 
-If you found this branch (4.0.0), you found the area that we're working on at the moment. The code is quite stable and we encourage you to use the 4.0.0-alpha2 release.
+If you found this branch (4.0.0), you found the area that we're working on at the moment. The code is quite stable and we encourage you to use the 4.0.0-beta1 release.
 
 If you want the fully stable version go back to master, in which you'll find the 3.x stream of the provider.
 
@@ -39,7 +39,7 @@ Then add the following to your **module's** build.gradle:
 ```gradle
 dependencies {
     ...
-    implementation 'com.raygun:raygun4android:4.0.0-alpha2'
+    implementation 'com.raygun:raygun4android:4.0.0-beta1'
 }
 ```
 
@@ -105,9 +105,9 @@ Add the following lines to your proguard-rules.pro file so that Raygun and ProGu
 
 **-renamesourcefileattribute** is optional. This causes the file names of your code to all appear as “SourceFile” in the stacktrace. This is for added secrecy so that your actual file names can not be seen in the application package. Even with a mapping file, the original file names can not be resolved, which is not so good for debugging. If you don't mind your file names being kept, then feel free to remove this line for the extra debugging help.
 
-### Gradle Task
+### Proguard Gradle Task
 
-Instead of uploading mapping.txt manually after each deployment, you can use the **uploadProguardMapping** task in the yaygun group of Gradle tasks.
+Instead of uploading mapping.txt manually after each deployment, you can use the **uploadProguardMapping** task in the Raygun group of Gradle tasks.
 
 You will find an example of how to do this in the sample app. Go to the **app** module's build.gradle file and look for the **createRaygunProguardTask** function.
 
@@ -136,6 +136,10 @@ def createRaygunProguardTask(token,raygunAppPath,groupName,version) {
 This function gets called from within the ```android {...}``` block of the Gradle file at each build in Android Studio and creates the appropriate parameterised task to push the file into the Raygun backend.
 
 The example shown requires curl to be on the PATH of your machine. Depending on your project structure and module names you also might have to adjust the path used in **proguardMappingFileParam**.
+
+### Release Notification Gradle Task
+
+TODO
 
 ## Advanced features
 
