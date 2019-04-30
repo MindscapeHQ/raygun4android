@@ -2,7 +2,7 @@
 
 Official development or production releases of Raygun4Android are usually done by the Raygun team. This file documents the setup needed to do snapshot and production releases.
 
-The release process uses Chris Banes' library for pushing to Maven with Gradle: https://github.com/chrisbanes/gradle-mvn-push. Please check out Chris' documentation before reading further.
+The release process uses a modified version of Chris Banes' library for pushing to Maven with Gradle: https://github.com/chrisbanes/gradle-mvn-push. Please check out Chris' documentation before reading further.
 
 ## Preparation
 
@@ -68,10 +68,10 @@ USERNAME: {to be provided}
 PASSWORD: {to be provided}
 ````
 
-To view our currently uploaded artifacts go to:
+To view our currently uploaded public artifacts go to:
 
 ````
-Repositories/User Managed Repositories/Public Repositories/Browse Storage/com/mindscapehq/android/raygun4android/{version}
+Repositories -> User Managed Repositories -> Public Repositories -> Browse Storage, then unfold the tree to com/raygun/raygun4android/{version}
 ````
 
 You can view more details by opening the right hand side menu.
@@ -92,11 +92,11 @@ More information can be found [here](https://help.sonatype.com/repomanager2/stag
 #### Staging Profile
 
 Details the repositories the artifacts are sent to throughout the staging process.
-Our staging profile is named **com.mindscapehq**
+Our staging profile is named **com.raygun**
 
 #### Staging Repositories
 
-A temp staging repository will be created here when we deploy.
+A temp staging repository will be created [here](https://oss.sonatype.org/content/groups/staging/com/raygun/raygun4android/) when we deploy.
 
 #### Staging Ruleset
 
@@ -114,14 +114,14 @@ Here you can manually upload artifacts.
     ````
 
 2. Login to the [Nexus Repository Manager](https://oss.sonatype.org) and go to the **Staging Repositories**.
-3. Locate the repository named 'commindscapehq-100*' near the bottom.
+3. Locate the repository named 'comraygun-100*' near the bottom.
 4. Mark this repository as **closed** by clicking the **Close** button.
 5. The repository will sent to the Target Groups defined in the **Staging Profiles** (for us it's **Staging**).
 6. Test the artifacts that are now in our staging target group (**Staging**).
 7. Release the artifacts by clicking the **Release** button on our staging repository (which we marked as **closed**).
 8. Artifacts are sent to the Release repository defined in the staging profile.
 9. The temp staging repository will be automatically deleted.
-10. Artifacts will take a few days to be made available to clients and should be listed [here](https://mvnrepository.com/artifact/com.mindscapehq.android/raygun4android) eventually.
+10. Artifacts will take a few days to be made available to clients and should be listed in the [public repositories](https://oss.sonatype.org/content/repositories/public/com/raygun/raygun4android/) first and on [mvnrepository.com](https://mvnrepository.com/artifact/com.raygun/raygun4android) eventually.
 
 
 
