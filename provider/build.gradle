@@ -31,7 +31,7 @@ android {
     libraryVariants.all { variant ->
         variant.outputs.all { output ->
             if (outputFile != null && outputFileName.endsWith('.aar')) {
-                if (variant.buildType.debuggable) {
+                if (variant.name == 'debug') {
                     outputFileName = "raygun4android-debug.aar"
                 } else {
                     outputFileName = "raygun4android.aar"
