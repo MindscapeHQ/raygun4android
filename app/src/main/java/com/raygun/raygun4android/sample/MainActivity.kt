@@ -9,7 +9,6 @@ import com.raygun.raygun4android.messages.shared.RaygunUserInfo
 import android.widget.Button
 import android.widget.TextView
 
-
 class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -28,6 +27,7 @@ class MainActivity : AppCompatActivity() {
 
         val buttonSend = findViewById(R.id.button_send) as Button
         val buttonCrash = findViewById(R.id.button_crash) as Button
+        val buttonHandleException = findViewById(R.id.button_handleException) as Button
         val buttonSetUserAnon = findViewById(R.id.button_set_user_anon) as Button
         val buttonSetUserA = findViewById(R.id.button_set_user_A) as Button
         val buttonSetUserB = findViewById(R.id.button_set_user_B) as Button
@@ -46,6 +46,17 @@ class MainActivity : AppCompatActivity() {
             // A real exception will be thrown here, which will be caught & sent by RaygunClient
             val i = 3 / 0
             Log.d("Raygun4Android-Sample", "This is here purely so that our division by zero calculation in i gets used and not optimised away in a release build: $i")
+        }
+
+        buttonHandleException.setOnClickListener {
+            // Handle an exception yourself - nothing should be sent to Raygun
+            try {
+                val i = 3 / 0
+                Log.d("Raygun4Android-Sample", "This is here purely so that our division by zero calculation in i gets used and not optimised away in a release build: $i")
+            } catch (ex: Exception) {
+                val i = 4
+                Log.d("Raygun4Android-Sample", "This is here purely so that our alternative value for i gets used and not optimised away in a release build: $i")
+            }
         }
 
         buttonSetUserAnon.setOnClickListener {
