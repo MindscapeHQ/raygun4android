@@ -1,27 +1,26 @@
 ## Changelog
 
-- v4.0.0: This is a major release. Overview of the most important and visible changes:
 
-  - Maven groupID for loading RG4A has changed to com.raygun
-  - The build process now uses Gradle, the Maven build process has been removed without replacement
+- v4.0.0-beta2: This is a major release and has a variety of breaking changes, depending on your use cases. This is an overview of the most important and visible changes:
+
+  - The Maven groupID for loading RG4A has changed to com.raygun.
+  - The build process now uses Gradle, the Maven build process has been removed without replacement.
   - Project setup optimised for Android Studio 3.1+:
     - app module build sample app
     - provider module is an Android Library project and creates .aar artifacts
-  - Improvements to sample app:
-    - Added sample Gradle task to send a deployment notification to Raygun
-    - Added sample Gradle task to upload the Proguard mapping file from a release build to Raygun
-  - RaygunPostService is now a JobIntentService to better deal with background limitations in Android 8+. This will behave as a service on Android 7 and earlier devices.
+  - Various improvements to sample app
+  - The background services are now a JobIntentService to better deal with background limitations in Android 8+. This will behave as a Service on Android 7 and earlier devices.
   - Sending POST data to the Raygun backend has been refactored to using Okhttp3. RG4A therefore has a new implementation dependency on this library.
-  - Build requirements updated to compileSDK 28 and minSDK 16+
+  - Build requirements have been updated to compileSDK 28 and minSDK 16+.
   - There is a new convenience constructor on RaygunUserInfo to create a user object that only has an identifier.
-  - All deprecated functionality from 3.x has been removed
-  - Custom endpoints are supported now
-  - You can change the default of 64 reports being stored to a lower value now
-  - General API cleanup and changes to Pulse -> all RUM now
+  - All deprecated functionality from 3.x has been removed.
+  - Custom endpoints are supported now.
+  - You can change the default of 64 reports being stored to a lower value now.
+  - General API cleanup and changes to Pulse -> all renamed RUM now
   - Removed uuid field from RaygunUserInfo
   - You have to enable individual products now before being able to use them.
   - Changes to RUM and Pulse APIs
-  - RaygunClient.post is not available anymore
+  - The post() functions in RaygunClient have been removed.
   
 - v3.0.6: Fixed null reference exception when building crash report messages. We now send messages using a JobIntentService to improve compatibility with the latest Android versions. IMPORTANT: Support for API versions 9 to 15 has been discontinued from this release due to that. 
 
