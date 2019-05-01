@@ -1,0 +1,123 @@
+import static groovyx.net.http.HttpBuilder.configure
+import static groovyx.net.http.ContentTypes.JSON
+
+apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
+
+// Used for Raygun notifyDeployment task. In the real world this would come from a local user.properties file etc.
+def localUserName = "Change Me"
+def localUserEmail = "changeme@test.com"
+
+// Raygun Gradle task configuration
+def RAYGUN_GROUP = "raygun"
+def RAYGUN_API_TOKEN = "<YOUR EXTERNAL ACCESS TOKEN>"
+def RAYGUN_API_KEY = "<YOUR RG APP API KEY>"
+def RAYGUN_APP_PATH = "<YOUR RG APP UPLOAD PATH>"
+
+/*
+ * Setup a sample Gradle task for deployment notification
+ * This is done as a function so that there's more flexibility when it comes to dealing with creating the tasks for multiple flavours etc.
+ */
+def createRaygunNotifyDeploymentTask(token,key,groupName,version,userName,userEmail) {
+
+    task "notifyDeployment" {
+        group "${groupName}"
+
+        doLast {
+            def result = configure {
+                request.uri = 'https://app.raygun.io/deployments?authToken=' + token
+                request.contentType = JSON[0]
+            }.post {
+                request.body = '{"apiKey":"' + key + '","version":"' + version + '","ownerName":"' + userName + '","emailAddress":"' + userEmail + '"}'
+                request.contentType = 'application/json'
+            }
+
+            println result
+            def depId = result.deploymentId as Long
+            assert depId != null && depId != '' && depId > 0
+        }
+    }
+}
+
+/*
+ * Setup a sample Gradle task for upload proguard mapping files
+ * This is done as a function so that there's more flexibility when it comes to dealing with creating the tasks for multiple flavours etc.
+ *
+ * TODO The function as of now requires curl to be available on the PATH of the machine running it and probably doesn't work out of the box on Windows. Should be refactored to using the Groovy HTTP library
+ */
+def createRaygunProguardTask(token,raygunAppPath,groupName,version) {
+
+    task "uploadProguardMapping" {
+        group "${groupName}"
+
+        doLast {
+            def proguardMappingFileParam = "file=@${project.rootDir}/app/build/outputs/mapping/release/mapping.txt"
+            def versionIdentifierParam = "version=${version}"
+            def raygunProguardEndpointUrlParam = "https://app.raygun.com/upload/proguardsymbols/${raygunAppPath}?authToken=${token}"
+
+            def p = ['curl', '-F', proguardMappingFileParam, '-F', versionIdentifierParam, raygunProguardEndpointUrlParam].execute()
+            p.waitFor()
+
+            def result = p.text
+            println result
+            assert result == "true"
+        }
+    }
+}
+
+
+android {
+    signingConfigs {
+        releaseConfig {
+            keyAlias 'testkey'
+            keyPassword '123456'
+            storeFile file('testkeystore.jks')
+            storePassword '123456'
+        }
+    }
+    compileSdkVersion 28
+    defaultConfig {
+        applicationId "com.raygun.raygun4android.sample"
+        minSdkVersion 16
+        targetSdkVersion 28
+        versionCode = Long.valueOf(VERSION_CODE)
+        versionName = "${VERSION_NAME}-sample"
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    }
+    buildTypes {
+        release {
+            debuggable false
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.releaseConfig
+        }
+        debug {
+            debuggable true
+            minifyEnabled false
+            applicationIdSuffix '.debug'
+            versionNameSuffix '-DEBUG'
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    // Setup RG tasks
+    createRaygunNotifyDeploymentTask(RAYGUN_API_TOKEN, RAYGUN_API_KEY, RAYGUN_GROUP, defaultConfig.versionName, localUserName, localUserEmail)
+    createRaygunProguardTask(RAYGUN_API_TOKEN, RAYGUN_APP_PATH, RAYGUN_GROUP, defaultConfig.versionName)
+}
+
+dependencies {
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    // Build from local provider library src
+    implementation project(':provider')
+    // Build from external repo
+    //implementation 'com.raygun:raygun4android:4.0.0-beta1'
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    implementation 'com.android.support:appcompat-v7:28.0.0'
+    implementation 'com.android.support.constraint:constraint-layout:1.1.3'
+    testImplementation 'junit:junit:4.12'
+    androidTestImplementation 'com.android.support.test:runner:1.0.2'
+    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
+}

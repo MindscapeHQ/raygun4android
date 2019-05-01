@@ -6,8 +6,8 @@ android {
     defaultConfig {
         minSdkVersion 16
         targetSdkVersion 28
-        versionCode 1
-        versionName "1.0"
+        versionCode = Long.valueOf(VERSION_CODE)
+        versionName = VERSION_NAME
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
 
@@ -17,25 +17,38 @@ android {
             minifyEnabled false
         }
         release {
-            debuggable false
+            debuggable true
             minifyEnabled false
             consumerProguardFiles 'proguard-rules.pro'
         }
     }
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_7
-        targetCompatibility JavaVersion.VERSION_1_7
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
     }
 
     libraryVariants.all { variant ->
         variant.outputs.all { output ->
             if (outputFile != null && outputFileName.endsWith('.aar')) {
-                if (variant.buildType.debuggable) {
+                if (variant.name == 'debug') {
                     outputFileName = "raygun4android-debug.aar"
                 } else {
                     outputFileName = "raygun4android.aar"
                 }
+            }
+        }
+    }
+
+    libraryVariants.all { variant ->
+        if (variant.name == 'release') {
+            task androidJavadocs(type: Javadoc) {
+                source = android.sourceSets.main.java.srcDirs
+                classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+                classpath += variant.javaCompiler.classpath
+                classpath += files("build/generated/source/buildConfig/release")
+
+                options.windowTitle = "Raygun4Android"
             }
         }
     }
@@ -56,4 +69,4 @@ dependencies {
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
 }
 
-apply from: 'https://raw.github.com/chrisbanes/gradle-mvn-push/master/gradle-mvn-push.gradle'
+apply from: 'gradle-mvn-push.gradle'

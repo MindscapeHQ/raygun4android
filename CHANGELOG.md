@@ -1,12 +1,35 @@
 ## Changelog
 
-- v3.0.6: Fixed null reference exception when building crash report messages. We now send messages using a JobIntentService to improve compatibility with the latest Android versions. IMPORTANT: Support for API versions 9 to 15 has been discontinued from this release due to that.
+- v4.0.0: This is a major release. Overview of the most important and visible changes:
+
+  - Maven groupID for loading RG4A has changed to com.raygun
+  - The build process now uses Gradle, the Maven build process has been removed without replacement
+  - Project setup optimised for Android Studio 3.1+:
+    - app module build sample app
+    - provider module is an Android Library project and creates .aar artifacts
+  - Improvements to sample app:
+    - Added sample Gradle task to send a deployment notification to Raygun
+    - Added sample Gradle task to upload the Proguard mapping file from a release build to Raygun
+  - RaygunPostService is now a JobIntentService to better deal with background limitations in Android 8+. This will behave as a service on Android 7 and earlier devices.
+  - Sending POST data to the Raygun backend has been refactored to using Okhttp3. RG4A therefore has a new implementation dependency on this library.
+  - Build requirements updated to compileSDK 28 and minSDK 16+
+  - There is a new convenience constructor on RaygunUserInfo to create a user object that only has an identifier.
+  - All deprecated functionality from 3.x has been removed
+  - Custom endpoints are supported now
+  - You can change the default of 64 reports being stored to a lower value now
+  - General API cleanup and changes to Pulse -> all RUM now
+  - Removed uuid field from RaygunUserInfo
+  - You have to enable individual products now before being able to use them.
+  - Changes to RUM and Pulse APIs
+  - RaygunClient.post is not available anymore
+  
+- v3.0.6: Fixed null reference exception when building crash report messages. We now send messages using a JobIntentService to improve compatibility with the latest Android versions. IMPORTANT: Support for API versions 9 to 15 has been discontinued from this release due to that. 
 
 - v3.0.5: Fixing timing issue from ConnectivityManager in RaygunPostService (#41), adding null checks around intent extras being null that should never be null (XRAY-1898)
 
 - v3.0.4: Fixing NPE in RaygunPostService (#34, PR #37); RaygunErrorMessage can now accept any Throwable (PR #33); Pulse now checks for connectivity (PR #38)
 
-- v3.0.3: Bugfix: removing println from code (PR #36)
+- v3.0.3: Bug fix: removing println from code (PR #36)
 
 - v3.0.2: Allowing all properties of the RaygunMessageDetails to be modifiable during the onBeforeSend callback.
 
@@ -36,7 +59,7 @@
 
 - v1.0.2: Added SetUser method for unique user tracking.
 
-- v1.0.1: Added caching of messages to disk when network unavailable & post them when it becomes available again; several bugfixes relating to the posting service. This version is recommended; do not use 1.0.0.
+- v1.0.1: Added caching of messages to disk when network unavailable & post them when it becomes available again; several bug fixes relating to the posting service. This version is recommended; do not use 1.0.0.
 
 - v1.0.0: Completed initial version with background service for performing posting, API key read from AndroidManifest and more.
 
