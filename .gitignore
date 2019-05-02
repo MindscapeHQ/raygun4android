@@ -25,7 +25,10 @@ Thumbs.db
 *.iml
 .idea/workspace.xml
 .idea/libraries
+.idea/encodings.xml
 .idea/modules.xml
+.idea/markdown-navigator.xml
+.idea/markdown-navigator
 .idea/caches/
 .gradle
 build/
@@ -40,6 +43,8 @@ output.json
 obj/
 .externalNativeBuild
 
-# Gradle
-gradle.properties
-secring.gpg
+# Release build
+releasing/secring.gpg
+*.jks
+/.idea/encodings.xml
+/.idea/dictionaries
