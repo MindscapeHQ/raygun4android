@@ -16,7 +16,7 @@ public class RaygunMessageDetails {
     private RaygunEnvironmentMessage environment;
     private RaygunClientMessage client;
     private List tags;
-    private Map userCustomData;
+    private Map customData;
     private RaygunAppContext context;
     private RaygunUserInfo user;
     private NetworkInfo request;
@@ -77,12 +77,12 @@ public class RaygunMessageDetails {
     }
 
     // Custom Data
-    public Map getUserCustomData() {
-        return userCustomData;
+    public Map getCustomData() {
+        return customData;
     }
 
-    public void setUserCustomData(Map userCustomData) {
-        this.userCustomData = userCustomData;
+    public void setCustomData(Map customData) {
+        this.customData = customData;
     }
 
     // App Context

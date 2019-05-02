@@ -23,7 +23,7 @@ class MainActivity : AppCompatActivity() {
         RaygunClient.enableCrashReporting()
         RaygunClient.enableRUM(this)
 
-        RaygunClient.setUserCustomData(initialCustomData)
+        RaygunClient.setCustomData(initialCustomData)
 
         val buttonSend = findViewById(R.id.button_send) as Button
         val buttonCrash = findViewById(R.id.button_crash) as Button

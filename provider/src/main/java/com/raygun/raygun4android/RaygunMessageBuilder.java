@@ -60,8 +60,8 @@ public class RaygunMessageBuilder implements IRaygunMessageBuilder {
     }
 
     @Override
-    public IRaygunMessageBuilder setUserCustomData(Map userCustomData) {
-        raygunMessage.getDetails().setUserCustomData(userCustomData);
+    public IRaygunMessageBuilder setCustomData(Map customData) {
+        raygunMessage.getDetails().setCustomData(customData);
         return this;
     }
 
