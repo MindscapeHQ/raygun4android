@@ -2,6 +2,7 @@ package com.raygun.raygun4android.messages.crashreporting;
 
 import android.content.Context;
 
+import com.google.gson.annotations.SerializedName;
 import com.raygun.raygun4android.messages.shared.RaygunUserInfo;
 
 import java.util.List;
@@ -16,6 +17,7 @@ public class RaygunMessageDetails {
     private RaygunEnvironmentMessage environment;
     private RaygunClientMessage client;
     private List tags;
+    @SerializedName("userCustomData")
     private Map customData;
     private RaygunAppContext context;
     private RaygunUserInfo user;
