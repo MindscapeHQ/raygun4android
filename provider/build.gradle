@@ -17,7 +17,7 @@ android {
             minifyEnabled false
         }
         release {
-            debuggable true
+            debuggable false
             minifyEnabled false
             consumerProguardFiles 'proguard-rules.pro'
         }
