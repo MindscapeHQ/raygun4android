@@ -18,14 +18,14 @@ Setup the app or provider module in Run - Edit Configurations. Select the module
 
 Building the app module will also resolve the dependency to the provider module.
 
-build.gradle in the app module defines which version of the library is being used:
+build.gradle in the app module defines which version of the library is being used (replace `<version>` with the library version you'd like to use):
 
 ````
 // Build from local provider library src
 implementation project(':provider')
 
 // Build from external repo
-//implementation 'com.raygun:raygun4android:4.0.0-alpha2'
+//implementation 'com.raygun:raygun4android:<version>'
 ````
 
 ### Building from command-line with Gradle
