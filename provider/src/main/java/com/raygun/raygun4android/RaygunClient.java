@@ -112,14 +112,14 @@ public class RaygunClient {
     /**
      * Sends an exception-type object to Raygun with a list of tags you specify, and a set of custom data.
      *
-     * @param throwable      The Throwable object that occurred in your application that will be sent to Raygun.
-     * @param tags           A list of data that will be attached to the Raygun message and visible on the error in the dashboard.
+     * @param throwable     The Throwable object that occurred in your application that will be sent to Raygun.
+     * @param tags          A list of data that will be attached to the Raygun message and visible on the error in the dashboard.
      *                       This could be a build tag, lifecycle state, debug/production version etc.
-     * @param userCustomData A set of custom key-value pairs relating to your application and its current state. This is a bucket
+     * @param customData    A set of custom key-value pairs relating to your application and its current state. This is a bucket
      *                       where you can attach any related data you want to see to the error.
      */
-    public static void send(Throwable throwable, List tags, Map userCustomData) {
-        CrashReporting.send(throwable, tags, userCustomData);
+    public static void send(Throwable throwable, List tags, Map customData) {
+        CrashReporting.send(throwable, tags, customData);
     }
 
     /**
@@ -197,10 +197,10 @@ public class RaygunClient {
      * Sets a key-value Map which, like the tags, will be sent along with every exception.
      * This will be merged with any other tags passed as the third param of send().
      *
-     * @param userCustomData Map with custom user data to be sent to Raygun
+     * @param customData Map with custom user data to be sent to Raygun
      */
-    public static void setUserCustomData(Map userCustomData) {
-        CrashReporting.setUserCustomData(userCustomData);
+    public static void setCustomData(Map customData) {
+        CrashReporting.setCustomData(customData);
     }
 
     /**

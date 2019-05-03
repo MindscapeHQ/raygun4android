@@ -27,7 +27,7 @@ public class CrashReporting {
     private static RaygunUncaughtExceptionHandler handler;
     private static CrashReportingOnBeforeSend onBeforeSend;
     private static List tags;
-    private static Map userCustomData;
+    private static Map customData;
     private static List<RaygunBreadcrumbMessage> breadcrumbs;
     private static boolean shouldProcessBreadcrumbLocation = false;
 
@@ -47,12 +47,12 @@ public class CrashReporting {
         CrashReporting.tags = tags;
     }
 
-    static Map getUserCustomData() {
-        return CrashReporting.userCustomData;
+    static Map getCustomData() {
+        return CrashReporting.customData;
     }
 
-    static void setUserCustomData(Map userCustomData) {
-        CrashReporting.userCustomData = userCustomData;
+    static void setCustomData(Map customData) {
+        CrashReporting.customData = customData;
     }
 
     static void recordBreadcrumb(String message) {
@@ -94,7 +94,7 @@ public class CrashReporting {
         send(throwable, tags, null);
     }
 
-    static void send(Throwable throwable, List tags, Map userCustomData) {
+    static void send(Throwable throwable, List tags, Map customData) {
         if (RaygunClient.isCrashReportingEnabled()) {
 
             RaygunMessage msg = buildMessage(throwable);
@@ -105,7 +105,7 @@ public class CrashReporting {
             }
 
             msg.getDetails().setTags(RaygunUtils.mergeLists(getTags(), tags));
-            msg.getDetails().setUserCustomData(RaygunUtils.mergeMaps(getUserCustomData(), userCustomData));
+            msg.getDetails().setCustomData(RaygunUtils.mergeMaps(getCustomData(), customData));
 
             if (onBeforeSend != null) {
                 msg = onBeforeSend.onBeforeSend(msg);

@@ -310,7 +310,7 @@ The following methods are available for sending manually; pick one depending on 
 
 * `RaygunClient.send(Throwable throwable)`
 * `RaygunClient.send(Throwable throwable, List tags)`
-* `RaygunClient.send(Throwable throwable, List tags, Map userCustomData)`
+* `RaygunClient.send(Throwable throwable, List tags, Map customData)`
 
 The `send` function builds a RaygunMessage for you and then sends it.
 
@@ -321,7 +321,7 @@ The `send` function builds a RaygunMessage for you and then sends it.
 
 The first method internally builds a `RaygunUserInfo` with `user` being used at the identifier field. Ensure you call again if the user context changes (usually login/logout).
 
-* `RaygunClient.setUserCustomData(Map userCustomData)`
+* `RaygunClient.setCustomData(Map customData)`
 
 Sets a key-value Map which will be sent along with every exception. This will be merged with any other custom data passed as the third param of send().
 
@@ -362,7 +362,7 @@ Provides an instance of a class which has an onBeforeSend method that can be use
 
 * Environment Data
 
-  A selection of environment data will be attached and available in the Environment tab in the dashboard, and more in the Raw tab. This data is gathered from android.os.Build - if you wish to see more data you can add them on the userCustomData object.
+  A selection of environment data will be attached and available in the Environment tab in the dashboard, and more in the Raw tab. This data is gathered from android.os.Build - if you wish to see more data you can add them on the userCustomData JSON object by setting custom data through the API..
 
 * The library logs an error message about a not found class: Rejecting re-init on previously-failed class java.lang.Class<android.support.v4.app.JobIntentService$JobServiceEngineImpl>
 
