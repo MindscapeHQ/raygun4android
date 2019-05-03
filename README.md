@@ -14,6 +14,8 @@ With the release of beta2, the 4.0.0 development branch has now been merged into
 
 If you want the fully stable version 3.0.6 please check out the changeset labelled with v3.0.6 and go from there.
 
+The master branch of this repository is currently heading towards a beta3 release.
+
 ## Requirements
 
 - minSdkVersion 16+
@@ -139,7 +141,34 @@ The example shown requires curl to be on the PATH of your machine. Depending on 
 
 ### Release Notification Gradle Task
 
-TODO
+Raygun4Android also comes with a second Gradle task intended to notify the Raygun backend when you deploy a new version of your app. The idea behind this functionality is that it will allow you to see changes in error rate or user behaviour by version.
+
+Raygun offers a REST API for this notification. The sample app contains a function **createRaygunNotifyDeploymentTask** that creates a **notifyDeployment** task.
+
+```groovy
+def createRaygunNotifyDeploymentTask(token,key,groupName,version,userName,userEmail) {
+
+    task "notifyDeployment" {
+        group "${groupName}"
+
+        doLast {
+            def result = configure {
+                request.uri = 'https://app.raygun.io/deployments?authToken=' + token
+                request.contentType = JSON[0]
+            }.post {
+                request.body = '{"apiKey":"' + key + '","version":"' + version + '","ownerName":"' + userName + '","emailAddress":"' + userEmail + '"}'
+                request.contentType = 'application/json'
+            }
+
+            println result
+            def depId = result.deploymentId as Long
+            assert depId != null && depId != '' && depId > 0
+        }
+    }
+}
+```
+
+This function gets called from within the ```android {...}``` block of the Gradle file at each build in Android Studio and creates the appropriate parameterised task to notify the Raygun backend of your app's deployment.
 
 ## Advanced features
 
