@@ -2,7 +2,7 @@ package com.raygun.raygun4android.network.http;
 
 import android.os.Build;
 
-import com.raygun.raygun4android.RaygunLogger;
+import com.raygun.raygun4android.logging.RaygunLogger;
 
 import java.net.URLStreamHandler;
 import java.net.URLStreamHandlerFactory;

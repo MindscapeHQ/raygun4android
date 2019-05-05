@@ -19,6 +19,7 @@ import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 import com.google.gson.Gson;
+import com.raygun.raygun4android.logging.RaygunLogger;
 import com.raygun.raygun4android.messages.rum.RaygunRUMData;
 import com.raygun.raygun4android.messages.rum.RaygunRUMDataMessage;
 import com.raygun.raygun4android.messages.rum.RaygunRUMMessage;

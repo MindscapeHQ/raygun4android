@@ -7,6 +7,7 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 
+import com.raygun.raygun4android.logging.RaygunLogger;
 import com.raygun.raygun4android.messages.crashreporting.RaygunBreadcrumbMessage;
 import com.raygun.raygun4android.messages.shared.RaygunUserInfo;
 import com.raygun.raygun4android.utils.RaygunFileUtils;

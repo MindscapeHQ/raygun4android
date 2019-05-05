@@ -1,5 +1,7 @@
 package com.raygun.raygun4android;
 
+import com.raygun.raygun4android.logging.RaygunLogger;
+
 import java.util.Arrays;
 import java.util.HashSet;
 

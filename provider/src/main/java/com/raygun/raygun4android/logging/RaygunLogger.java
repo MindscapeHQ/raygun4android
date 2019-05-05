@@ -1,4 +1,6 @@
-package com.raygun.raygun4android;
+package com.raygun.raygun4android.logging;
+
+import com.raygun.raygun4android.RaygunSettings;
 
 import timber.log.Timber;
 

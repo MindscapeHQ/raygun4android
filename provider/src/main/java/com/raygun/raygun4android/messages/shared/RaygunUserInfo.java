@@ -1,7 +1,7 @@
 package com.raygun.raygun4android.messages.shared;
 
 import com.raygun.raygun4android.RaygunClient;
-import com.raygun.raygun4android.RaygunLogger;
+import com.raygun.raygun4android.logging.RaygunLogger;
 import com.raygun.raygun4android.network.RaygunNetworkUtils;
 
 public class RaygunUserInfo {
