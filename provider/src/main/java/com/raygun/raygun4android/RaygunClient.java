@@ -8,6 +8,7 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 
 import com.raygun.raygun4android.logging.RaygunLogger;
+import com.raygun.raygun4android.logging.TimberRaygunLoggerImplementation;
 import com.raygun.raygun4android.messages.crashreporting.RaygunBreadcrumbMessage;
 import com.raygun.raygun4android.messages.shared.RaygunUserInfo;
 import com.raygun.raygun4android.utils.RaygunFileUtils;
@@ -15,8 +16,6 @@ import com.raygun.raygun4android.utils.RaygunFileUtils;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-
-import timber.log.Timber;
 
 /**
  * The official Raygun provider for Android. This is the main class that provides functionality for
@@ -66,9 +65,7 @@ public class RaygunClient {
      */
     public static void init(Application application, String apiKey, String version) {
 
-        if (BuildConfig.DEBUG && Timber.treeCount() == 0) {
-            Timber.plant(new Timber.DebugTree());
-        }
+        TimberRaygunLoggerImplementation.init();
 
         RaygunLogger.d("Configuring Raygun4Android (v" + RaygunSettings.RAYGUN_CLIENT_VERSION + ")");
 

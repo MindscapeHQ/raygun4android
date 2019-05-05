@@ -2,10 +2,8 @@ package com.raygun.raygun4android.services;
 
 import android.support.v4.app.JobIntentService;
 
-import com.raygun.raygun4android.BuildConfig;
 import com.raygun.raygun4android.logging.RaygunLogger;
-
-import timber.log.Timber;
+import com.raygun.raygun4android.logging.TimberRaygunLoggerImplementation;
 
 /**
  * A JobIntentService that can validate Raygun API keys
@@ -30,9 +28,7 @@ public abstract class RaygunPostService extends JobIntentService {
     public void onCreate() {
         super.onCreate();
 
-        if (BuildConfig.DEBUG && Timber.treeCount() == 0) {
-            Timber.plant(new Timber.DebugTree());
-        }
+        TimberRaygunLoggerImplementation.init();
 
         RaygunLogger.i("onCreate() in RaygunPostService executed");
     }

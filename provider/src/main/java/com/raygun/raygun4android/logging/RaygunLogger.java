@@ -32,7 +32,7 @@ public class RaygunLogger {
 
     public static void v(String string) {
         if (string != null) {
-            Timber.v(string);
+            Timber.tag(RaygunSettings.LOGGING_TAG).v(string);
         }
     }
 
