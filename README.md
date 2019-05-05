@@ -243,17 +243,15 @@ class BeforeSendImplementation implements CrashReportingOnBeforeSend {
     }
 }
 
+...
 
-public class FullscreenActivity extends Activity {
+public class SomeActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         // Initialize the activity as normal
-
-        RaygunClient.init((Application)getApplicationContext());
-
-        RaygunClient.enableCrashReporting();
-        RaygunClient.enableRUM(this);
-
+        ...
+        // Initialize Raygun
+        ...
         RaygunClient.setOnBeforeSend(new BeforeSendImplementation());
     }
 }

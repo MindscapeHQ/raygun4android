@@ -4,33 +4,35 @@ import android.util.Log;
 
 public class RaygunLogger {
 
+    private static String TAG = "Raygun4Android";
+
     public static void d(String string) {
         if (string != null) {
-            Log.d("Raygun4Android", string);
+            Log.d(TAG, string);
         }
     }
 
     public static void i(String string) {
         if (string != null) {
-            Log.i("Raygun4Android", string);
+            Log.i(TAG, string);
         }
     }
 
     public static void w(String string) {
         if (string != null) {
-            Log.w("Raygun4Android", string);
+            Log.w(TAG, string);
         }
     }
 
     public static void e(String string) {
         if (string != null) {
-            Log.e("Raygun4Android", string);
+            Log.e(TAG, string);
         }
     }
 
     public static void v(String string) {
         if (string != null) {
-            Log.v("Raygun4Android", string);
+            Log.v(TAG, string);
         }
     }
 
