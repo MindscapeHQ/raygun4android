@@ -1,7 +1,5 @@
 package com.raygun.raygun4android;
 
-import android.util.Log;
-
 import timber.log.Timber;
 
 public class RaygunLogger {
