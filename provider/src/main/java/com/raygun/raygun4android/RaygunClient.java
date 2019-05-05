@@ -15,6 +15,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import timber.log.Timber;
+
 /**
  * The official Raygun provider for Android. This is the main class that provides functionality for
  * automatically sending exceptions to the Raygun service.
@@ -62,6 +64,10 @@ public class RaygunClient {
      * @param version The version of your application, format x.x.x.x, where x is a positive integer.
      */
     public static void init(Application application, String apiKey, String version) {
+
+        if (BuildConfig.DEBUG && Timber.treeCount() == 0) {
+            Timber.plant(new Timber.DebugTree());
+        }
 
         RaygunLogger.d("Configuring Raygun4Android (v" + RaygunSettings.RAYGUN_CLIENT_VERSION + ")");
 

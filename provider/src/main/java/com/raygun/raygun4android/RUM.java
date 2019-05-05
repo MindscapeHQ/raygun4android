@@ -39,7 +39,7 @@ public class RUM implements ActivityLifecycleCallbacks {
 
     private static void attach(Activity mainActivity) {
 
-        RaygunLogger.v("attach");
+        RaygunLogger.v("attached RUM");
         if (RUM.rum == null && mainActivity != null) {
             Application application = mainActivity.getApplication();
 
@@ -105,7 +105,7 @@ public class RUM implements ActivityLifecycleCallbacks {
 
     @Override
     public void onActivityCreated(Activity activity, Bundle bundle) {
-        RaygunLogger.v("onActivityCreated");
+        RaygunLogger.v("RUM - onActivityCreated");
         if (RUM.currentActivity == null) {
             if (doesNeedSessionRotation()) {
                 rotateSession(currentSessionUser,currentSessionUser);
@@ -123,7 +123,7 @@ public class RUM implements ActivityLifecycleCallbacks {
 
     @Override
     public void onActivityStarted(Activity activity) {
-        RaygunLogger.v("onActivityStarted");
+        RaygunLogger.v("RUM - onActivityStarted");
         if (RUM.currentActivity == null) {
             if (doesNeedSessionRotation()) {
                 rotateSession(currentSessionUser,currentSessionUser);
@@ -141,7 +141,7 @@ public class RUM implements ActivityLifecycleCallbacks {
 
     @Override
     public void onActivityResumed(Activity activity) {
-        RaygunLogger.v("onActivityResumed");
+        RaygunLogger.v("RUM - onActivityResumed");
         if (RUM.currentActivity == null) {
             if (doesNeedSessionRotation()) {
                 rotateSession(currentSessionUser,currentSessionUser);
@@ -166,13 +166,13 @@ public class RUM implements ActivityLifecycleCallbacks {
 
     @Override
     public void onActivityPaused(Activity activity) {
-        RaygunLogger.v("onActivityPaused");
+        RaygunLogger.v("RUM - onActivityPaused");
         RUM.lastSeenTime = System.currentTimeMillis();
     }
 
     @Override
     public void onActivityStopped(Activity activity) {
-        RaygunLogger.v("onActivityStopped");
+        RaygunLogger.v("RUM - onActivityStopped");
         if (activity == RUM.currentActivity) {
             RUM.currentActivity = null;
             RUM.loadingActivity = null;
@@ -182,7 +182,7 @@ public class RUM implements ActivityLifecycleCallbacks {
 
     @Override
     public void onActivitySaveInstanceState(Activity activity, Bundle bundle) {
-        RaygunLogger.v("onActivitySIS");
+        RaygunLogger.v("RUM - onActivitySIS");
         RUM.lastSeenTime = System.currentTimeMillis();
     }
 
