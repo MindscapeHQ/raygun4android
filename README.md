@@ -6,7 +6,7 @@ Supports Android 4.1+ (API 16+).
 
 ## IMPORTANT
 
-### 1 May 2019
+### 6 May 2019
 
 Raygun4Android is currently actively being worked on for a release of version 4.
 
