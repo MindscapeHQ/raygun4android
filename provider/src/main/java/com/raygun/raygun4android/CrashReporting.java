@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Build;
 
 import com.google.gson.Gson;
+import com.raygun.raygun4android.logging.RaygunLogger;
 import com.raygun.raygun4android.messages.crashreporting.RaygunBreadcrumbMessage;
 import com.raygun.raygun4android.messages.crashreporting.RaygunMessage;
 import com.raygun.raygun4android.network.RaygunNetworkUtils;

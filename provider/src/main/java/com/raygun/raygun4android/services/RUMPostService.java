@@ -5,7 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 
-import com.raygun.raygun4android.RaygunLogger;
+import com.raygun.raygun4android.logging.RaygunLogger;
 import com.raygun.raygun4android.RaygunSettings;
 import com.raygun.raygun4android.network.RaygunNetworkUtils;
 

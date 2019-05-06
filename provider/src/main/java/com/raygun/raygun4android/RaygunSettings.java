@@ -1,5 +1,7 @@
 package com.raygun.raygun4android;
 
+import com.raygun.raygun4android.logging.RaygunLogger;
+
 import java.util.Arrays;
 import java.util.HashSet;
 
@@ -8,6 +10,7 @@ public class RaygunSettings {
     // General
     public static final String APIKEY_MANIFEST_FIELD = "com.raygun.raygun4android.apikey";
     public static final String RAYGUN_CLIENT_VERSION = BuildConfig.VERSION_NAME;
+    public static final String LOGGING_TAG = "Raygun4Android";
 
     // HTTP error response codes
     public static final int RESPONSE_CODE_ACCEPTED = 202;

@@ -2,7 +2,8 @@ package com.raygun.raygun4android.services;
 
 import android.support.v4.app.JobIntentService;
 
-import com.raygun.raygun4android.RaygunLogger;
+import com.raygun.raygun4android.logging.RaygunLogger;
+import com.raygun.raygun4android.logging.TimberRaygunLoggerImplementation;
 
 /**
  * A JobIntentService that can validate Raygun API keys
@@ -23,8 +24,19 @@ public abstract class RaygunPostService extends JobIntentService {
         }
     }
 
+  @Override
+    public void onCreate() {
+        super.onCreate();
+
+        TimberRaygunLoggerImplementation.init();
+
+        RaygunLogger.i("onCreate() in RaygunPostService executed");
+    }
+
     @Override
     public void onDestroy() {
         super.onDestroy();
+
+        RaygunLogger.i("onDestroy() in RaygunPostService executed");
     }
 }

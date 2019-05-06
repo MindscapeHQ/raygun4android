@@ -8,7 +8,7 @@ import android.os.StatFs;
 import android.util.DisplayMetrics;
 import android.view.WindowManager;
 
-import com.raygun.raygun4android.RaygunLogger;
+import com.raygun.raygun4android.logging.RaygunLogger;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;

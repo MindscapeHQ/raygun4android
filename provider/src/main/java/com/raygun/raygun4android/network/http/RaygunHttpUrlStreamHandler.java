@@ -1,6 +1,6 @@
 package com.raygun.raygun4android.network.http;
 
-import com.raygun.raygun4android.RaygunLogger;
+import com.raygun.raygun4android.logging.RaygunLogger;
 import com.raygun.raygun4android.utils.RaygunReflectionUtils;
 
 import java.io.IOException;
