@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 
+import java.lang.ref.WeakReference;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -30,9 +31,9 @@ import com.raygun.raygun4android.services.RUMPostService;
 
 public class RUM implements ActivityLifecycleCallbacks {
     private static RUM rum;
-    private static Activity mainActivity;
-    private static Activity currentActivity;
-    private static Activity loadingActivity;
+    private static WeakReference<Activity> mainActivity;
+    private static WeakReference<Activity> currentActivity;
+    private static WeakReference<Activity> loadingActivity;
     private static long startTime;
     private static long lastSeenTime;
     private static String sessionId;
@@ -45,8 +46,8 @@ public class RUM implements ActivityLifecycleCallbacks {
             Application application = mainActivity.getApplication();
 
             if (application != null) {
-                RUM.mainActivity = mainActivity;
-                RUM.currentActivity = mainActivity;
+                RUM.mainActivity = new WeakReference<>(mainActivity);
+                RUM.currentActivity = new WeakReference<>(mainActivity);
                 RUM.startTime = System.nanoTime();
 
                 RUM.rum = new RUM();
@@ -69,18 +70,18 @@ public class RUM implements ActivityLifecycleCallbacks {
     }
 
     protected static void detach() {
-        if (RUM.rum != null && RUM.mainActivity != null && RUM.mainActivity.getApplication() != null) {
-            RUM.mainActivity.getApplication().unregisterActivityLifecycleCallbacks(RUM.rum);
-            RUM.mainActivity = null;
-            RUM.currentActivity = null;
+        if (RUM.rum != null && RUM.mainActivity.get() != null && RUM.mainActivity.get().getApplication() != null) {
+            RUM.mainActivity.get().getApplication().unregisterActivityLifecycleCallbacks(RUM.rum);
+            RUM.mainActivity.clear();
+            RUM.currentActivity.clear();
             RUM.rum = null;
         }
     }
 
     static void sendRemainingActivity() {
         if (RUM.rum != null) {
-            if (RUM.loadingActivity != null) {
-                String activityName = getActivityName(RUM.loadingActivity);
+            if (RUM.loadingActivity.get() != null) {
+                String activityName = getActivityName(RUM.loadingActivity.get());
 
                 long diff = System.nanoTime() - RUM.startTime;
                 long duration = TimeUnit.NANOSECONDS.toMillis(diff);
@@ -107,15 +108,15 @@ public class RUM implements ActivityLifecycleCallbacks {
     @Override
     public void onActivityCreated(Activity activity, Bundle bundle) {
         RaygunLogger.v("RUM - onActivityCreated");
-        if (RUM.currentActivity == null) {
+        if (RUM.currentActivity.get() == null) {
             if (doesNeedSessionRotation()) {
                 rotateSession(currentSessionUser,currentSessionUser);
             }
         }
 
-        if (activity != RUM.currentActivity) {
-            RUM.currentActivity = activity;
-            RUM.loadingActivity = activity;
+        if (activity != RUM.currentActivity.get()) {
+            RUM.currentActivity = new WeakReference<>(activity);
+            RUM.loadingActivity = new WeakReference<>(activity);
             RUM.startTime = System.nanoTime();
         }
 
@@ -125,15 +126,15 @@ public class RUM implements ActivityLifecycleCallbacks {
     @Override
     public void onActivityStarted(Activity activity) {
         RaygunLogger.v("RUM - onActivityStarted");
-        if (RUM.currentActivity == null) {
+        if (RUM.currentActivity.get() == null) {
             if (doesNeedSessionRotation()) {
                 rotateSession(currentSessionUser,currentSessionUser);
             }
         }
 
-        if (activity != RUM.currentActivity) {
-            RUM.currentActivity = activity;
-            RUM.loadingActivity = activity;
+        if (activity != RUM.currentActivity.get()) {
+            RUM.currentActivity = new WeakReference<>(activity);
+            RUM.loadingActivity = new WeakReference<>(activity);
             RUM.startTime = System.nanoTime();
         }
 
@@ -143,7 +144,7 @@ public class RUM implements ActivityLifecycleCallbacks {
     @Override
     public void onActivityResumed(Activity activity) {
         RaygunLogger.v("RUM - onActivityResumed");
-        if (RUM.currentActivity == null) {
+        if (RUM.currentActivity.get() == null) {
             if (doesNeedSessionRotation()) {
                 rotateSession(currentSessionUser,currentSessionUser);
             }
@@ -152,13 +153,13 @@ public class RUM implements ActivityLifecycleCallbacks {
         String activityName = getActivityName(activity);
         long duration = 0;
 
-        if (activity == RUM.currentActivity) {
+        if (activity == RUM.currentActivity.get()) {
             long diff = System.nanoTime() - RUM.startTime;
             duration = TimeUnit.NANOSECONDS.toMillis(diff);
         }
 
-        RUM.currentActivity = activity;
-        RUM.loadingActivity = null;
+        RUM.currentActivity = new WeakReference<>(activity);
+        RUM.loadingActivity.clear();
 
         sendRUMTimingEvent(RaygunRUMEventType.ACTIVITY_LOADED, activityName, duration);
 
@@ -174,9 +175,9 @@ public class RUM implements ActivityLifecycleCallbacks {
     @Override
     public void onActivityStopped(Activity activity) {
         RaygunLogger.v("RUM - onActivityStopped");
-        if (activity == RUM.currentActivity) {
-            RUM.currentActivity = null;
-            RUM.loadingActivity = null;
+        if (activity == RUM.currentActivity.get()) {
+            RUM.currentActivity.clear();
+            RUM.loadingActivity.clear();
             RUM.lastSeenTime = System.currentTimeMillis();
         }
     }
