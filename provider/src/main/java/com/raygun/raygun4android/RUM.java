@@ -72,15 +72,15 @@ public class RUM implements ActivityLifecycleCallbacks {
     protected static void detach() {
         if (RUM.rum != null && RUM.mainActivity.get() != null && RUM.mainActivity.get().getApplication() != null) {
             RUM.mainActivity.get().getApplication().unregisterActivityLifecycleCallbacks(RUM.rum);
-            RUM.mainActivity.clear();
-            RUM.currentActivity.clear();
+            RUM.mainActivity = null;
+            RUM.currentActivity = null;
             RUM.rum = null;
         }
     }
 
     static void sendRemainingActivity() {
         if (RUM.rum != null) {
-            if (RUM.loadingActivity.get() != null) {
+            if (RUM.loadingActivity != null && RUM.loadingActivity.get() != null) {
                 String activityName = getActivityName(RUM.loadingActivity.get());
 
                 long diff = System.nanoTime() - RUM.startTime;
@@ -108,13 +108,13 @@ public class RUM implements ActivityLifecycleCallbacks {
     @Override
     public void onActivityCreated(Activity activity, Bundle bundle) {
         RaygunLogger.v("RUM - onActivityCreated");
-        if (RUM.currentActivity.get() == null) {
+        if (RUM.currentActivity == null || RUM.currentActivity.get() == null) {
             if (doesNeedSessionRotation()) {
                 rotateSession(currentSessionUser,currentSessionUser);
             }
         }
 
-        if (activity != RUM.currentActivity.get()) {
+        if (RUM.currentActivity == null || RUM.currentActivity != null && RUM.currentActivity.get() != activity) {
             RUM.currentActivity = new WeakReference<>(activity);
             RUM.loadingActivity = new WeakReference<>(activity);
             RUM.startTime = System.nanoTime();
@@ -126,13 +126,13 @@ public class RUM implements ActivityLifecycleCallbacks {
     @Override
     public void onActivityStarted(Activity activity) {
         RaygunLogger.v("RUM - onActivityStarted");
-        if (RUM.currentActivity.get() == null) {
+        if (RUM.currentActivity == null || RUM.currentActivity.get() == null) {
             if (doesNeedSessionRotation()) {
                 rotateSession(currentSessionUser,currentSessionUser);
             }
         }
 
-        if (activity != RUM.currentActivity.get()) {
+        if (RUM.currentActivity == null || RUM.currentActivity != null && RUM.currentActivity.get() != activity) {
             RUM.currentActivity = new WeakReference<>(activity);
             RUM.loadingActivity = new WeakReference<>(activity);
             RUM.startTime = System.nanoTime();
@@ -144,7 +144,7 @@ public class RUM implements ActivityLifecycleCallbacks {
     @Override
     public void onActivityResumed(Activity activity) {
         RaygunLogger.v("RUM - onActivityResumed");
-        if (RUM.currentActivity.get() == null) {
+        if (RUM.currentActivity == null || RUM.currentActivity.get() == null) {
             if (doesNeedSessionRotation()) {
                 rotateSession(currentSessionUser,currentSessionUser);
             }
@@ -153,13 +153,13 @@ public class RUM implements ActivityLifecycleCallbacks {
         String activityName = getActivityName(activity);
         long duration = 0;
 
-        if (activity == RUM.currentActivity.get()) {
+        if (RUM.currentActivity != null && activity == RUM.currentActivity.get()) {
             long diff = System.nanoTime() - RUM.startTime;
             duration = TimeUnit.NANOSECONDS.toMillis(diff);
         }
 
         RUM.currentActivity = new WeakReference<>(activity);
-        RUM.loadingActivity.clear();
+        RUM.loadingActivity = null;
 
         sendRUMTimingEvent(RaygunRUMEventType.ACTIVITY_LOADED, activityName, duration);
 
@@ -175,9 +175,9 @@ public class RUM implements ActivityLifecycleCallbacks {
     @Override
     public void onActivityStopped(Activity activity) {
         RaygunLogger.v("RUM - onActivityStopped");
-        if (activity == RUM.currentActivity.get()) {
-            RUM.currentActivity.clear();
-            RUM.loadingActivity.clear();
+        if (RUM.currentActivity != null && activity == RUM.currentActivity.get()) {
+            RUM.currentActivity = null;
+            RUM.loadingActivity = null;
             RUM.lastSeenTime = System.currentTimeMillis();
         }
     }
