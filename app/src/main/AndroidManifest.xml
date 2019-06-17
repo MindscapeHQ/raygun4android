@@ -19,6 +19,11 @@
             </intent-filter>
         </activity>
 
+        <activity
+            android:name=".SecondActivity"
+            android:parentActivityName=".MainActivity">
+        </activity>
+
         <service
             android:name="com.raygun.raygun4android.services.CrashReportingPostService"
             android:exported="false"
