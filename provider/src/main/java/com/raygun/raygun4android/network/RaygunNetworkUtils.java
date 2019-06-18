@@ -1,5 +1,6 @@
 package com.raygun.raygun4android.network;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
@@ -48,6 +49,7 @@ public class RaygunNetworkUtils {
             if (id != null) {
                 return UUID.fromString(id).toString();
             } else {
+                @SuppressLint("HardwareIds")
                 final String androidId = Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID);
 
                 try {

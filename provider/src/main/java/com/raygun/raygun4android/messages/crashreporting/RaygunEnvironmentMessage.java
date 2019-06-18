@@ -96,7 +96,7 @@ public class RaygunEnvironmentMessage {
 
     private String getTotalRam() throws IOException {
         RandomAccessFile reader = null;
-        String load = null;
+        String load;
         try {
             reader = new RandomAccessFile("/proc/meminfo", "r");
             load = reader.readLine();

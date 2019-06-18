@@ -91,13 +91,4 @@
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/button_crash" />
 
-    <Button
-        android:id="@+id/button_secondActivity"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Go to a second Activity"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/button_set_user_B" />
-
 </android.support.constraint.ConstraintLayout>

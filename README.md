@@ -6,15 +6,15 @@ Supports Android 4.1+ (API 16+).
 
 ## IMPORTANT
 
-### 6 May 2019
+### 17 Juni 2019
 
-Raygun4Android is currently actively being worked on for a release of version 4.
+Raygun4Android 4.0 is considered stable.
 
-With the release of beta2, the 4.0.0 development branch has now been merged into master and is now the mainstream development line. The code is quite stable and we encourage you to use the 4.0.0-beta2 release.
+Raygun4Android is currently actively being worked on towards a release of version 4.1.
 
-If you want the fully stable version 3.0.6 please check out the changeset labelled with v3.0.6 and go from there.
+With the release of 4.0.0-beta2, the 4.0.0 development branch has been merged into master and is now the mainstream development line.
 
-The master branch of this repository is currently heading towards a beta3 release.
+If you want the older stable version 3.0.6 please check out the change set labelled with v3.0.6 and go from there.
 
 ## Requirements
 
@@ -41,7 +41,7 @@ Then add the following to your **module's** build.gradle:
 ```gradle
 dependencies {
     ...
-    implementation 'com.raygun:raygun4android:4.0.0-beta2'
+    implementation 'com.raygun:raygun4android:4.0.0'
 }
 ```
 

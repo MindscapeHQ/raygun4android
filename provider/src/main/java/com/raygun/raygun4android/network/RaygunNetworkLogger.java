@@ -65,9 +65,7 @@ public class RaygunNetworkLogger {
     public static synchronized void cancelNetworkCall(String url, String requestMethod, long endTime, String exception) {
         if (url != null) {
             String id = sanitiseURL(url);
-            if ((connections != null) && (connections.containsKey(id))) {
-                connections.remove(id);
-            }
+            connections.remove(id);
         }
     }
 
