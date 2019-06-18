@@ -1,6 +1,10 @@
 ## Changelog
 
-- Towards v4.0.0-beta3:
+- v4.0.0:
+  - Minor internal changes to memory handling
+  - Linting cleanup
+
+- v4.0.0-beta3:
   - API changes for setting and working with custom data: the field userCustomData is now being referred to as customData. This is reflected in API method changes.
   - Documentation for both Raygun4Android Gradle tasks
   - Added Timber 4.7.1 dependency for debug/prod logging
