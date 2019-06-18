@@ -18,14 +18,14 @@ class SecondActivity : AppCompatActivity() {
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-        val buttonSend = findViewById(R.id.button_send) as Button
-        val buttonCrash = findViewById(R.id.button_crash) as Button
-        val buttonHandleException = findViewById(R.id.button_handleException) as Button
-        val buttonSetUserAnon = findViewById(R.id.button_set_user_anon) as Button
-        val buttonSetUserA = findViewById(R.id.button_set_user_A) as Button
-        val buttonSetUserB = findViewById(R.id.button_set_user_B) as Button
-        val textViewAppVersion = findViewById(R.id.textView_appVersion) as TextView
-        val textViewProviderVersion = findViewById(R.id.textView_providerVersion) as TextView
+        val buttonSend = findViewById<Button>(R.id.button_send)
+        val buttonCrash = findViewById<Button>(R.id.button_crash)
+        val buttonHandleException = findViewById<Button>(R.id.button_handleException)
+        val buttonSetUserAnon = findViewById<Button>(R.id.button_set_user_anon)
+        val buttonSetUserA = findViewById<Button>(R.id.button_set_user_A)
+        val buttonSetUserB = findViewById<Button>(R.id.button_set_user_B)
+        val textViewAppVersion = findViewById<TextView>(R.id.textView_appVersion)
+        val textViewProviderVersion = findViewById<TextView>(R.id.textView_providerVersion)
 
         buttonSend.setOnClickListener {
             val tw = HashMap<String,String>()

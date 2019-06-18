@@ -171,7 +171,9 @@ public class CrashReporting {
                             ois = new ObjectInputStream(new FileInputStream(f));
                             SerializedMessage serializedMessage = (SerializedMessage) ois.readObject();
                             enqueueWorkForCrashReportingService(RaygunClient.getApiKey(), serializedMessage.message);
-                            f.delete();
+                            if (!f.delete()) {
+                                RaygunLogger.w("Couldn't delete cached report (" + f.getName() + ")");
+                            }
                         } finally {
                             if (ois != null) {
                                 ois.close();
