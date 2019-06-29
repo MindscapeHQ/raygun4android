@@ -73,6 +73,7 @@ class MainActivity : AppCompatActivity() {
             user.firstName = "User C"
             user.email = "e@f.com.com"
             RaygunClient.setUser(user)
+            RaygunClient.recordBreadcrumb("I'm now user C")
         }
 
         buttonSetUserB.setOnClickListener{
@@ -81,6 +82,7 @@ class MainActivity : AppCompatActivity() {
             user.firstName = "User D"
             user.email = "g@h.com"
             RaygunClient.setUser(user)
+            RaygunClient.recordBreadcrumb("I'm now user D")
         }
 
         buttonSecondActivity.setOnClickListener {
@@ -90,5 +92,8 @@ class MainActivity : AppCompatActivity() {
 
         textViewAppVersion.text = "App ${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE} ${BuildConfig.BUILD_TYPE})"
         textViewProviderVersion.text = "Provider ${com.raygun.raygun4android.BuildConfig.VERSION_NAME} (${com.raygun.raygun4android.BuildConfig.VERSION_CODE} ${BuildConfig.BUILD_TYPE})"
+
+        RaygunClient.recordBreadcrumb("I'm here in Main Activity")
+
     }
 }
