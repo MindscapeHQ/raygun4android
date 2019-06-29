@@ -8,7 +8,10 @@ import android.util.Log
 import android.widget.Button
 import android.widget.TextView
 import com.raygun.raygun4android.RaygunClient
+import com.raygun.raygun4android.messages.crashreporting.RaygunBreadcrumbLevel
+import com.raygun.raygun4android.messages.crashreporting.RaygunBreadcrumbMessage
 import com.raygun.raygun4android.messages.shared.RaygunUserInfo
+import java.util.*
 
 class SecondActivity : AppCompatActivity() {
 
@@ -75,6 +78,22 @@ class SecondActivity : AppCompatActivity() {
 
         textViewAppVersion.text = "App ${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE} ${BuildConfig.BUILD_TYPE})"
         textViewProviderVersion.text = "Provider ${com.raygun.raygun4android.BuildConfig.VERSION_NAME} (${com.raygun.raygun4android.BuildConfig.VERSION_CODE} ${BuildConfig.BUILD_TYPE})"
+
+        RaygunClient.clearBreadcrumbs()
+
+        val customData = WeakHashMap<String,Any>()
+        customData["someKey"] = "someValue"
+        customData["someotherkey"] = "someothervalue"
+
+        val breadcrumbMessage = RaygunBreadcrumbMessage.Builder("I'm here in SecondActivity")
+            .level(RaygunBreadcrumbLevel.ERROR)
+            .category("Launch")
+            .lineNumber(78)
+            .methodName("onCreate")
+            .customData(customData)
+            .build()
+
+        RaygunClient.recordBreadcrumb(breadcrumbMessage)
     }
 
     companion object {
