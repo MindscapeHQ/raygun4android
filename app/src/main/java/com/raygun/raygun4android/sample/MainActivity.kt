@@ -25,6 +25,8 @@ class MainActivity : AppCompatActivity() {
 
         RaygunClient.setCustomData(initialCustomData)
 
+        RaygunClient.setOnBeforeSend(SampleOnBeforeSend())
+
         val buttonSend = findViewById<Button>(R.id.button_send)
         val buttonCrash = findViewById<Button>(R.id.button_crash)
         val buttonHandleException = findViewById<Button>(R.id.button_handleException)
