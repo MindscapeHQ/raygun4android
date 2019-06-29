@@ -65,6 +65,10 @@ public class CrashReporting {
         breadcrumbs.add(processBreadcrumbLocation(breadcrumb, shouldProcessBreadcrumbLocation(),3));
     }
 
+    static void clearBreadcrumbs() {
+        breadcrumbs.clear();
+    }
+
     private static RaygunBreadcrumbMessage processBreadcrumbLocation(RaygunBreadcrumbMessage breadcrumb, boolean shouldProcessBreadcrumbLocation, int stackFrame) {
 
         if(shouldProcessBreadcrumbLocation && breadcrumb.getClassName() == null) {

@@ -226,6 +226,14 @@ public class RaygunClient {
     }
 
     /**
+     * Clears breadcrumbs
+     *
+     */
+    public static void clearBreadcrumbs() {
+        CrashReporting.clearBreadcrumbs();
+    }
+
+    /**
      * Enables the processing of the full location of breadcrumb messages. This defaults to false and please
      * be aware that setting this to true could seriously degrade the performance of your application.
      *
