@@ -163,31 +163,36 @@ public class CrashReporting {
     static void postCachedMessages() {
         if (RaygunNetworkUtils.hasInternetConnection(RaygunClient.getApplicationContext())) {
             File[] fileList = RaygunClient.getApplicationContext().getCacheDir().listFiles(new RaygunFileFilter());
-            for (File f : fileList) {
-                try {
-                    if (RaygunFileUtils.getExtension(f.getName()).equalsIgnoreCase(RaygunSettings.DEFAULT_FILE_EXTENSION)) {
-                        ObjectInputStream ois = null;
-                        try {
-                            ois = new ObjectInputStream(new FileInputStream(f));
-                            SerializedMessage serializedMessage = (SerializedMessage) ois.readObject();
-                            enqueueWorkForCrashReportingService(RaygunClient.getApiKey(), serializedMessage.message);
-                            if (!f.delete()) {
-                                RaygunLogger.w("Couldn't delete cached report (" + f.getName() + ")");
-                            }
-                        } finally {
-                            if (ois != null) {
-                                ois.close();
+            if (fileList != null) {
+                for (File f : fileList) {
+                    try {
+                        if (RaygunFileUtils.getExtension(f.getName()).equalsIgnoreCase(RaygunSettings.DEFAULT_FILE_EXTENSION)) {
+                            ObjectInputStream ois = null;
+                            try {
+                                ois = new ObjectInputStream(new FileInputStream(f));
+                                SerializedMessage serializedMessage = (SerializedMessage) ois.readObject();
+                                enqueueWorkForCrashReportingService(RaygunClient.getApiKey(), serializedMessage.message);
+                                if (!f.delete()) {
+                                    RaygunLogger.w("Couldn't delete cached report (" + f.getName() + ")");
+                                }
+                            } finally {
+                                if (ois != null) {
+                                    ois.close();
+                                }
                             }
                         }
+                    } catch (FileNotFoundException e) {
+                        RaygunLogger.e("Error loading cached message from filesystem - " + e.getMessage());
+                    } catch (IOException e) {
+                        RaygunLogger.e("Error reading cached message from filesystem - " + e.getMessage());
+                    } catch (ClassNotFoundException e) {
+                        RaygunLogger.e("Error in handling cached message from filesystem - " + e.getMessage());
                     }
-                } catch (FileNotFoundException e) {
-                    RaygunLogger.e("Error loading cached message from filesystem - " + e.getMessage());
-                } catch (IOException e) {
-                    RaygunLogger.e("Error reading cached message from filesystem - " + e.getMessage());
-                } catch (ClassNotFoundException e) {
-                    RaygunLogger.e("Error in cached message from filesystem - " + e.getMessage());
                 }
+            } else {
+                RaygunLogger.e("Error in handling cached message from filesystem - could not get a list of files from cache dir");
             }
+
         }
     }
 
