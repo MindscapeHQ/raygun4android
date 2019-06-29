@@ -6,9 +6,9 @@ import java.util.WeakHashMap;
 public class RaygunBreadcrumbMessage {
     private String message;
     private String category;
-    private int level = RaygunBreadcrumbLevel.INFO.ordinal();
+    private int level;
     private String type = "Manual";
-    private Map<String, Object> customData = new WeakHashMap<String, Object>();
+    private Map<String, Object> customData;
     private Long timestamp = System.currentTimeMillis();
     private String className;
     private String methodName;
@@ -17,8 +17,8 @@ public class RaygunBreadcrumbMessage {
     public static class Builder {
         private String message;
         private String category;
-        private int level;
-        private Map<String, Object> customData;
+        private int level = RaygunBreadcrumbLevel.INFO.ordinal();
+        private Map<String, Object> customData = new WeakHashMap<>();
         private String className;
         private String methodName;
         private Integer lineNumber;
