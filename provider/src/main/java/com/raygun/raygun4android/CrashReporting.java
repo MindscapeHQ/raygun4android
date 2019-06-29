@@ -29,7 +29,7 @@ public class CrashReporting {
     private static CrashReportingOnBeforeSend onBeforeSend;
     private static List tags;
     private static Map customData;
-    private static List<RaygunBreadcrumbMessage> breadcrumbs;
+    private static List<RaygunBreadcrumbMessage> breadcrumbs = new ArrayList<>();
     private static boolean shouldProcessBreadcrumbLocation = false;
 
     static RaygunUncaughtExceptionHandler getExceptionHandler() {
