@@ -62,26 +62,44 @@ public class CrashReporting {
     }
 
     static void recordBreadcrumb(RaygunBreadcrumbMessage breadcrumb) {
-        breadcrumbs.add(processBreadcrumbLocation(breadcrumb, shouldProcessBreadcrumbLocation(),3));
+        breadcrumbs.add(processBreadcrumbLocation(breadcrumb, shouldProcessBreadcrumbLocation()));
     }
 
     static void clearBreadcrumbs() {
         breadcrumbs.clear();
     }
 
-    private static RaygunBreadcrumbMessage processBreadcrumbLocation(RaygunBreadcrumbMessage breadcrumb, boolean shouldProcessBreadcrumbLocation, int stackFrame) {
+    private static RaygunBreadcrumbMessage processBreadcrumbLocation(RaygunBreadcrumbMessage breadcrumb, boolean shouldProcessBreadcrumbLocation) {
 
         if(shouldProcessBreadcrumbLocation && breadcrumb.getClassName() == null) {
-            StackTraceElement frame = Thread.currentThread().getStackTrace()[stackFrame];
 
-            return new RaygunBreadcrumbMessage.Builder(breadcrumb.getMessage())
-                .category(breadcrumb.getCategory())
-                .customData(breadcrumb.getCustomData())
-                .level(breadcrumb.getLevel())
-                .className(frame.getClassName())
-                .methodName(frame.getMethodName())
-                .lineNumber(frame.getLineNumber())
-                .build();
+            StackTraceElement[] trace = Thread.currentThread().getStackTrace();
+            StackTraceElement frame = null;
+
+            if (trace != null && trace.length > 0) {
+                for (int i = 0; i < trace.length-1; i++) {
+                    StackTraceElement thisFrame =trace[i];
+                    StackTraceElement nextFrame = trace[i+1];
+
+                    if (thisFrame.getClassName().contains("com.raygun.raygun4android.") && !nextFrame.getClassName().contains("com.raygun.raygun4android.")) {
+                        frame = nextFrame;
+                        break;
+                    }
+                }
+            }
+
+            if (frame != null) {
+                return new RaygunBreadcrumbMessage.Builder(breadcrumb.getMessage())
+                    .category(breadcrumb.getCategory())
+                    .customData(breadcrumb.getCustomData())
+                    .level(breadcrumb.getLevel())
+                    .className(frame.getClassName())
+                    .methodName(frame.getMethodName())
+                    .lineNumber(frame.getLineNumber())
+                    .build();
+            }
+
+
         }
 
         return breadcrumb;
