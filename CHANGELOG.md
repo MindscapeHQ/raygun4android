@@ -1,5 +1,14 @@
 ## Changelog
 
+- v4.0.1:
+  - Fixes for an issue with breadcrumb processing (#64) and improved general parsing of the stack trace
+  - Fixes inability to use CrashReporingOnBeforeSend interface due to wrong visibility (#63)
+  - Safeguard against slightly obscure "out of files" scenario that can cause File.listFiles() to return null (#62)
+  - General improvements to the sample app:
+    - Refactoring of sample app into its own namespace
+    - Samples for breadcrumb handling
+    - Samples for intercepting the crash reporting data
+
 - v4.0.0:
   - Minor internal changes to memory handling
   - Linting cleanup

@@ -78,7 +78,7 @@ android {
     }
     compileSdkVersion 28
     defaultConfig {
-        applicationId "com.raygun.raygun4android.sample"
+        applicationId "com.raygun.raygun4androidsample"
         minSdkVersion 16
         targetSdkVersion 28
         versionCode = Long.valueOf(VERSION_CODE)

@@ -26,14 +26,18 @@ public class RaygunFileUtils {
     public static void clearCachedReports(Context context) {
         synchronized(RaygunFileUtils.class) {
             final File[] fileList = context.getCacheDir().listFiles(new RaygunFileFilter());
-
-            for (File f : fileList) {
-                if (RaygunFileUtils.getExtension(f.getName()).equalsIgnoreCase(RaygunSettings.DEFAULT_FILE_EXTENSION)) {
-                    if (!f.delete()) {
-                        RaygunLogger.w("Couldn't delete cached report (" + f.getName() + ")");
+            if (fileList != null) {
+                for (File f : fileList) {
+                    if (RaygunFileUtils.getExtension(f.getName()).equalsIgnoreCase(RaygunSettings.DEFAULT_FILE_EXTENSION)) {
+                        if (!f.delete()) {
+                            RaygunLogger.w("Couldn't delete cached report (" + f.getName() + ")");
+                        }
                     }
                 }
+            } else {
+                RaygunLogger.e("Error in handling cached message from filesystem - could not get a list of files from cache dir");
             }
+
         }
     }
 }

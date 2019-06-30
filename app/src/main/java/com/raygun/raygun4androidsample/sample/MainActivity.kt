@@ -1,22 +1,32 @@
-package com.raygun.raygun4android.sample
+package com.raygun.raygun4androidsample.sample
 
-import android.content.Context
-import android.content.Intent
-import android.os.Bundle
+import android.app.Application
 import android.support.v7.app.AppCompatActivity
+import android.os.Bundle
 import android.util.Log
-import android.widget.Button
-import android.widget.TextView
 import com.raygun.raygun4android.RaygunClient
 import com.raygun.raygun4android.messages.shared.RaygunUserInfo
+import android.widget.Button
+import android.widget.TextView
 
-class SecondActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_second)
+        setContentView(R.layout.activity_main)
 
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        val initialCustomData = HashMap<String,String>()
+        initialCustomData["firstkey"] = "firstvalue"
+
+        // This sets up the client with the API key as provided in your AndroidManifest.xml
+        RaygunClient.init(applicationContext as Application)
+        RaygunClient.enableCrashReporting()
+        RaygunClient.enableRUM(this)
+        RaygunClient.shouldProcessBreadcrumbLocation(true)
+
+        RaygunClient.setCustomData(initialCustomData)
+
+        RaygunClient.setOnBeforeSend(SampleOnBeforeSend())
 
         val buttonSend = findViewById<Button>(R.id.button_send)
         val buttonCrash = findViewById<Button>(R.id.button_crash)
@@ -26,13 +36,14 @@ class SecondActivity : AppCompatActivity() {
         val buttonSetUserB = findViewById<Button>(R.id.button_set_user_B)
         val textViewAppVersion = findViewById<TextView>(R.id.textView_appVersion)
         val textViewProviderVersion = findViewById<TextView>(R.id.textView_providerVersion)
+        val buttonSecondActivity = findViewById<Button>(R.id.button_secondActivity)
 
         buttonSend.setOnClickListener {
             val tw = HashMap<String,String>()
             tw["secondkey"] = "secondvalue"
 
             // Manual exception creation & sending
-            RaygunClient.send(Exception("Congratulations, you have sent errors with Raygun4Android from SecondActivity"), null, tw)
+            RaygunClient.send(Exception("Congratulations, you have sent errors with Raygun4Android"), null, tw)
         }
 
         buttonCrash.setOnClickListener {
@@ -63,6 +74,7 @@ class SecondActivity : AppCompatActivity() {
             user.firstName = "User C"
             user.email = "e@f.com.com"
             RaygunClient.setUser(user)
+            RaygunClient.recordBreadcrumb("I'm now user C")
         }
 
         buttonSetUserB.setOnClickListener{
@@ -71,13 +83,18 @@ class SecondActivity : AppCompatActivity() {
             user.firstName = "User D"
             user.email = "g@h.com"
             RaygunClient.setUser(user)
+            RaygunClient.recordBreadcrumb("I'm now user D")
         }
+
+        buttonSecondActivity.setOnClickListener {
+            startActivity(SecondActivity.getIntent(this@MainActivity))
+        }
+
 
         textViewAppVersion.text = "App ${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE} ${BuildConfig.BUILD_TYPE})"
         textViewProviderVersion.text = "Provider ${com.raygun.raygun4android.BuildConfig.VERSION_NAME} (${com.raygun.raygun4android.BuildConfig.VERSION_CODE} ${BuildConfig.BUILD_TYPE})"
-    }
 
-    companion object {
-        fun getIntent(context: Context): Intent = Intent(context, SecondActivity::class.java)
+        RaygunClient.recordBreadcrumb("I'm here in Main Activity")
+
     }
 }
