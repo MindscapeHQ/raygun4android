@@ -23,10 +23,12 @@ Thumbs.db
 
 # Android Studio
 *.iml
+.idea/codeStyles/Project.xml
 .idea/workspace.xml
 .idea/libraries
 .idea/encodings.xml
 .idea/modules.xml
+.idea/dictionaries
 .idea/markdown-navigator.xml
 .idea/markdown-navigator
 .idea/caches/
@@ -46,5 +48,4 @@ obj/
 # Release build
 releasing/secring.gpg
 *.jks
-/.idea/encodings.xml
-/.idea/dictionaries
+
