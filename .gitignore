@@ -23,7 +23,7 @@ Thumbs.db
 
 # Android Studio
 *.iml
-.idea/codeStyles/Project.xml
+.idea/codeStyles/
 .idea/workspace.xml
 .idea/libraries
 .idea/encodings.xml
