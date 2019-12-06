@@ -8,9 +8,11 @@ Supports Android 4.1+ (API 16+).
 
 ### 30 Juni 2019
 
-Raygun4Android 4.0.x is currently considered to be the stable line of the provider.
+Raygun4Android 4.0.1 is currently considered to be the stable release of the provider.
 
-Raygun4Android is currently actively being worked on towards a release of version 4.1.
+The master branch reflect ongoing work on the 4.0.x line. 
+
+Raygun4Android is currently actively being worked on towards a release of version 4.1 in a separate branch.
 
 With the release of 4.0.0-beta2, the 4.0.0 development branch had been merged into master and is now the mainstream development line.
 
@@ -380,6 +382,23 @@ Provides an instance of a class which has an onBeforeSend method that can be use
 * Not seeing errors in the dashboard?
 
   Raygun4Android outputs Logcat messages - look for the the logcat tag **Raygun4Android**. HTTP Status 403 will indicate an invalid API key, 400 a bad message, and 202 will indicate received successfully.
+
+* My build fails with `Default interface methods are only supported starting with Android N (--min-api 24)`. Why is that?
+
+  Raygun4Android uses Timber for internal logging. This requires some language features that are only available with Java 8. Make sure that your project using the library has set compilation compatibility to Java 8.
+  
+  Google's documentation has more information on the reasons and implications of this requirement: https://developer.android.com/studio/write/java8-support
+  
+```groovy
+android {
+  ...
+  compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+  ...
+}
+```
 
 * There's something weird going on - I checked the logs and the Raygun servers can't be reached!
 
