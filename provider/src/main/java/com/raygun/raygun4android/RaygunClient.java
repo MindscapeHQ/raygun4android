@@ -30,6 +30,7 @@ public class RaygunClient {
     private static String version;
     private static String appContextIdentifier;
     private static RaygunUserInfo userInfo;
+    private static Context applicationContext;
 
     private static boolean crashReportingEnabled = false;
     private static boolean RUMEnabled = false;
@@ -53,6 +54,43 @@ public class RaygunClient {
      */
     public static void init(Application application, String apiKey) {
         init(application, apiKey, null);
+    }
+
+    /**
+     * Initializes the Raygun client with applicationContext and your Raygun API key. The version
+     * transmitted will be the value of the versionName attribute in your manifest element. This
+     * function should be used by 3rd party library.
+     *
+     * @param Context The Android applicationContext
+     * @param apiKey An API key that belongs to a Raygun application created in your dashboard
+     */
+    public static void init(Context applicationContext, String apiKey) {
+        TimberRaygunLoggerImplementation.init();
+
+        RaygunLogger.d("Configuring Raygun4Android (v" + RaygunSettings.RAYGUN_CLIENT_VERSION + ")");
+
+        RaygunClient.applicationContext = applicationContext;
+
+        if (apiKey == null || apiKey.trim().isEmpty()) {
+            RaygunClient.apiKey = readApiKey(getApplicationContext());
+        } else {
+            RaygunClient.apiKey = apiKey;
+        }
+
+        RaygunClient.appContextIdentifier = UUID.randomUUID().toString();
+
+        if (version == null || version.trim().isEmpty()) {
+            try {
+                RaygunClient.version = getApplicationContext().getPackageManager().getPackageInfo(getApplicationContext().getPackageName(), 0).versionName;
+            } catch (PackageManager.NameNotFoundException e) {
+                RaygunClient.version = "Not Provided";
+                RaygunLogger.w("Couldn't read application version from calling package");
+            }
+        } else {
+            RaygunClient.version = version;
+        }
+
+        CrashReporting.postCachedMessages();
     }
 
     /**
@@ -404,10 +442,13 @@ public class RaygunClient {
      * @throws java.lang.IllegalStateException if init() has not been called.
      */
     public static Context getApplicationContext() {
-        if (RaygunClient.application == null) {
-            throw new IllegalStateException("init() must be called first.");
+        if (RaygunClient.application != null) {
+            return RaygunClient.application.getApplicationContext();
+        }
+        if (RaygunClient.applicationContext != null) {
+            return RaygunClient.applicationContext;
         }
 
-        return RaygunClient.application.getApplicationContext();
+        throw new IllegalStateException("init() must be called first.");
     }
 }
