@@ -63,34 +63,11 @@ public class RaygunClient {
      *
      * @param Context The Android applicationContext
      * @param apiKey An API key that belongs to a Raygun application created in your dashboard
+     * @param version The version of your application, format x.x.x.x, where x is a positive integer.
      */
-    public static void init(Context applicationContext, String apiKey) {
-        TimberRaygunLoggerImplementation.init();
-
-        RaygunLogger.d("Configuring Raygun4Android (v" + RaygunSettings.RAYGUN_CLIENT_VERSION + ")");
-
+    public static void init(Context applicationContext, String apiKey, String version) {
         RaygunClient.applicationContext = applicationContext;
-
-        if (apiKey == null || apiKey.trim().isEmpty()) {
-            RaygunClient.apiKey = readApiKey(getApplicationContext());
-        } else {
-            RaygunClient.apiKey = apiKey;
-        }
-
-        RaygunClient.appContextIdentifier = UUID.randomUUID().toString();
-
-        if (version == null || version.trim().isEmpty()) {
-            try {
-                RaygunClient.version = getApplicationContext().getPackageManager().getPackageInfo(getApplicationContext().getPackageName(), 0).versionName;
-            } catch (PackageManager.NameNotFoundException e) {
-                RaygunClient.version = "Not Provided";
-                RaygunLogger.w("Couldn't read application version from calling package");
-            }
-        } else {
-            RaygunClient.version = version;
-        }
-
-        CrashReporting.postCachedMessages();
+        init(null, apiKey, version);
     }
 
     /**
