@@ -417,7 +417,7 @@ public class RaygunClient {
     /**
      * Returns the current Application's context.
      *
-     * @return The current application Context.
+     * @return The current application context.
      * @throws java.lang.IllegalStateException if init() has not been called.
      */
     public static Context getApplicationContext() {
