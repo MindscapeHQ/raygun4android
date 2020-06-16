@@ -57,11 +57,13 @@ public class RaygunClient {
     }
 
     /**
-     * Initializes the Raygun client with applicationContext and your Raygun API key. The version
-     * transmitted will be the value of the versionName attribute in your manifest element. This
-     * function should be used by 3rd party library.
+     * Initializes the Raygun client with an Android application context, your Raygun API key and the
+     * version of your application.
      *
-     * @param Context The Android applicationContext
+     * This function is intended to be used by 3rd-party libraries such as Raygun for React Native or
+     * Raygun for Flutter etc.
+     *
+     * @param applicationContext The Android applicationContext
      * @param apiKey An API key that belongs to a Raygun application created in your dashboard
      * @param version The version of your application, format x.x.x.x, where x is a positive integer.
      */
