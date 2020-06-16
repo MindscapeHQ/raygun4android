@@ -30,6 +30,7 @@ public class RaygunClient {
     private static String version;
     private static String appContextIdentifier;
     private static RaygunUserInfo userInfo;
+    private static Context applicationContext;
 
     private static boolean crashReportingEnabled = false;
     private static boolean RUMEnabled = false;
@@ -53,6 +54,20 @@ public class RaygunClient {
      */
     public static void init(Application application, String apiKey) {
         init(application, apiKey, null);
+    }
+
+    /**
+     * Initializes the Raygun client with applicationContext and your Raygun API key. The version
+     * transmitted will be the value of the versionName attribute in your manifest element. This
+     * function should be used by 3rd party library.
+     *
+     * @param Context The Android applicationContext
+     * @param apiKey An API key that belongs to a Raygun application created in your dashboard
+     * @param version The version of your application, format x.x.x.x, where x is a positive integer.
+     */
+    public static void init(Context applicationContext, String apiKey, String version) {
+        RaygunClient.applicationContext = applicationContext;
+        init(null, apiKey, version);
     }
 
     /**
@@ -404,10 +419,13 @@ public class RaygunClient {
      * @throws java.lang.IllegalStateException if init() has not been called.
      */
     public static Context getApplicationContext() {
-        if (RaygunClient.application == null) {
-            throw new IllegalStateException("init() must be called first.");
+        if (RaygunClient.application != null) {
+            return RaygunClient.application.getApplicationContext();
+        }
+        if (RaygunClient.applicationContext != null) {
+            return RaygunClient.applicationContext;
         }
 
-        return RaygunClient.application.getApplicationContext();
+        throw new IllegalStateException("init() must be called first.");
     }
 }
