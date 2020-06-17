@@ -26,10 +26,11 @@ import java.util.UUID;
  */
 public class RaygunClient {
     private static String apiKey;
-    private static Application application;
-    private static String version;
+     private static String version;
     private static String appContextIdentifier;
     private static RaygunUserInfo userInfo;
+    // During initialisation, either application or applicationContext will be set.
+    private static Application application;
     private static Context applicationContext;
 
     private static boolean crashReportingEnabled = false;
@@ -60,7 +61,7 @@ public class RaygunClient {
      * Initializes the Raygun client with an Android application context, your Raygun API key and the
      * version of your application.
      *
-     * This function is intended to be used by 3rd-party libraries such as Raygun for React Native or
+     * This method is intended to be used by 3rd-party libraries such as Raygun for React Native or
      * Raygun for Flutter etc.
      *
      * @param applicationContext The Android applicationContext
@@ -69,7 +70,7 @@ public class RaygunClient {
      */
     public static void init(Context applicationContext, String apiKey, String version) {
         RaygunClient.applicationContext = applicationContext;
-        init(null, apiKey, version);
+        sharedSetup(apiKey, version);
     }
 
     /**
@@ -81,15 +82,18 @@ public class RaygunClient {
      * @param version The version of your application, format x.x.x.x, where x is a positive integer.
      */
     public static void init(Application application, String apiKey, String version) {
+        RaygunClient.application = application;
+        sharedSetup(apiKey, version);
+    }
+
+    private static void sharedSetup(String apiKey, String version) {
 
         TimberRaygunLoggerImplementation.init();
 
         RaygunLogger.d("Configuring Raygun4Android (v" + RaygunSettings.RAYGUN_CLIENT_VERSION + ")");
 
-        RaygunClient.application = application;
-
         if (apiKey == null || apiKey.trim().isEmpty()) {
-           RaygunClient.apiKey = readApiKey(getApplicationContext());
+            RaygunClient.apiKey = readApiKey(getApplicationContext());
         } else {
             RaygunClient.apiKey = apiKey;
         }
@@ -108,7 +112,9 @@ public class RaygunClient {
         }
 
         CrashReporting.postCachedMessages();
+
     }
+
 
     /**
      * Sends an exception-type object to Raygun.
