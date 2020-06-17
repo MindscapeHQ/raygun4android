@@ -1,5 +1,9 @@
 ## Changelog
 
+- v4.0.2-beta1:
+  - Added additional RaygunClient.init() entry point to make usage from within cross-platform libraries more accessible (#72)
+  - Debug build of the sample app now includes LeakCanary
+
 - v4.0.1:
   - Fixes for an issue with breadcrumb processing (#64) and improved general parsing of the stack trace
   - Fixes inability to use CrashReporingOnBeforeSend interface due to wrong visibility (#63)

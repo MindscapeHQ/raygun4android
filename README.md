@@ -6,9 +6,11 @@ Supports Android 4.1+ (API 16+).
 
 ## IMPORTANT
 
-### 30 Juni 2019
+### 16 June 2020
 
 Raygun4Android 4.0.1 is currently considered to be the stable release of the provider.
+
+Raygun4Android 4.0.2-beta1 has a few minor bugfixes and improvements.
 
 The master branch reflect ongoing work on the 4.0.x line. 
 
