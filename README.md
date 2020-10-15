@@ -45,7 +45,7 @@ Then add the following to your **module's** build.gradle:
 ```gradle
 dependencies {
     ...
-    implementation 'com.raygun:raygun4android:4.0.1'
+    implementation 'com.raygun:raygun4android:4.+'
 }
 ```
 
