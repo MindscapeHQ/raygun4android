@@ -176,11 +176,11 @@ This function gets called from within the ```android {...}``` block of the Gradl
 
 ## Advanced features
 
-### Affected Customers
+### Affected user tracking
 
-Raygun supports tracking the unique customers who encounter bugs in your apps.
+Raygun supports tracking the unique users who encounter bugs in your apps.
 
-By default a device-derived UUID is transmitted. You can also add the currently logged in customer's data like this:
+By default a device-derived UUID is transmitted. You can also add the currently logged in user's data like this:
 
 ```java
 String userIdentifier = "12345";
@@ -195,9 +195,9 @@ RaygunClient.setUser(user);
 
 Any of the properties but `identifier` and `isAnonymous` are optional. `isAnonymous` will be set to true if the identifier is null or an empty string. There is also a constructor overload if you prefer to specify all in one statement and a convenience constructor to only set an identifier.
 
-`identifier` should be a unique representation of the current logged in customer - we will assume that messages with the same identifier are the same customer. If you do not set it, it will be automatically set to the device UUID.
+`identifier` should be a unique representation of the current logged in user - we will assume that messages with the same identifier are the same user. If you do not set it, it will be automatically set to the device UUID.
 
-If the customer context changes, for instance on log in/out, you should remember to call setUser again to store the updated customer identifier. If a customer logs out and you want to use the default device identifier again, just create an empty `RaygunUserInfo` object without an identifier. In this case `isAnonymous` will be set to true.
+If the user context changes, for instance on log in/out, you should remember to call setUser again to store the updated user identifier. If a user logs out and you want to use the default device identifier again, just create an empty `RaygunUserInfo` object without an identifier. In this case `isAnonymous` will be set to true.
 
 ### Custom endpoints
 
@@ -345,12 +345,12 @@ The following methods are available for sending manually; pick one depending on 
 
 The `send` function builds a RaygunMessage for you and then sends it.
 
-#### Customer management
+#### User management
 
 * `RaygunClient.setUser(String user)`
 * `RaygunClient.setUser(RaygunUserInfo userInfo)`
 
-The first method internally builds a `RaygunUserInfo` with `user` being used at the identifier field. Ensure you call again if the customer context changes (usually login/logout).
+The first method internally builds a `RaygunUserInfo` with `user` being used at the identifier field. Ensure you call again if the user context changes (usually login/logout).
 
 * `RaygunClient.setCustomData(Map customData)`
 
@@ -406,7 +406,7 @@ android {
 
   We found that certain apps in the category of ad- and tracking blockers on Android devices can stop Raygun messages from going through to our servers. One example of this is Blockada, a well-known and root-less Adblocker on Android. Unfortunately there is nothing we can directly do to stop problems arising from this to occur.
 
-  One possible workaround would be to implement a check in your app to see if api.raygun.io is reachable and if not, post this customer's crash reports or RUM events to your own backend via custom endpoints.
+  One possible workaround would be to implement a check in your app to see if api.raygun.io is reachable and if not, post this user's crash reports or RUM events to your own backend via custom endpoints.
 
 * Environment Data
 
