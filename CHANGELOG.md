@@ -77,7 +77,7 @@
 
 - v1.0.3: Improved version tracking support
 
-- v1.0.2: Added SetUser method for unique user tracking.
+- v1.0.2: Added SetUser method for unique user tracking/customers.
 
 - v1.0.1: Added caching of messages to disk when network unavailable & post them when it becomes available again; several bug fixes relating to the posting service. This version is recommended; do not use 1.0.0.
 
