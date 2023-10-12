@@ -23,7 +23,7 @@ If you want the older stable version 3.0.6 please check out the change set label
 ## Requirements
 
 - minSdkVersion 16+
-- compileSdkVersion 28
+- compileSdkVersion 34
 
 ## Installation
 

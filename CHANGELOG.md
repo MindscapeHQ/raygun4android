@@ -1,5 +1,8 @@
 ## Changelog
 
+- v4.0.3:
+    - Update targetSDK to use version 34
+
 - v4.0.2-beta1:
   - Added additional RaygunClient.init() entry point to make usage from within cross-platform libraries more accessible (#72)
   - Debug build of the sample app now includes LeakCanary
