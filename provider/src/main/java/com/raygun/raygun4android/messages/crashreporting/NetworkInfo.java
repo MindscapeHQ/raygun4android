@@ -10,6 +10,7 @@ import java.net.NetworkInterface;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 
 public class NetworkInfo {
     private List<String> iPAddress = new ArrayList<String>();
@@ -113,7 +114,7 @@ public class NetworkInfo {
 
                 for (InetAddress addr : addrs) {
                     if (!addr.isLoopbackAddress()) {
-                        String sAddr = addr.getHostAddress().toUpperCase();
+                        String sAddr = addr.getHostAddress().toUpperCase(Locale.ROOT);
                         boolean isIPv4 = addr instanceof Inet4Address;
 
                         if (isIPv4) {
