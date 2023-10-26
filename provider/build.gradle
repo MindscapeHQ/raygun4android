@@ -1,11 +1,11 @@
 apply plugin: 'com.android.library'
 
 android {
-    compileSdk 28
+    compileSdk 34
 
     defaultConfig {
         minSdkVersion 16
-        targetSdkVersion 28
+        targetSdkVersion 34
         versionCode = Long.valueOf(VERSION_CODE)
         versionName = VERSION_NAME
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
@@ -25,6 +25,10 @@ android {
             buildConfigField("String","VERSION_NAME","\"${defaultConfig.versionName}\"")
             consumerProguardFiles 'proguard-rules.pro'
         }
+    }
+
+    lintOptions {
+        disable 'LogNotTimber', 'StringFormatInTimber', 'ThrowableNotAtBeginning', 'BinaryOperationInTimber', 'TimberArgCount', 'TimberArgTypes', 'TimberTagLength'
     }
 
     compileOptions {
@@ -65,7 +69,7 @@ dependencies {
 
     implementation 'com.android.support:support-compat:28.0.0'
     implementation 'com.android.support:appcompat-v7:28.0.0'
-    implementation 'com.google.code.gson:gson:2.8.5'
+    implementation 'com.google.code.gson:gson:2.8.9'
     implementation 'com.squareup.okhttp3:okhttp:3.12.2'
     implementation 'com.jakewharton.timber:timber:4.7.1'
 
@@ -76,4 +80,5 @@ dependencies {
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
 }
 
+// Commented code to push to lib repos as that code will need to change
 // apply from: 'gradle-mvn-push.gradle'
