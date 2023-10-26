@@ -3,7 +3,6 @@ import static groovyx.net.http.ContentTypes.JSON
 
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-android-extensions'
 
 // Used for Raygun notifyDeployment task. In the real world this would come from a local user.properties file etc.
 def localUserName = "Change Me"
@@ -76,7 +75,7 @@ android {
             storePassword '123456'
         }
     }
-    compileSdkVersion 28
+    compileSdk 28
     defaultConfig {
         applicationId "com.raygun.raygun4androidsample"
         minSdkVersion 16
@@ -99,6 +98,9 @@ android {
             versionNameSuffix '-DEBUG'
         }
     }
+    buildFeatures {
+        viewBinding true
+    }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
@@ -106,6 +108,7 @@ android {
     // Setup RG tasks
     createRaygunNotifyDeploymentTask(RAYGUN_API_TOKEN, RAYGUN_API_KEY, RAYGUN_GROUP, defaultConfig.versionName, localUserName, localUserEmail)
     createRaygunProguardTask(RAYGUN_API_TOKEN, RAYGUN_APP_PATH, RAYGUN_GROUP, defaultConfig.versionName)
+    namespace 'com.raygun.raygun4androidsample.sample'
 }
 
 dependencies {

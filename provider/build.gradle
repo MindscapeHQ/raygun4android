@@ -1,7 +1,7 @@
 apply plugin: 'com.android.library'
 
 android {
-    compileSdkVersion 28
+    compileSdk 28
 
     defaultConfig {
         minSdkVersion 16
@@ -15,10 +15,14 @@ android {
         debug {
             debuggable true
             minifyEnabled false
+            buildConfigField("long", "VERSION_CODE", "${defaultConfig.versionCode}")
+            buildConfigField("String","VERSION_NAME","\"${defaultConfig.versionName}\"")
         }
         release {
             debuggable false
             minifyEnabled false
+            buildConfigField("long", "VERSION_CODE", "${defaultConfig.versionCode}")
+            buildConfigField("String","VERSION_NAME","\"${defaultConfig.versionName}\"")
             consumerProguardFiles 'proguard-rules.pro'
         }
     }
@@ -27,6 +31,7 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+    namespace 'com.raygun.raygun4android'
 
     libraryVariants.all { variant ->
         variant.outputs.all { output ->
@@ -71,4 +76,4 @@ dependencies {
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
 }
 
-apply from: 'gradle-mvn-push.gradle'
+// apply from: 'gradle-mvn-push.gradle'
