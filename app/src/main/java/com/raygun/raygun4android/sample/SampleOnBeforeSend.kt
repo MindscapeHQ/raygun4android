@@ -1,4 +1,4 @@
-package com.raygun.raygun4androidsample.sample
+package com.raygun.raygun4android.sample
 
 import android.util.Log
 import com.raygun.raygun4android.CrashReportingOnBeforeSend

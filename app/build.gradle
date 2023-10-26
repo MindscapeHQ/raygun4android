@@ -77,7 +77,7 @@ android {
     }
     compileSdk 28
     defaultConfig {
-        applicationId "com.raygun.raygun4androidsample"
+        applicationId "com.raygun.raygun4android"
         minSdkVersion 16
         targetSdkVersion 28
         versionCode = Long.valueOf(VERSION_CODE)
@@ -108,7 +108,7 @@ android {
     // Setup RG tasks
     createRaygunNotifyDeploymentTask(RAYGUN_API_TOKEN, RAYGUN_API_KEY, RAYGUN_GROUP, defaultConfig.versionName, localUserName, localUserEmail)
     createRaygunProguardTask(RAYGUN_API_TOKEN, RAYGUN_APP_PATH, RAYGUN_GROUP, defaultConfig.versionName)
-    namespace 'com.raygun.raygun4androidsample.sample'
+    namespace 'com.raygun.raygun4android.sample'
 }
 
 dependencies {
