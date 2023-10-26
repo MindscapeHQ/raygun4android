@@ -1,6 +1,6 @@
 package com.raygun.raygun4android.services;
 
-import android.support.v4.app.JobIntentService;
+import androidx.core.app.JobIntentService;
 
 import com.raygun.raygun4android.logging.RaygunLogger;
 import com.raygun.raygun4android.logging.TimberRaygunLoggerImplementation;
