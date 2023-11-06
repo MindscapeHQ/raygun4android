@@ -85,7 +85,7 @@ android {
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
     }
     lintOptions {
-        disable 'StringFormatInTimber', 'ThrowableNotAtBeginning', 'BinaryOperationInTimber', 'TimberArgCount', 'TimberArgTypes', 'TimberTagLength'
+        disable 'LogNotTimber','StringFormatInTimber', 'ThrowableNotAtBeginning', 'BinaryOperationInTimber', 'TimberArgCount', 'TimberArgTypes', 'TimberTagLength'
     }
     buildTypes {
         release {
@@ -116,16 +116,17 @@ android {
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-    // Option A: Build from local provider library src
+
+    // Usage option A: Use and build from local provider library src
     implementation project(':provider')
-    // Option B: Build from external repo
+    // Usage option B: Use and build from external repo
     // implementation 'com.raygun:raygun4android:x.y.z'
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
-    implementation 'androidx.appcompat:appcompat:1.0.0'
-    implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
-    testImplementation 'junit:junit:4.12'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.3'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.0'
+
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+    testImplementation 'junit:junit:4.13.2'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
 
     debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.12'
 }
