@@ -85,7 +85,7 @@ android {
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
     }
     lintOptions {
-        disable 'DataExtractionRules','MonochromeLauncherIcon','SetTextI18n','HardcodedText', 'LogNotTimber', 'StringFormatInTimber', 'ThrowableNotAtBeginning', 'BinaryOperationInTimber', 'TimberArgCount', 'TimberArgTypes', 'TimberTagLength'
+        disable 'MonochromeLauncherIcon','SetTextI18n','HardcodedText', 'LogNotTimber', 'StringFormatInTimber', 'ThrowableNotAtBeginning', 'BinaryOperationInTimber', 'TimberArgCount', 'TimberArgTypes', 'TimberTagLength'
     }
     buildTypes {
         release {
@@ -119,7 +119,7 @@ dependencies {
     // Build from local provider library src
     implementation project(':provider')
     // Build from external repo
-    //implementation 'com.raygun:raygun4android:4.0.0'
+    //implementation 'com.raygun:raygun4android:x.y.z'
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
     implementation 'androidx.appcompat:appcompat:1.0.0'
     implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
