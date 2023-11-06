@@ -382,7 +382,7 @@ Provides an instance of a class which has an onBeforeSend method that can be use
 
   Yup - clone this repository, then run the **app** module of the project.
 
-* I'm not seeing errors in the dashboard.
+* I'm not seeing errors in Raygun Crash Reporting.
 
   Raygun4Android outputs Logcat messages - look for the the logcat tag **Raygun4Android**. HTTP Status 403 will indicate an invalid API key, 400 a bad message, and 202 will indicate received successfully.
 
