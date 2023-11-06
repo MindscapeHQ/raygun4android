@@ -2,4 +2,13 @@
     <string name="app_name">Raygun4Android Sample App</string>
     <string name="app_version_text">App %1$s (%2$i %3$s)</string>
     <string name="provider_version_text">Provider %1$s (%2$i %3$s)</string>
+    <string name="send_an_error">Send an error</string>
+    <string name="crash_app">Crash app</string>
+    <string name="set_user_anonymous">Set user anonymous</string>
+    <string name="set_user_a">Set user A</string>
+    <string name="set_user_b">Set user B</string>
+    <string name="handle_crash">Handle Crash</string>
+    <string name="go_to_a_second_activity">Go to a second Activity</string>
+    <string name="hello_world_main_activity">Hello World! Main Activity!</string>
+    <string name="hello_world_second_activity">Hello World! Second Activity!</string>
 </resources>
