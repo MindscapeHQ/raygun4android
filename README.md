@@ -176,7 +176,7 @@ def createRaygunNotifyDeploymentTask(token,key,groupName,version,userName,userEm
 
 This function gets called from within the ```android {...}``` block of the Gradle file at each build in Android Studio and creates the appropriate parameterised task to notify the Raygun backend of your app's deployment.
 
-## Advanced
+## Advanced Features
 
 ### Affected Customers
 
@@ -216,7 +216,7 @@ Please note that setting a custom endpoint will stop Crash Report or Real User M
 
 ### Storing crash reports on the device
 
-If the device can't connect, Raygun4Android will save the crash report to the device storage. At the next start of the application, (along with the provider) it will check if the internet is now available. If it is, send the cached messages. A maximum of 64 messages will be cached and you can change the amount by calling:
+If the device can't connect because it is offline, Raygun4Android will save the crash report to the device storage. At the next start of the application, (along with the provider) it will check if the internet is now available. If it is, send the cached messages. A maximum of 64 messages will be cached. Once the storage limit is reached, no further crash reports are stored locally until the storage has been cleared. You can change the amount by calling:
 
 ```java
 RaygunClient.setMaxReportsStoredOnDevice(amount)
