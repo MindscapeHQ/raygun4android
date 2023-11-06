@@ -1,5 +1,10 @@
 ## Changelog
 
+- v4.1.0-alpha1:
+ - Upgrade repo and all dependencies to SDK 34, Android X (#83) and others.
+ - Documented Timber linting behaviour and solution (#69).
+ - Upgraded all builds to Gradle 7.x to work correctly with Android Studio Giraffe (2022.3.1)
+
 - v4.0.2-beta1:
   - Added additional RaygunClient.init() entry point to make usage from within cross-platform libraries more accessible (#72)
   - Debug build of the sample app now includes LeakCanary

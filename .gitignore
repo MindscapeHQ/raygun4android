@@ -32,6 +32,7 @@ Thumbs.db
 .idea/markdown-navigator.xml
 .idea/markdown-navigator-enh.xml
 .idea/markdown-navigator
+.idea/deploymentTargetDropDown.xml
 .idea/caches/
 .gradle
 build/

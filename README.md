@@ -8,22 +8,24 @@ Supports Android 4.1+ (API 16+).
 
 ### 16 June 2020
 
-Raygun4Android 4.0.1 is currently considered to be the stable release of the provider.
+Raygun4Android 4.0.1 is currently considered to be the stable release of the provider and is tagged in the repository.
 
-Raygun4Android 4.0.2-beta1 has a few minor bugfixes and improvements.
+The master branch reflect ongoing work on the 4.1 line as snapshots. 
 
-The master branch reflect ongoing work on the 4.0.x line. 
+Raygun4Android is currently actively being worked on towards a release of version 5 in the near future.
 
-Raygun4Android is currently actively being worked on towards a release of version 4.1 in a separate branch.
-
-With the release of 4.0.0-beta2, the 4.0.0 development branch had been merged into master and is now the mainstream development line.
-
-If you want the older stable version 3.0.6 please check out the change set labelled with v3.0.6 and go from there.
+If you want the *very old* stable version 3.0.6 please check out the change set labelled with v3.0.6 and go from there.
 
 ## Requirements
 
 - minSdkVersion 16+
-- compileSdkVersion 28
+- compileSdkVersion 34
+
+## Internal dependencies
+
+- Gson
+- OKHttp
+- Timber
 
 ## Installation
 
@@ -45,7 +47,7 @@ Then add the following to your **module's** build.gradle:
 ```gradle
 dependencies {
     ...
-    implementation 'com.raygun:raygun4android:4.+'
+    implementation 'com.raygun:raygun4android:4.0.1'
 }
 ```
 
@@ -88,11 +90,11 @@ The above exception handler automatically catches and sends all uncaught excepti
 
 For an actual usage example, check out the sample application in the **app** module of this project
 
-## Raygun and ProGuard
+## Raygun and ProGuard/R8
 
 ### General
 
-ProGuard is a free Java tool for obfuscation, class file shrinking, optimizing and pre-verifying. When enabling ProGuard in a native Android application that also uses Raygun, the obfuscation feature requires a bit of attention. By default, your obfuscated class and method names will show up in the stacktraces of exception/error reports submitted to Raygun. This makes the stacktraces difficult to read when looking into the cause of the issues.
+ProGuard and R8 are tools for obfuscation, class file shrinking, optimizing and pre-verifying. When enabling ProGuard in a native Android application that also uses Raygun, the obfuscation feature requires a bit of attention. By default, your obfuscated class and method names will show up in the stacktraces of exception/error reports submitted to Raygun. This makes the stacktraces difficult to read when looking into the cause of the issues.
 
 ProGuard produces a mapping.txt file that can be used to restore the original class and method names. Such files can be uploaded to Raygun to automatically process all of your exception reports into readable stacktraces. 
 
@@ -174,7 +176,7 @@ def createRaygunNotifyDeploymentTask(token,key,groupName,version,userName,userEm
 
 This function gets called from within the ```android {...}``` block of the Gradle file at each build in Android Studio and creates the appropriate parameterised task to notify the Raygun backend of your app's deployment.
 
-## Advanced features
+## Advanced Features
 
 ### Affected Customers
 
@@ -214,7 +216,7 @@ Please note that setting a custom endpoint will stop Crash Report or Real User M
 
 ### Storing crash reports on the device
 
-If the device can't connect, Raygun4Android will save the crash report to disk. At the next start of the application (and therefore the provider) it will check if the internet is now available, and if it is, send the cached messages. A maximum of 64 messages will be cached and you can change the amount by calling:
+If the device can't connect because it is offline, Raygun4Android will save the crash report to the device storage. At the next start of the application, (along with the provider) it will check if the internet is now available. If it is, send the cached messages. A maximum of 64 messages will be cached. Once the storage limit is reached, no further crash reports are stored locally until the storage has been cleared. You can change the amount by calling:
 
 ```java
 RaygunClient.setMaxReportsStoredOnDevice(amount)
@@ -246,7 +248,6 @@ class BeforeSendImplementation implements CrashReportingOnBeforeSend {
         return message;
     }
 }
-
 ...
 
 public class SomeActivity extends Activity {
@@ -379,26 +380,26 @@ Provides an instance of a class which has an onBeforeSend method that can be use
 
 * Is there an example app?
 
-  Yup - clone this repository then run the **app** module of the project.
+  Yup - clone this repository, then run the **app** module of the project.
 
-* Not seeing errors in the dashboard?
+* I'm not seeing errors in Raygun Crash Reporting.
 
   Raygun4Android outputs Logcat messages - look for the the logcat tag **Raygun4Android**. HTTP Status 403 will indicate an invalid API key, 400 a bad message, and 202 will indicate received successfully.
 
 * My build fails with `Default interface methods are only supported starting with Android N (--min-api 24)`. Why is that?
 
-  Raygun4Android uses Timber for internal logging. This requires some language features that are only available with Java 8. Make sure that your project using the library has set compilation compatibility to Java 8.
+  Raygun4Android uses Timber for internal logging. This requires some language features that are only available with Java 8. Make sure that your project, using the library, has set the compilation compatibility to Java 8 as the minimum.
   
   Google's documentation has more information on the reasons and implications of this requirement: https://developer.android.com/studio/write/java8-support
   
 ```groovy
 android {
-  ...
-  compileOptions {
+    ...
+    compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
-  ...
+    ...
 }
 ```
 
@@ -415,3 +416,17 @@ android {
 * The library logs an error message about a not found class: Rejecting re-init on previously-failed class java.lang.Class<android.support.v4.app.JobIntentService$JobServiceEngineImpl>
 
   The message above stems from certain versions of the Android support libraries. JobServiceEngineImpl is part of Android Oreo (8, SDK 26) and newer only. The support library catering for supporting services on earlier versions of Android runs internal checks for which implementation is available to it. As part of the checks, it outputs the message as an informational feedback only.
+
+* Timber Lint warnings get exposed to my app even though I don't (want to) use Timber.
+
+  The solution for the time being is to disable linting for those specific lint warning in your app:
+
+```groovy
+android {
+    ...
+    lintOptions {
+        disable 'LogNotTimber', 'StringFormatInTimber', 'ThrowableNotAtBeginning', 'BinaryOperationInTimber', 'TimberArgCount', 'TimberArgTypes', 'TimberTagLength'
+    }
+    ...
+}
+```

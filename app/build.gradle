@@ -75,14 +75,17 @@ android {
             storePassword '123456'
         }
     }
-    compileSdk 28
+    compileSdk 34
     defaultConfig {
-        applicationId "com.raygun.raygun4androidsample"
+        applicationId "com.raygun.raygun4android"
         minSdkVersion 16
-        targetSdkVersion 28
+        targetSdkVersion 34
         versionCode = Long.valueOf(VERSION_CODE)
         versionName = "${VERSION_NAME}-sample"
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
+    }
+    lintOptions {
+        disable 'LogNotTimber','StringFormatInTimber', 'ThrowableNotAtBeginning', 'BinaryOperationInTimber', 'TimberArgCount', 'TimberArgTypes', 'TimberTagLength'
     }
     buildTypes {
         release {
@@ -108,21 +111,22 @@ android {
     // Setup RG tasks
     createRaygunNotifyDeploymentTask(RAYGUN_API_TOKEN, RAYGUN_API_KEY, RAYGUN_GROUP, defaultConfig.versionName, localUserName, localUserEmail)
     createRaygunProguardTask(RAYGUN_API_TOKEN, RAYGUN_APP_PATH, RAYGUN_GROUP, defaultConfig.versionName)
-    namespace 'com.raygun.raygun4androidsample.sample'
+    namespace 'com.raygun.raygun4android.sample'
 }
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-    // Build from local provider library src
-    implementation project(':provider')
-    // Build from external repo
-    //implementation 'com.raygun:raygun4android:4.0.0'
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-    implementation 'com.android.support:appcompat-v7:28.0.0'
-    implementation 'com.android.support.constraint:constraint-layout:1.1.3'
-    testImplementation 'junit:junit:4.12'
-    androidTestImplementation 'com.android.support.test:runner:1.0.2'
-    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
 
-    debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.4'
+    // Usage option A: Use and build from local provider library src
+    implementation project(':provider')
+    // Usage option B: Use and build from external repo
+    // implementation 'com.raygun:raygun4android:x.y.z'
+
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+    testImplementation 'junit:junit:4.13.2'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
+
+    debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.12'
 }

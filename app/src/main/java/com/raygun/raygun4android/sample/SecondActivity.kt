@@ -1,9 +1,9 @@
-package com.raygun.raygun4androidsample.sample
+package com.raygun.raygun4android.sample
 
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.support.v7.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatActivity
 import android.util.Log
 import android.widget.Button
 import android.widget.TextView
@@ -76,8 +76,8 @@ class SecondActivity : AppCompatActivity() {
             RaygunClient.setUser(user)
         }
 
-        textViewAppVersion.text = "App ${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE} ${BuildConfig.BUILD_TYPE})"
-        textViewProviderVersion.text = "Provider ${com.raygun.raygun4android.BuildConfig.VERSION_NAME} (${com.raygun.raygun4android.BuildConfig.VERSION_CODE} ${BuildConfig.BUILD_TYPE})"
+        textViewAppVersion.text = getString(R.string.app_version_text, BuildConfig.VERSION_NAME, BuildConfig.VERSION_CODE, BuildConfig.BUILD_TYPE)
+        textViewProviderVersion.text = getString(R.string.provider_version_text, BuildConfig.VERSION_NAME, BuildConfig.VERSION_CODE, BuildConfig.BUILD_TYPE)
 
         RaygunClient.clearBreadcrumbs()
 

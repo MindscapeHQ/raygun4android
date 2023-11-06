@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -10,7 +10,7 @@
         android:id="@+id/textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Hello World!"
+        android:text="@string/hello_world_main_activity"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
@@ -21,7 +21,7 @@
         android:id="@+id/button_send"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Send an error"
+        android:text="@string/send_an_error"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView" />
@@ -30,7 +30,7 @@
         android:id="@+id/button_crash"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Crash app"
+        android:text="@string/crash_app"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/button_send" />
@@ -39,7 +39,7 @@
         android:id="@+id/button_set_user_anon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Set user anonymous"
+        android:text="@string/set_user_anonymous"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/button_handleException" />
@@ -48,7 +48,7 @@
         android:id="@+id/button_set_user_A"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Set user A"
+        android:text="@string/set_user_a"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/button_set_user_anon" />
@@ -57,7 +57,7 @@
         android:id="@+id/button_set_user_B"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Set user B"
+        android:text="@string/set_user_b"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/button_set_user_A" />
@@ -86,7 +86,7 @@
         android:id="@+id/button_handleException"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Handle Crash"
+        android:text="@string/handle_crash"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/button_crash" />
@@ -95,9 +95,9 @@
         android:id="@+id/button_secondActivity"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Go to a second Activity"
+        android:text="@string/go_to_a_second_activity"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/button_set_user_B" />
 
-</android.support.constraint.ConstraintLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
