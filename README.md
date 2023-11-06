@@ -388,7 +388,7 @@ Provides an instance of a class which has an onBeforeSend method that can be use
 
 * My build fails with `Default interface methods are only supported starting with Android N (--min-api 24)`. Why is that?
 
-  Raygun4Android uses Timber for internal logging. This requires some language features that are only available with Java 8. Make sure that your project using the library has set compilation compatibility to Java 8 as the minimum
+  Raygun4Android uses Timber for internal logging. This requires some language features that are only available with Java 8. Make sure that your project, using the library, has set the compilation compatibility to Java 8 as the minimum.
   
   Google's documentation has more information on the reasons and implications of this requirement: https://developer.android.com/studio/write/java8-support
   
