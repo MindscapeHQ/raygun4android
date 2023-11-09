@@ -105,8 +105,8 @@ android {
         viewBinding true
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
     }
     // Setup RG tasks
     createRaygunNotifyDeploymentTask(RAYGUN_API_TOKEN, RAYGUN_API_KEY, RAYGUN_GROUP, defaultConfig.versionName, localUserName, localUserEmail)
