@@ -6,20 +6,19 @@ android {
     defaultConfig {
         minSdkVersion 16
         targetSdkVersion 34
+        buildConfigField("long", "VERSION_CODE", VERSION_CODE)
+        buildConfigField("String","VERSION_NAME","\"${VERSION_NAME}\"")
     }
 
     buildTypes {
         debug {
             debuggable true
             minifyEnabled false
-            buildConfigField("long", "VERSION_CODE", VERSION_CODE)
-            buildConfigField("String","VERSION_NAME","\"${VERSION_NAME}\"")
+
         }
         release {
             debuggable false
             minifyEnabled false
-            buildConfigField("long", "VERSION_CODE", VERSION_CODE)
-            buildConfigField("String","VERSION_NAME","\"${VERSION_NAME}\"")
             consumerProguardFiles 'proguard-rules.pro'
         }
     }
