@@ -1,5 +1,10 @@
 ## Changelog
 
+- v4.1.0-alpha2:
+- Gradle 8, AGP 8.1.1
+- Fix: Sample app displayed wrong provider version
+- Internal: Introduced gitflow process
+
 - v4.1.0-alpha1:
  - Upgrade repo and all dependencies to SDK 34, Android X (#83) and others.
  - Documented Timber linting behaviour and solution (#69).
