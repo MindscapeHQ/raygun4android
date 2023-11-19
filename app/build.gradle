@@ -65,8 +65,8 @@ def createRaygunProguardTask(token,raygunAppPath,groupName,version) {
     }
 }
 
-
 android {
+
     signingConfigs {
         releaseConfig {
             keyAlias 'testkey'
@@ -75,18 +75,22 @@ android {
             storePassword '123456'
         }
     }
+
     compileSdk 34
+
     defaultConfig {
         applicationId "com.raygun.raygun4android"
         minSdkVersion 16
         targetSdkVersion 34
-        versionCode = Long.valueOf(VERSION_CODE)
-        versionName = "${VERSION_NAME}-sample"
+        buildConfigField("long", "VERSION_CODE", VERSION_CODE)
+        buildConfigField("String","VERSION_NAME","\"${VERSION_NAME}-sample\"")
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
     }
+
     lintOptions {
         disable 'LogNotTimber','StringFormatInTimber', 'ThrowableNotAtBeginning', 'BinaryOperationInTimber', 'TimberArgCount', 'TimberArgTypes', 'TimberTagLength'
     }
+
     buildTypes {
         release {
             debuggable false
@@ -101,13 +105,16 @@ android {
             versionNameSuffix '-DEBUG'
         }
     }
+
     buildFeatures {
         viewBinding true
     }
+
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
     }
+
     // Setup RG tasks
     createRaygunNotifyDeploymentTask(RAYGUN_API_TOKEN, RAYGUN_API_KEY, RAYGUN_GROUP, defaultConfig.versionName, localUserName, localUserEmail)
     createRaygunProguardTask(RAYGUN_API_TOKEN, RAYGUN_APP_PATH, RAYGUN_GROUP, defaultConfig.versionName)

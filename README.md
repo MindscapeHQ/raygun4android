@@ -6,11 +6,13 @@ Supports Android 4.1+ (API 16+).
 
 ## IMPORTANT
 
-### 16 June 2020
+### 10 November 2023
 
 Raygun4Android 4.0.1 is currently considered to be the stable release of the provider and is tagged in the repository.
 
-The master branch reflect ongoing work on the 4.1 line as snapshots. 
+The `develop` branch reflects ongoing work on the 4.1 line as tagged snapshots.
+
+The `master` branch used to be the branch for ongoing work and releases until `4.1.0-alpha1`. In the future, the `master` branch will reflect release builds.
 
 Raygun4Android is currently actively being worked on towards a release of version 5 in the near future.
 
@@ -391,17 +393,6 @@ Provides an instance of a class which has an onBeforeSend method that can be use
   Raygun4Android uses Timber for internal logging. This requires some language features that are only available with Java 8. Make sure that your project, using the library, has set the compilation compatibility to Java 8 as the minimum.
   
   Google's documentation has more information on the reasons and implications of this requirement: https://developer.android.com/studio/write/java8-support
-  
-```groovy
-android {
-    ...
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
-    }
-    ...
-}
-```
 
 * There's something weird going on - I checked the logs and the Raygun servers can't be reached!
 
