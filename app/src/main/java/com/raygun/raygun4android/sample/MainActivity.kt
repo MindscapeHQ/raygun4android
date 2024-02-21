@@ -1,13 +1,15 @@
 package com.raygun.raygun4android.sample
 
 import android.app.Application
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
-import com.raygun.raygun4android.RaygunClient
-import com.raygun.raygun4android.messages.shared.RaygunUserInfo
 import android.widget.Button
 import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
+import com.google.android.material.snackbar.Snackbar
+import com.raygun.raygun4android.RaygunClient
+import com.raygun.raygun4android.messages.shared.RaygunUserInfo
+
 
 class MainActivity : AppCompatActivity() {
 
@@ -44,6 +46,7 @@ class MainActivity : AppCompatActivity() {
 
             // Manual exception creation & sending
             RaygunClient.send(Exception("Congratulations, you have sent errors with Raygun4Android"), null, tw)
+            Snackbar.make(it, getString(R.string.you_have_just_sent_an_error_with_raygun4android),Snackbar.LENGTH_SHORT).show()
         }
 
         buttonCrash.setOnClickListener {
@@ -60,30 +63,34 @@ class MainActivity : AppCompatActivity() {
             } catch (ex: Exception) {
                 val i = 4
                 Log.d("Raygun4Android-Sample", "This is here purely so that our alternative value for i gets used and not optimised away in a release build: $i")
+                Snackbar.make(it, getString(R.string.you_just_created_and_caught_an_exception),Snackbar.LENGTH_SHORT).show()
             }
         }
 
         buttonSetUserAnon.setOnClickListener {
             val user = RaygunUserInfo()
             RaygunClient.setUser(user)
+            Snackbar.make(it, getString(R.string.user_is_now_set_to_anonymous_for_future_raygun_reports),Snackbar.LENGTH_SHORT).show()
         }
 
         buttonSetUserA.setOnClickListener {
             val user = RaygunUserInfo("superuser3")
-            user.fullName = "User Name C"
-            user.firstName = "User C"
+            user.fullName = "User Name A"
+            user.firstName = "User A"
             user.email = "e@f.com.com"
             RaygunClient.setUser(user)
-            RaygunClient.recordBreadcrumb("I'm now user C")
+            RaygunClient.recordBreadcrumb("I'm now user A")
+            Snackbar.make(it, getString(R.string.user_is_now_set_to_user_a_for_future_raygun_reports),Snackbar.LENGTH_SHORT).show()
         }
 
         buttonSetUserB.setOnClickListener{
             val user = RaygunUserInfo("superuser4")
-            user.fullName = "User Name D"
-            user.firstName = "User D"
+            user.fullName = "User Name B"
+            user.firstName = "User B"
             user.email = "g@h.com"
             RaygunClient.setUser(user)
-            RaygunClient.recordBreadcrumb("I'm now user D")
+            RaygunClient.recordBreadcrumb("I'm now user B")
+            Snackbar.make(it, getString(R.string.user_is_now_set_to_user_b_for_future_raygun_reports),Snackbar.LENGTH_SHORT).show()
         }
 
         buttonSecondActivity.setOnClickListener {
@@ -94,6 +101,5 @@ class MainActivity : AppCompatActivity() {
         textViewProviderVersion.text = getString(R.string.provider_version_text, com.raygun.raygun4android.BuildConfig.VERSION_NAME, com.raygun.raygun4android.BuildConfig.VERSION_CODE, com.raygun.raygun4android.BuildConfig.BUILD_TYPE)
 
         RaygunClient.recordBreadcrumb("I'm here in Main Activity")
-
     }
 }

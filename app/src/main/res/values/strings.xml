@@ -11,4 +11,10 @@
     <string name="go_to_a_second_activity">Go to a second Activity</string>
     <string name="hello_world_main_activity">Hello World! Main Activity!</string>
     <string name="hello_world_second_activity">Hello World! Second Activity!</string>
+    <string name="you_have_just_sent_an_error_with_raygun4android">You have just sent an error with Raygun4Android.</string>
+    <string name="you_just_created_and_caught_an_exception">You just created and caught an exception.</string>
+    <string name="user_is_now_set_to_anonymous_for_future_raygun_reports">User is now set to \'Anonymous\' for future Raygun reports.</string>
+    <string name="user_is_now_set_to_user_a_for_future_raygun_reports">User is now set to \'User A\' for future Raygun reports.</string>
+    <string name="user_is_now_set_to_user_b_for_future_raygun_reports">User is now set to \'User B\' for future Raygun reports.</string>
+    <string name="we_re_now_on_the_second_activity_screen">We\'re now on the second activity screen.</string>
 </resources>
