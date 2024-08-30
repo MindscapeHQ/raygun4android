@@ -4,8 +4,10 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import android.widget.Button
 import android.widget.TextView
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.snackbar.Snackbar
 import com.raygun.raygun4android.RaygunClient
@@ -87,6 +89,13 @@ class SecondActivity : AppCompatActivity() {
         textViewAppVersion.text = getString(R.string.app_version_text, BuildConfig.VERSION_NAME, BuildConfig.VERSION_CODE, BuildConfig.BUILD_TYPE)
         textViewProviderVersion.text = getString(R.string.provider_version_text, com.raygun.raygun4android.BuildConfig.VERSION_NAME, com.raygun.raygun4android.BuildConfig.VERSION_CODE, com.raygun.raygun4android.BuildConfig.BUILD_TYPE)
 
+        // Handle hardware and  back presses
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                finishWithResult()
+            }
+        })
+
         RaygunClient.clearBreadcrumbs()
 
         val customData = WeakHashMap<String,Any>()
@@ -102,7 +111,24 @@ class SecondActivity : AppCompatActivity() {
             .build()
 
         RaygunClient.recordBreadcrumb(breadcrumbMessage)
-        Snackbar.make(window.decorView.rootView, getString(R.string.we_re_now_on_the_second_activity_screen), Snackbar.LENGTH_SHORT).show()
+        val rootView: View = findViewById(android.R.id.content)
+        Snackbar.make(rootView, getString(R.string.we_re_now_on_the_second_activity_screen), Snackbar.LENGTH_SHORT).show()
+    }
+
+    // Handle action bar item clicks
+    override fun onOptionsItemSelected(item: android.view.MenuItem): Boolean {
+        when (item.itemId) {
+            android.R.id.home -> {
+                finishWithResult()
+                return true
+            }
+        }
+        return super.onOptionsItemSelected(item)
+    }
+
+    private fun finishWithResult() {
+        setResult(RESULT_OK)
+        finish()
     }
 
     companion object {

@@ -3,13 +3,14 @@ package com.raygun.raygun4android.sample
 import android.app.Application
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import android.widget.Button
 import android.widget.TextView
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.snackbar.Snackbar
 import com.raygun.raygun4android.RaygunClient
 import com.raygun.raygun4android.messages.shared.RaygunUserInfo
-
 
 class MainActivity : AppCompatActivity() {
 
@@ -94,12 +95,21 @@ class MainActivity : AppCompatActivity() {
         }
 
         buttonSecondActivity.setOnClickListener {
-            startActivity(SecondActivity.getIntent(this@MainActivity))
+            startSecondActivity.launch(SecondActivity.getIntent(this@MainActivity))
         }
 
         textViewAppVersion.text = getString(R.string.app_version_text, BuildConfig.VERSION_NAME, BuildConfig.VERSION_CODE, BuildConfig.BUILD_TYPE)
         textViewProviderVersion.text = getString(R.string.provider_version_text, com.raygun.raygun4android.BuildConfig.VERSION_NAME, com.raygun.raygun4android.BuildConfig.VERSION_CODE, com.raygun.raygun4android.BuildConfig.BUILD_TYPE)
 
         RaygunClient.recordBreadcrumb("I'm here in Main Activity")
+    }
+
+    private val startSecondActivity = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == RESULT_OK) {
+            val rootView: View = findViewById(android.R.id.content)
+            Snackbar.make(rootView, getString(R.string.we_returned_to_first_activity), Snackbar.LENGTH_SHORT).show()
+        }
     }
 }
