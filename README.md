@@ -178,6 +178,13 @@ def createRaygunNotifyDeploymentTask(token,key,groupName,version,userName,userEm
 
 This function gets called from within the ```android {...}``` block of the Gradle file at each build in Android Studio and creates the appropriate parameterised task to notify the Raygun backend of your app's deployment.
 
+## Sample application
+
+The project contains a small sample application in the `:app` module. It demonstrates common use cases like using a global error handler, custom behaviour for catching and reporting errors and more.
+
+[!image1](app-1.jpg)
+[!image2](app-2.jpg)
+
 ## Advanced Features
 
 ### Affected Customers
