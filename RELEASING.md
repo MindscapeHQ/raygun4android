@@ -19,7 +19,7 @@ signing.password={to be provided}
 signing.secretKeyRingFile={to be provided}
 ```
 
-All keys have to populated with the appropriate values and file paths to allow a successful publication on Maven Central. These values will be provided to people with the appropriate level 
+All keys have to populated with the appropriate values and file paths to allow a successful publication on Maven Central. These values will be provided to people with the appropriate level
 of access by the Raygun team.
 
 ## Publish a build
@@ -122,6 +122,3 @@ Here you can manually upload artifacts.
 8. Artifacts are sent to the Release repository defined in the staging profile.
 9. The temp staging repository will be automatically deleted.
 10. Artifacts will take a few days to be made available to clients and should be listed in the [public repositories](https://oss.sonatype.org/content/repositories/public/com/raygun/raygun4android/) first and on [mvnrepository.com](https://mvnrepository.com/artifact/com.raygun/raygun4android) eventually.
-
-
-

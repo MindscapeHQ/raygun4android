@@ -3,7 +3,6 @@ package com.raygun.raygun4android.messages.crashreporting;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.telephony.TelephonyManager;
-
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
@@ -14,6 +13,7 @@ import java.util.Locale;
 
 public class NetworkInfo {
     private List<String> iPAddress = new ArrayList<String>();
+
     @SuppressWarnings("FieldCanBeLocal")
     private String networkConnectivityState;
 
@@ -33,7 +33,8 @@ public class NetworkInfo {
     private String readNetworkConnectivityState(Context context) {
         String result = "Not connected";
 
-        ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        ConnectivityManager cm =
+                (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         android.net.NetworkInfo info = cm.getActiveNetworkInfo();
 
         if (info != null) {
@@ -107,7 +108,8 @@ public class NetworkInfo {
 
     private void readIPAddress() {
         try {
-            List<NetworkInterface> interfaces = Collections.list(NetworkInterface.getNetworkInterfaces());
+            List<NetworkInterface> interfaces =
+                    Collections.list(NetworkInterface.getNetworkInterfaces());
 
             for (NetworkInterface intf : interfaces) {
                 List<InetAddress> addrs = Collections.list(intf.getInetAddresses());

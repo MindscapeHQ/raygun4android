@@ -7,9 +7,7 @@ import android.os.Environment;
 import android.os.StatFs;
 import android.util.DisplayMetrics;
 import android.view.WindowManager;
-
 import com.raygun.raygun4android.logging.RaygunLogger;
-
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.Date;
@@ -64,17 +62,22 @@ public class RaygunEnvironmentMessage {
             }
 
             DisplayMetrics metrics = new DisplayMetrics();
-            ((WindowManager) context.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay().getMetrics(metrics);
+            ((WindowManager) context.getSystemService(Context.WINDOW_SERVICE))
+                    .getDefaultDisplay()
+                    .getMetrics(metrics);
             windowsBoundWidth = metrics.widthPixels;
             windowsBoundHeight = metrics.heightPixels;
 
             TimeZone tz = TimeZone.getDefault();
             Date now = new Date();
-            utcOffset = TimeUnit.SECONDS.convert(tz.getOffset(now.getTime()), TimeUnit.MILLISECONDS) / 3600;
+            utcOffset =
+                    TimeUnit.SECONDS.convert(tz.getOffset(now.getTime()), TimeUnit.MILLISECONDS)
+                            / 3600;
             locale = context.getResources().getConfiguration().locale.toString();
 
             ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
-            ActivityManager am = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+            ActivityManager am =
+                    (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
             am.getMemoryInfo(mi);
             availablePhysicalMemory = mi.availMem / 0x100000;
 

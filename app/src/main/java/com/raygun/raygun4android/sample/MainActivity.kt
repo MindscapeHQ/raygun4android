@@ -18,7 +18,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val initialCustomData = HashMap<String,String>()
+        val initialCustomData = HashMap<String, String>()
         initialCustomData["firstkey"] = "firstvalue"
 
         // This sets up the client with the API key as provided in your AndroidManifest.xml
@@ -42,12 +42,12 @@ class MainActivity : AppCompatActivity() {
         val buttonSecondActivity = findViewById<Button>(R.id.button_secondActivity)
 
         buttonSend.setOnClickListener {
-            val tw = HashMap<String,String>()
+            val tw = HashMap<String, String>()
             tw["secondkey"] = "secondvalue"
 
             // Manual exception creation & sending
             RaygunClient.send(Exception("Congratulations, you have sent errors with Raygun4Android"), null, tw)
-            Snackbar.make(it, getString(R.string.you_have_just_sent_an_error_with_raygun4android),Snackbar.LENGTH_SHORT).show()
+            Snackbar.make(it, getString(R.string.you_have_just_sent_an_error_with_raygun4android), Snackbar.LENGTH_SHORT).show()
         }
 
         buttonCrash.setOnClickListener {
@@ -64,14 +64,14 @@ class MainActivity : AppCompatActivity() {
             } catch (ex: Exception) {
                 val i = 4
                 Log.d("Raygun4Android-Sample", "This is here purely so that our alternative value for i gets used and not optimised away in a release build: $i")
-                Snackbar.make(it, getString(R.string.you_just_created_and_caught_an_exception),Snackbar.LENGTH_SHORT).show()
+                Snackbar.make(it, getString(R.string.you_just_created_and_caught_an_exception), Snackbar.LENGTH_SHORT).show()
             }
         }
 
         buttonSetUserAnon.setOnClickListener {
             val user = RaygunUserInfo()
             RaygunClient.setUser(user)
-            Snackbar.make(it, getString(R.string.user_is_now_set_to_anonymous_for_future_raygun_reports),Snackbar.LENGTH_SHORT).show()
+            Snackbar.make(it, getString(R.string.user_is_now_set_to_anonymous_for_future_raygun_reports), Snackbar.LENGTH_SHORT).show()
         }
 
         buttonSetUserA.setOnClickListener {
@@ -81,17 +81,17 @@ class MainActivity : AppCompatActivity() {
             user.email = "e@f.com.com"
             RaygunClient.setUser(user)
             RaygunClient.recordBreadcrumb("I'm now user A")
-            Snackbar.make(it, getString(R.string.user_is_now_set_to_user_a_for_future_raygun_reports),Snackbar.LENGTH_SHORT).show()
+            Snackbar.make(it, getString(R.string.user_is_now_set_to_user_a_for_future_raygun_reports), Snackbar.LENGTH_SHORT).show()
         }
 
-        buttonSetUserB.setOnClickListener{
+        buttonSetUserB.setOnClickListener {
             val user = RaygunUserInfo("superuser4")
             user.fullName = "User Name B"
             user.firstName = "User B"
             user.email = "g@h.com"
             RaygunClient.setUser(user)
             RaygunClient.recordBreadcrumb("I'm now user B")
-            Snackbar.make(it, getString(R.string.user_is_now_set_to_user_b_for_future_raygun_reports),Snackbar.LENGTH_SHORT).show()
+            Snackbar.make(it, getString(R.string.user_is_now_set_to_user_b_for_future_raygun_reports), Snackbar.LENGTH_SHORT).show()
         }
 
         buttonSecondActivity.setOnClickListener {
@@ -105,7 +105,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private val startSecondActivity = registerForActivityResult(
-        ActivityResultContracts.StartActivityForResult()
+        ActivityResultContracts.StartActivityForResult(),
     ) { result ->
         if (result.resultCode == RESULT_OK) {
             val rootView: View = findViewById(android.R.id.content)

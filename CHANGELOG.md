@@ -52,8 +52,8 @@
   - You have to enable individual products now before being able to use them.
   - Changes to RUM and Pulse APIs
   - The post() functions in RaygunClient have been removed.
-  
-- v3.0.6: Fixed null reference exception when building crash report messages. We now send messages using a JobIntentService to improve compatibility with the latest Android versions. IMPORTANT: Support for API versions 9 to 15 has been discontinued from this release due to that. 
+
+- v3.0.6: Fixed null reference exception when building crash report messages. We now send messages using a JobIntentService to improve compatibility with the latest Android versions. IMPORTANT: Support for API versions 9 to 15 has been discontinued from this release due to that.
 
 - v3.0.5: Fixing timing issue from ConnectivityManager in RaygunPostService (#41), adding null checks around intent extras being null that should never be null (XRAY-1898)
 

@@ -4,7 +4,6 @@ import com.raygun.raygun4android.RUM;
 import com.raygun.raygun4android.RaygunRUMEventType;
 import com.raygun.raygun4android.RaygunSettings;
 import com.raygun.raygun4android.network.http.RaygunUrlStreamHandlerFactory;
-
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -12,7 +11,8 @@ import java.util.Map;
 
 public class RaygunNetworkLogger {
     private static final long CONNECTION_TIMEOUT = 60000L; // 1 min
-    private static final HashMap<String, RaygunNetworkRequestInfo> connections = new HashMap<String, RaygunNetworkRequestInfo>();
+    private static final HashMap<String, RaygunNetworkRequestInfo> connections =
+            new HashMap<String, RaygunNetworkRequestInfo>();
     private static boolean loggingEnabled = true;
     private static boolean loggingInitialized = false;
 
@@ -40,13 +40,20 @@ public class RaygunNetworkLogger {
         }
     }
 
-    public static synchronized void endNetworkCall(String url, String requestMethod, long endTime, int statusCode) {
+    public static synchronized void endNetworkCall(
+            String url, String requestMethod, long endTime, int statusCode) {
         if (url != null) {
             String id = sanitiseURL(url);
             if ((connections.containsKey(id))) {
                 RaygunNetworkRequestInfo request = connections.get(id);
                 if (request != null) {
-                    sendNetworkTimingEvent(request.url, requestMethod, request.startTime, endTime, statusCode, null);
+                    sendNetworkTimingEvent(
+                            request.url,
+                            requestMethod,
+                            request.startTime,
+                            endTime,
+                            statusCode,
+                            null);
                     connections.remove(id);
                 }
             }
@@ -54,30 +61,42 @@ public class RaygunNetworkLogger {
     }
 
     /**
-     * When a network request is cancelled we stop tracking it and do not send the information through.
-     * Future updates may include sending the cancelled request timing through with information showing it was cancelled.
+     * When a network request is cancelled we stop tracking it and do not send the information
+     * through. Future updates may include sending the cancelled request timing through with
+     * information showing it was cancelled.
      *
-     * @param url               URL to cancel
-     * @param requestMethod     URL to cancel
-     * @param endTime           URL to cancel
-     * @param exception         URL to cancel
+     * @param url URL to cancel
+     * @param requestMethod URL to cancel
+     * @param endTime URL to cancel
+     * @param exception URL to cancel
      */
-    public static synchronized void cancelNetworkCall(String url, String requestMethod, long endTime, String exception) {
+    public static synchronized void cancelNetworkCall(
+            String url, String requestMethod, long endTime, String exception) {
         if (url != null) {
             String id = sanitiseURL(url);
             connections.remove(id);
         }
     }
 
-    private static synchronized void sendNetworkTimingEvent(String url, String requestMethod, long startTime, long endTime, int statusCode, String exception) {
+    private static synchronized void sendNetworkTimingEvent(
+            String url,
+            String requestMethod,
+            long startTime,
+            long endTime,
+            int statusCode,
+            String exception) {
         if (!shouldIgnoreURL(url) && loggingEnabled) {
             url = sanitiseURL(url);
-            RUM.sendRUMTimingEvent(RaygunRUMEventType.NETWORK_CALL, requestMethod + " " + url, endTime - startTime);
+            RUM.sendRUMTimingEvent(
+                    RaygunRUMEventType.NETWORK_CALL,
+                    requestMethod + " " + url,
+                    endTime - startTime);
         }
     }
 
     private static synchronized void removeOldEntries() {
-        Iterator<Map.Entry<String, RaygunNetworkRequestInfo>> it = connections.entrySet().iterator();
+        Iterator<Map.Entry<String, RaygunNetworkRequestInfo>> it =
+                connections.entrySet().iterator();
         while (it.hasNext()) {
             Map.Entry<String, RaygunNetworkRequestInfo> pairs = it.next();
             long startTime = pairs.getValue().startTime;

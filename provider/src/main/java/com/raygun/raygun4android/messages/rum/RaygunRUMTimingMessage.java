@@ -3,6 +3,7 @@ package com.raygun.raygun4android.messages.rum;
 public class RaygunRUMTimingMessage {
     @SuppressWarnings("FieldCanBeLocal")
     private String type;
+
     @SuppressWarnings("FieldCanBeLocal")
     private long duration;
 

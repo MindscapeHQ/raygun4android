@@ -2,7 +2,6 @@ package com.raygun.raygun4android.network.http;
 
 import com.raygun.raygun4android.logging.RaygunLogger;
 import com.raygun.raygun4android.utils.RaygunReflectionUtils;
-
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -22,7 +21,11 @@ final class RaygunHttpsUrlStreamHandler extends URLStreamHandler {
 
     protected URLConnection openConnection(URL url) throws IOException {
         try {
-            Method method = RaygunReflectionUtils.findMethod(originalHandler.getClass(), "openConnection", new Class<?>[]{URL.class});
+            Method method =
+                    RaygunReflectionUtils.findMethod(
+                            originalHandler.getClass(),
+                            "openConnection",
+                            new Class<?>[] {URL.class});
             method.setAccessible(true);
 
             URLConnection urlConnection = (URLConnection) method.invoke(originalHandler, url);
@@ -45,10 +48,15 @@ final class RaygunHttpsUrlStreamHandler extends URLStreamHandler {
 
     protected URLConnection openConnection(URL url, Proxy proxy) throws IOException {
         try {
-            Method method = RaygunReflectionUtils.findMethod(originalHandler.getClass(), "openConnection", new Class<?>[]{URL.class, Proxy.class});
+            Method method =
+                    RaygunReflectionUtils.findMethod(
+                            originalHandler.getClass(),
+                            "openConnection",
+                            new Class<?>[] {URL.class, Proxy.class});
             method.setAccessible(true);
 
-            URLConnection urlConnection = (URLConnection) method.invoke(originalHandler, url, proxy);
+            URLConnection urlConnection =
+                    (URLConnection) method.invoke(originalHandler, url, proxy);
 
             if (urlConnection == null) {
                 throw new IOException("Failed to create connection");
