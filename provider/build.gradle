@@ -59,12 +59,11 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-
-    implementation 'androidx.core:core:1.12.0'
-    implementation 'androidx.appcompat:appcompat:1.6.1'
-    implementation 'com.google.code.gson:gson:2.8.9'
-    implementation 'com.squareup.okhttp3:okhttp:3.14.9'
-    implementation 'com.jakewharton.timber:timber:5.0.1'
+    implementation(libs.androidx.core.core)
+    implementation(libs.androidx.appcompat.appcompat)
+    implementation(libs.gson)
+    implementation(libs.okhttp)
+    implementation(libs.timber)
 }
 
 // Commented code to push to lib repos as that code will need to change
