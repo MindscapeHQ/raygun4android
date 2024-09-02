@@ -6,7 +6,6 @@ import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.provider.Settings;
-
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URLConnection;
@@ -31,7 +30,11 @@ public class RaygunNetworkUtils {
     }
 
     public static boolean hasInternetConnection(Context appContext) {
-        ConnectivityManager cm = (ConnectivityManager) appContext.getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+        ConnectivityManager cm =
+                (ConnectivityManager)
+                        appContext
+                                .getApplicationContext()
+                                .getSystemService(Context.CONNECTIVITY_SERVICE);
 
         if (cm != null) {
             NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
@@ -50,7 +53,9 @@ public class RaygunNetworkUtils {
                 return UUID.fromString(id).toString();
             } else {
                 @SuppressLint("HardwareIds")
-                final String androidId = Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID);
+                final String androidId =
+                        Settings.Secure.getString(
+                                context.getContentResolver(), Settings.Secure.ANDROID_ID);
 
                 try {
                     if (!"9774d56d682e549c".equals(androidId)) {
@@ -67,5 +72,4 @@ public class RaygunNetworkUtils {
             }
         }
     }
-
 }

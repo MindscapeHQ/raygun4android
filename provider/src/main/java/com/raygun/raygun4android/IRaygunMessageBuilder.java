@@ -1,10 +1,8 @@
 package com.raygun.raygun4android;
 
 import android.content.Context;
-
 import com.raygun.raygun4android.messages.crashreporting.RaygunBreadcrumbMessage;
 import com.raygun.raygun4android.messages.crashreporting.RaygunMessage;
-
 import java.util.List;
 import java.util.Map;
 
@@ -34,5 +32,4 @@ public interface IRaygunMessageBuilder {
     IRaygunMessageBuilder setGroupingKey(String groupingKey);
 
     IRaygunMessageBuilder setBreadcrumbs(List<RaygunBreadcrumbMessage> breadcrumbs);
-
 }

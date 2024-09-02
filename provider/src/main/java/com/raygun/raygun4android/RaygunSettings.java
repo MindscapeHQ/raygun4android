@@ -1,7 +1,6 @@
 package com.raygun.raygun4android;
 
 import com.raygun.raygun4android.logging.RaygunLogger;
-
 import java.util.Arrays;
 import java.util.HashSet;
 
@@ -39,8 +38,7 @@ public class RaygunSettings {
     private static String crashReportingEndpoint = DEFAULT_CRASHREPORTING_ENDPOINT;
     private static String rumEndpoint = DEFAULT_RUM_ENDPOINT;
 
-    private RaygunSettings() {
-    }
+    private RaygunSettings() {}
 
     public static String getCrashReportingEndpoint() {
         return crashReportingEndpoint;
@@ -74,7 +72,10 @@ public class RaygunSettings {
         if (maxReportsStoredOnDevice <= DEFAULT_MAX_REPORTS_STORED_ON_DEVICE) {
             RaygunSettings.maxReportsStoredOnDevice = maxReportsStoredOnDevice;
         } else {
-            RaygunLogger.w("It's not possible to exceed the value " + DEFAULT_MAX_REPORTS_STORED_ON_DEVICE + " for the number of reports stored on the device. The setting has not been applied.");
+            RaygunLogger.w(
+                    "It's not possible to exceed the value "
+                            + DEFAULT_MAX_REPORTS_STORED_ON_DEVICE
+                            + " for the number of reports stored on the device. The setting has not been applied.");
         }
     }
 

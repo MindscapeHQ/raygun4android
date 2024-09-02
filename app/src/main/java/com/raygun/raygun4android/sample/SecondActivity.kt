@@ -34,12 +34,12 @@ class SecondActivity : AppCompatActivity() {
         val textViewProviderVersion = findViewById<TextView>(R.id.textView_providerVersion)
 
         buttonSend.setOnClickListener {
-            val tw = HashMap<String,String>()
+            val tw = HashMap<String, String>()
             tw["secondkey"] = "secondvalue"
 
             // Manual exception creation & sending
             RaygunClient.send(Exception("Congratulations, you have sent errors with Raygun4Android from SecondActivity"), null, tw)
-            Snackbar.make(it, getString(R.string.you_have_just_sent_an_error_with_raygun4android),Snackbar.LENGTH_SHORT).show()
+            Snackbar.make(it, getString(R.string.you_have_just_sent_an_error_with_raygun4android), Snackbar.LENGTH_SHORT).show()
         }
 
         buttonCrash.setOnClickListener {
@@ -56,14 +56,14 @@ class SecondActivity : AppCompatActivity() {
             } catch (ex: Exception) {
                 val i = 4
                 Log.d("Raygun4Android-Sample", "This is here purely so that our alternative value for i gets used and not optimised away in a release build: $i")
-                Snackbar.make(it, getString(R.string.you_just_created_and_caught_an_exception),Snackbar.LENGTH_SHORT).show()
+                Snackbar.make(it, getString(R.string.you_just_created_and_caught_an_exception), Snackbar.LENGTH_SHORT).show()
             }
         }
 
         buttonSetUserAnon.setOnClickListener {
             val user = RaygunUserInfo()
             RaygunClient.setUser(user)
-            Snackbar.make(it, getString(R.string.user_is_now_set_to_anonymous_for_future_raygun_reports),Snackbar.LENGTH_SHORT).show()
+            Snackbar.make(it, getString(R.string.user_is_now_set_to_anonymous_for_future_raygun_reports), Snackbar.LENGTH_SHORT).show()
         }
 
         buttonSetUserA.setOnClickListener {
@@ -73,32 +73,35 @@ class SecondActivity : AppCompatActivity() {
             user.email = "e@f.com.com"
             RaygunClient.setUser(user)
             RaygunClient.recordBreadcrumb("I'm now user A")
-            Snackbar.make(it, getString(R.string.user_is_now_set_to_user_a_for_future_raygun_reports),Snackbar.LENGTH_SHORT).show()
+            Snackbar.make(it, getString(R.string.user_is_now_set_to_user_a_for_future_raygun_reports), Snackbar.LENGTH_SHORT).show()
         }
 
-        buttonSetUserB.setOnClickListener{
+        buttonSetUserB.setOnClickListener {
             val user = RaygunUserInfo("superuser4")
             user.fullName = "User Name B"
             user.firstName = "User B"
             user.email = "g@h.com"
             RaygunClient.setUser(user)
             RaygunClient.recordBreadcrumb("I'm now user B")
-            Snackbar.make(it, getString(R.string.user_is_now_set_to_user_b_for_future_raygun_reports),Snackbar.LENGTH_SHORT).show()
+            Snackbar.make(it, getString(R.string.user_is_now_set_to_user_b_for_future_raygun_reports), Snackbar.LENGTH_SHORT).show()
         }
 
         textViewAppVersion.text = getString(R.string.app_version_text, BuildConfig.VERSION_NAME, BuildConfig.VERSION_CODE, BuildConfig.BUILD_TYPE)
         textViewProviderVersion.text = getString(R.string.provider_version_text, com.raygun.raygun4android.BuildConfig.VERSION_NAME, com.raygun.raygun4android.BuildConfig.VERSION_CODE, com.raygun.raygun4android.BuildConfig.BUILD_TYPE)
 
         // Handle hardware and  back presses
-        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
-            override fun handleOnBackPressed() {
-                finishWithResult()
-            }
-        })
+        onBackPressedDispatcher.addCallback(
+            this,
+            object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    finishWithResult()
+                }
+            },
+        )
 
         RaygunClient.clearBreadcrumbs()
 
-        val customData = WeakHashMap<String,Any>()
+        val customData = WeakHashMap<String, Any>()
         customData["someKey"] = "someValue"
         customData["someotherkey"] = "someothervalue"
 

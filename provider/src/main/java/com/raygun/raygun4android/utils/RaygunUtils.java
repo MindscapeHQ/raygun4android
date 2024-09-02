@@ -24,7 +24,6 @@ public class RaygunUtils {
         merged.addAll(secondList);
 
         return merged;
-
     }
 
     public static Map mergeMaps(Map firstMap, Map secondMap) {
@@ -47,6 +46,5 @@ public class RaygunUtils {
         merged.putAll(secondMap);
 
         return merged;
-
     }
 }

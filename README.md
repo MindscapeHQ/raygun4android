@@ -98,7 +98,7 @@ For an actual usage example, check out the sample application in the **app** mod
 
 ProGuard and R8 are tools for obfuscation, class file shrinking, optimizing and pre-verifying. When enabling ProGuard in a native Android application that also uses Raygun, the obfuscation feature requires a bit of attention. By default, your obfuscated class and method names will show up in the stacktraces of exception/error reports submitted to Raygun. This makes the stacktraces difficult to read when looking into the cause of the issues.
 
-ProGuard produces a mapping.txt file that can be used to restore the original class and method names. Such files can be uploaded to Raygun to automatically process all of your exception reports into readable stacktraces. 
+ProGuard produces a mapping.txt file that can be used to restore the original class and method names. Such files can be uploaded to Raygun to automatically process all of your exception reports into readable stacktraces.
 
 ### Setup
 
@@ -398,7 +398,7 @@ Provides an instance of a class which has an onBeforeSend method that can be use
 * My build fails with `Default interface methods are only supported starting with Android N (--min-api 24)`. Why is that?
 
   Raygun4Android uses Timber for internal logging. This requires some language features that are only available with Java 8. Make sure that your project, using the library, has set the compilation compatibility to Java 8 as the minimum.
-  
+
   Google's documentation has more information on the reasons and implications of this requirement: https://developer.android.com/studio/write/java8-support
 
 * There's something weird going on - I checked the logs and the Raygun servers can't be reached!

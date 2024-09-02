@@ -1,21 +1,20 @@
 package com.raygun.raygun4android.logging;
 
 import android.util.Log;
-
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
 import timber.log.Timber;
 
 class TimberRaygunReleaseTree extends Timber.Tree {
 
-    static private final int MAX_LOG_LENGTH = 4000;
+    private static final int MAX_LOG_LENGTH = 4000;
 
     @Override
-    protected void log(int priority, @Nullable String tag, @NotNull String message, @Nullable Throwable t) {
+    protected void log(
+            int priority, @Nullable String tag, @NotNull String message, @Nullable Throwable t) {
         if (priority == Log.ERROR || priority == Log.WARN) {
 
-            if (message.length() <  MAX_LOG_LENGTH) {
+            if (message.length() < MAX_LOG_LENGTH) {
                 Log.println(priority, tag, message);
                 return;
             }

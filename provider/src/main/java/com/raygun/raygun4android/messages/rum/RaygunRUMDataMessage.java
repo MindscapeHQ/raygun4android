@@ -87,4 +87,3 @@ public class RaygunRUMDataMessage {
         data = builder.data;
     }
 }
-
