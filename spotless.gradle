@@ -26,4 +26,10 @@ spotless {
         trimTrailingWhitespace()
         endWithNewline()
     }
+    format 'yml', {
+        target '**/*.yml'
+        indentWithSpaces()
+        trimTrailingWhitespace()
+        endWithNewline()
+    }
 }
