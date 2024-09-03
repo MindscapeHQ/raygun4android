@@ -32,7 +32,8 @@ public class RaygunUserInfo {
             this.email = email;
         } else {
             RaygunLogger.i(
-                    "Ignored firstName, fullName and email because created user was deemed anonymous");
+                    "Ignored firstName, fullName and email because created user was deemed"
+                            + " anonymous");
         }
     }
 
