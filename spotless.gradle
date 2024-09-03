@@ -1,7 +1,7 @@
 spotless {
     java {
         target '**/*.java'
-        googleJavaFormat().aosp()
+        googleJavaFormat().aosp().reflowLongStrings(true)
         removeUnusedImports()
         trimTrailingWhitespace()
         indentWithSpaces()
@@ -10,6 +10,10 @@ spotless {
     kotlin {
         target '**/*.kt'
         ktlint()
+        ktfmt().googleStyle().configure {
+            it.setBlockIndent(4)
+            it.setContinuationIndent(4)
+        }
         trimTrailingWhitespace()
         indentWithSpaces()
         endWithNewline()
