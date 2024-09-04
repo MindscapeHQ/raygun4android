@@ -15,7 +15,7 @@ leakcanary = "2.12"
 kotlin = "1.8.22"
 gradle = "8.1.1"
 raygun = "4.0.1"
-spotless = "6.12.1"
+spotless = "6.25.0"
 
 [libraries]
 android-material-material = { module = "com.google.android.material:material", version.ref = "android-material" }
