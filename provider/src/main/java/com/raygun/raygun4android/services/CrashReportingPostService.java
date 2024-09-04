@@ -107,7 +107,8 @@ public class CrashReportingPostService extends RaygunPostService {
                 }
             } else {
                 RaygunLogger.w(
-                        "Can't write crash report to local disk, maximum number of stored reports reached.");
+                        "Can't write crash report to local disk, maximum number of stored reports"
+                                + " reached.");
             }
         }
     }

@@ -224,7 +224,8 @@ public class CrashReporting {
                 }
             } else {
                 RaygunLogger.e(
-                        "Error in handling cached message from filesystem - could not get a list of files from cache dir");
+                        "Error in handling cached message from filesystem - could not get a list of"
+                                + " files from cache dir");
             }
         }
     }

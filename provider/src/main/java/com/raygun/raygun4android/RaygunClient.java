@@ -318,7 +318,8 @@ public class RaygunClient {
             RaygunSettings.setCrashReportingEndpoint(url);
         } else {
             RaygunLogger.w(
-                    "A custom crash reporting endpoint can't be null or empty. Custom endpoint has NOT been applied and default will be used.");
+                    "A custom crash reporting endpoint can't be null or empty. Custom endpoint has"
+                            + " NOT been applied and default will be used.");
         }
     }
 
@@ -332,7 +333,8 @@ public class RaygunClient {
             RaygunSettings.setRUMEndpoint(url);
         } else {
             RaygunLogger.w(
-                    "A custom RUM endpoint can't be null or empty. Custom endpoint has NOT been applied and default will be used.");
+                    "A custom RUM endpoint can't be null or empty. Custom endpoint has NOT been"
+                            + " applied and default will be used.");
         }
     }
 
@@ -429,11 +431,13 @@ public class RaygunClient {
             return bundle.getString(RaygunSettings.APIKEY_MANIFEST_FIELD);
         } catch (PackageManager.NameNotFoundException e) {
             RaygunLogger.e(
-                    "Couldn't read API key from your AndroidManifest.xml <meta-data /> element; cannot send. Detailed error: "
+                    "Couldn't read API key from your AndroidManifest.xml <meta-data /> element;"
+                            + " cannot send. Detailed error: "
                             + e.getMessage());
         } catch (NullPointerException e) {
             RaygunLogger.e(
-                    "Couldn't find <meta-data /> element for your API key in the AndroidManifest.xml element; cannot send. Detailed error: "
+                    "Couldn't find <meta-data /> element for your API key in the"
+                            + " AndroidManifest.xml element; cannot send. Detailed error: "
                             + e.getMessage());
         }
 

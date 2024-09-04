@@ -124,19 +124,23 @@ android {
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-
     // Usage option A: Use and build from local provider library src
     implementation project(':provider')
     // Usage option B: Use and build from external repo
+    // 1. Use
     // implementation 'com.raygun:raygun4android:x.y.z'
+    // or
+    // 2. Change version in Gradle library register and use
+    // implementation(libs.raygun)
+    implementation(libs.androidx.appcompat.appcompat)
+    implementation(libs.androidx.constraintlayout.constraintlayout)
+    implementation(libs.android.material.material)
+    implementation(libs.androidx.multidex.multidex)
 
-    implementation 'androidx.appcompat:appcompat:1.6.1'
-    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
-    implementation 'com.google.android.material:material:1.11.0'
-    implementation 'androidx.multidex:multidex:2.0.1'
-    testImplementation 'junit:junit:4.13.2'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
+    testImplementation(libs.junit)
 
-    debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.12'
+    androidTestImplementation(libs.androidx.test.ext.junit)
+    androidTestImplementation(libs.androidx.test.espresso.core)
+
+    debugImplementation(libs.leakcanary)
 }

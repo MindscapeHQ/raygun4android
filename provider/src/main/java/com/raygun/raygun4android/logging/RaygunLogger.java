@@ -42,11 +42,14 @@ public class RaygunLogger {
                 break;
             case RaygunSettings.RESPONSE_CODE_BAD_MESSAGE:
                 RaygunLogger.e(
-                        "Bad message - could not parse the provided JSON. Check all fields are present, especially both occurredOn (ISO 8601 DateTime) and details { } at the top level");
+                        "Bad message - could not parse the provided JSON. Check all fields are"
+                            + " present, especially both occurredOn (ISO 8601 DateTime) and details"
+                            + " { } at the top level");
                 break;
             case RaygunSettings.RESPONSE_CODE_INVALID_API_KEY:
                 RaygunLogger.e(
-                        "Invalid API Key - The value specified in the header X-ApiKey did not match with an application in Raygun");
+                        "Invalid API Key - The value specified in the header X-ApiKey did not match"
+                                + " with an application in Raygun");
                 break;
             case RaygunSettings.RESPONSE_CODE_LARGE_PAYLOAD:
                 RaygunLogger.e(
