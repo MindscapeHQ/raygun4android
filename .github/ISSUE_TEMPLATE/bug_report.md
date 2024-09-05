@@ -29,7 +29,7 @@ If applicable, add screenshots to help explain your problem.
 - OS/SDK version: [e.g. Android 13, SDK 34 etc]
 - Raygun version: [e.g. 4.1.0]
 - Device information: [e.g. Samsung Galaxy S24]
-- Other technologies or frameworks used: 
+- Other technologies or frameworks used:
 
 **Logs**
 If applicable, include relevant logs or error messages here (please use code blocks to format properly).
