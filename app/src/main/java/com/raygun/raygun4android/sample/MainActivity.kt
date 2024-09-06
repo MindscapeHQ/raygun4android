@@ -13,7 +13,6 @@ import com.raygun.raygun4android.RaygunClient
 import com.raygun.raygun4android.messages.shared.RaygunUserInfo
 
 class MainActivity : AppCompatActivity() {
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -52,10 +51,10 @@ class MainActivity : AppCompatActivity() {
                 tw,
             )
             Snackbar.make(
-                    it,
-                    getString(R.string.you_have_just_sent_an_error_with_raygun4android),
-                    Snackbar.LENGTH_SHORT,
-                )
+                it,
+                getString(R.string.you_have_just_sent_an_error_with_raygun4android),
+                Snackbar.LENGTH_SHORT,
+            )
                 .show()
         }
 
@@ -64,7 +63,8 @@ class MainActivity : AppCompatActivity() {
             val i = 3 / 0
             Log.d(
                 "Raygun4Android-Sample",
-                "This is here purely so that our division by zero calculation in i gets used and not optimised away in a release build: $i",
+                "This is here purely so that our division by zero calculation in i gets used and not optimised away " +
+                    "in a release build: $i",
             )
         }
 
@@ -74,19 +74,21 @@ class MainActivity : AppCompatActivity() {
                 val i = 3 / 0
                 Log.d(
                     "Raygun4Android-Sample",
-                    "This is here purely so that our division by zero calculation in i gets used and not optimised away in a release build: $i",
+                    "This is here purely so that our division by zero calculation in i gets used and not optimised away " +
+                        "in a release build: $i",
                 )
             } catch (ex: Exception) {
                 val i = 4
                 Log.d(
                     "Raygun4Android-Sample",
-                    "This is here purely so that our alternative value for i gets used and not optimised away in a release build: $i",
+                    "This is here purely so that our alternative value for i gets used and not optimised away " +
+                        "in a release build: $i",
                 )
                 Snackbar.make(
-                        it,
-                        getString(R.string.you_just_created_and_caught_an_exception),
-                        Snackbar.LENGTH_SHORT,
-                    )
+                    it,
+                    getString(R.string.you_just_created_and_caught_an_exception),
+                    Snackbar.LENGTH_SHORT,
+                )
                     .show()
             }
         }
@@ -95,10 +97,10 @@ class MainActivity : AppCompatActivity() {
             val user = RaygunUserInfo()
             RaygunClient.setUser(user)
             Snackbar.make(
-                    it,
-                    getString(R.string.user_is_now_set_to_anonymous_for_future_raygun_reports),
-                    Snackbar.LENGTH_SHORT,
-                )
+                it,
+                getString(R.string.user_is_now_set_to_anonymous_for_future_raygun_reports),
+                Snackbar.LENGTH_SHORT,
+            )
                 .show()
         }
 
@@ -110,10 +112,10 @@ class MainActivity : AppCompatActivity() {
             RaygunClient.setUser(user)
             RaygunClient.recordBreadcrumb("I'm now user A")
             Snackbar.make(
-                    it,
-                    getString(R.string.user_is_now_set_to_user_a_for_future_raygun_reports),
-                    Snackbar.LENGTH_SHORT,
-                )
+                it,
+                getString(R.string.user_is_now_set_to_user_a_for_future_raygun_reports),
+                Snackbar.LENGTH_SHORT,
+            )
                 .show()
         }
 
@@ -125,10 +127,10 @@ class MainActivity : AppCompatActivity() {
             RaygunClient.setUser(user)
             RaygunClient.recordBreadcrumb("I'm now user B")
             Snackbar.make(
-                    it,
-                    getString(R.string.user_is_now_set_to_user_b_for_future_raygun_reports),
-                    Snackbar.LENGTH_SHORT,
-                )
+                it,
+                getString(R.string.user_is_now_set_to_user_b_for_future_raygun_reports),
+                Snackbar.LENGTH_SHORT,
+            )
                 .show()
         }
 
@@ -161,10 +163,10 @@ class MainActivity : AppCompatActivity() {
             if (result.resultCode == RESULT_OK) {
                 val rootView: View = findViewById(android.R.id.content)
                 Snackbar.make(
-                        rootView,
-                        getString(R.string.we_returned_to_first_activity),
-                        Snackbar.LENGTH_SHORT,
-                    )
+                    rootView,
+                    getString(R.string.we_returned_to_first_activity),
+                    Snackbar.LENGTH_SHORT,
+                )
                     .show()
             }
         }
