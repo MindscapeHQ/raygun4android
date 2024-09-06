@@ -2,15 +2,17 @@
 
 The world's best Android Crash Reporting and Real User Monitoring solution
 
-Supports Android 4.1+ (API 16+).
+Supports Android 5+ (API 21+). 
+
+If you need to support Android 4.1+, please use Raygun4Android 4.0.1.
 
 ## IMPORTANT
 
 ### 10 November 2023
 
-Raygun4Android 4.0.1 is currently considered to be the stable release of the provider and is tagged in the repository.
+Raygun4Android 4.0.1 is currently considered to be the stable release of the provider and is tagged in the repository and supports Android 4.1+ (API 16+)
 
-The `develop` branch reflects ongoing work on the 4.1 line as tagged snapshots.
+The `develop` branch reflects ongoing work on the 4.1 line as tagged snapshots and only support
 
 The `master` branch used to be the branch for ongoing work and releases until `4.1.0-alpha1`. In the future, the `master` branch will reflect release builds.
 
@@ -20,7 +22,7 @@ If you want the *very old* stable version 3.0.6 please check out the change set 
 
 ## Requirements
 
-- minSdkVersion 16+
+- minSdkVersion 21+
 - compileSdkVersion 34
 
 ## Internal dependencies

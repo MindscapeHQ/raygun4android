@@ -4,7 +4,7 @@ android {
     compileSdk 34
 
     defaultConfig {
-        minSdkVersion 16
+        minSdkVersion 21
         targetSdkVersion 34
         buildConfigField("long", "VERSION_CODE", VERSION_CODE)
         buildConfigField("String","VERSION_NAME","\"${VERSION_NAME}\"")
