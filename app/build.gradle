@@ -138,6 +138,8 @@ dependencies {
     implementation(libs.androidx.multidex.multidex)
 
     testImplementation(libs.junit)
+    testImplementation(libs.mockito.core)
+    testImplementation(libs.mockito.mockito.inline)
 
     androidTestImplementation(libs.androidx.test.ext.junit)
     androidTestImplementation(libs.androidx.test.espresso.core)

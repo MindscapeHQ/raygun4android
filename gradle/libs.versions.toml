@@ -8,6 +8,7 @@ androidx-test-espresso = "3.6.1"
 android-material = "1.11.0"
 github-http-builder = "1.0.3"
 gson = "2.11.0"
+mockito = "3.11.2"
 okhttp = "3.14.9"
 timber = "5.0.1"
 junit = "4.13.2"
@@ -27,6 +28,8 @@ androidx-multidex-multidex = { module = "androidx.multidex:multidex", version.re
 androidx-test-ext-junit = { module = "androidx.test.ext:junit", version.ref = "androidx-test-ext" }
 androidx-test-espresso-core = { module = "androidx.test.espresso:espresso-core", version.ref = "androidx-test-espresso" }
 gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
+mockito-core = { module = "org.mockito:mockito-core", version.ref = "mockito" }
+mockito-mockito-inline = { module = "org.mockito:mockito-inline", version.ref = "mockito" }
 okhttp = { module = "com.squareup.okhttp3:okhttp", version.ref = "okhttp" }
 timber = { module = "com.jakewharton.timber:timber", version.ref = "timber" }
 junit  = { module = "junit:junit", version.ref = "junit" }
