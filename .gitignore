@@ -34,6 +34,7 @@ Thumbs.db
 .idea/markdown-navigator
 .idea/deploymentTargetDropDown.xml
 .idea/caches/
+.idea/androidTestResultsUserPreferences.xml
 .gradle
 build/
 .navigation
