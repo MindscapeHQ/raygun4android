@@ -9,6 +9,7 @@ android-material = "1.11.0"
 github-http-builder = "1.0.3"
 gson = "2.11.0"
 mockito = "3.11.2"
+mockito-kotlin = "5.4.0"
 okhttp = "3.14.9"
 timber = "5.0.1"
 junit = "4.13.2"
@@ -30,6 +31,7 @@ androidx-test-espresso-core = { module = "androidx.test.espresso:espresso-core",
 gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
 mockito-core = { module = "org.mockito:mockito-core", version.ref = "mockito" }
 mockito-mockito-inline = { module = "org.mockito:mockito-inline", version.ref = "mockito" }
+mockito-kotlin-mockito-kotlin = { module = "org.mockito.kotlin:mockito-kotlin", version.ref = "mockito-kotlin" }
 okhttp = { module = "com.squareup.okhttp3:okhttp", version.ref = "okhttp" }
 timber = { module = "com.jakewharton.timber:timber", version.ref = "timber" }
 junit  = { module = "junit:junit", version.ref = "junit" }
