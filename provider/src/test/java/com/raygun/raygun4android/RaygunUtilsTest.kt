@@ -5,7 +5,6 @@ import org.junit.Assert.assertEquals
 import org.junit.Test
 
 class RaygunUtilsTest {
-
     @Test
     fun mergeListsBothNull() {
         val result = RaygunUtils.mergeLists(null, null)

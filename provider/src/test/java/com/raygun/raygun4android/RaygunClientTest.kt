@@ -15,7 +15,6 @@ import timber.log.Timber
 
 @RunWith(MockitoJUnitRunner::class)
 class RaygunClientTest {
-
     @Before
     fun setup() {
         Timber.plant(TestTree())
@@ -31,7 +30,6 @@ class RaygunClientTest {
 
     @Test
     fun initializesWithApplicationAndApiKeyAndVersion() {
-
         val mockApplication = mock<Application>(Application::class.java)
         whenever(mockApplication.applicationContext).thenReturn(mockApplication)
 
@@ -43,5 +41,4 @@ class RaygunClientTest {
         assertEquals("1.0.0", RaygunClient.getVersion())
         assertNotNull(RaygunClient.getApplicationContext())
     }
-
 }

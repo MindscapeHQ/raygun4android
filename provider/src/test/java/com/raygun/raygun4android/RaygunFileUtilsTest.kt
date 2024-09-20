@@ -13,7 +13,6 @@ import org.mockito.kotlin.whenever
 import java.io.File
 
 class RaygunFileUtilsTest {
-
     @Test
     fun getExtensionReturnsCorrectExtension() {
         val filename = "testfile.txt"
