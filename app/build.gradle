@@ -85,6 +85,7 @@ android {
         buildConfigField("long", "VERSION_CODE", VERSION_CODE)
         buildConfigField("String","VERSION_NAME","\"${VERSION_NAME}-sample\"")
         multiDexEnabled true
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
     lintOptions {
@@ -139,6 +140,12 @@ dependencies {
     testImplementation(libs.junit)
     testImplementation(libs.mockito.core)
     testImplementation(libs.mockito.mockito.inline)
+
+    androidTestImplementation(libs.androidx.test.ext.junit)
+    androidTestImplementation(libs.androidx.test.espresso.core)
+    androidTestDebugImplementation(libs.androidx.espresso.intents)
+    androidTestImplementation(libs.androidx.test.runner)
+    androidTestImplementation(libs.androidx.test.rules)
 
     debugImplementation(libs.leakcanary)
 }

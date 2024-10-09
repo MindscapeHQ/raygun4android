@@ -7,7 +7,6 @@ import org.junit.Assert.assertNotNull
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.Mock
 import org.mockito.Mockito.mock
 import org.mockito.junit.MockitoJUnitRunner
 import org.mockito.kotlin.whenever
@@ -25,7 +24,6 @@ class RaygunClientTest {
         Timber.uprootAll()
     }
 
-    @Mock
     private lateinit var mockApplication: Application
 
     @Test
