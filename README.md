@@ -2,7 +2,7 @@
 
 The world's best Android Crash Reporting and Real User Monitoring solution
 
-Supports Android 5+ (API 21+). 
+Supports Android 5+ (API 21+).
 
 If you need to support Android 4.1+, please use Raygun4Android 4.0.1.
 
