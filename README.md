@@ -354,6 +354,7 @@ The following methods are available for sending manually; pick one depending on 
 * `RaygunClient.send(Throwable throwable)`
 * `RaygunClient.send(Throwable throwable, List tags)`
 * `RaygunClient.send(Throwable throwable, List tags, Map customData)`
+* `RaygunClient.send(String exceptionName, String reason, List tags, Map customData)`
 
 The `send` function builds a RaygunMessage for you and then sends it.
 
