@@ -160,6 +160,25 @@ public class RaygunClient {
     }
 
     /**
+     * Sends an exception name and reason to Raygun by constructing a Throwable object from it. Adds
+     * a list of tags you specify, and a set of custom data.
+     *
+     * @param exceptionName The name or description of the exception that occurred in your
+     *     application that will be sent to Raygun.
+     * @param reason The reason for the exception that occurred in your application that will be
+     *     sent to Raygun.
+     * @param tags A list of data that will be attached to the Raygun message and visible on the
+     *     error in the dashboard. This could be a build tag, lifecycle state, debug/production
+     *     version etc.
+     * @param customData A set of custom key-value pairs relating to your application and its
+     *     current state. This is a bucket where you can attach any related data you want to see to
+     *     the error.
+     */
+    public static void send(String exceptionName, String reason, List tags, Map customData) {
+        CrashReporting.send(new Throwable(exceptionName, new Throwable(reason)), tags, customData);
+    }
+
+    /**
      * Sets the current user of your application. If user is an email address which is associated
      * with a Gravatar, their picture will be displayed in the error view. If setUser is not called,
      * a random ID will be assigned. If the user context changes in your application (i.e log

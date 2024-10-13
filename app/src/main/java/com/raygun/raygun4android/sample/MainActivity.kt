@@ -50,6 +50,10 @@ class MainActivity : AppCompatActivity() {
                 null,
                 tw,
             )
+
+            // Manual exception creation & sending via 2 strings
+            RaygunClient.send("My custom message", "The reason for the error", null, tw)
+
             Snackbar.make(
                 it,
                 getString(R.string.you_have_just_sent_an_error_with_raygun4android),
