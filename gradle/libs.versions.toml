@@ -17,7 +17,7 @@ timber = "5.0.1"
 junit = "4.13.2"
 leakcanary = "2.14"
 kotlin = "1.8.22"
-gradle = "8.1.1"
+gradle = "8.7.2"
 raygun = "4.0.1"
 spotless = "6.25.0"
 
