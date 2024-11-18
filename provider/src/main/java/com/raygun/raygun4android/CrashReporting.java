@@ -3,6 +3,8 @@ package com.raygun.raygun4android;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.os.Build;
+import android.util.Log;
+
 import com.google.gson.Gson;
 import com.raygun.raygun4android.logging.RaygunLogger;
 import com.raygun.raygun4android.messages.crashreporting.RaygunBreadcrumbMessage;
@@ -255,6 +257,11 @@ public class CrashReporting {
 
         @Override
         public void uncaughtException(Thread thread, Throwable throwable) {
+
+            if (throwable instanceof StackOverflowError) {
+                Log.e("KAI", "SOE detected");
+                Log.e("KAI", thread.getName());
+            }
 
             List tags = new ArrayList();
             tags.add(RaygunSettings.CRASH_REPORTING_UNHANDLED_EXCEPTION_TAG);

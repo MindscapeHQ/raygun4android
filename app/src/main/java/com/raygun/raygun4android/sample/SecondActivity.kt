@@ -1,5 +1,6 @@
 package com.raygun.raygun4android.sample
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -187,6 +188,11 @@ class SecondActivity : AppCompatActivity() {
             }
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    @SuppressLint("MissingSuperCall")
+    override fun onBackPressed() {
+        onBackPressed()
     }
 
     private fun finishWithResult() {
