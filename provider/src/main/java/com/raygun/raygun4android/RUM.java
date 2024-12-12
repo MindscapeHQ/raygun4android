@@ -8,6 +8,7 @@ import android.content.ComponentName;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+
 import com.google.gson.Gson;
 import com.raygun.raygun4android.logging.RaygunLogger;
 import com.raygun.raygun4android.messages.rum.RaygunRUMData;
@@ -17,6 +18,7 @@ import com.raygun.raygun4android.messages.rum.RaygunRUMTimingMessage;
 import com.raygun.raygun4android.messages.shared.RaygunUserInfo;
 import com.raygun.raygun4android.network.RaygunNetworkLogger;
 import com.raygun.raygun4android.services.RUMPostService;
+
 import java.lang.ref.WeakReference;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
@@ -69,8 +71,8 @@ public class RUM implements ActivityLifecycleCallbacks {
 
     protected static void detach() {
         if (RUM.rum != null
-                && RUM.mainActivity.get() != null
-                && RUM.mainActivity.get().getApplication() != null) {
+            && RUM.mainActivity.get() != null
+            && RUM.mainActivity.get().getApplication() != null) {
             RUM.mainActivity.get().getApplication().unregisterActivityLifecycleCallbacks(RUM.rum);
             RUM.mainActivity = null;
             RUM.currentActivity = null;
@@ -98,7 +100,7 @@ public class RUM implements ActivityLifecycleCallbacks {
         intent.setAction("com.raygun.raygun4android.intent.action.LAUNCH_RUM_POST_SERVICE");
         intent.setPackage("com.raygun.raygun4android");
         intent.setComponent(
-                new ComponentName(RaygunClient.getApplicationContext(), RUMPostService.class));
+            new ComponentName(RaygunClient.getApplicationContext(), RUMPostService.class));
 
         intent.putExtra("msg", jsonPayload);
         intent.putExtra("apikey", apiKey);
@@ -116,7 +118,7 @@ public class RUM implements ActivityLifecycleCallbacks {
         }
 
         if (RUM.currentActivity == null
-                || RUM.currentActivity != null && RUM.currentActivity.get() != activity) {
+            || RUM.currentActivity != null && RUM.currentActivity.get() != activity) {
             RUM.currentActivity = new WeakReference<>(activity);
             RUM.loadingActivity = new WeakReference<>(activity);
             RUM.startTime = System.nanoTime();
@@ -135,7 +137,7 @@ public class RUM implements ActivityLifecycleCallbacks {
         }
 
         if (RUM.currentActivity == null
-                || RUM.currentActivity != null && RUM.currentActivity.get() != activity) {
+            || RUM.currentActivity != null && RUM.currentActivity.get() != activity) {
             RUM.currentActivity = new WeakReference<>(activity);
             RUM.loadingActivity = new WeakReference<>(activity);
             RUM.startTime = System.nanoTime();
@@ -192,14 +194,15 @@ public class RUM implements ActivityLifecycleCallbacks {
     }
 
     @Override
-    public void onActivityDestroyed(Activity activity) {}
+    public void onActivityDestroyed(Activity activity) {
+    }
 
     private static String getActivityName(Activity activity) {
         return activity.getClass().getSimpleName();
     }
 
     private static void rotateSession(
-            RaygunUserInfo currentSessionUser, RaygunUserInfo newSessionUser) {
+        RaygunUserInfo currentSessionUser, RaygunUserInfo newSessionUser) {
         sendRUMEvent(RaygunSettings.RUM_EVENT_SESSION_END, currentSessionUser);
         RUM.sessionId = UUID.randomUUID().toString();
         sendRUMEvent(RaygunSettings.RUM_EVENT_SESSION_START, newSessionUser);
@@ -207,8 +210,8 @@ public class RUM implements ActivityLifecycleCallbacks {
 
     private static boolean doesNeedSessionRotation() {
         return RUM.lastSeenTime > 0
-                && System.currentTimeMillis() - RUM.lastSeenTime
-                        > RaygunSettings.RUM_SESSION_EXPIRY;
+            && System.currentTimeMillis() - RUM.lastSeenTime
+            > RaygunSettings.RUM_SESSION_EXPIRY;
     }
 
     static void updateCurrentSessionUser(RaygunUserInfo userInfo) {
@@ -216,7 +219,7 @@ public class RUM implements ActivityLifecycleCallbacks {
         if (RUM.currentSessionUser != null) {
             boolean currentSessionUserIsAnon = RUM.currentSessionUser.getIsAnonymous();
             boolean usersAreTheSame =
-                    RUM.currentSessionUser.getIdentifier().equals(userInfo.getIdentifier());
+                RUM.currentSessionUser.getIdentifier().equals(userInfo.getIdentifier());
             boolean changedUser = !usersAreTheSame && !currentSessionUserIsAnon;
 
             if (changedUser) {
@@ -240,7 +243,7 @@ public class RUM implements ActivityLifecycleCallbacks {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 LocalDateTime utcDateTime = LocalDateTime.now(ZoneId.of("UTC"));
                 if (RaygunSettings.RUM_EVENT_SESSION_END.equals(eventName)) {
-                    utcDateTime.plus(2, ChronoUnit.SECONDS);
+                    utcDateTime.plusSeconds(2);
                 }
                 timestamp = utcDateTime.toString();
             } else {
@@ -255,21 +258,21 @@ public class RUM implements ActivityLifecycleCallbacks {
             }
 
             RaygunUserInfo user =
-                    userInfo == null ? new RaygunUserInfo(null, null, null, null) : userInfo;
+                userInfo == null ? new RaygunUserInfo(null, null, null, null) : userInfo;
 
             RaygunRUMDataMessage dataMessage =
-                    new RaygunRUMDataMessage.Builder(eventName)
-                            .timestamp(timestamp)
-                            .sessionId(sessionId)
-                            .version(RaygunClient.getVersion())
-                            .os("Android")
-                            .osVersion(Build.VERSION.RELEASE)
-                            .platform(String.format("%s %s", Build.MANUFACTURER, Build.MODEL))
-                            .user(user)
-                            .build();
+                new RaygunRUMDataMessage.Builder(eventName)
+                    .timestamp(timestamp)
+                    .sessionId(sessionId)
+                    .version(RaygunClient.getVersion())
+                    .os("Android")
+                    .osVersion(Build.VERSION.RELEASE)
+                    .platform(String.format("%s %s", Build.MANUFACTURER, Build.MODEL))
+                    .user(user)
+                    .build();
 
             RaygunRUMMessage message = new RaygunRUMMessage();
-            message.setEventData(new RaygunRUMDataMessage[] {dataMessage});
+            message.setEventData(new RaygunRUMDataMessage[]{dataMessage});
 
             enqueueWorkForRUMService(RaygunClient.getApiKey(), new Gson().toJson(message));
         } else {
@@ -279,22 +282,22 @@ public class RUM implements ActivityLifecycleCallbacks {
 
     private static void sendRUMEvent(String eventName) {
         RaygunUserInfo user =
-                RaygunClient.getUser() == null
-                        ? new RaygunUserInfo(null, null, null, null)
-                        : RaygunClient.getUser();
+            RaygunClient.getUser() == null
+                ? new RaygunUserInfo(null, null, null, null)
+                : RaygunClient.getUser();
         sendRUMEvent(eventName, user);
     }
 
     /**
      * Sends a RUM timing event to Raygun. The message is sent on a background thread.
      *
-     * @param eventType The type of event that occurred.
-     * @param name The name of the event resource such as the activity name or URL of a network
-     *     call.
+     * @param eventType    The type of event that occurred.
+     * @param name         The name of the event resource such as the activity name or URL of a network
+     *                     call.
      * @param milliseconds The duration of the event in milliseconds.
      */
     public static void sendRUMTimingEvent(
-            RaygunRUMEventType eventType, String name, long milliseconds) {
+        RaygunRUMEventType eventType, String name, long milliseconds) {
 
         if (RaygunClient.isRUMEnabled()) {
             if (sessionId == null) {
@@ -324,40 +327,40 @@ public class RUM implements ActivityLifecycleCallbacks {
             }
 
             RaygunUserInfo user =
-                    RaygunClient.getUser() == null
-                            ? new RaygunUserInfo(null, null, null, null)
-                            : RaygunClient.getUser();
+                RaygunClient.getUser() == null
+                    ? new RaygunUserInfo(null, null, null, null)
+                    : RaygunClient.getUser();
 
             RaygunRUMTimingMessage timingMessage =
-                    new RaygunRUMTimingMessage.Builder(
-                                    eventType == RaygunRUMEventType.ACTIVITY_LOADED ? "p" : "n")
-                            .duration(milliseconds)
-                            .build();
+                new RaygunRUMTimingMessage.Builder(
+                    eventType == RaygunRUMEventType.ACTIVITY_LOADED ? "p" : "n")
+                    .duration(milliseconds)
+                    .build();
 
             RaygunRUMData data = new RaygunRUMData.Builder(name).timing(timingMessage).build();
 
-            RaygunRUMData[] dataArray = new RaygunRUMData[] {data};
+            RaygunRUMData[] dataArray = new RaygunRUMData[]{data};
             String dataStr = new Gson().toJson(dataArray);
 
             RaygunRUMDataMessage dataMessage =
-                    new RaygunRUMDataMessage.Builder(RaygunSettings.RUM_EVENT_TIMING)
-                            .timestamp(timestamp)
-                            .sessionId(sessionId)
-                            .version(RaygunClient.getVersion())
-                            .os("Android")
-                            .osVersion(Build.VERSION.RELEASE)
-                            .platform(String.format("%s %s", Build.MANUFACTURER, Build.MODEL))
-                            .user(user)
-                            .data(dataStr)
-                            .build();
+                new RaygunRUMDataMessage.Builder(RaygunSettings.RUM_EVENT_TIMING)
+                    .timestamp(timestamp)
+                    .sessionId(sessionId)
+                    .version(RaygunClient.getVersion())
+                    .os("Android")
+                    .osVersion(Build.VERSION.RELEASE)
+                    .platform(String.format("%s %s", Build.MANUFACTURER, Build.MODEL))
+                    .user(user)
+                    .data(dataStr)
+                    .build();
 
             RaygunRUMMessage message = new RaygunRUMMessage();
-            message.setEventData(new RaygunRUMDataMessage[] {dataMessage});
+            message.setEventData(new RaygunRUMDataMessage[]{dataMessage});
 
             enqueueWorkForRUMService(RaygunClient.getApiKey(), new Gson().toJson(message));
         } else {
             RaygunLogger.w(
-                    "RUM is not enabled, please enable to use the sendRUMTimingEvent() function");
+                "RUM is not enabled, please enable to use the sendRUMTimingEvent() function");
         }
     }
 

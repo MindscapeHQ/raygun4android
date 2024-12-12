@@ -1,16 +1,18 @@
 package com.raygun.raygun4android;
 
 import android.content.Context;
+
 import com.raygun.raygun4android.messages.crashreporting.RaygunBreadcrumbMessage;
 import com.raygun.raygun4android.messages.crashreporting.RaygunClientMessage;
 import com.raygun.raygun4android.messages.crashreporting.RaygunEnvironmentMessage;
 import com.raygun.raygun4android.messages.crashreporting.RaygunErrorMessage;
 import com.raygun.raygun4android.messages.crashreporting.RaygunMessage;
+
 import java.util.List;
 import java.util.Map;
 
 public class RaygunMessageBuilder implements IRaygunMessageBuilder {
-    private RaygunMessage raygunMessage;
+    private final RaygunMessage raygunMessage;
 
     private RaygunMessageBuilder() {
         raygunMessage = new RaygunMessage();

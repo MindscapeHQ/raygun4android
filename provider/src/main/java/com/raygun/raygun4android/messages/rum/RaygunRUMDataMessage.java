@@ -4,21 +4,21 @@ import com.raygun.raygun4android.messages.shared.RaygunUserInfo;
 
 @SuppressWarnings("FieldCanBeLocal")
 public class RaygunRUMDataMessage {
-    private String sessionId;
-    private String timestamp;
-    private String type;
-    private RaygunUserInfo user;
-    private String version;
-    private String os;
-    private String osVersion;
-    private String platform;
-    private String data;
+    private final String sessionId;
+    private final String timestamp;
+    private final String type;
+    private final RaygunUserInfo user;
+    private final String version;
+    private final String os;
+    private final String osVersion;
+    private final String platform;
+    private final String data;
 
     public static class Builder {
 
         private String sessionId;
         private String timestamp;
-        private String type;
+        private final String type;
         private RaygunUserInfo user;
         private String version;
         private String os;

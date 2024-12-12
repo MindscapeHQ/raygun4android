@@ -7,7 +7,9 @@ import android.os.Environment;
 import android.os.StatFs;
 import android.util.DisplayMetrics;
 import android.view.WindowManager;
+
 import com.raygun.raygun4android.logging.RaygunLogger;
+
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.Date;
@@ -63,21 +65,21 @@ public class RaygunEnvironmentMessage {
 
             DisplayMetrics metrics = new DisplayMetrics();
             ((WindowManager) context.getSystemService(Context.WINDOW_SERVICE))
-                    .getDefaultDisplay()
-                    .getMetrics(metrics);
+                .getDefaultDisplay()
+                .getMetrics(metrics);
             windowsBoundWidth = metrics.widthPixels;
             windowsBoundHeight = metrics.heightPixels;
 
             TimeZone tz = TimeZone.getDefault();
             Date now = new Date();
             utcOffset =
-                    TimeUnit.SECONDS.convert(tz.getOffset(now.getTime()), TimeUnit.MILLISECONDS)
-                            / 3600;
+                TimeUnit.SECONDS.convert(tz.getOffset(now.getTime()), TimeUnit.MILLISECONDS)
+                    / 3600;
             locale = context.getResources().getConfiguration().locale.toString();
 
             ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
             ActivityManager am =
-                    (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+                (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
             am.getMemoryInfo(mi);
             availablePhysicalMemory = mi.availMem / 0x100000;
 
@@ -89,8 +91,8 @@ public class RaygunEnvironmentMessage {
 
             StatFs stat = new StatFs(Environment.getDataDirectory().getPath());
 
-            long availableBlocks = (long) stat.getAvailableBlocks();
-            long blockSize = (long) stat.getBlockSize();
+            long availableBlocks = stat.getAvailableBlocks();
+            long blockSize = stat.getBlockSize();
             diskSpaceFree = (availableBlocks * blockSize) / 0x100000;
         } catch (Exception e) {
             RaygunLogger.w("Couldn't get all env data: " + e);
