@@ -1,8 +1,10 @@
 package com.raygun.raygun4android.messages.crashreporting;
 
 import android.content.Context;
+
 import com.google.gson.annotations.SerializedName;
 import com.raygun.raygun4android.messages.shared.RaygunUserInfo;
+
 import java.util.List;
 import java.util.Map;
 

@@ -4,18 +4,18 @@ import java.util.Map;
 import java.util.WeakHashMap;
 
 public class RaygunBreadcrumbMessage {
-    private String message;
-    private String category;
-    private int level;
-    private String type = "Manual";
-    private Map<String, Object> customData;
-    private Long timestamp = System.currentTimeMillis();
-    private String className;
-    private String methodName;
-    private Integer lineNumber;
+    private final String message;
+    private final String category;
+    private final int level;
+    private final String type = "Manual";
+    private final Map<String, Object> customData;
+    private final Long timestamp = System.currentTimeMillis();
+    private final String className;
+    private final String methodName;
+    private final Integer lineNumber;
 
     public static class Builder {
-        private String message;
+        private final String message;
         private String category;
         private int level = RaygunBreadcrumbLevel.INFO.ordinal();
         private Map<String, Object> customData = new WeakHashMap<>();

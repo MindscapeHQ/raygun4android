@@ -1,8 +1,10 @@
 package com.raygun.raygun4android;
 
 import android.content.Context;
+
 import com.raygun.raygun4android.messages.crashreporting.RaygunBreadcrumbMessage;
 import com.raygun.raygun4android.messages.crashreporting.RaygunMessage;
+
 import java.util.List;
 import java.util.Map;
 

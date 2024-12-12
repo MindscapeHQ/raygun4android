@@ -2,6 +2,7 @@ package com.raygun.raygun4android.messages.crashreporting;
 
 import android.annotation.SuppressLint;
 import android.os.Build;
+
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.ZoneId;

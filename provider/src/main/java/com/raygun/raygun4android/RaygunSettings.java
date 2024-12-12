@@ -1,6 +1,7 @@
 package com.raygun.raygun4android;
 
 import com.raygun.raygun4android.logging.RaygunLogger;
+
 import java.util.Arrays;
 import java.util.HashSet;
 
@@ -32,13 +33,14 @@ public class RaygunSettings {
     // 30 minutes in milliseconds
     public static final int RUM_SESSION_EXPIRY = 30 * 60 * 1000;
 
-    private static IgnoredURLs ignoredURLs = new IgnoredURLs("api.raygun.io");
-    private static HashSet<String> ignoredViews = new HashSet<>();
+    private static final IgnoredURLs ignoredURLs = new IgnoredURLs("api.raygun.io");
+    private static final HashSet<String> ignoredViews = new HashSet<>();
     private static int maxReportsStoredOnDevice = DEFAULT_MAX_REPORTS_STORED_ON_DEVICE;
     private static String crashReportingEndpoint = DEFAULT_CRASHREPORTING_ENDPOINT;
     private static String rumEndpoint = DEFAULT_RUM_ENDPOINT;
 
-    private RaygunSettings() {}
+    private RaygunSettings() {
+    }
 
     public static String getCrashReportingEndpoint() {
         return crashReportingEndpoint;
@@ -73,10 +75,10 @@ public class RaygunSettings {
             RaygunSettings.maxReportsStoredOnDevice = maxReportsStoredOnDevice;
         } else {
             RaygunLogger.w(
-                    "It's not possible to exceed the value "
-                            + DEFAULT_MAX_REPORTS_STORED_ON_DEVICE
-                            + " for the number of reports stored on the device. The setting has not"
-                            + " been applied.");
+                "It's not possible to exceed the value "
+                    + DEFAULT_MAX_REPORTS_STORED_ON_DEVICE
+                    + " for the number of reports stored on the device. The setting has not"
+                    + " been applied.");
         }
     }
 
