@@ -76,12 +76,12 @@ android {
         }
     }
 
-    compileSdk 34
+    compileSdk 35
 
     defaultConfig {
         applicationId "com.raygun.raygun4android"
         minSdkVersion 21
-        targetSdkVersion 34
+        targetSdkVersion 35
         buildConfigField("long", "VERSION_CODE", VERSION_CODE)
         buildConfigField("String","VERSION_NAME","\"${VERSION_NAME}-sample\"")
         multiDexEnabled true
