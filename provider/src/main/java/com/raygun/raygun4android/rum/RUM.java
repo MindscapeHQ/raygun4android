@@ -6,8 +6,6 @@ import android.content.ComponentName;
 import android.content.Intent;
 import android.os.Build;
 
-import androidx.fragment.app.FragmentActivity;
-
 import com.google.gson.Gson;
 import com.raygun.raygun4android.RaygunClient;
 import com.raygun.raygun4android.RaygunRUMEventType;
@@ -37,11 +35,9 @@ public class RUM {
     private String sessionId;
     private RaygunUserInfo currentSessionUser;
     private final RUMActivity rumActivity;
-    private final RUMFragment rumFragment;
 
     private RUM() {
-        this.rumFragment = new RUMFragment(this);
-        this.rumActivity = new RUMActivity(this, rumFragment);
+        this.rumActivity = new RUMActivity(this, new RUMFragment(this));
     }
 
     /**
@@ -76,7 +72,6 @@ public class RUM {
      */
     public void sendRemaining() {
         rumActivity.sendRemaining();
-        rumFragment.sendRemaining();
         sendRUMEvent(RaygunSettings.RUM_EVENT_SESSION_END, currentSessionUser);
         seen();
     }
@@ -117,9 +112,13 @@ public class RUM {
         currentSessionUser = userInfo;
     }
 
+    /**
+     * Detaches the RUM instance from the main activity and stops tracking RUM events.
+     * Also detaches from the FragmentManager in the main activity.
+     * And clears the singleton instance.
+     */
     public void detach() {
         rumActivity.detach();
-//        rumFragment.detach();
         instance = null;
     }
 

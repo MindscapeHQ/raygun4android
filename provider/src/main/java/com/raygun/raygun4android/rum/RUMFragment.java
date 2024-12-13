@@ -40,10 +40,6 @@ public class RUMFragment extends FragmentManager.FragmentLifecycleCallbacks {
         fragmentManager.unregisterFragmentLifecycleCallbacks(this);
     }
 
-    public void sendRemaining() {
-        // mb: TODO
-    }
-
     @Override
     public void onFragmentCreated(@NonNull FragmentManager fm, @NonNull Fragment fragment, @Nullable Bundle savedInstanceState) {
         super.onFragmentCreated(fm, fragment, savedInstanceState);

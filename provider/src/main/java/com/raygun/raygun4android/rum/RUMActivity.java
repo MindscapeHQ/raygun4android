@@ -57,6 +57,9 @@ public class RUMActivity implements Application.ActivityLifecycleCallbacks {
     public void detach() {
         if (mainActivity != null && mainActivity.get() != null) {
             mainActivity.get().getApplication().unregisterActivityLifecycleCallbacks(this);
+            if (mainActivity.get() instanceof FragmentActivity) {
+                rumFragment.detach(((FragmentActivity) mainActivity.get()).getSupportFragmentManager());
+            }
         }
         mainActivity = null;
         currentActivity = null;
