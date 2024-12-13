@@ -14,6 +14,7 @@ import com.raygun.raygun4android.logging.RaygunLogger;
 import com.raygun.raygun4android.logging.TimberRaygunLoggerImplementation;
 import com.raygun.raygun4android.messages.crashreporting.RaygunBreadcrumbMessage;
 import com.raygun.raygun4android.messages.shared.RaygunUserInfo;
+import com.raygun.raygun4android.rum.RUM;
 import com.raygun.raygun4android.utils.RaygunFileUtils;
 
 import java.util.List;
@@ -211,12 +212,12 @@ public class RaygunClient {
      */
     public static void setUser(RaygunUserInfo userInfo) {
         if (isRUMEnabled()) {
-            RUM.updateCurrentSessionUser(userInfo);
+            RUM.getInstance().updateCurrentSessionUser(userInfo);
         }
         RaygunClient.userInfo = userInfo;
     }
 
-    static RaygunUserInfo getUser() {
+    public static RaygunUserInfo getUser() {
         return RaygunClient.userInfo;
     }
 
@@ -235,11 +236,11 @@ public class RaygunClient {
         }
     }
 
-    static String getVersion() {
+    public static String getVersion() {
         return RaygunClient.version;
     }
 
-    static String getApiKey() {
+    public static String getApiKey() {
         return RaygunClient.apiKey;
     }
 
@@ -439,12 +440,9 @@ public class RaygunClient {
      */
     public static void enableRUM(Activity activity, boolean networkLogging) {
         RaygunClient.RUMEnabled = true;
-        RUM.attach(activity, networkLogging);
-        if (activity instanceof FragmentActivity) {
-            RUMFragment.attach(((FragmentActivity) activity).getSupportFragmentManager());
-        }
+        RUM.getInstance().attach(activity, networkLogging);
         if (RaygunClient.userInfo != null) {
-            RUM.updateCurrentSessionUser(RaygunClient.userInfo);
+            RUM.getInstance().updateCurrentSessionUser(RaygunClient.userInfo);
         }
     }
 
@@ -457,7 +455,8 @@ public class RaygunClient {
      * @param fragmentManager The FragmentManager to attach RUM to.
      */
     public static void attachRUM(FragmentManager fragmentManager) {
-        RUMFragment.attach(fragmentManager);
+        // TODO
+//        RUMFragment.attach(fragmentManager);
     }
 
     private static String readApiKey(Context context) {

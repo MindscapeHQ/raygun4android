@@ -60,7 +60,7 @@ public class RaygunSettings {
         return ignoredURLs;
     }
 
-    static HashSet<String> getIgnoredViews() {
+    public static HashSet<String> getIgnoredViews() {
         return ignoredViews;
     }
 

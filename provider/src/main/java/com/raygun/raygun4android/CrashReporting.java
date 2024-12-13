@@ -12,6 +12,8 @@ import com.raygun.raygun4android.services.CrashReportingPostService;
 import com.raygun.raygun4android.utils.RaygunFileFilter;
 import com.raygun.raygun4android.utils.RaygunFileUtils;
 import com.raygun.raygun4android.utils.RaygunUtils;
+import com.raygun.raygun4android.rum.RUM;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -261,7 +263,7 @@ public class CrashReporting {
 
             CrashReporting.send(throwable, tags);
 
-            RUM.sendRemainingActivity();
+            RUM.getInstance().sendRemaining();
 
             defaultHandler.uncaughtException(thread, throwable);
         }

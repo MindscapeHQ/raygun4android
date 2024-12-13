@@ -1,4 +1,4 @@
-package com.raygun.raygun4android;
+package com.raygun.raygun4android.rum;
 
 import android.os.Bundle;
 
@@ -6,61 +6,70 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentOnAttachListener;
 
 import com.raygun.raygun4android.logging.RaygunLogger;
 
 public class RUMFragment extends FragmentManager.FragmentLifecycleCallbacks {
-    private static RUMFragment rum;
+    private final RUM rum;
 
-    public static void attach(FragmentManager fragmentManager) {
-        if (rum == null) {
-            rum = new RUMFragment();
-        }
+    public RUMFragment(RUM rum) {
+        this.rum = rum;
+    }
 
+    public void attach(FragmentManager fragmentManager) {
         RaygunLogger.v("RUM - Attaching RUM Fragment");
-        fragmentManager.registerFragmentLifecycleCallbacks(rum, true);
+        fragmentManager.registerFragmentLifecycleCallbacks(this, true);
     }
 
     // TODO: Do we need this? Is there a reason on why a fragment manager may need to be detached?
-    public static void detach(FragmentManager fragmentManager) {
+    public void detach(FragmentManager fragmentManager) {
         RaygunLogger.v("RUM - Detaching RUM Fragment");
-        fragmentManager.unregisterFragmentLifecycleCallbacks(rum);
+        fragmentManager.unregisterFragmentLifecycleCallbacks(this);
+    }
+
+    public void sendRemaining() {
+
     }
 
     @Override
     public void onFragmentCreated(@NonNull FragmentManager fm, @NonNull Fragment f, @Nullable Bundle savedInstanceState) {
-        RaygunLogger.v("RUM - Fragment created: " + f.getClass().getSimpleName());
         super.onFragmentCreated(fm, f, savedInstanceState);
+        RaygunLogger.v("RUM - Fragment created: " + f.getClass().getSimpleName());
+        rum.seen();
     }
 
     @Override
     public void onFragmentStarted(@NonNull FragmentManager fm, @NonNull Fragment f) {
-        RaygunLogger.v("RUM - Fragment started: " + f.getClass().getSimpleName());
         super.onFragmentStarted(fm, f);
+        RaygunLogger.v("RUM - Fragment started: " + f.getClass().getSimpleName());
+        rum.seen();
     }
 
     @Override
     public void onFragmentResumed(@NonNull FragmentManager fm, @NonNull Fragment f) {
-        RaygunLogger.v("RUM - Fragment resumed: " + f.getClass().getSimpleName());
         super.onFragmentResumed(fm, f);
+        RaygunLogger.v("RUM - Fragment resumed: " + f.getClass().getSimpleName());
+        rum.seen();
     }
 
     @Override
     public void onFragmentPaused(@NonNull FragmentManager fm, @NonNull Fragment f) {
-        RaygunLogger.v(" RUM - Fragment paused: " + f.getClass().getSimpleName());
         super.onFragmentPaused(fm, f);
+        RaygunLogger.v(" RUM - Fragment paused: " + f.getClass().getSimpleName());
+        rum.seen();
     }
 
     @Override
     public void onFragmentStopped(@NonNull FragmentManager fm, @NonNull Fragment f) {
-        RaygunLogger.v("RUM - Fragment stopped: " + f.getClass().getSimpleName());
         super.onFragmentStopped(fm, f);
+        RaygunLogger.v("RUM - Fragment stopped: " + f.getClass().getSimpleName());
+        rum.seen();
     }
 
     @Override
     public void onFragmentDestroyed(@NonNull FragmentManager fm, @NonNull Fragment f) {
-        RaygunLogger.v("RUM - Fragment destroyed: " + f.getClass().getSimpleName());
         super.onFragmentDestroyed(fm, f);
+        RaygunLogger.v("RUM - Fragment destroyed: " + f.getClass().getSimpleName());
+        rum.seen();
     }
 }
