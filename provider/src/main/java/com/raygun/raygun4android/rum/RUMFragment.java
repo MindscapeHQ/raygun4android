@@ -75,7 +75,9 @@ public class RUMFragment extends FragmentManager.FragmentLifecycleCallbacks {
             }
         }
         String fragmentName = fragment.getClass().getSimpleName();
-        rum.sendRUMTimingEvent(RaygunRUMEventType.FRAGMENT_LOADED, fragmentName, duration);
+        // TODO: Maybe provide Parent Activity + Fragment Name
+//        fragment.getActivity().getClass().getSimpleName();
+//        rum.sendRUMTimingEvent(RaygunRUMEventType.FRAGMENT_LOADED, fragmentName, duration);
         rum.seen();
     }
 
