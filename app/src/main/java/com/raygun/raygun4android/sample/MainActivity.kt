@@ -39,6 +39,7 @@ class MainActivity : AppCompatActivity() {
         val textViewAppVersion = findViewById<TextView>(R.id.textView_appVersion)
         val textViewProviderVersion = findViewById<TextView>(R.id.textView_providerVersion)
         val buttonSecondActivity = findViewById<Button>(R.id.button_secondActivity)
+        val buttonNavigationActivity = findViewById<Button>(R.id.button_navigationActivity)
 
         buttonSend.setOnClickListener {
             val tw = HashMap<String, String>()
@@ -140,6 +141,10 @@ class MainActivity : AppCompatActivity() {
 
         buttonSecondActivity.setOnClickListener {
             startSecondActivity.launch(SecondActivity.getIntent(this@MainActivity))
+        }
+
+        buttonNavigationActivity.setOnClickListener {
+            this.startActivity(NavigationActivity.getIntent(this))
         }
 
         textViewAppVersion.text =

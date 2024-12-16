@@ -5,12 +5,12 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
 
 import com.raygun.raygun4android.RaygunRUMEventType;
 import com.raygun.raygun4android.logging.RaygunLogger;
 
-import java.lang.ref.WeakReference;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -43,7 +43,7 @@ public class RUMFragment extends FragmentManager.FragmentLifecycleCallbacks {
     @Override
     public void onFragmentCreated(@NonNull FragmentManager fm, @NonNull Fragment fragment, @Nullable Bundle savedInstanceState) {
         super.onFragmentCreated(fm, fragment, savedInstanceState);
-        RaygunLogger.v("RUM - Fragment created: " + fragment.getClass().getSimpleName());
+        RaygunLogger.v("RUM - Fragment created: " + getFragmentName(fragment));
         if (!fragmentStartTime.containsKey(fragment.getId())) {
             fragmentStartTime.put(fragment.getId(), System.nanoTime());
         }
@@ -53,7 +53,7 @@ public class RUMFragment extends FragmentManager.FragmentLifecycleCallbacks {
     @Override
     public void onFragmentStarted(@NonNull FragmentManager fm, @NonNull Fragment fragment) {
         super.onFragmentStarted(fm, fragment);
-        RaygunLogger.v("RUM - Fragment started: " + fragment.getClass().getSimpleName());
+        RaygunLogger.v("RUM - Fragment started: " + getFragmentName(fragment));
         if (!fragmentStartTime.containsKey(fragment.getId())) {
             fragmentStartTime.put(fragment.getId(), System.nanoTime());
         }
@@ -63,7 +63,7 @@ public class RUMFragment extends FragmentManager.FragmentLifecycleCallbacks {
     @Override
     public void onFragmentResumed(@NonNull FragmentManager fm, @NonNull Fragment fragment) {
         super.onFragmentResumed(fm, fragment);
-        RaygunLogger.v("RUM - Fragment resumed: " + fragment.getClass().getSimpleName());
+        RaygunLogger.v("RUM - Fragment resumed: " + getFragmentName(fragment));
         long duration = 0;
         if (!fragmentStartTime.containsKey(fragment.getId())) {
             fragmentStartTime.put(fragment.getId(), System.nanoTime());
@@ -74,24 +74,21 @@ public class RUMFragment extends FragmentManager.FragmentLifecycleCallbacks {
                 duration = TimeUnit.NANOSECONDS.toMillis(diff);
             }
         }
-        String fragmentName = fragment.getClass().getSimpleName();
-        // TODO: Maybe provide Parent Activity + Fragment Name
-//        fragment.getActivity().getClass().getSimpleName();
-//        rum.sendRUMTimingEvent(RaygunRUMEventType.FRAGMENT_LOADED, fragmentName, duration);
+        rum.sendRUMTimingEvent(RaygunRUMEventType.FRAGMENT_LOADED, getFragmentName(fragment), duration);
         rum.seen();
     }
 
     @Override
     public void onFragmentPaused(@NonNull FragmentManager fm, @NonNull Fragment f) {
         super.onFragmentPaused(fm, f);
-        RaygunLogger.v(" RUM - Fragment paused: " + f.getClass().getSimpleName());
+        RaygunLogger.v(" RUM - Fragment paused: " + getFragmentName(f));
         rum.seen();
     }
 
     @Override
     public void onFragmentStopped(@NonNull FragmentManager fm, @NonNull Fragment fragment) {
         super.onFragmentStopped(fm, fragment);
-        RaygunLogger.v("RUM - Fragment stopped: " + fragment.getClass().getSimpleName());
+        RaygunLogger.v("RUM - Fragment stopped: " + getFragmentName(fragment));
         // Remove the start time for the fragment
         fragmentStartTime.remove(fragment.getId());
         rum.seen();
@@ -100,9 +97,19 @@ public class RUMFragment extends FragmentManager.FragmentLifecycleCallbacks {
     @Override
     public void onFragmentDestroyed(@NonNull FragmentManager fm, @NonNull Fragment fragment) {
         super.onFragmentDestroyed(fm, fragment);
-        RaygunLogger.v("RUM - Fragment destroyed: " + fragment.getClass().getSimpleName());
+        RaygunLogger.v("RUM - Fragment destroyed: " + getFragmentName(fragment));
         // Remove the start time for the fragment
         fragmentStartTime.remove(fragment.getId());
         rum.seen();
+    }
+
+    public String getFragmentName(Fragment fragment) {
+        FragmentActivity activity = fragment.getActivity();
+        String simpleName = fragment.getClass().getSimpleName();
+        if (activity != null) {
+            return activity.getClass().getSimpleName() + " - " + simpleName;
+        } else {
+            return simpleName;
+        }
     }
 }

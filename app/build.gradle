@@ -142,6 +142,7 @@ dependencies {
     implementation(libs.androidx.constraintlayout.constraintlayout)
     implementation(libs.android.material.material)
     implementation(libs.androidx.multidex.multidex)
+    implementation libs.androidx.activity
 
     testImplementation(libs.junit)
     testImplementation(libs.mockito.core)
