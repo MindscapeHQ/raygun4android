@@ -11,7 +11,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".NavigationActivity"
+            android:name=".fragments.NavigationActivity"
             android:exported="false" />
         <activity
             android:name=".MainActivity"

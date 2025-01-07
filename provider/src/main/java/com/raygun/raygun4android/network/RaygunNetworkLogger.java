@@ -1,6 +1,6 @@
 package com.raygun.raygun4android.network;
 
-import com.raygun.raygun4android.RUM;
+import com.raygun.raygun4android.rum.RUM;
 import com.raygun.raygun4android.RaygunRUMEventType;
 import com.raygun.raygun4android.RaygunSettings;
 import com.raygun.raygun4android.network.http.RaygunUrlStreamHandlerFactory;
@@ -87,10 +87,10 @@ public class RaygunNetworkLogger {
             String exception) {
         if (!shouldIgnoreURL(url) && loggingEnabled) {
             url = sanitiseURL(url);
-            RUM.sendRUMTimingEvent(
-                    RaygunRUMEventType.NETWORK_CALL,
-                    requestMethod + " " + url,
-                    endTime - startTime);
+            RUM.getInstance().sendRUMTimingEvent(
+                RaygunRUMEventType.NETWORK_CALL,
+                requestMethod + " " + url,
+                endTime - startTime);
         }
     }
 

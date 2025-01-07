@@ -1,4 +1,4 @@
-package com.raygun.raygun4android.sample
+package com.raygun.raygun4android.sample.fragments
 
 import android.content.Context
 import android.content.Intent
@@ -7,7 +7,16 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import com.raygun.raygun4android.sample.R
 
+/**
+ * Activity that contains a Fragment.
+ *
+ * [Fragment1] is defined in the activity_navigation.xml in a FragmentContainerView.
+ *
+ * RUM registers the FragmentManager from this Activity automatically,
+ * reporting the Fragment lifecycle events as RUM navigation events.
+ */
 class NavigationActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

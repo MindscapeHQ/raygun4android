@@ -11,6 +11,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.snackbar.Snackbar
 import com.raygun.raygun4android.RaygunClient
 import com.raygun.raygun4android.messages.shared.RaygunUserInfo
+import com.raygun.raygun4android.sample.fragments.NavigationActivity
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -144,6 +145,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         buttonNavigationActivity.setOnClickListener {
+            // Launches an Activity containing a Fragment
             this.startActivity(NavigationActivity.getIntent(this))
         }
 
