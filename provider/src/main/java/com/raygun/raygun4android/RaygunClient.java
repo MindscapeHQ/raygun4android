@@ -7,9 +7,6 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 
-import androidx.fragment.app.FragmentActivity;
-import androidx.fragment.app.FragmentManager;
-
 import com.raygun.raygun4android.logging.RaygunLogger;
 import com.raygun.raygun4android.logging.TimberRaygunLoggerImplementation;
 import com.raygun.raygun4android.messages.crashreporting.RaygunBreadcrumbMessage;
@@ -444,19 +441,6 @@ public class RaygunClient {
         if (RaygunClient.userInfo != null) {
             RUM.getInstance().updateCurrentSessionUser(RaygunClient.userInfo);
         }
-    }
-
-    /**
-     * Manually attach RUM to the FragmentManager to track fragment lifecycle events.
-     *
-     * <p>This step is not necessary if enableRUM is called
-     * with an Activity that is a FragmentActivity.
-     *
-     * @param fragmentManager The FragmentManager to attach RUM to.
-     */
-    public static void attachRUM(FragmentManager fragmentManager) {
-        // TODO
-//        RUMFragment.attach(fragmentManager);
     }
 
     private static String readApiKey(Context context) {
