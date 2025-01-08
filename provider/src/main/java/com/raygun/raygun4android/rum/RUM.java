@@ -242,7 +242,6 @@ public class RUM {
                     ? new RaygunUserInfo(null, null, null, null)
                     : RaygunClient.getUser();
 
-            // TODO(Miguel Beltran): type = p, what does it mean?
             RaygunRUMTimingMessage timingMessage =
                 new RaygunRUMTimingMessage.Builder(
                     eventType == RaygunRUMEventType.ACTIVITY_LOADED || eventType == RaygunRUMEventType.FRAGMENT_LOADED ? "p" : "n")
