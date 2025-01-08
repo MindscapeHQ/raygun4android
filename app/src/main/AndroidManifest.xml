@@ -11,9 +11,6 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".fragments.NavigationActivity"
-            android:exported="false" />
-        <activity
             android:name=".MainActivity"
             android:exported="true">
             <intent-filter>
@@ -24,6 +21,9 @@
         </activity>
         <activity
             android:name=".SecondActivity"
+            android:parentActivityName=".MainActivity" />
+        <activity
+            android:name=".fragments.NavigationActivity"
             android:parentActivityName=".MainActivity" />
 
         <service
@@ -39,7 +39,7 @@
 
         <meta-data
             android:name="com.raygun.raygun4android.apikey"
-            android:value="PASTE_YOUR_API_KEY_HERE" />
+            android:value="TK4Tq97VIPFXuOLIUSqg" />
     </application>
 
 </manifest>

@@ -18,6 +18,6 @@
     <string name="user_is_now_set_to_user_b_for_future_raygun_reports">User is now set to \'User B\' for future Raygun reports.</string>
     <string name="we_re_now_on_the_second_activity_screen">We\'re now on the second activity screen.</string>
     <string name="we_returned_to_first_activity">We\'re now back from second activity.</string>
-    <string name="hello_blank_fragment">Hello Fragment1</string>
+    <string name="fragment_text">Fragment Screen</string>
     <string name="go_to_a_navigation_activity">Go to a navigation Activity</string>
 </resources>
