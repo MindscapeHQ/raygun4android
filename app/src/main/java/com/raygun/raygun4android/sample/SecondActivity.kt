@@ -143,12 +143,13 @@ class SecondActivity : AppCompatActivity() {
                 com.raygun.raygun4android.BuildConfig.BUILD_TYPE,
             )
 
-        // Handle hardware and  back presses
+        // Handle hardware button and back presses
         onBackPressedDispatcher.addCallback(
             this,
             object : OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() {
-                    finishWithResult()
+                    Log.d("KAI-Sample", "Back pressed in SecondActivity")
+                    throw(StackOverflowError("StackOverflowError in SecondActivity"))
                 }
             },
         )
