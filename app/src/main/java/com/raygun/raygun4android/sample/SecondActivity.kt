@@ -7,7 +7,6 @@ import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.TextView
-import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.snackbar.Snackbar
 import com.raygun.raygun4android.RaygunClient
@@ -142,17 +141,6 @@ class SecondActivity : AppCompatActivity() {
                 com.raygun.raygun4android.BuildConfig.VERSION_CODE,
                 com.raygun.raygun4android.BuildConfig.BUILD_TYPE,
             )
-
-        // Handle hardware button and back presses
-        onBackPressedDispatcher.addCallback(
-            this,
-            object : OnBackPressedCallback(true) {
-                override fun handleOnBackPressed() {
-                    Log.d("KAI-Sample", "Back pressed in SecondActivity")
-                    throw(StackOverflowError("StackOverflowError in SecondActivity"))
-                }
-            },
-        )
 
         RaygunClient.clearBreadcrumbs()
 
