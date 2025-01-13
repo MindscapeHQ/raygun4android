@@ -95,7 +95,7 @@ public class CrashReportingWorker extends Worker {
 
     private int postCrashReporting(String apiKey, String jsonPayload) {
         try {
-            if (validateApiKey(apiKey)) {
+            if (CrashReportingHelper.validateApiKey(apiKey)) {
                 String endpoint = RaygunSettings.getCrashReportingEndpoint();
                 MediaType MEDIA_TYPE_JSON = MediaType.parse("application/json; charset=utf-8");
 
@@ -135,13 +135,5 @@ public class CrashReportingWorker extends Worker {
         return -1;
     }
 
-    private Boolean validateApiKey(String apiKey) {
-        if (apiKey.isEmpty()) {
-            RaygunLogger.e("API key is empty, nothing will be logged or reported");
-            return false;
-        } else {
-            return true;
-        }
-    }
 }
 

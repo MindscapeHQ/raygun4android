@@ -22,6 +22,15 @@ public class CrashReportingHelper {
 
         WorkManager.getInstance(context).enqueue(workRequest);
 
-        RaygunLogger.i("Work for CrashReportingWorker has been put into the queue");
+        RaygunLogger.i("Work for CrashReportingWorker has been put into the queue.");
+    }
+
+    protected static Boolean validateApiKey(String apiKey) {
+        if (apiKey.isEmpty()) {
+            RaygunLogger.e("API key is empty, nothing will be logged or reported.");
+            return false;
+        } else {
+            return true;
+        }
     }
 }
