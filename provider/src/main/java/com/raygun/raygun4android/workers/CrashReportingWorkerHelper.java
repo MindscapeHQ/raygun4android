@@ -8,7 +8,7 @@ import androidx.work.WorkManager;
 
 import com.raygun.raygun4android.logging.RaygunLogger;
 
-public class CrashReportingHelper {
+public class CrashReportingWorkerHelper {
 
     public static void enqueueCrashReport(Context context, String message, String apiKey) {
         Data inputData = new Data.Builder()
