@@ -10,30 +10,12 @@ concurrency:
 
 env:
   JAVA_VERSION: 17
+  # See https://github.com/actions/setup-java?tab=readme-ov-file#supported-distributions
   JAVA_DISTRIBUTION: 'adopt'
 
 jobs:
-  app-check:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v4
-    - uses: actions/setup-java@v4
-      with:
-        distribution: ${{ env.JAVA_DISTRIBUTION }}
-        java-version: ${{ env.JAVA_VERSION }}
-    - run: ./gradlew app:check
-
-  provider-check:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v4
-    - uses: actions/setup-java@v4
-      with:
-        distribution: ${{ env.JAVA_DISTRIBUTION }}
-        java-version: ${{ env.JAVA_VERSION }}
-    - run: ./gradlew provider:check
-
   spotless:
+    name: "Spotless"
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
@@ -44,6 +26,7 @@ jobs:
     - run: ./gradlew spotlessCheck
 
   app-lint:
+    name: "app:lint"
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
@@ -54,6 +37,7 @@ jobs:
     - run: ./gradlew app:lint
 
   provider-lint:
+    name: "provider:lint"
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
@@ -64,6 +48,7 @@ jobs:
     - run: ./gradlew provider:lint
 
   app-assemble-debug:
+    name: "app:assembleDebug"
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
@@ -74,6 +59,7 @@ jobs:
     - run: ./gradlew app:assembleDebug
 
   provider-assemble-debug:
+    name: "provider:assembleDebug"
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
@@ -84,6 +70,7 @@ jobs:
     - run: ./gradlew provider:assembleDebug
 
   provider-test:
+    name: "provider:test"
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
