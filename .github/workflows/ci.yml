@@ -3,8 +3,9 @@ name: "CI"
 on: [push]
 
 # Cancel running job if a new push is made to the same branch
-concurrency: 
-  group: ${{ github.head_ref }}
+# https://docs.github.com/en/actions/writing-workflows/workflow-syntax-for-github-actions#concurrency
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
