@@ -1,10 +1,8 @@
 package com.raygun.raygun4android.utils;
 
 import android.content.Context;
-
 import com.raygun.raygun4android.RaygunSettings;
 import com.raygun.raygun4android.logging.RaygunLogger;
-
 import java.io.File;
 
 public class RaygunFileUtils {
@@ -29,7 +27,7 @@ public class RaygunFileUtils {
             if (fileList != null) {
                 for (File f : fileList) {
                     if (RaygunFileUtils.getExtension(f.getName())
-                        .equalsIgnoreCase(RaygunSettings.DEFAULT_FILE_EXTENSION)) {
+                            .equalsIgnoreCase(RaygunSettings.DEFAULT_FILE_EXTENSION)) {
                         if (!f.delete()) {
                             RaygunLogger.w("Couldn't delete cached report (" + f.getName() + ")");
                         }
@@ -37,8 +35,8 @@ public class RaygunFileUtils {
                 }
             } else {
                 RaygunLogger.e(
-                    "Error in handling cached message from filesystem - could not get a list of"
-                        + " files from cache dir");
+                        "Error in handling cached message from filesystem - could not get a list of"
+                                + " files from cache dir");
             }
         }
     }

@@ -4,15 +4,12 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-
 import androidx.annotation.NonNull;
-
 import com.raygun.raygun4android.RaygunSettings;
 import com.raygun.raygun4android.SerializedMessage;
 import com.raygun.raygun4android.logging.RaygunLogger;
 import com.raygun.raygun4android.network.RaygunNetworkUtils;
 import com.raygun.raygun4android.utils.RaygunFileFilter;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -24,7 +21,6 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
-
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -39,10 +35,10 @@ public class CrashReportingPostService extends RaygunPostService {
     public static void enqueueWork(Context context, Intent intent) {
         RaygunLogger.i("Work for CrashReportingPostService has been put in the job queue");
         enqueueWork(
-            context,
-            CrashReportingPostService.class,
-            CRASHREPORTING_POSTSERVICE_JOB_ID,
-            intent);
+                context,
+                CrashReportingPostService.class,
+                CRASHREPORTING_POSTSERVICE_JOB_ID,
+                intent);
     }
 
     @Override
@@ -81,7 +77,7 @@ public class CrashReportingPostService extends RaygunPostService {
     private void saveMessage(String message) {
         synchronized (this) {
             ArrayList<File> cachedFiles =
-                new ArrayList<>(Arrays.asList(getCacheDir().listFiles(new RaygunFileFilter())));
+                    new ArrayList<>(Arrays.asList(getCacheDir().listFiles(new RaygunFileFilter())));
 
             if (cachedFiles.size() < RaygunSettings.getMaxReportsStoredOnDevice()) {
                 @SuppressLint("SimpleDateFormat")
@@ -89,13 +85,13 @@ public class CrashReportingPostService extends RaygunPostService {
                 String uuid = UUID.randomUUID().toString().replace("-", "");
                 String timestamp = dateFormat.format(new Date(System.currentTimeMillis()));
                 File fn =
-                    new File(
-                        getCacheDir(),
-                        timestamp
-                            + "-"
-                            + uuid
-                            + "."
-                            + RaygunSettings.DEFAULT_FILE_EXTENSION);
+                        new File(
+                                getCacheDir(),
+                                timestamp
+                                        + "-"
+                                        + uuid
+                                        + "."
+                                        + RaygunSettings.DEFAULT_FILE_EXTENSION);
 
                 try {
                     SerializedMessage serializedMessage = new SerializedMessage(message);
@@ -104,15 +100,15 @@ public class CrashReportingPostService extends RaygunPostService {
                     out.close();
                 } catch (FileNotFoundException e) {
                     RaygunLogger.e(
-                        "Error creating file when caching message to filesystem - "
-                            + e.getMessage());
+                            "Error creating file when caching message to filesystem - "
+                                    + e.getMessage());
                 } catch (IOException e) {
                     RaygunLogger.e("Error writing message to filesystem - " + e.getMessage());
                 }
             } else {
                 RaygunLogger.w(
-                    "Can't write crash report to local disk, maximum number of stored reports"
-                        + " reached.");
+                        "Can't write crash report to local disk, maximum number of stored reports"
+                                + " reached.");
             }
         }
     }
@@ -120,10 +116,10 @@ public class CrashReportingPostService extends RaygunPostService {
     /**
      * Raw post method that delivers a pre-built Crash Reporting payload to the Raygun API.
      *
-     * @param apiKey      The API key of the app to deliver to
+     * @param apiKey The API key of the app to deliver to
      * @param jsonPayload The JSON representation of a RaygunMessage to be delivered over HTTPS.
      * @return HTTP result code - 202 if successful, 403 if API key invalid, 400 if bad message
-     * (invalid properties), 429 if rate limited
+     *     (invalid properties), 429 if rate limited
      */
     private static int postCrashReporting(String apiKey, String jsonPayload) {
         try {
@@ -132,20 +128,20 @@ public class CrashReportingPostService extends RaygunPostService {
                 MediaType MEDIA_TYPE_JSON = MediaType.parse("application/json; charset=utf-8");
 
                 OkHttpClient client =
-                    new OkHttpClient.Builder()
-                        .connectTimeout(NETWORK_TIMEOUT, TimeUnit.SECONDS)
-                        .writeTimeout(NETWORK_TIMEOUT, TimeUnit.SECONDS)
-                        .readTimeout(NETWORK_TIMEOUT, TimeUnit.SECONDS)
-                        .build();
+                        new OkHttpClient.Builder()
+                                .connectTimeout(NETWORK_TIMEOUT, TimeUnit.SECONDS)
+                                .writeTimeout(NETWORK_TIMEOUT, TimeUnit.SECONDS)
+                                .readTimeout(NETWORK_TIMEOUT, TimeUnit.SECONDS)
+                                .build();
 
                 RequestBody body = RequestBody.create(MEDIA_TYPE_JSON, jsonPayload);
 
                 Request request =
-                    new Request.Builder()
-                        .url(endpoint)
-                        .header("X-ApiKey", apiKey)
-                        .post(body)
-                        .build();
+                        new Request.Builder()
+                                .url(endpoint)
+                                .header("X-ApiKey", apiKey)
+                                .post(body)
+                                .build();
 
                 Response response = null;
 
@@ -155,8 +151,8 @@ public class CrashReportingPostService extends RaygunPostService {
                     return response.code();
                 } catch (IOException ioe) {
                     RaygunLogger.e(
-                        "OkHttp POST to Raygun Crash Reporting backend failed - "
-                            + ioe.getMessage());
+                            "OkHttp POST to Raygun Crash Reporting backend failed - "
+                                    + ioe.getMessage());
                     ioe.printStackTrace();
                 } finally {
                     if (response != null) {
