@@ -78,4 +78,3 @@ jobs:
         distribution: 'adopt'
         java-version: 17
     - run: ./gradlew provider:assembleDebug
-
