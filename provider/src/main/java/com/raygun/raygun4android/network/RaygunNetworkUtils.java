@@ -6,8 +6,6 @@ import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.provider.Settings;
-
-import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
@@ -33,10 +31,10 @@ public class RaygunNetworkUtils {
 
     public static boolean hasInternetConnection(Context appContext) {
         ConnectivityManager cm =
-            (ConnectivityManager)
-                appContext
-                    .getApplicationContext()
-                    .getSystemService(Context.CONNECTIVITY_SERVICE);
+                (ConnectivityManager)
+                        appContext
+                                .getApplicationContext()
+                                .getSystemService(Context.CONNECTIVITY_SERVICE);
 
         if (cm != null) {
             NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
@@ -54,12 +52,15 @@ public class RaygunNetworkUtils {
             if (id != null) {
                 return UUID.fromString(id).toString();
             } else {
-                @SuppressLint("HardwareIds") final String androidId =
-                    Settings.Secure.getString(
-                        context.getContentResolver(), Settings.Secure.ANDROID_ID);
+                @SuppressLint("HardwareIds")
+                final String androidId =
+                        Settings.Secure.getString(
+                                context.getContentResolver(), Settings.Secure.ANDROID_ID);
 
                 if (!"9774d56d682e549c".equals(androidId)) {
-                    id = UUID.nameUUIDFromBytes(androidId.getBytes(StandardCharsets.UTF_8)).toString();
+                    id =
+                            UUID.nameUUIDFromBytes(androidId.getBytes(StandardCharsets.UTF_8))
+                                    .toString();
                 } else {
                     id = UUID.randomUUID().toString();
                 }

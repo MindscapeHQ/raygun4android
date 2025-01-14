@@ -11,8 +11,7 @@ import java.io.Serializable;
 public class SerializedMessage implements Serializable {
     public String message;
 
-    public SerializedMessage() {
-    }
+    public SerializedMessage() {}
 
     public SerializedMessage(String message) {
         this.message = message;

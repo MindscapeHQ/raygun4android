@@ -16,14 +16,14 @@ public class RaygunUserInfo {
      * Set the current user's info to be transmitted - any parameter can be null if the data is not
      * available or you do not wish to send it.
      *
-     * @param firstName  The user's first name
-     * @param fullName   The user's full name - if setting the first name you should set this too
-     * @param email      User's email address
+     * @param firstName The user's first name
+     * @param fullName The user's full name - if setting the first name you should set this too
+     * @param email User's email address
      * @param identifier Unique identifier for this user. Set this to the internal identifier you
-     *                   use to look up users, or a correlation ID for anonymous users if you have one. It doesn't
-     *                   have to be unique, but we will treat any duplicated values as the same user. If you use
-     *                   their email address here, pass it in as the 'emailAddress' parameter too. If identifier
-     *                   is not set and/or null, a uuid will be assigned to this field.
+     *     use to look up users, or a correlation ID for anonymous users if you have one. It doesn't
+     *     have to be unique, but we will treat any duplicated values as the same user. If you use
+     *     their email address here, pass it in as the 'emailAddress' parameter too. If identifier
+     *     is not set and/or null, a uuid will be assigned to this field.
      */
     public RaygunUserInfo(String identifier, String firstName, String fullName, String email) {
         if (isValidUser(identifier)) {
@@ -32,8 +32,8 @@ public class RaygunUserInfo {
             this.email = email;
         } else {
             RaygunLogger.i(
-                "Ignored firstName, fullName and email because created user was deemed"
-                    + " anonymous");
+                    "Ignored firstName, fullName and email because created user was deemed"
+                            + " anonymous");
         }
     }
 
@@ -42,11 +42,11 @@ public class RaygunUserInfo {
      * user.
      *
      * @param identifier Unique identifier for this user. Set this to the internal identifier you
-     *                   use to look up users, or a correlation ID for anonymous users if you have one. It doesn't
-     *                   have to be unique, but we will treat any duplicated values as the same user. If you use
-     *                   their email address here, please use the full constructor and pass it in as the
-     *                   'emailAddress' parameter too. If identifier is not set and/or null, a uuid will be
-     *                   assigned to this field.
+     *     use to look up users, or a correlation ID for anonymous users if you have one. It doesn't
+     *     have to be unique, but we will treat any duplicated values as the same user. If you use
+     *     their email address here, please use the full constructor and pass it in as the
+     *     'emailAddress' parameter too. If identifier is not set and/or null, a uuid will be
+     *     assigned to this field.
      */
     public RaygunUserInfo(String identifier) {
         isValidUser(identifier);
@@ -104,7 +104,7 @@ public class RaygunUserInfo {
     private Boolean isValidUser(String identifier) {
         if (identifier == null || identifier.isEmpty()) {
             this.identifier =
-                RaygunNetworkUtils.getDeviceUuid(RaygunClient.getApplicationContext());
+                    RaygunNetworkUtils.getDeviceUuid(RaygunClient.getApplicationContext());
             this.isAnonymous = true;
             RaygunLogger.i("Created anonymous user");
             return false;

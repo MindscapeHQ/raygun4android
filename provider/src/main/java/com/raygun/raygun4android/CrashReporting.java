@@ -3,7 +3,6 @@ package com.raygun.raygun4android;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.os.Build;
-
 import com.google.gson.Gson;
 import com.raygun.raygun4android.logging.RaygunLogger;
 import com.raygun.raygun4android.messages.crashreporting.RaygunBreadcrumbMessage;
@@ -13,7 +12,6 @@ import com.raygun.raygun4android.services.CrashReportingPostService;
 import com.raygun.raygun4android.utils.RaygunFileFilter;
 import com.raygun.raygun4android.utils.RaygunFileUtils;
 import com.raygun.raygun4android.utils.RaygunUtils;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -70,7 +68,7 @@ public class CrashReporting {
     }
 
     private static RaygunBreadcrumbMessage processBreadcrumbLocation(
-        RaygunBreadcrumbMessage breadcrumb, boolean shouldProcessBreadcrumbLocation) {
+            RaygunBreadcrumbMessage breadcrumb, boolean shouldProcessBreadcrumbLocation) {
 
         if (shouldProcessBreadcrumbLocation && breadcrumb.getClassName() == null) {
 
@@ -83,7 +81,7 @@ public class CrashReporting {
                     StackTraceElement nextFrame = trace[i + 1];
 
                     if (thisFrame.getClassName().contains("com.raygun.raygun4android.")
-                        && !nextFrame.getClassName().contains("com.raygun.raygun4android.")) {
+                            && !nextFrame.getClassName().contains("com.raygun.raygun4android.")) {
                         frame = nextFrame;
                         break;
                     }
@@ -92,13 +90,13 @@ public class CrashReporting {
 
             if (frame != null) {
                 return new RaygunBreadcrumbMessage.Builder(breadcrumb.getMessage())
-                    .category(breadcrumb.getCategory())
-                    .customData(breadcrumb.getCustomData())
-                    .level(breadcrumb.getLevel())
-                    .className(frame.getClassName())
-                    .methodName(frame.getMethodName())
-                    .lineNumber(frame.getLineNumber())
-                    .build();
+                        .category(breadcrumb.getCategory())
+                        .customData(breadcrumb.getCustomData())
+                        .level(breadcrumb.getLevel())
+                        .className(frame.getClassName())
+                        .methodName(frame.getMethodName())
+                        .lineNumber(frame.getLineNumber())
+                        .build();
             }
         }
 
@@ -141,23 +139,23 @@ public class CrashReporting {
             postCachedMessages();
         } else {
             RaygunLogger.w(
-                "Crash Reporting is not enabled, please enable to use the send() function");
+                    "Crash Reporting is not enabled, please enable to use the send() function");
         }
     }
 
     private static RaygunMessage buildMessage(Throwable throwable) {
         try {
             RaygunMessage msg =
-                RaygunMessageBuilder.instance()
-                    .setEnvironmentDetails(RaygunClient.getApplicationContext())
-                    .setMachineName(Build.MODEL)
-                    .setExceptionDetails(throwable)
-                    .setClientDetails()
-                    .setAppContext(RaygunClient.getAppContextIdentifier())
-                    .setVersion(RaygunClient.getVersion())
-                    .setNetworkInfo(RaygunClient.getApplicationContext())
-                    .setBreadcrumbs(breadcrumbs)
-                    .build();
+                    RaygunMessageBuilder.instance()
+                            .setEnvironmentDetails(RaygunClient.getApplicationContext())
+                            .setMachineName(Build.MODEL)
+                            .setExceptionDetails(throwable)
+                            .setClientDetails()
+                            .setAppContext(RaygunClient.getAppContextIdentifier())
+                            .setVersion(RaygunClient.getVersion())
+                            .setNetworkInfo(RaygunClient.getApplicationContext())
+                            .setBreadcrumbs(breadcrumbs)
+                            .build();
 
             if (RaygunClient.getVersion() != null) {
                 msg.getDetails().setVersion(RaygunClient.getVersion());
@@ -187,24 +185,24 @@ public class CrashReporting {
     static void postCachedMessages() {
         if (RaygunNetworkUtils.hasInternetConnection(RaygunClient.getApplicationContext())) {
             File[] fileList =
-                RaygunClient.getApplicationContext()
-                    .getCacheDir()
-                    .listFiles(new RaygunFileFilter());
+                    RaygunClient.getApplicationContext()
+                            .getCacheDir()
+                            .listFiles(new RaygunFileFilter());
             if (fileList != null) {
                 for (File f : fileList) {
                     try {
                         if (RaygunFileUtils.getExtension(f.getName())
-                            .equalsIgnoreCase(RaygunSettings.DEFAULT_FILE_EXTENSION)) {
+                                .equalsIgnoreCase(RaygunSettings.DEFAULT_FILE_EXTENSION)) {
                             ObjectInputStream ois = null;
                             try {
                                 ois = new ObjectInputStream(new FileInputStream(f));
                                 SerializedMessage serializedMessage =
-                                    (SerializedMessage) ois.readObject();
+                                        (SerializedMessage) ois.readObject();
                                 enqueueWorkForCrashReportingService(
-                                    RaygunClient.getApiKey(), serializedMessage.message);
+                                        RaygunClient.getApiKey(), serializedMessage.message);
                                 if (!f.delete()) {
                                     RaygunLogger.w(
-                                        "Couldn't delete cached report (" + f.getName() + ")");
+                                            "Couldn't delete cached report (" + f.getName() + ")");
                                 }
                             } finally {
                                 if (ois != null) {
@@ -214,33 +212,33 @@ public class CrashReporting {
                         }
                     } catch (FileNotFoundException e) {
                         RaygunLogger.e(
-                            "Error loading cached message from filesystem - " + e.getMessage());
+                                "Error loading cached message from filesystem - " + e.getMessage());
                     } catch (IOException e) {
                         RaygunLogger.e(
-                            "Error reading cached message from filesystem - " + e.getMessage());
+                                "Error reading cached message from filesystem - " + e.getMessage());
                     } catch (ClassNotFoundException e) {
                         RaygunLogger.e(
-                            "Error in handling cached message from filesystem - "
-                                + e.getMessage());
+                                "Error in handling cached message from filesystem - "
+                                        + e.getMessage());
                     }
                 }
             } else {
                 RaygunLogger.e(
-                    "Error in handling cached message from filesystem - could not get a list of"
-                        + " files from cache dir");
+                        "Error in handling cached message from filesystem - could not get a list of"
+                                + " files from cache dir");
             }
         }
     }
 
     private static void enqueueWorkForCrashReportingService(String apiKey, String jsonPayload) {
         Intent intent =
-            new Intent(RaygunClient.getApplicationContext(), CrashReportingPostService.class);
+                new Intent(RaygunClient.getApplicationContext(), CrashReportingPostService.class);
         intent.setAction(
-            "com.raygun.raygun4android.intent.action.LAUNCH_CRASHREPORTING_POST_SERVICE");
+                "com.raygun.raygun4android.intent.action.LAUNCH_CRASHREPORTING_POST_SERVICE");
         intent.setPackage("com.raygun.raygun4android");
         intent.setComponent(
-            new ComponentName(
-                RaygunClient.getApplicationContext(), CrashReportingPostService.class));
+                new ComponentName(
+                        RaygunClient.getApplicationContext(), CrashReportingPostService.class));
 
         intent.putExtra("msg", jsonPayload);
         intent.putExtra("apikey", apiKey);

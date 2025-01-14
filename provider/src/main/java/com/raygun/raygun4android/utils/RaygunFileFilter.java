@@ -1,7 +1,6 @@
 package com.raygun.raygun4android.utils;
 
 import com.raygun.raygun4android.RaygunSettings;
-
 import java.io.File;
 import java.io.FileFilter;
 import java.util.Locale;
