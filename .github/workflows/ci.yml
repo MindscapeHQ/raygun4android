@@ -2,8 +2,13 @@ name: "CI"
 
 on: [push]
 
+# Cancel running job if a new push is made to the same branch
+concurrency: 
+  group: ${{ github.head_ref }}
+  cancel-in-progress: true
+
 jobs:
-  build:
+  app-check:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
@@ -11,4 +16,65 @@ jobs:
       with:
         distribution: 'adopt'
         java-version: 17
-    - run: ./gradlew build
+    - run: ./gradlew app:check
+
+  provider-check:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-java@v4
+      with:
+        distribution: 'adopt'
+        java-version: 17
+    - run: ./gradlew provider:check
+
+  spotless:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-java@v4
+      with:
+        distribution: 'adopt'
+        java-version: 17
+    - run: ./gradlew spotlessCheck
+
+  app-lint:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-java@v4
+      with:
+        distribution: 'adopt'
+        java-version: 17
+    - run: ./gradlew app:lint
+
+  provider-lint:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-java@v4
+      with:
+        distribution: 'adopt'
+        java-version: 17
+    - run: ./gradlew provider:lint
+
+  app-assemble-debug:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-java@v4
+      with:
+        distribution: 'adopt'
+        java-version: 17
+    - run: ./gradlew app:assembleDebug
+
+  provider-assemble-debug:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-java@v4
+      with:
+        distribution: 'adopt'
+        java-version: 17
+    - run: ./gradlew provider:assembleDebug
+
