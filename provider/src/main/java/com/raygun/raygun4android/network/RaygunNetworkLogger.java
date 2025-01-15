@@ -4,7 +4,6 @@ import com.raygun.raygun4android.RaygunRUMEventType;
 import com.raygun.raygun4android.RaygunSettings;
 import com.raygun.raygun4android.network.http.RaygunUrlStreamHandlerFactory;
 import com.raygun.raygun4android.rum.RUM;
-
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Iterator;
