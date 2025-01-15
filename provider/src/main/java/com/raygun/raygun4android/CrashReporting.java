@@ -1,7 +1,6 @@
 package com.raygun.raygun4android;
 
 import android.os.Build;
-import android.util.Log;
 import com.google.gson.Gson;
 import com.raygun.raygun4android.logging.RaygunLogger;
 import com.raygun.raygun4android.messages.crashreporting.RaygunBreadcrumbMessage;
