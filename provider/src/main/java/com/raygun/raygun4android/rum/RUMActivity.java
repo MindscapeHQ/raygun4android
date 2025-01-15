@@ -3,14 +3,11 @@ package com.raygun.raygun4android.rum;
 import android.app.Activity;
 import android.app.Application;
 import android.os.Bundle;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.FragmentActivity;
-
 import com.raygun.raygun4android.RaygunRUMEventType;
 import com.raygun.raygun4android.logging.RaygunLogger;
-
 import java.lang.ref.WeakReference;
 import java.util.concurrent.TimeUnit;
 
@@ -58,7 +55,8 @@ public class RUMActivity implements Application.ActivityLifecycleCallbacks {
         if (mainActivity != null && mainActivity.get() != null) {
             mainActivity.get().getApplication().unregisterActivityLifecycleCallbacks(this);
             if (mainActivity.get() instanceof FragmentActivity) {
-                rumFragment.detach(((FragmentActivity) mainActivity.get()).getSupportFragmentManager());
+                rumFragment.detach(
+                        ((FragmentActivity) mainActivity.get()).getSupportFragmentManager());
             }
         }
         mainActivity = null;

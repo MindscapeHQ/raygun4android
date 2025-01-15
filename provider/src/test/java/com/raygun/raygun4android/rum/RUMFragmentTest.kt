@@ -4,16 +4,13 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import com.raygun.raygun4android.RaygunRUMEventType
 import com.raygun.raygun4android.TestTree
-import junit.framework.TestCase.fail
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.Mockito.anyInt
 import org.mockito.Mockito.anyLong
 import org.mockito.Mockito.mock
 import org.mockito.junit.MockitoJUnitRunner
-import org.mockito.kotlin.any
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
@@ -50,7 +47,7 @@ class RUMFragmentTest {
         verify(mockRUM).sendRUMTimingEvent(
             eq(RaygunRUMEventType.FRAGMENT_LOADED),
             eq("Fragment"),
-            anyLong()
+            anyLong(),
         )
 
         // seen should be called for each "onFragment..."

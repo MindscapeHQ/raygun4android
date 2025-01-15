@@ -1,7 +1,6 @@
 package com.raygun.raygun4android.rum
 
 import androidx.appcompat.app.AppCompatActivity
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import com.raygun.raygun4android.RaygunRUMEventType
 import com.raygun.raygun4android.TestTree
@@ -48,7 +47,7 @@ class RUMActivityTest {
         verify(mockRUM).sendRUMTimingEvent(
             eq(RaygunRUMEventType.ACTIVITY_LOADED),
             eq("AppCompatActivity"),
-            anyLong()
+            anyLong(),
         )
 
         // seen should be called for each "onActivity..."
