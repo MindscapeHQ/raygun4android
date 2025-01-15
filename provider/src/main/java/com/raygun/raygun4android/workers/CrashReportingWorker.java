@@ -93,6 +93,14 @@ public class CrashReportingWorker extends Worker {
         }
     }
 
+    /**
+     * Raw post method that delivers a pre-built Crash Reporting payload to the Raygun API.
+     *
+     * @param apiKey      The API key of the app to deliver to
+     * @param jsonPayload The JSON representation of a RaygunMessage to be delivered over HTTPS.
+     * @return HTTP result code - 202 if successful, 403 if API key invalid, 400 if bad message
+     * (invalid properties), 429 if rate limited
+     */
     private int postCrashReporting(String apiKey, String jsonPayload) {
         try {
             if (CrashReportingWorkerHelper.validateApiKey(apiKey)) {
@@ -117,10 +125,11 @@ public class CrashReportingWorker extends Worker {
 
                 try {
                     response = client.newCall(request).execute();
-                    RaygunLogger.d("HTTP POST result: " + response.code());
+                    RaygunLogger.d("Crash Reporting HTTP POST result: " + response.code());
                     return response.code();
                 } catch (IOException ioe) {
                     RaygunLogger.e("OkHttp POST to Raygun Crash Reporting backend failed: " + ioe.getMessage());
+                    ioe.printStackTrace();
                 } finally {
                     if (response != null) {
                         if (response.body() != null) {
@@ -131,9 +140,9 @@ public class CrashReportingWorker extends Worker {
             }
         } catch (Exception e) {
             RaygunLogger.e("Error posting to Crash Reporting: " + e.getMessage());
+            e.printStackTrace();
         }
         return -1;
     }
-
 }
 
