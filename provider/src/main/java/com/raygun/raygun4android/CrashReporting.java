@@ -244,11 +244,6 @@ public class CrashReporting {
         @Override
         public void uncaughtException(Thread thread, Throwable throwable) {
 
-            if (throwable instanceof StackOverflowError) {
-                Log.e("KAI", "SOE detected");
-                Log.e("KAI", thread.getName());
-            }
-
             List tags = new ArrayList();
             tags.add(RaygunSettings.CRASH_REPORTING_UNHANDLED_EXCEPTION_TAG);
 
