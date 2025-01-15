@@ -66,14 +66,6 @@ In your app's **AndroidManifest.xml**, make sure you have granted Internet permi
 Inside the ```<application>``` element, add:
 
 ```xml
-<service android:name="com.raygun.raygun4android.services.CrashReportingPostService"
-         android:exported="false"
-         android:permission="android.permission.BIND_JOB_SERVICE"
-         android:process=":crashreportingpostservice"/>
-<service android:name="com.raygun.raygun4android.services.RUMPostService"
-         android:exported="false"
-         android:permission="android.permission.BIND_JOB_SERVICE"
-         android:process=":rumpostservice"/>
 <meta-data android:name="com.raygun.raygun4android.apikey"
            android:value="PASTE_YOUR_API_KEY_HERE" />
 ```
