@@ -1,18 +1,14 @@
 package com.raygun.raygun4android.workers;
 
 import android.content.Context;
-
 import androidx.annotation.NonNull;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
-
 import com.raygun.raygun4android.RaygunSettings;
 import com.raygun.raygun4android.logging.RaygunLogger;
 import com.raygun.raygun4android.network.RaygunNetworkUtils;
-
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
-
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -50,13 +46,13 @@ public class RUMWorker extends Worker {
     }
 
     /**
-    * Raw post method that delivers a pre-built RUM payload to the Raygun API.
-    *
-    * @param apiKey      The API key of the app to deliver to
-    * @param jsonPayload The JSON representation of a ??? to be delivered over HTTPS.
-    * @return HTTP result code - 202 if successful, 403 if API key invalid, 400 if bad message
-    * (invalid properties)
-    */
+     * Raw post method that delivers a pre-built RUM payload to the Raygun API.
+     *
+     * @param apiKey The API key of the app to deliver to
+     * @param jsonPayload The JSON representation of a ??? to be delivered over HTTPS.
+     * @return HTTP result code - 202 if successful, 403 if API key invalid, 400 if bad message
+     *     (invalid properties)
+     */
     private static int postRUM(String apiKey, String jsonPayload) {
         try {
             if (RUMWorkerHelper.validateApiKey(apiKey)) {
@@ -64,20 +60,20 @@ public class RUMWorker extends Worker {
                 MediaType MEDIA_TYPE_JSON = MediaType.parse("application/json; charset=utf-8");
 
                 OkHttpClient client =
-                    new OkHttpClient.Builder()
-                        .connectTimeout(NETWORK_TIMEOUT, TimeUnit.SECONDS)
-                        .writeTimeout(NETWORK_TIMEOUT, TimeUnit.SECONDS)
-                        .readTimeout(NETWORK_TIMEOUT, TimeUnit.SECONDS)
-                        .build();
+                        new OkHttpClient.Builder()
+                                .connectTimeout(NETWORK_TIMEOUT, TimeUnit.SECONDS)
+                                .writeTimeout(NETWORK_TIMEOUT, TimeUnit.SECONDS)
+                                .readTimeout(NETWORK_TIMEOUT, TimeUnit.SECONDS)
+                                .build();
 
                 RequestBody body = RequestBody.create(MEDIA_TYPE_JSON, jsonPayload);
 
                 Request request =
-                    new Request.Builder()
-                        .url(endpoint)
-                        .header("X-ApiKey", apiKey)
-                        .post(body)
-                        .build();
+                        new Request.Builder()
+                                .url(endpoint)
+                                .header("X-ApiKey", apiKey)
+                                .post(body)
+                                .build();
 
                 Response response = null;
 
@@ -86,8 +82,7 @@ public class RUMWorker extends Worker {
                     RaygunLogger.d("RUM HTTP POST result: " + response.code());
                     return response.code();
                 } catch (IOException ioe) {
-                    RaygunLogger.e(
-                        "OkHttp POST to Raygun RUM backend failed: " + ioe.getMessage());
+                    RaygunLogger.e("OkHttp POST to Raygun RUM backend failed: " + ioe.getMessage());
                     ioe.printStackTrace();
                 } finally {
                     if (response != null) {

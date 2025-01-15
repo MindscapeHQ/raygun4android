@@ -1,11 +1,5 @@
 package com.raygun.raygun4android.workers;
 
-import android.content.Context;
-
-import androidx.work.Data;
-import androidx.work.OneTimeWorkRequest;
-import androidx.work.WorkManager;
-
 import com.raygun.raygun4android.logging.RaygunLogger;
 
 public class RaygunWorkerHelper {

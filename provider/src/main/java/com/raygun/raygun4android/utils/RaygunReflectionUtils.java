@@ -7,7 +7,7 @@ import java.util.HashSet;
 
 public class RaygunReflectionUtils {
     public static Method findMethod(Class<?> clazz, String methodName, Class<?>[] args)
-        throws NoSuchMethodException {
+            throws NoSuchMethodException {
         Method methodMatched = null;
 
         for (Method m : getAllMethods(clazz)) {

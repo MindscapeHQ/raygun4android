@@ -2,7 +2,6 @@ package com.raygun.raygun4android.network.http;
 
 import com.raygun.raygun4android.network.RaygunNetworkLogger;
 import com.raygun.raygun4android.network.RaygunNetworkUtils;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -14,7 +13,6 @@ import java.security.Permission;
 import java.security.cert.Certificate;
 import java.util.List;
 import java.util.Map;
-
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLPeerUnverifiedException;
 
@@ -25,7 +23,7 @@ final class RaygunHttpsUrlConnection extends HttpsURLConnection {
         super(connection.getURL());
         connectionInstance = connection;
         RaygunNetworkLogger.startNetworkCall(
-            connectionInstance.getURL().toExternalForm(), System.currentTimeMillis());
+                connectionInstance.getURL().toExternalForm(), System.currentTimeMillis());
     }
 
     public void connect() throws IOException {
@@ -33,10 +31,10 @@ final class RaygunHttpsUrlConnection extends HttpsURLConnection {
             connectionInstance.connect();
         } catch (IOException e) {
             RaygunNetworkLogger.cancelNetworkCall(
-                url.toExternalForm(),
-                getRequestMethod(),
-                System.currentTimeMillis(),
-                e.getMessage());
+                    url.toExternalForm(),
+                    getRequestMethod(),
+                    System.currentTimeMillis(),
+                    e.getMessage());
             throw e;
         }
     }
@@ -44,7 +42,7 @@ final class RaygunHttpsUrlConnection extends HttpsURLConnection {
     public void disconnect() {
         int statusCode = RaygunNetworkUtils.getStatusCode(connectionInstance);
         RaygunNetworkLogger.endNetworkCall(
-            url.toExternalForm(), getRequestMethod(), System.currentTimeMillis(), statusCode);
+                url.toExternalForm(), getRequestMethod(), System.currentTimeMillis(), statusCode);
 
         if ((connectionInstance instanceof HttpURLConnection)) {
             ((HttpURLConnection) connectionInstance).disconnect();
@@ -56,10 +54,10 @@ final class RaygunHttpsUrlConnection extends HttpsURLConnection {
             return connectionInstance.getInputStream();
         } catch (IOException e) {
             RaygunNetworkLogger.cancelNetworkCall(
-                url.toExternalForm(),
-                getRequestMethod(),
-                System.currentTimeMillis(),
-                e.getMessage());
+                    url.toExternalForm(),
+                    getRequestMethod(),
+                    System.currentTimeMillis(),
+                    e.getMessage());
             throw e;
         }
     }
@@ -69,10 +67,10 @@ final class RaygunHttpsUrlConnection extends HttpsURLConnection {
             return connectionInstance.getOutputStream();
         } catch (IOException e) {
             RaygunNetworkLogger.cancelNetworkCall(
-                url.toExternalForm(),
-                getRequestMethod(),
-                System.currentTimeMillis(),
-                e.getMessage());
+                    url.toExternalForm(),
+                    getRequestMethod(),
+                    System.currentTimeMillis(),
+                    e.getMessage());
             throw e;
         }
     }
@@ -94,10 +92,10 @@ final class RaygunHttpsUrlConnection extends HttpsURLConnection {
             return connectionInstance.getContent();
         } catch (IOException e) {
             RaygunNetworkLogger.cancelNetworkCall(
-                url.toExternalForm(),
-                getRequestMethod(),
-                System.currentTimeMillis(),
-                e.getMessage());
+                    url.toExternalForm(),
+                    getRequestMethod(),
+                    System.currentTimeMillis(),
+                    e.getMessage());
             throw e;
         }
     }
@@ -107,10 +105,10 @@ final class RaygunHttpsUrlConnection extends HttpsURLConnection {
             return connectionInstance.getContent(types);
         } catch (IOException e) {
             RaygunNetworkLogger.cancelNetworkCall(
-                url.toExternalForm(),
-                getRequestMethod(),
-                System.currentTimeMillis(),
-                e.getMessage());
+                    url.toExternalForm(),
+                    getRequestMethod(),
+                    System.currentTimeMillis(),
+                    e.getMessage());
             throw e;
         }
     }
@@ -184,10 +182,10 @@ final class RaygunHttpsUrlConnection extends HttpsURLConnection {
             return connectionInstance.getPermission();
         } catch (IOException e) {
             RaygunNetworkLogger.cancelNetworkCall(
-                url.toExternalForm(),
-                getRequestMethod(),
-                System.currentTimeMillis(),
-                e.getMessage());
+                    url.toExternalForm(),
+                    getRequestMethod(),
+                    System.currentTimeMillis(),
+                    e.getMessage());
             throw e;
         }
     }

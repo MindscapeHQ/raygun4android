@@ -1,9 +1,7 @@
 package com.raygun.raygun4android.network.http;
 
 import android.os.Build;
-
 import com.raygun.raygun4android.logging.RaygunLogger;
-
 import java.net.URLStreamHandler;
 import java.net.URLStreamHandlerFactory;
 import java.util.HashMap;
@@ -21,14 +19,14 @@ public class RaygunUrlStreamHandlerFactory implements URLStreamHandlerFactory {
         URLStreamHandler httpHandler = findHandler("http");
         if (httpHandler != null) {
             RaygunHttpUrlStreamHandler raygunHttpHandler =
-                new RaygunHttpUrlStreamHandler(httpHandler);
+                    new RaygunHttpUrlStreamHandler(httpHandler);
             handlers.put(raygunHttpHandler.getProtocol(), raygunHttpHandler);
         }
 
         URLStreamHandler httpsHandler = findHandler("https");
         if (httpsHandler != null) {
             RaygunHttpsUrlStreamHandler raygunHttpsHandler =
-                new RaygunHttpsUrlStreamHandler(httpsHandler);
+                    new RaygunHttpsUrlStreamHandler(httpsHandler);
             handlers.put(raygunHttpsHandler.getProtocol(), raygunHttpsHandler);
         }
     }
