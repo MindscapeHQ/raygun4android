@@ -8,7 +8,8 @@ import androidx.work.WorkManager;
 
 import com.raygun.raygun4android.logging.RaygunLogger;
 
-public class CrashReportingWorkerHelper extends RaygunWorkerHelper {
+public class RUMWorkerHelper extends RaygunWorkerHelper {
+
     public static void enqueueCrashReport(Context context, String message, String apiKey) {
         Data inputData = new Data.Builder()
             .putString("msg", message)
@@ -21,6 +22,6 @@ public class CrashReportingWorkerHelper extends RaygunWorkerHelper {
 
         WorkManager.getInstance(context).enqueue(workRequest);
 
-        RaygunLogger.i("Work for CrashReportingWorker has been put into the queue.");
+        RaygunLogger.i("Work for RUMWorker has been put into the queue.");
     }
 }
