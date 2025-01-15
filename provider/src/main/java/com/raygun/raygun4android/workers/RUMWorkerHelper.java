@@ -10,7 +10,7 @@ import com.raygun.raygun4android.logging.RaygunLogger;
 
 public class RUMWorkerHelper extends RaygunWorkerHelper {
 
-    public static void enqueueCrashReport(Context context, String message, String apiKey) {
+    public static void enqueueRUM(Context context, String message, String apiKey) {
         Data inputData = new Data.Builder()
             .putString("msg", message)
             .putString("apikey", apiKey)

@@ -17,7 +17,7 @@ import com.raygun.raygun4android.messages.rum.RaygunRUMMessage;
 import com.raygun.raygun4android.messages.rum.RaygunRUMTimingMessage;
 import com.raygun.raygun4android.messages.shared.RaygunUserInfo;
 import com.raygun.raygun4android.network.RaygunNetworkLogger;
-import com.raygun.raygun4android.services.RUMPostService;
+import com.raygun.raygun4android.workers.RUMWorkerHelper;
 
 import java.lang.ref.WeakReference;
 import java.text.SimpleDateFormat;
@@ -96,16 +96,7 @@ public class RUM implements ActivityLifecycleCallbacks {
     }
 
     private static void enqueueWorkForRUMService(String apiKey, String jsonPayload) {
-        Intent intent = new Intent(RaygunClient.getApplicationContext(), RUMPostService.class);
-        intent.setAction("com.raygun.raygun4android.intent.action.LAUNCH_RUM_POST_SERVICE");
-        intent.setPackage("com.raygun.raygun4android");
-        intent.setComponent(
-            new ComponentName(RaygunClient.getApplicationContext(), RUMPostService.class));
-
-        intent.putExtra("msg", jsonPayload);
-        intent.putExtra("apikey", apiKey);
-
-        RUMPostService.enqueueWork(RaygunClient.getApplicationContext(), intent);
+        RUMWorkerHelper.enqueueRUM(RaygunClient.getApplicationContext(), jsonPayload, apiKey);
     }
 
     @Override
