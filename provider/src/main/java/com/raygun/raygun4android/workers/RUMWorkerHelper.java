@@ -16,7 +16,7 @@ public class RUMWorkerHelper extends RaygunWorkerHelper {
             .putString("apikey", apiKey)
             .build();
 
-        OneTimeWorkRequest workRequest = new OneTimeWorkRequest.Builder(CrashReportingWorker.class)
+        OneTimeWorkRequest workRequest = new OneTimeWorkRequest.Builder(RUMWorker.class)
             .setInputData(inputData)
             .build();
 
