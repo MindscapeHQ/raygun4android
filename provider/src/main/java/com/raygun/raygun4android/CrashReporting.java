@@ -1,17 +1,15 @@
 package com.raygun.raygun4android;
 
-import android.content.ComponentName;
-import android.content.Intent;
 import android.os.Build;
 import com.google.gson.Gson;
 import com.raygun.raygun4android.logging.RaygunLogger;
 import com.raygun.raygun4android.messages.crashreporting.RaygunBreadcrumbMessage;
 import com.raygun.raygun4android.messages.crashreporting.RaygunMessage;
 import com.raygun.raygun4android.network.RaygunNetworkUtils;
-import com.raygun.raygun4android.services.CrashReportingPostService;
 import com.raygun.raygun4android.utils.RaygunFileFilter;
 import com.raygun.raygun4android.utils.RaygunFileUtils;
 import com.raygun.raygun4android.utils.RaygunUtils;
+import com.raygun.raygun4android.workers.CrashReportingWorkerHelper;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -135,7 +133,7 @@ public class CrashReporting {
                 }
             }
 
-            enqueueWorkForCrashReportingService(RaygunClient.getApiKey(), new Gson().toJson(msg));
+            enqueueWorkForCrashReporting(RaygunClient.getApiKey(), new Gson().toJson(msg));
             postCachedMessages();
         } else {
             RaygunLogger.w(
@@ -198,7 +196,7 @@ public class CrashReporting {
                                 ois = new ObjectInputStream(new FileInputStream(f));
                                 SerializedMessage serializedMessage =
                                         (SerializedMessage) ois.readObject();
-                                enqueueWorkForCrashReportingService(
+                                enqueueWorkForCrashReporting(
                                         RaygunClient.getApiKey(), serializedMessage.message);
                                 if (!f.delete()) {
                                     RaygunLogger.w(
@@ -230,20 +228,9 @@ public class CrashReporting {
         }
     }
 
-    private static void enqueueWorkForCrashReportingService(String apiKey, String jsonPayload) {
-        Intent intent =
-                new Intent(RaygunClient.getApplicationContext(), CrashReportingPostService.class);
-        intent.setAction(
-                "com.raygun.raygun4android.intent.action.LAUNCH_CRASHREPORTING_POST_SERVICE");
-        intent.setPackage("com.raygun.raygun4android");
-        intent.setComponent(
-                new ComponentName(
-                        RaygunClient.getApplicationContext(), CrashReportingPostService.class));
-
-        intent.putExtra("msg", jsonPayload);
-        intent.putExtra("apikey", apiKey);
-
-        CrashReportingPostService.enqueueWork(RaygunClient.getApplicationContext(), intent);
+    private static void enqueueWorkForCrashReporting(String apiKey, String jsonPayload) {
+        CrashReportingWorkerHelper.enqueueCrashReport(
+                RaygunClient.getApplicationContext(), jsonPayload, apiKey);
     }
 
     static class RaygunUncaughtExceptionHandler implements Thread.UncaughtExceptionHandler {

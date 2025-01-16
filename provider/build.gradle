@@ -28,6 +28,13 @@ android {
         targetCompatibility JavaVersion.VERSION_17
     }
 
+    kotlinOptions {
+        jvmTarget = "17"
+    }
+    kotlin {
+        jvmToolchain(17)
+    }
+
     namespace 'com.raygun.raygun4android'
 
     libraryVariants.all { variant ->
@@ -64,6 +71,7 @@ dependencies {
     implementation(libs.gson)
     implementation(libs.okhttp)
     implementation(libs.timber)
+    implementation(libs.androidx.work.work.runtime)
 
     testImplementation(libs.junit)
     testImplementation(libs.mockito.core)
