@@ -113,7 +113,7 @@ public class CrashReportingWorker extends Worker {
      */
     private int postCrashReporting(String apiKey, String jsonPayload) {
         try {
-            if (CrashReportingWorkerHelper.validateApiKey(apiKey)) {
+            if (RaygunWorkerHelper.validateApiKey(apiKey)) {
                 String endpoint = RaygunSettings.getCrashReportingEndpoint();
                 MediaType MEDIA_TYPE_JSON = MediaType.parse("application/json; charset=utf-8");
 

@@ -6,7 +6,7 @@ import androidx.work.OneTimeWorkRequest;
 import androidx.work.WorkManager;
 import com.raygun.raygun4android.logging.RaygunLogger;
 
-public class RUMWorkerHelper extends RaygunWorkerHelper {
+public class RUMWorkerHelper {
 
     public static void enqueueRUM(Context context, String message, String apiKey) {
         Data inputData =

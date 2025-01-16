@@ -55,7 +55,7 @@ public class RUMWorker extends Worker {
      */
     private static int postRUM(String apiKey, String jsonPayload) {
         try {
-            if (RUMWorkerHelper.validateApiKey(apiKey)) {
+            if (RaygunWorkerHelper.validateApiKey(apiKey)) {
                 String endpoint = RaygunSettings.getRUMEndpoint();
                 MediaType MEDIA_TYPE_JSON = MediaType.parse("application/json; charset=utf-8");
 

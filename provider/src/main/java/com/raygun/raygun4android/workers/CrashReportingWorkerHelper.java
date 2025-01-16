@@ -6,7 +6,7 @@ import androidx.work.OneTimeWorkRequest;
 import androidx.work.WorkManager;
 import com.raygun.raygun4android.logging.RaygunLogger;
 
-public class CrashReportingWorkerHelper extends RaygunWorkerHelper {
+public class CrashReportingWorkerHelper {
     public static void enqueueCrashReport(Context context, String message, String apiKey) {
         Data inputData =
                 new Data.Builder().putString("msg", message).putString("apikey", apiKey).build();
