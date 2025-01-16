@@ -20,8 +20,6 @@
     <string name="we_returned_to_first_activity">We\'re now back from second activity.</string>
     <string name="fragment_text">Fragment Screen</string>
     <string name="go_to_a_navigation_activity">Go to a navigation Activity</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="fragmentswap1_title">FragmentSwap1</string>
     <string name="go_to_fragmentswap2">Go to FragmentSwap2</string>
     <string name="fragmentswap2_title">FragmentSwap2</string>
