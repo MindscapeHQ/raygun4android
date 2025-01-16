@@ -28,7 +28,7 @@
 
         <meta-data
             android:name="com.raygun.raygun4android.apikey"
-            android:value="TK4Tq97VIPFXuOLIUSqg" />
+            android:value="YOUR_API_KEY_HERE" />
     </application>
 
 </manifest>
