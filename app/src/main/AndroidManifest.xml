@@ -25,7 +25,9 @@
         <activity
             android:name=".fragments.NavigationActivity"
             android:parentActivityName=".MainActivity" />
-
+        <activity
+            android:name=".fragments.NavigationFragmentSwapActivity"
+            android:parentActivityName=".MainActivity" />
         <meta-data
             android:name="com.raygun.raygun4android.apikey"
             android:value="YOUR_API_KEY_HERE" />

@@ -42,9 +42,13 @@ public class RUMFragment extends FragmentManager.FragmentLifecycleCallbacks {
             @NonNull Fragment fragment,
             @Nullable Bundle savedInstanceState) {
         super.onFragmentCreated(fm, fragment, savedInstanceState);
-        RaygunLogger.v("RUM - Fragment created: " + getFragmentName(fragment));
-        if (!fragmentStartTime.containsKey(fragment.getId())) {
-            fragmentStartTime.put(fragment.getId(), System.nanoTime());
+        RaygunLogger.v(
+                "RUM - Fragment created: "
+                        + getFragmentName(fragment)
+                        + " id: "
+                        + getUniqueId(fragment));
+        if (!fragmentStartTime.containsKey(getUniqueId(fragment))) {
+            fragmentStartTime.put(getUniqueId(fragment), System.nanoTime());
         }
         rum.seen();
     }
@@ -52,9 +56,13 @@ public class RUMFragment extends FragmentManager.FragmentLifecycleCallbacks {
     @Override
     public void onFragmentStarted(@NonNull FragmentManager fm, @NonNull Fragment fragment) {
         super.onFragmentStarted(fm, fragment);
-        RaygunLogger.v("RUM - Fragment started: " + getFragmentName(fragment));
-        if (!fragmentStartTime.containsKey(fragment.getId())) {
-            fragmentStartTime.put(fragment.getId(), System.nanoTime());
+        RaygunLogger.v(
+                "RUM - Fragment started: "
+                        + getFragmentName(fragment)
+                        + " id: "
+                        + getUniqueId(fragment));
+        if (!fragmentStartTime.containsKey(getUniqueId(fragment))) {
+            fragmentStartTime.put(getUniqueId(fragment), System.nanoTime());
         }
         rum.seen();
     }
@@ -62,12 +70,16 @@ public class RUMFragment extends FragmentManager.FragmentLifecycleCallbacks {
     @Override
     public void onFragmentResumed(@NonNull FragmentManager fm, @NonNull Fragment fragment) {
         super.onFragmentResumed(fm, fragment);
-        RaygunLogger.v("RUM - Fragment resumed: " + getFragmentName(fragment));
+        RaygunLogger.v(
+                "RUM - Fragment resumed: "
+                        + getFragmentName(fragment)
+                        + " id: "
+                        + getUniqueId(fragment));
         long duration = 0;
-        if (!fragmentStartTime.containsKey(fragment.getId())) {
-            fragmentStartTime.put(fragment.getId(), System.nanoTime());
+        if (!fragmentStartTime.containsKey(getUniqueId(fragment))) {
+            fragmentStartTime.put(getUniqueId(fragment), System.nanoTime());
         } else {
-            Long startTime = fragmentStartTime.get(fragment.getId());
+            Long startTime = fragmentStartTime.get(getUniqueId(fragment));
             if (startTime != null) {
                 long diff = System.nanoTime() - startTime;
                 duration = TimeUnit.NANOSECONDS.toMillis(diff);
@@ -79,27 +91,39 @@ public class RUMFragment extends FragmentManager.FragmentLifecycleCallbacks {
     }
 
     @Override
-    public void onFragmentPaused(@NonNull FragmentManager fm, @NonNull Fragment f) {
-        super.onFragmentPaused(fm, f);
-        RaygunLogger.v(" RUM - Fragment paused: " + getFragmentName(f));
+    public void onFragmentPaused(@NonNull FragmentManager fm, @NonNull Fragment fragment) {
+        super.onFragmentPaused(fm, fragment);
+        RaygunLogger.v(
+                "RUM - Fragment paused: "
+                        + getFragmentName(fragment)
+                        + " id: "
+                        + getUniqueId(fragment));
         rum.seen();
     }
 
     @Override
     public void onFragmentStopped(@NonNull FragmentManager fm, @NonNull Fragment fragment) {
         super.onFragmentStopped(fm, fragment);
-        RaygunLogger.v("RUM - Fragment stopped: " + getFragmentName(fragment));
+        RaygunLogger.v(
+                "RUM - Fragment stopped: "
+                        + getFragmentName(fragment)
+                        + " id: "
+                        + getUniqueId(fragment));
         // Remove the start time for the fragment
-        fragmentStartTime.remove(fragment.getId());
+        fragmentStartTime.remove(getUniqueId(fragment));
         rum.seen();
     }
 
     @Override
     public void onFragmentDestroyed(@NonNull FragmentManager fm, @NonNull Fragment fragment) {
         super.onFragmentDestroyed(fm, fragment);
-        RaygunLogger.v("RUM - Fragment destroyed: " + getFragmentName(fragment));
+        RaygunLogger.v(
+                "RUM - Fragment destroyed: "
+                        + getFragmentName(fragment)
+                        + " id: "
+                        + getUniqueId(fragment));
         // Remove the start time for the fragment
-        fragmentStartTime.remove(fragment.getId());
+        fragmentStartTime.remove(getUniqueId(fragment));
         rum.seen();
     }
 
@@ -111,5 +135,9 @@ public class RUMFragment extends FragmentManager.FragmentLifecycleCallbacks {
         } else {
             return simpleName;
         }
+    }
+
+    public int getUniqueId(Fragment fragment) {
+        return fragment.hashCode();
     }
 }
