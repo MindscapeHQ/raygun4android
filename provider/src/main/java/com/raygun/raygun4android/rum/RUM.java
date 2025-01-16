@@ -2,8 +2,6 @@ package com.raygun.raygun4android.rum;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.content.ComponentName;
-import android.content.Intent;
 import android.os.Build;
 import com.google.gson.Gson;
 import com.raygun.raygun4android.RaygunClient;
@@ -16,7 +14,7 @@ import com.raygun.raygun4android.messages.rum.RaygunRUMMessage;
 import com.raygun.raygun4android.messages.rum.RaygunRUMTimingMessage;
 import com.raygun.raygun4android.messages.shared.RaygunUserInfo;
 import com.raygun.raygun4android.network.RaygunNetworkLogger;
-import com.raygun.raygun4android.services.RUMPostService;
+import com.raygun.raygun4android.workers.RUMWorkerHelper;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -116,17 +114,8 @@ public class RUM {
         sendRUMEvent(RaygunSettings.RUM_EVENT_SESSION_START, newSessionUser);
     }
 
-    private void enqueueWorkForRUMService(String apiKey, String jsonPayload) {
-        Intent intent = new Intent(RaygunClient.getApplicationContext(), RUMPostService.class);
-        intent.setAction("com.raygun.raygun4android.intent.action.LAUNCH_RUM_POST_SERVICE");
-        intent.setPackage("com.raygun.raygun4android");
-        intent.setComponent(
-                new ComponentName(RaygunClient.getApplicationContext(), RUMPostService.class));
-
-        intent.putExtra("msg", jsonPayload);
-        intent.putExtra("apikey", apiKey);
-
-        RUMPostService.enqueueWork(RaygunClient.getApplicationContext(), intent);
+    private static void enqueueWorkForRUMService(String apiKey, String jsonPayload) {
+        RUMWorkerHelper.enqueueRUM(RaygunClient.getApplicationContext(), jsonPayload, apiKey);
     }
 
     /**

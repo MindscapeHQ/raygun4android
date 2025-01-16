@@ -1,9 +1,9 @@
-package com.raygun.raygun4android.services;
+package com.raygun.raygun4android.workers;
 
 import android.content.Context;
-import android.content.Intent;
-import android.os.Bundle;
 import androidx.annotation.NonNull;
+import androidx.work.Worker;
+import androidx.work.WorkerParameters;
 import com.raygun.raygun4android.RaygunSettings;
 import com.raygun.raygun4android.logging.RaygunLogger;
 import com.raygun.raygun4android.network.RaygunNetworkUtils;
@@ -15,39 +15,34 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
-public class RUMPostService extends RaygunPostService {
+public class RUMWorker extends Worker {
 
-    private static final int RUM_POSTSERVICE_JOB_ID = 815;
     private static final int NETWORK_TIMEOUT = 30;
 
-    public static void enqueueWork(Context context, Intent intent) {
-        RaygunLogger.i("Work for RUMPostService has been put in the job queue");
-        enqueueWork(context, RUMPostService.class, RUM_POSTSERVICE_JOB_ID, intent);
+    public RUMWorker(@NonNull Context context, @NonNull WorkerParameters workerParams) {
+        super(context, workerParams);
     }
 
+    @NonNull
     @Override
-    public void onHandleWork(@NonNull Intent intent) {
+    public Result doWork() {
+        // Retrieve data from WorkManager
+        String message = getInputData().getString("msg");
+        String apiKey = getInputData().getString("apikey");
 
-        if (intent.getExtras() != null) {
-            final Bundle bundle = intent.getExtras();
+        RaygunLogger.v(message);
 
-            String message = bundle.getString("msg");
-            String apiKey = bundle.getString("apikey");
-
-            RaygunLogger.v(message);
-
-            // Moved the check for internet connection as close as possible to the calls because the
-            // condition can change quite rapidly
-            if (RaygunNetworkUtils.hasInternetConnection(this.getApplicationContext())) {
+        // Moved the check for internet connection as close as possible to the calls because the
+        // condition can change quite rapidly
+        if (message != null && apiKey != null) {
+            if (RaygunNetworkUtils.hasInternetConnection(getApplicationContext())) {
                 int responseCode = postRUM(apiKey, message);
                 RaygunLogger.responseCode(responseCode);
             }
+            return Result.success();
         }
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
+        RaygunLogger.e("No message or API key was provided.");
+        return Result.failure();
     }
 
     /**
@@ -60,7 +55,7 @@ public class RUMPostService extends RaygunPostService {
      */
     private static int postRUM(String apiKey, String jsonPayload) {
         try {
-            if (validateApiKey(apiKey)) {
+            if (RaygunWorkerHelper.validateApiKey(apiKey)) {
                 String endpoint = RaygunSettings.getRUMEndpoint();
                 MediaType MEDIA_TYPE_JSON = MediaType.parse("application/json; charset=utf-8");
 
@@ -87,8 +82,7 @@ public class RUMPostService extends RaygunPostService {
                     RaygunLogger.d("RUM HTTP POST result: " + response.code());
                     return response.code();
                 } catch (IOException ioe) {
-                    RaygunLogger.e(
-                            "OkHttp POST to Raygun RUM backend failed - " + ioe.getMessage());
+                    RaygunLogger.e("OkHttp POST to Raygun RUM backend failed: " + ioe.getMessage());
                     ioe.printStackTrace();
                 } finally {
                     if (response != null) {

@@ -1,10 +1,10 @@
-package com.raygun.raygun4android.services;
+package com.raygun.raygun4android.workers;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.content.Intent;
-import android.os.Bundle;
 import androidx.annotation.NonNull;
+import androidx.work.Worker;
+import androidx.work.WorkerParameters;
 import com.raygun.raygun4android.RaygunSettings;
 import com.raygun.raygun4android.SerializedMessage;
 import com.raygun.raygun4android.logging.RaygunLogger;
@@ -27,88 +27,78 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
-public class CrashReportingPostService extends RaygunPostService {
+public class CrashReportingWorker extends Worker {
 
-    private static final int CRASHREPORTING_POSTSERVICE_JOB_ID = 4711;
     private static final int NETWORK_TIMEOUT = 30;
 
-    public static void enqueueWork(Context context, Intent intent) {
-        RaygunLogger.i("Work for CrashReportingPostService has been put in the job queue");
-        enqueueWork(
-                context,
-                CrashReportingPostService.class,
-                CRASHREPORTING_POSTSERVICE_JOB_ID,
-                intent);
+    public CrashReportingWorker(@NonNull Context context, @NonNull WorkerParameters workerParams) {
+        super(context, workerParams);
     }
 
+    @NonNull
     @Override
-    public void onHandleWork(@NonNull Intent intent) {
+    public Result doWork() {
+        // Retrieve data from WorkManager
+        String message = getInputData().getString("msg");
+        String apiKey = getInputData().getString("apikey");
 
-        if (intent.getExtras() != null) {
+        RaygunLogger.v(message);
 
-            final Bundle bundle = intent.getExtras();
-
-            String message = bundle.getString("msg");
-            String apiKey = bundle.getString("apikey");
-
-            RaygunLogger.v(message);
-
-            // Moved the check for internet connection as close as possible to the calls because the
-            // condition can change quite rapidly
-            if (RaygunNetworkUtils.hasInternetConnection(this.getApplicationContext())) {
+        if (message != null && apiKey != null) {
+            if (RaygunNetworkUtils.hasInternetConnection(getApplicationContext())) {
                 int responseCode = postCrashReporting(apiKey, message);
                 RaygunLogger.responseCode(responseCode);
 
                 if (responseCode == RaygunSettings.RESPONSE_CODE_RATE_LIMITED) {
                     saveMessage(message);
                 }
-
-            } else if (!RaygunNetworkUtils.hasInternetConnection(this.getApplicationContext())) {
+            } else {
                 saveMessage(message);
             }
+            return Result.success();
         }
-    }
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
+        RaygunLogger.e("No message or API key was provided.");
+        return Result.failure();
     }
 
     private void saveMessage(String message) {
         synchronized (this) {
             ArrayList<File> cachedFiles =
-                    new ArrayList<>(Arrays.asList(getCacheDir().listFiles(new RaygunFileFilter())));
+                    new ArrayList<>(
+                            Arrays.asList(
+                                    getApplicationContext()
+                                            .getCacheDir()
+                                            .listFiles(new RaygunFileFilter())));
 
             if (cachedFiles.size() < RaygunSettings.getMaxReportsStoredOnDevice()) {
                 @SuppressLint("SimpleDateFormat")
-                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
+                String timestamp =
+                        new SimpleDateFormat("yyyyMMddHHmmss")
+                                .format(new Date(System.currentTimeMillis()));
                 String uuid = UUID.randomUUID().toString().replace("-", "");
-                String timestamp = dateFormat.format(new Date(System.currentTimeMillis()));
-                File fn =
+                File file =
                         new File(
-                                getCacheDir(),
+                                getApplicationContext().getCacheDir(),
                                 timestamp
                                         + "-"
                                         + uuid
                                         + "."
                                         + RaygunSettings.DEFAULT_FILE_EXTENSION);
 
-                try {
+                try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(file))) {
                     SerializedMessage serializedMessage = new SerializedMessage(message);
-                    ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(fn));
                     out.writeObject(serializedMessage);
                     out.close();
                 } catch (FileNotFoundException e) {
                     RaygunLogger.e(
-                            "Error creating file when caching message to filesystem - "
+                            "Error creating file when caching message to filesystem: "
                                     + e.getMessage());
                 } catch (IOException e) {
-                    RaygunLogger.e("Error writing message to filesystem - " + e.getMessage());
+                    RaygunLogger.e("Error writing message to filesystem: " + e.getMessage());
                 }
             } else {
-                RaygunLogger.w(
-                        "Can't write crash report to local disk, maximum number of stored reports"
-                                + " reached.");
+                RaygunLogger.w("Maximum stored reports reached. Discarding message.");
             }
         }
     }
@@ -121,9 +111,9 @@ public class CrashReportingPostService extends RaygunPostService {
      * @return HTTP result code - 202 if successful, 403 if API key invalid, 400 if bad message
      *     (invalid properties), 429 if rate limited
      */
-    private static int postCrashReporting(String apiKey, String jsonPayload) {
+    private int postCrashReporting(String apiKey, String jsonPayload) {
         try {
-            if (validateApiKey(apiKey)) {
+            if (RaygunWorkerHelper.validateApiKey(apiKey)) {
                 String endpoint = RaygunSettings.getCrashReportingEndpoint();
                 MediaType MEDIA_TYPE_JSON = MediaType.parse("application/json; charset=utf-8");
 
@@ -147,11 +137,11 @@ public class CrashReportingPostService extends RaygunPostService {
 
                 try {
                     response = client.newCall(request).execute();
-                    RaygunLogger.d("Exception message HTTP POST result: " + response.code());
+                    RaygunLogger.d("Crash Reporting HTTP POST result: " + response.code());
                     return response.code();
                 } catch (IOException ioe) {
                     RaygunLogger.e(
-                            "OkHttp POST to Raygun Crash Reporting backend failed - "
+                            "OkHttp POST to Raygun Crash Reporting backend failed: "
                                     + ioe.getMessage());
                     ioe.printStackTrace();
                 } finally {
@@ -163,7 +153,7 @@ public class CrashReportingPostService extends RaygunPostService {
                 }
             }
         } catch (Exception e) {
-            RaygunLogger.e("Can't post to Crash Reporting. Exception - " + e.getMessage());
+            RaygunLogger.e("Error posting to Crash Reporting: " + e.getMessage());
             e.printStackTrace();
         }
         return -1;
