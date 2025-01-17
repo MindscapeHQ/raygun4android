@@ -21,6 +21,8 @@ leakcanary = "2.14"
 kotlin = "1.8.22"
 raygun = "4.0.1"
 spotless = "6.25.0"
+activity = "1.8.0"
+kotlin-version = "1.8.22"
 
 [libraries]
 android-material-material = { module = "com.google.android.material:material", version.ref = "android-material" }
@@ -46,8 +48,10 @@ leakcanary  = { module = "com.squareup.leakcanary:leakcanary-android", version.r
 github-http-builder-core = { module = "io.github.http-builder-ng:http-builder-ng-core", version.ref = "github-http-builder" }
 kotlin-gradle = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
 raygun = { module = "com.raygun:raygun4android", version.ref = "raygun" }
+androidx-activity = { group = "androidx.activity", name = "activity", version.ref = "activity" }
 
 [bundles]
 
 [plugins]
 spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }
+kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin-version" }
