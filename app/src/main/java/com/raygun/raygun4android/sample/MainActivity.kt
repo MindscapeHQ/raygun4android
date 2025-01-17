@@ -12,6 +12,7 @@ import com.google.android.material.snackbar.Snackbar
 import com.raygun.raygun4android.RaygunClient
 import com.raygun.raygun4android.messages.shared.RaygunUserInfo
 import com.raygun.raygun4android.sample.fragments.NavigationActivity
+import com.raygun.raygun4android.sample.fragments.NavigationFragmentSwapActivity
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -41,6 +42,7 @@ class MainActivity : AppCompatActivity() {
         val textViewProviderVersion = findViewById<TextView>(R.id.textView_providerVersion)
         val buttonSecondActivity = findViewById<Button>(R.id.button_secondActivity)
         val buttonNavigationActivity = findViewById<Button>(R.id.button_navigationActivity)
+        val buttonFragmentSwapActivity = findViewById<Button>(R.id.button_navigationFragmentSwapActivity)
 
         buttonSend.setOnClickListener {
             val tw = HashMap<String, String>()
@@ -147,6 +149,11 @@ class MainActivity : AppCompatActivity() {
         buttonNavigationActivity.setOnClickListener {
             // Launches an Activity containing a Fragment
             this.startActivity(NavigationActivity.getIntent(this))
+        }
+
+        buttonFragmentSwapActivity.setOnClickListener {
+            // Launches an Activity containing a Fragment
+            this.startActivity(NavigationFragmentSwapActivity.getIntent(this))
         }
 
         textViewAppVersion.text =
