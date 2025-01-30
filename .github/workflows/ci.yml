@@ -1,0 +1,81 @@
+name: "CI"
+
+on: [push]
+
+# Cancel running job if a new push is made to the same branch
+# https://docs.github.com/en/actions/writing-workflows/workflow-syntax-for-github-actions#concurrency
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  JAVA_VERSION: 17
+  # See https://github.com/actions/setup-java?tab=readme-ov-file#supported-distributions
+  JAVA_DISTRIBUTION: 'adopt'
+
+jobs:
+  spotless:
+    name: "Spotless"
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-java@v4
+      with:
+        distribution: ${{ env.JAVA_DISTRIBUTION }}
+        java-version: ${{ env.JAVA_VERSION }}
+    - run: ./gradlew spotlessCheck
+
+  app-lint:
+    name: "app:lint"
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-java@v4
+      with:
+        distribution: ${{ env.JAVA_DISTRIBUTION }}
+        java-version: ${{ env.JAVA_VERSION }}
+    - run: ./gradlew app:lint
+
+  provider-lint:
+    name: "provider:lint"
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-java@v4
+      with:
+        distribution: ${{ env.JAVA_DISTRIBUTION }}
+        java-version: ${{ env.JAVA_VERSION }}
+    - run: ./gradlew provider:lint
+
+  app-assemble-debug:
+    name: "app:assembleDebug"
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-java@v4
+      with:
+        distribution: ${{ env.JAVA_DISTRIBUTION }}
+        java-version: ${{ env.JAVA_VERSION }}
+    - run: ./gradlew app:assembleDebug
+
+  provider-assemble-debug:
+    name: "provider:assembleDebug"
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-java@v4
+      with:
+        distribution: ${{ env.JAVA_DISTRIBUTION }}
+        java-version: ${{ env.JAVA_VERSION }}
+    - run: ./gradlew provider:assembleDebug
+
+  provider-test:
+    name: "provider:test"
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-java@v4
+      with:
+        distribution: ${{ env.JAVA_DISTRIBUTION }}
+        java-version: ${{ env.JAVA_VERSION }}
+    - run: ./gradlew provider:test

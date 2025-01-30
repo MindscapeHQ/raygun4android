@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 public class RaygunMessageBuilder implements IRaygunMessageBuilder {
-    private RaygunMessage raygunMessage;
+    private final RaygunMessage raygunMessage;
 
     private RaygunMessageBuilder() {
         raygunMessage = new RaygunMessage();

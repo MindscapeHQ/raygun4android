@@ -2,14 +2,14 @@ package com.raygun.raygun4android.messages.rum;
 
 public class RaygunRUMTimingMessage {
     @SuppressWarnings("FieldCanBeLocal")
-    private String type;
+    private final String type;
 
     @SuppressWarnings("FieldCanBeLocal")
-    private long duration;
+    private final long duration;
 
     public static class Builder {
 
-        private String type;
+        private final String type;
         private long duration;
 
         public Builder(String type) {

@@ -15,7 +15,7 @@ public class NetworkInfo {
     private List<String> iPAddress = new ArrayList<String>();
 
     @SuppressWarnings("FieldCanBeLocal")
-    private String networkConnectivityState;
+    private final String networkConnectivityState;
 
     public NetworkInfo(Context context) {
         readIPAddress();

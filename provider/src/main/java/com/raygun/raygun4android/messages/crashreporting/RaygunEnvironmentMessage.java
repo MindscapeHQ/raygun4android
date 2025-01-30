@@ -89,8 +89,8 @@ public class RaygunEnvironmentMessage {
 
             StatFs stat = new StatFs(Environment.getDataDirectory().getPath());
 
-            long availableBlocks = (long) stat.getAvailableBlocks();
-            long blockSize = (long) stat.getBlockSize();
+            long availableBlocks = stat.getAvailableBlocks();
+            long blockSize = stat.getBlockSize();
             diskSpaceFree = (availableBlocks * blockSize) / 0x100000;
         } catch (Exception e) {
             RaygunLogger.w("Couldn't get all env data: " + e);
