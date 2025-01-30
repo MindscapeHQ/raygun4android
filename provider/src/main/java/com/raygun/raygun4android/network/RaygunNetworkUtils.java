@@ -6,9 +6,9 @@ import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.provider.Settings;
-import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URLConnection;
+import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
 public class RaygunNetworkUtils {
@@ -57,14 +57,12 @@ public class RaygunNetworkUtils {
                         Settings.Secure.getString(
                                 context.getContentResolver(), Settings.Secure.ANDROID_ID);
 
-                try {
-                    if (!"9774d56d682e549c".equals(androidId)) {
-                        id = UUID.nameUUIDFromBytes(androidId.getBytes("utf8")).toString();
-                    } else {
-                        id = UUID.randomUUID().toString();
-                    }
-                } catch (UnsupportedEncodingException e) {
-                    throw new RuntimeException(e);
+                if (!"9774d56d682e549c".equals(androidId)) {
+                    id =
+                            UUID.nameUUIDFromBytes(androidId.getBytes(StandardCharsets.UTF_8))
+                                    .toString();
+                } else {
+                    id = UUID.randomUUID().toString();
                 }
 
                 prefs.edit().putString(PREFS_DEVICE_ID, id).apply();

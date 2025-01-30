@@ -32,8 +32,8 @@ public class RaygunSettings {
     // 30 minutes in milliseconds
     public static final int RUM_SESSION_EXPIRY = 30 * 60 * 1000;
 
-    private static IgnoredURLs ignoredURLs = new IgnoredURLs("api.raygun.io");
-    private static HashSet<String> ignoredViews = new HashSet<>();
+    private static final IgnoredURLs ignoredURLs = new IgnoredURLs("api.raygun.io");
+    private static final HashSet<String> ignoredViews = new HashSet<>();
     private static int maxReportsStoredOnDevice = DEFAULT_MAX_REPORTS_STORED_ON_DEVICE;
     private static String crashReportingEndpoint = DEFAULT_CRASHREPORTING_ENDPOINT;
     private static String rumEndpoint = DEFAULT_RUM_ENDPOINT;
@@ -60,7 +60,7 @@ public class RaygunSettings {
         return ignoredURLs;
     }
 
-    static HashSet<String> getIgnoredViews() {
+    public static HashSet<String> getIgnoredViews() {
         return ignoredViews;
     }
 

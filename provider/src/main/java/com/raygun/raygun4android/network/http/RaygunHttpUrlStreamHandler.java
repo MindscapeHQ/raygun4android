@@ -13,7 +13,7 @@ import java.net.URLStreamHandler;
 final class RaygunHttpUrlStreamHandler extends URLStreamHandler {
     private static final int PORT = 80;
     private static final String PROTOCOL = "http";
-    private URLStreamHandler originalHandler;
+    private final URLStreamHandler originalHandler;
 
     RaygunHttpUrlStreamHandler(URLStreamHandler handler) {
         originalHandler = handler;
