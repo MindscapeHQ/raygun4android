@@ -44,12 +44,12 @@ class SecondActivity : AppCompatActivity() {
                 null,
                 tw,
             )
-            Snackbar.make(
-                it,
-                getString(R.string.you_have_just_sent_an_error_with_raygun4android),
-                Snackbar.LENGTH_SHORT,
-            )
-                .show()
+            Snackbar
+                .make(
+                    it,
+                    getString(R.string.you_have_just_sent_an_error_with_raygun4android),
+                    Snackbar.LENGTH_SHORT,
+                ).show()
         }
 
         buttonCrash.setOnClickListener {
@@ -78,24 +78,24 @@ class SecondActivity : AppCompatActivity() {
                     "This is here purely so that our alternative value for i gets used and not optimised away " +
                         "in a release build: $i",
                 )
-                Snackbar.make(
-                    it,
-                    getString(R.string.you_just_created_and_caught_an_exception),
-                    Snackbar.LENGTH_SHORT,
-                )
-                    .show()
+                Snackbar
+                    .make(
+                        it,
+                        getString(R.string.you_just_created_and_caught_an_exception),
+                        Snackbar.LENGTH_SHORT,
+                    ).show()
             }
         }
 
         buttonSetUserAnon.setOnClickListener {
             val user = RaygunUserInfo()
             RaygunClient.setUser(user)
-            Snackbar.make(
-                it,
-                getString(R.string.user_is_now_set_to_anonymous_for_future_raygun_reports),
-                Snackbar.LENGTH_SHORT,
-            )
-                .show()
+            Snackbar
+                .make(
+                    it,
+                    getString(R.string.user_is_now_set_to_anonymous_for_future_raygun_reports),
+                    Snackbar.LENGTH_SHORT,
+                ).show()
         }
 
         buttonSetUserA.setOnClickListener {
@@ -105,12 +105,12 @@ class SecondActivity : AppCompatActivity() {
             user.email = "e@f.com.com"
             RaygunClient.setUser(user)
             RaygunClient.recordBreadcrumb("I'm now user A")
-            Snackbar.make(
-                it,
-                getString(R.string.user_is_now_set_to_user_a_for_future_raygun_reports),
-                Snackbar.LENGTH_SHORT,
-            )
-                .show()
+            Snackbar
+                .make(
+                    it,
+                    getString(R.string.user_is_now_set_to_user_a_for_future_raygun_reports),
+                    Snackbar.LENGTH_SHORT,
+                ).show()
         }
 
         buttonSetUserB.setOnClickListener {
@@ -120,12 +120,12 @@ class SecondActivity : AppCompatActivity() {
             user.email = "g@h.com"
             RaygunClient.setUser(user)
             RaygunClient.recordBreadcrumb("I'm now user B")
-            Snackbar.make(
-                it,
-                getString(R.string.user_is_now_set_to_user_b_for_future_raygun_reports),
-                Snackbar.LENGTH_SHORT,
-            )
-                .show()
+            Snackbar
+                .make(
+                    it,
+                    getString(R.string.user_is_now_set_to_user_b_for_future_raygun_reports),
+                    Snackbar.LENGTH_SHORT,
+                ).show()
         }
 
         textViewAppVersion.text =
@@ -160,7 +160,8 @@ class SecondActivity : AppCompatActivity() {
         customData["someotherkey"] = "someothervalue"
 
         val breadcrumbMessage =
-            RaygunBreadcrumbMessage.Builder("I'm here in SecondActivity")
+            RaygunBreadcrumbMessage
+                .Builder("I'm here in SecondActivity")
                 .level(RaygunBreadcrumbLevel.ERROR)
                 .category("Launch")
                 .lineNumber(78)
@@ -170,12 +171,12 @@ class SecondActivity : AppCompatActivity() {
 
         RaygunClient.recordBreadcrumb(breadcrumbMessage)
         val rootView: View = findViewById(android.R.id.content)
-        Snackbar.make(
-            rootView,
-            getString(R.string.we_re_now_on_the_second_activity_screen),
-            Snackbar.LENGTH_SHORT,
-        )
-            .show()
+        Snackbar
+            .make(
+                rootView,
+                getString(R.string.we_re_now_on_the_second_activity_screen),
+                Snackbar.LENGTH_SHORT,
+            ).show()
     }
 
     // Handle action bar item clicks

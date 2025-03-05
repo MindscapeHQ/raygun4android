@@ -14,8 +14,8 @@ import com.raygun.raygun4android.sample.R
  *
  * [Fragment1] is defined in the activity_navigation.xml in a FragmentContainerView.
  *
- * RUM registers the FragmentManager from this Activity automatically,
- * reporting the Fragment lifecycle events as RUM navigation events.
+ * RUM registers the FragmentManager from this Activity automatically, reporting the Fragment
+ * lifecycle events as RUM navigation events.
  */
 class NavigationActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
