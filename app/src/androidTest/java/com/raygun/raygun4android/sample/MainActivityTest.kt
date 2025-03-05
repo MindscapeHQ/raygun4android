@@ -19,11 +19,9 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class MainActivityTest {
-    @get:Rule
-    val activityRule = ActivityScenarioRule(MainActivity::class.java)
+    @get:Rule val activityRule = ActivityScenarioRule(MainActivity::class.java)
 
-    @get:Rule
-    val intentRule = IntentsTestRule(MainActivity::class.java)
+    @get:Rule val intentRule = IntentsTestRule(MainActivity::class.java)
 
     @Test
     fun testPackageContext() {

@@ -44,11 +44,8 @@ class RUMFragmentTest {
         rumFragment.onFragmentDestroyed(mockFragmentManager, fragment)
 
         // onFragmentResumed should have called to sendRUMTimingEvent
-        verify(mockRUM).sendRUMTimingEvent(
-            eq(RaygunRUMEventType.FRAGMENT_LOADED),
-            eq("Fragment"),
-            anyLong(),
-        )
+        verify(mockRUM)
+            .sendRUMTimingEvent(eq(RaygunRUMEventType.FRAGMENT_LOADED), eq("Fragment"), anyLong())
 
         // seen should be called for each "onFragment..."
         verify(mockRUM, times(6)).seen()

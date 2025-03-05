@@ -42,7 +42,8 @@ class MainActivity : AppCompatActivity() {
         val textViewProviderVersion = findViewById<TextView>(R.id.textView_providerVersion)
         val buttonSecondActivity = findViewById<Button>(R.id.button_secondActivity)
         val buttonNavigationActivity = findViewById<Button>(R.id.button_navigationActivity)
-        val buttonFragmentSwapActivity = findViewById<Button>(R.id.button_navigationFragmentSwapActivity)
+        val buttonFragmentSwapActivity =
+            findViewById<Button>(R.id.button_navigationFragmentSwapActivity)
 
         buttonSend.setOnClickListener {
             val tw = HashMap<String, String>()
@@ -58,12 +59,12 @@ class MainActivity : AppCompatActivity() {
             // Manual exception creation & sending via 2 strings
             RaygunClient.send("My custom message", "The reason for the error", null, tw)
 
-            Snackbar.make(
-                it,
-                getString(R.string.you_have_just_sent_an_error_with_raygun4android),
-                Snackbar.LENGTH_SHORT,
-            )
-                .show()
+            Snackbar
+                .make(
+                    it,
+                    getString(R.string.you_have_just_sent_an_error_with_raygun4android),
+                    Snackbar.LENGTH_SHORT,
+                ).show()
         }
 
         buttonCrash.setOnClickListener {
@@ -92,24 +93,24 @@ class MainActivity : AppCompatActivity() {
                     "This is here purely so that our alternative value for i gets used and not optimised away " +
                         "in a release build: $i",
                 )
-                Snackbar.make(
-                    it,
-                    getString(R.string.you_just_created_and_caught_an_exception),
-                    Snackbar.LENGTH_SHORT,
-                )
-                    .show()
+                Snackbar
+                    .make(
+                        it,
+                        getString(R.string.you_just_created_and_caught_an_exception),
+                        Snackbar.LENGTH_SHORT,
+                    ).show()
             }
         }
 
         buttonSetUserAnon.setOnClickListener {
             val user = RaygunUserInfo()
             RaygunClient.setUser(user)
-            Snackbar.make(
-                it,
-                getString(R.string.user_is_now_set_to_anonymous_for_future_raygun_reports),
-                Snackbar.LENGTH_SHORT,
-            )
-                .show()
+            Snackbar
+                .make(
+                    it,
+                    getString(R.string.user_is_now_set_to_anonymous_for_future_raygun_reports),
+                    Snackbar.LENGTH_SHORT,
+                ).show()
         }
 
         buttonSetUserA.setOnClickListener {
@@ -119,12 +120,12 @@ class MainActivity : AppCompatActivity() {
             user.email = "e@f.com.com"
             RaygunClient.setUser(user)
             RaygunClient.recordBreadcrumb("I'm now user A")
-            Snackbar.make(
-                it,
-                getString(R.string.user_is_now_set_to_user_a_for_future_raygun_reports),
-                Snackbar.LENGTH_SHORT,
-            )
-                .show()
+            Snackbar
+                .make(
+                    it,
+                    getString(R.string.user_is_now_set_to_user_a_for_future_raygun_reports),
+                    Snackbar.LENGTH_SHORT,
+                ).show()
         }
 
         buttonSetUserB.setOnClickListener {
@@ -134,12 +135,12 @@ class MainActivity : AppCompatActivity() {
             user.email = "g@h.com"
             RaygunClient.setUser(user)
             RaygunClient.recordBreadcrumb("I'm now user B")
-            Snackbar.make(
-                it,
-                getString(R.string.user_is_now_set_to_user_b_for_future_raygun_reports),
-                Snackbar.LENGTH_SHORT,
-            )
-                .show()
+            Snackbar
+                .make(
+                    it,
+                    getString(R.string.user_is_now_set_to_user_b_for_future_raygun_reports),
+                    Snackbar.LENGTH_SHORT,
+                ).show()
         }
 
         buttonSecondActivity.setOnClickListener {
@@ -175,17 +176,15 @@ class MainActivity : AppCompatActivity() {
     }
 
     private val startSecondActivity =
-        registerForActivityResult(
-            ActivityResultContracts.StartActivityForResult(),
-        ) { result ->
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == RESULT_OK) {
                 val rootView: View = findViewById(android.R.id.content)
-                Snackbar.make(
-                    rootView,
-                    getString(R.string.we_returned_to_first_activity),
-                    Snackbar.LENGTH_SHORT,
-                )
-                    .show()
+                Snackbar
+                    .make(
+                        rootView,
+                        getString(R.string.we_returned_to_first_activity),
+                        Snackbar.LENGTH_SHORT,
+                    ).show()
             }
         }
 }

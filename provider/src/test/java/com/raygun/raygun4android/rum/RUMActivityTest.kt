@@ -44,11 +44,12 @@ class RUMActivityTest {
         rumActivity.onActivityDestroyed(mockActivity)
 
         // onActivityResumed should have called to sendRUMTimingEvent
-        verify(mockRUM).sendRUMTimingEvent(
-            eq(RaygunRUMEventType.ACTIVITY_LOADED),
-            eq("AppCompatActivity"),
-            anyLong(),
-        )
+        verify(mockRUM)
+            .sendRUMTimingEvent(
+                eq(RaygunRUMEventType.ACTIVITY_LOADED),
+                eq("AppCompatActivity"),
+                anyLong(),
+            )
 
         // seen should be called for each "onActivity..."
         verify(mockRUM, times(6)).seen()
