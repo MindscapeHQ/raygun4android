@@ -7,9 +7,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.raygun.raygun4android.sample.R
 
-/**
- * A simple empty [Fragment].
- */
+/** A simple empty [Fragment]. */
 class Fragment1 : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater,
