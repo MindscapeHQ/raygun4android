@@ -1,9 +1,62 @@
 ## Changelog
 
+### v4.1.0
+
+- feat: RUM support for Fragments (#131) (2025-01-17)
+- feat: Migrating from IntentService to WorkManager (#133) (2025-01-16)
+- feat: new public method to allow sending simple strings (#122) (2024-10-14)
+- Quick fix for #94. (2024-09-06)
+- chore(deps): bump com.android.tools.build:gradle from 8.7.3 to 8.8.2 (#146) (2025-03-05)
+- chore(deps): bump org.jetbrains.kotlin.android from 1.8.22 to 2.1.10 (#144) (2025-03-05)
+- chore(deps): bump com.diffplug.spotless from 6.25.0 to 7.0.2 (#143) (2025-03-05)
+- chore(deps): bump androidx.activity:activity from 1.10.0 to 1.10.1 (#145) (2025-03-02)
+- chore(deps): bump androidx.constraintlayout:constraintlayout (#142) (2025-03-02)
+- chore(deps): bump androidx.work:work-runtime from 2.9.1 to 2.10.0 (#138) (2025-02-02)
+- chore(deps): bump androidx.activity:activity from 1.8.0 to 1.10.0 (#139) (2025-02-02)
+- chore(deps): bump com.google.code.gson:gson from 2.11.0 to 2.12.1 (#141) (2025-02-02)
+- chore(deps): bump org.jetbrains.kotlin:kotlin-gradle-plugin (#137) (2025-02-02)
+- chore(deps): bump mockito from 3.11.2 to 5.2.0 (#126) (2025-01-31)
+- chore(deps): bump org.jetbrains.kotlin:kotlin-gradle-plugin (#128) (2025-01-31)
+- chore: Code formatting in provider sourcecode (#130) (2024-12-12)
+- chore: Project upgrades to run on Android Studio 2024.2.1 Patch 3 (#129) (2024-12-12)
+- chore(deps): bump androidx.constraintlayout:constraintlayout (#124) (2024-12-12)
+- chore(deps): bump androidx.core:core from 1.13.1 to 1.15.0 (#123) (2024-12-12)
+- OKHttp to 4.12.0 (#121) (2024-10-14)
+- chore: Collection of dependabot changes (#120) (2024-10-10)
+- chore: Testing infrastructure (#119) (2024-10-10)
+- chore(deps): bump androidx.test.espresso:espresso-core (#108) (2024-09-06)
+- chore(deps): bump androidx.appcompat:appcompat from 1.6.1 to 1.7.0 (#111) (2024-09-06)
+- chore(deps): bumps Spotless to 6.25.0 and associated fixes. (2024-09-06)
+- chore(deps): bump com.squareup.leakcanary:leakcanary-android (#110) (2024-09-05)
+- chore(deps): bump com.google.code.gson:gson from 2.8.9 to 2.11.0 (#112) (2024-09-05)
+- Ran spotless checks from root for the first time and it found more to correct. (2024-09-05)
+- Changed build management for resources after investigating the new Gradle settings. (2024-09-05)
+- Merge pull request #107 from MindscapeHQ/feature/#102-dependencies (2024-09-05)
+- Formatting result (2024-09-03)
+- Tweaking formatting rules (2024-09-03)
+- Dependabot integration using the Gradle version library setup. (2024-09-03)
+- Merge pull request #106 from MindscapeHQ/feature/#100-templates (2024-09-03)
+- Transition to using a Gradle library version management file and re-wiring, so that we can use dependabot and generate BOMs etc. (2024-09-02)
+- Merge pull request #105 from MindscapeHQ/feature/#103-linting-formatting (2024-09-02)
+- Added issue and PR templates. (2024-08-31)
+- Spotless run to cleanup and normalize formatting. (2024-08-31)
+- Added Spotless for code project-wide code-formatting. (2024-08-31)
+- Merge pull request #99 from MindscapeHQ/feature/#98-feedbackonbuttons (2024-08-31)
+- Added some screenshots of the sample app and mentioned in documentation. (2024-08-30)
+- Changing the way 2nd activity is called so that a snackbar can be shown on return properly. (2024-08-30)
+- Enabling multi-dexing for the sample app. (2024-08-30)
+- Added some UI Snackbars as action indicators. (2024-02-21)
+- Added material to sample app for Snackbar component (2024-02-21)
+- Fixed wrong tool context (2024-02-21)
+- ci: Add connected test to GH CI (#136) (2025-01-31)
+- ci: #90 add CI workflow (#132) (2025-01-14)
+
+---
+
 - v4.1.0-alpha2:
-- Gradle 8, AGP 8.1.1
-- Fix: Sample app displayed wrong provider version
-- Internal: Introduced gitflow process
+  - Gradle 8, AGP 8.1.1
+  - Fix: Sample app displayed wrong provider version
+  - Internal: Introduced gitflow process
 
 - v4.1.0-alpha1:
  - Upgrade repo and all dependencies to SDK 34, Android X (#83) and others.
