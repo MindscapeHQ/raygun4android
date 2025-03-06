@@ -14,7 +14,13 @@
  * limitations under the License.
  */
 
-apply plugin: 'maven'
+/*
+ * Originally based on https://github.com/chrisbanes/gradle-mvn-push/blob/master/gradle-mvn-push.gradle
+ * Modified by Raygun to use the `maven-publish` plugin
+ * instead of the `maven` plugin, which has been deprecated.
+ */
+
+apply plugin: 'maven-publish'
 apply plugin: 'signing'
 
 def isReleaseBuild() {
@@ -40,69 +46,73 @@ def getRepositoryPassword() {
 }
 
 afterEvaluate { project ->
-    uploadArchives {
-        repositories {
-            mavenDeployer {
-                beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+    publishing {
+        publications {
+            mavenJava(MavenPublication) {
+                groupId = GROUP
+                artifactId = POM_ARTIFACT_ID
+                version = VERSION_NAME
 
-                pom.groupId = GROUP
-                pom.artifactId = POM_ARTIFACT_ID
-                pom.version = VERSION_NAME
-
-                repository(url: getReleaseRepositoryUrl()) {
-                    authentication(userName: getRepositoryUsername(), password: getRepositoryPassword())
-                }
-                snapshotRepository(url: getSnapshotRepositoryUrl()) {
-                    authentication(userName: getRepositoryUsername(), password: getRepositoryPassword())
-                }
-
-                pom.project {
-                    name POM_NAME
-                    packaging POM_PACKAGING
-                    description POM_DESCRIPTION
-                    url POM_URL
+                pom {
+                    name = POM_NAME
+                    packaging = POM_PACKAGING
+                    description = POM_DESCRIPTION
+                    url = POM_URL
 
                     scm {
-                        url POM_SCM_URL
-                        connection POM_SCM_CONNECTION
-                        developerConnection POM_SCM_DEV_CONNECTION
+                        url = POM_SCM_URL
+                        connection = POM_SCM_CONNECTION
+                        developerConnection = POM_SCM_DEV_CONNECTION
                     }
 
                     licenses {
                         license {
-                            name POM_LICENCE_NAME
-                            url POM_LICENCE_URL
-                            distribution POM_LICENCE_DIST
+                            name = POM_LICENCE_NAME
+                            url = POM_LICENCE_URL
+                            distribution = POM_LICENCE_DIST
                         }
                     }
 
                     developers {
                         developer {
-                            id POM_DEVELOPER_1_ID
-                            name POM_DEVELOPER_1_NAME
+                            id = POM_DEVELOPER_1_ID
+                            name = POM_DEVELOPER_1_NAME
                         }
                         developer {
-                            id POM_DEVELOPER_2_ID
-                            name POM_DEVELOPER_2_NAME
+                            id = POM_DEVELOPER_2_ID
+                            name = POM_DEVELOPER_2_NAME
                         }
                     }
+                }
+            }
+        }
+        repositories {
+            maven {
+                if (isReleaseBuild()) {
+                    url getReleaseRepositoryUrl()
+                } else {
+                    url getSnapshotRepositoryUrl()
+                }
+                credentials {
+                    username getRepositoryUsername()
+                    password getRepositoryPassword()
                 }
             }
         }
     }
 
     signing {
-        required { isReleaseBuild() && gradle.taskGraph.hasTask("uploadArchives") }
-        sign configurations.archives
+        required { isReleaseBuild() }
+        sign publishing.publications.mavenJava
     }
 
     task androidJavadocsJar(type: Jar, dependsOn: androidJavadocs) {
-        classifier = 'javadoc'
+        archiveClassifier = 'javadoc'
         from androidJavadocs.destinationDir
     }
 
     task androidSourcesJar(type: Jar) {
-        classifier = 'sources'
+        archiveClassifier = 'sources'
         from android.sourceSets.main.java.sourceFiles
     }
 
