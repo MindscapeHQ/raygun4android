@@ -2,7 +2,9 @@
 
 Official development or production releases of Raygun4Android are usually done by the Raygun team. This file documents the setup needed to do snapshot and production releases.
 
-The release process uses a modified version of Chris Banes' library for pushing to Maven with Gradle: https://github.com/chrisbanes/gradle-mvn-push. Please check out Chris' documentation before reading further.
+The release process is implemented in the Gradle file `provider/gradle-mv-push.gradle` which uses the `maven-publish` plugin.
+
+Plugin documentation can be found here: https://docs.gradle.org/current/userguide/publishing_maven.html
 
 ## Preparation
 
@@ -110,7 +112,7 @@ Here you can manually upload artifacts.
 1. Build the provider for release and upload it to Nexus by running the following command in the terminal:
 
     ````
-    ./gradlew clean :provider:build :provider:uploadArchives
+    ./gradlew clean :provider:build :provider:publish
     ````
 
 2. Login to the [Nexus Repository Manager](https://oss.sonatype.org) and go to the **Staging Repositories**.

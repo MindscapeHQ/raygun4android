@@ -14,6 +14,12 @@
  * limitations under the License.
  */
 
+/*
+ * Originally based on https://github.com/chrisbanes/gradle-mvn-push/blob/master/gradle-mvn-push.gradle
+ * Modified by Raygun to use the `maven-publish` plugin
+ * instead of the `maven` plugin, which has been deprecated.
+ */
+
 apply plugin: 'maven-publish'
 apply plugin: 'signing'
 
