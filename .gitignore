@@ -52,3 +52,6 @@ obj/
 releasing/secring.gpg
 *.jks
 
+# Signing key
+secring.gpg
+
