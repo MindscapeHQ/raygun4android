@@ -84,6 +84,10 @@ afterEvaluate { project ->
                         }
                     }
                 }
+
+                afterEvaluate {
+                    from components.release
+                }
             }
         }
         repositories {
