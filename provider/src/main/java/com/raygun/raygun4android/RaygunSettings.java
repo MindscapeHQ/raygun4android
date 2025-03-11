@@ -2,11 +2,8 @@ package com.raygun.raygun4android;
 
 import com.raygun.raygun4android.logging.RaygunLogger;
 import com.raygun.raygun4android.network.RaygunOkHttpClientBuilder;
-
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.concurrent.TimeUnit;
-
 import okhttp3.OkHttpClient;
 
 public class RaygunSettings {
@@ -45,8 +42,7 @@ public class RaygunSettings {
 
     protected static OkHttpClientBuilder okHttpClientBuilder;
 
-    private RaygunSettings() {
-    }
+    private RaygunSettings() {}
 
     public static String getCrashReportingEndpoint() {
         return crashReportingEndpoint;
@@ -81,10 +77,10 @@ public class RaygunSettings {
             RaygunSettings.maxReportsStoredOnDevice = maxReportsStoredOnDevice;
         } else {
             RaygunLogger.w(
-                "It's not possible to exceed the value "
-                    + DEFAULT_MAX_REPORTS_STORED_ON_DEVICE
-                    + " for the number of reports stored on the device. The setting has not"
-                    + " been applied.");
+                    "It's not possible to exceed the value "
+                            + DEFAULT_MAX_REPORTS_STORED_ON_DEVICE
+                            + " for the number of reports stored on the device. The setting has not"
+                            + " been applied.");
         }
     }
 

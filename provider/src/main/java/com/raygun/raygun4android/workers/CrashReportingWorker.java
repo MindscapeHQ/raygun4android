@@ -5,8 +5,6 @@ import android.content.Context;
 import androidx.annotation.NonNull;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
-
-import com.raygun.raygun4android.OkHttpClientBuilder;
 import com.raygun.raygun4android.RaygunSettings;
 import com.raygun.raygun4android.SerializedMessage;
 import com.raygun.raygun4android.logging.RaygunLogger;
