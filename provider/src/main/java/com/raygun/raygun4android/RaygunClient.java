@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import androidx.annotation.Nullable;
 import com.raygun.raygun4android.logging.RaygunLogger;
 import com.raygun.raygun4android.logging.TimberRaygunLoggerImplementation;
 import com.raygun.raygun4android.messages.crashreporting.RaygunBreadcrumbMessage;
@@ -15,6 +16,8 @@ import com.raygun.raygun4android.utils.RaygunFileUtils;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.X509TrustManager;
 
 /**
  * The official Raygun provider for Android. This is the main class that provides functionality for
@@ -34,6 +37,11 @@ public class RaygunClient {
 
     private static boolean crashReportingEnabled = false;
     private static boolean RUMEnabled = false;
+
+    private static String sslFactory;
+
+    @Nullable private static SSLSocketFactory sslSocketFactory;
+    @Nullable private static X509TrustManager x509TrustManager;
 
     /**
      * Initializes the Raygun client. This expects that you have placed the API key in your
@@ -472,7 +480,7 @@ public class RaygunClient {
      * Returns the current Application's context.
      *
      * @return The current application context.
-     * @throws java.lang.IllegalStateException if init() has not been called.
+     * @throws IllegalStateException if init() has not been called.
      */
     public static Context getApplicationContext() {
         if (RaygunClient.application != null) {
@@ -483,5 +491,22 @@ public class RaygunClient {
         }
 
         throw new IllegalStateException("init() must be called first.");
+    }
+
+    /** Configurable SSLSocketFactory and X509TrustManager for OkHttpClient. */
+    public static void configureOkHttpClientSSL(
+            SSLSocketFactory sslSocketFactory, X509TrustManager x509TrustManager) {
+        RaygunClient.sslSocketFactory = sslSocketFactory;
+        RaygunClient.x509TrustManager = x509TrustManager;
+    }
+
+    @Nullable
+    public static SSLSocketFactory getSslSocketFactory() {
+        return sslSocketFactory;
+    }
+
+    @Nullable
+    public static X509TrustManager getX509TrustManager() {
+        return x509TrustManager;
     }
 }

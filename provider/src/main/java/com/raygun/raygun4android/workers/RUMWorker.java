@@ -8,7 +8,6 @@ import com.raygun.raygun4android.RaygunSettings;
 import com.raygun.raygun4android.logging.RaygunLogger;
 import com.raygun.raygun4android.network.RaygunNetworkUtils;
 import java.io.IOException;
-import java.util.concurrent.TimeUnit;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -59,12 +58,7 @@ public class RUMWorker extends Worker {
                 String endpoint = RaygunSettings.getRUMEndpoint();
                 MediaType MEDIA_TYPE_JSON = MediaType.parse("application/json; charset=utf-8");
 
-                OkHttpClient client =
-                        new OkHttpClient.Builder()
-                                .connectTimeout(NETWORK_TIMEOUT, TimeUnit.SECONDS)
-                                .writeTimeout(NETWORK_TIMEOUT, TimeUnit.SECONDS)
-                                .readTimeout(NETWORK_TIMEOUT, TimeUnit.SECONDS)
-                                .build();
+                OkHttpClient client = OkHttpClientBuilder.build();
 
                 RequestBody body = RequestBody.create(MEDIA_TYPE_JSON, jsonPayload);
 
