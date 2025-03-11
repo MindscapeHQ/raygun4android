@@ -20,7 +20,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -117,12 +116,7 @@ public class CrashReportingWorker extends Worker {
                 String endpoint = RaygunSettings.getCrashReportingEndpoint();
                 MediaType MEDIA_TYPE_JSON = MediaType.parse("application/json; charset=utf-8");
 
-                OkHttpClient client =
-                        new OkHttpClient.Builder()
-                                .connectTimeout(NETWORK_TIMEOUT, TimeUnit.SECONDS)
-                                .writeTimeout(NETWORK_TIMEOUT, TimeUnit.SECONDS)
-                                .readTimeout(NETWORK_TIMEOUT, TimeUnit.SECONDS)
-                                .build();
+                OkHttpClient client = RaygunSettings.getHttpClient();
 
                 RequestBody body = RequestBody.create(MEDIA_TYPE_JSON, jsonPayload);
 

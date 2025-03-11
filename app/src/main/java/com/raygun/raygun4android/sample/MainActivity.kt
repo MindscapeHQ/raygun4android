@@ -22,6 +22,12 @@ class MainActivity : AppCompatActivity() {
         val initialCustomData = HashMap<String, String>()
         initialCustomData["firstkey"] = "firstvalue"
 
+        // Provide a custom OkHttpClient
+        //        RaygunClient.setOkHttpClientBuilder {
+        //            Log.d("MainActivity", "Using custom http client");
+        //            OkHttpClient().newBuilder().build();
+        //        }
+
         // This sets up the client with the API key as provided in your AndroidManifest.xml
         RaygunClient.init(applicationContext as Application)
         RaygunClient.enableCrashReporting()

@@ -472,7 +472,7 @@ public class RaygunClient {
      * Returns the current Application's context.
      *
      * @return The current application context.
-     * @throws java.lang.IllegalStateException if init() has not been called.
+     * @throws IllegalStateException if init() has not been called.
      */
     public static Context getApplicationContext() {
         if (RaygunClient.application != null) {
@@ -483,5 +483,13 @@ public class RaygunClient {
         }
 
         throw new IllegalStateException("init() must be called first.");
+    }
+
+    /**
+     * Customizable OkHttpClient builder e.g. provide custom SSL Context. Setting to null uses
+     * default internal builder.
+     */
+    public static void setOkHttpClientBuilder(OkHttpClientBuilder okHttpClientBuilder) {
+        RaygunSettings.okHttpClientBuilder = okHttpClientBuilder;
     }
 }
