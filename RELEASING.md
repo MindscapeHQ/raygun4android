@@ -111,9 +111,9 @@ Here you can manually upload artifacts.
 ## Steps for releasing the provider
 1. Build the provider for release and upload it to Nexus by running the following command in the terminal:
 
-    ````
-    ./gradlew clean :provider:build :provider:publish
-    ````
+```
+./gradlew clean :provider:build :provider:publish
+```
 
 2. Login to the [Nexus Repository Manager](https://oss.sonatype.org) and go to the **Staging Repositories**.
 3. Locate the repository named 'comraygun-100*' near the bottom.
@@ -124,3 +124,40 @@ Here you can manually upload artifacts.
 8. Artifacts are sent to the Release repository defined in the staging profile.
 9. The temp staging repository will be automatically deleted.
 10. Artifacts will take a few days to be made available to clients and should be listed in the [public repositories](https://oss.sonatype.org/content/repositories/public/com/raygun/raygun4android/) first and on [mvnrepository.com](https://mvnrepository.com/artifact/com.raygun/raygun4android) eventually.
+
+## Maven local testing
+
+To release the provider to Maven local (i.e. your local maven repository),
+build the provider for release and publish it locally by running
+the following command in the terminal (notice the command name)
+
+```
+./gradlew clean :provider:build :provider:publishToMavenLocal
+```
+
+Then verify that the package exists in your Maven local folder, e.g. `/home/<user>/.m2/`.
+
+You can now test the local package distribution locally by changing the following:
+
+1. Add `mavenLocal()` to the top `build.gradle`:
+
+```groovy
+allprojects {
+    repositories {
+        google()
+        mavenLocal()
+        mavenCentral()
+        jcenter()
+    }
+}
+```
+
+2. Change the Raygun dependency on `app/build.gradle`, where `x.y.z` is the newly build version.
+
+```groovy
+dependencies {
+    // ...
+    implementation 'com.raygun:raygun4android:x.y.z'
+    // ...
+}
+```
