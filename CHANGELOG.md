@@ -1,6 +1,6 @@
 ## Changelog
 
-### v4.1.0
+### v4.1.1
 
 - feat: RUM support for Fragments (#131) (2025-01-17)
 - feat: Migrating from IntentService to WorkManager (#133) (2025-01-16)
@@ -50,6 +50,14 @@
 - Fixed wrong tool context (2024-02-21)
 - ci: Add connected test to GH CI (#136) (2025-01-31)
 - ci: #90 add CI workflow (#132) (2025-01-14)
+
+### v4.1.0
+
+The content of v4.1.0 is identical to v4.1.1.
+
+Unfortunately we made a mistake when releasing v4.1.0 to Maven Central and it got published in an incomplete state.
+
+Please use v4.1.1 instead.
 
 ### v4.1.0-alpha2
 
