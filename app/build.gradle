@@ -143,6 +143,7 @@ dependencies {
     implementation(libs.android.material.material)
     implementation(libs.androidx.multidex.multidex)
     implementation(libs.androidx.activity)
+    implementation(libs.okhttp)
 
     testImplementation(libs.junit)
     testImplementation(libs.mockito.core)

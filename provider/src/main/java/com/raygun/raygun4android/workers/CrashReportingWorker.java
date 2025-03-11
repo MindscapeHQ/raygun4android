@@ -5,6 +5,8 @@ import android.content.Context;
 import androidx.annotation.NonNull;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
+
+import com.raygun.raygun4android.OkHttpClientBuilder;
 import com.raygun.raygun4android.RaygunSettings;
 import com.raygun.raygun4android.SerializedMessage;
 import com.raygun.raygun4android.logging.RaygunLogger;
@@ -116,7 +118,7 @@ public class CrashReportingWorker extends Worker {
                 String endpoint = RaygunSettings.getCrashReportingEndpoint();
                 MediaType MEDIA_TYPE_JSON = MediaType.parse("application/json; charset=utf-8");
 
-                OkHttpClient client = OkHttpClientBuilder.build();
+                OkHttpClient client = RaygunSettings.getHttpClient();
 
                 RequestBody body = RequestBody.create(MEDIA_TYPE_JSON, jsonPayload);
 

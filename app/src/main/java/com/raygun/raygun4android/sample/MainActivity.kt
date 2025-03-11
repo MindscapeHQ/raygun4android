@@ -13,6 +13,8 @@ import com.raygun.raygun4android.RaygunClient
 import com.raygun.raygun4android.messages.shared.RaygunUserInfo
 import com.raygun.raygun4android.sample.fragments.NavigationActivity
 import com.raygun.raygun4android.sample.fragments.NavigationFragmentSwapActivity
+import okhttp3.OkHttpClient
+import java.util.concurrent.TimeUnit
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -21,6 +23,13 @@ class MainActivity : AppCompatActivity() {
 
         val initialCustomData = HashMap<String, String>()
         initialCustomData["firstkey"] = "firstvalue"
+
+
+        // Provide a custom OkHttpClient
+//        RaygunClient.setOkHttpClientBuilder {
+//            Log.d("MainActivity", "Using custom http client");
+//            OkHttpClient().newBuilder().build();
+//        }
 
         // This sets up the client with the API key as provided in your AndroidManifest.xml
         RaygunClient.init(applicationContext as Application)
