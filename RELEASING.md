@@ -128,7 +128,7 @@ Here you can manually upload artifacts.
 ## Maven local testing
 
 To release the provider to Maven local (i.e. your local maven repository),
-build the provider for release and upload it to Nexus by running
+build the provider for release and publish it locally by running
 the following command in the terminal (notice the command name)
 
 ```
