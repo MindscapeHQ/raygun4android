@@ -8,9 +8,7 @@ If you need to support Android 4.1+, please use Raygun4Android 4.0.1.
 
 ## IMPORTANT
 
-### 10 November 2023
-
-Raygun4Android 4.0.1 is currently considered to be the stable release of the provider and is tagged in the repository and supports Android 4.1+ (API 16+)
+Raygun4Android 4.1.1 is currently considered to be the stable release of the provider and is tagged in the repository and supports Android 5+.
 
 The `develop` branch reflects ongoing work on the 4.1/5 line as tagged snapshots and only support
 
@@ -18,7 +16,7 @@ The `master` branch used to be the branch for ongoing work and releases until `4
 
 Raygun4Android is currently actively being worked on towards a release of version 5 in the near future.
 
-If you want the *very old* stable version 3.0.6 please check out the change set labelled with v3.0.6 and go from there.
+If you want the *very old* stable version 3.0.6 please check out the change set labelled with `v3.0.6` and go from there.
 
 ## Requirements
 
