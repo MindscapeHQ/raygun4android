@@ -11,6 +11,7 @@ import com.raygun.raygun4android.logging.RaygunLogger;
 import com.raygun.raygun4android.network.RaygunNetworkUtils;
 import com.raygun.raygun4android.utils.RaygunFileFilter;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -39,9 +40,12 @@ public class CrashReportingWorker extends Worker {
     public Result doWork() {
         // Retrieve data from WorkManager
         String message = getInputData().getString("msg");
+        String file = getInputData().getString("file");
         String apiKey = getInputData().getString("apikey");
 
-        RaygunLogger.v(message);
+        if (message == null && file != null) {
+            message = readMessageFromTempFileAndDelete(file);
+        }
 
         if (message != null && apiKey != null) {
             if (RaygunNetworkUtils.hasInternetConnection(getApplicationContext())) {
@@ -151,5 +155,25 @@ public class CrashReportingWorker extends Worker {
             e.printStackTrace();
         }
         return -1;
+    }
+
+    private String readMessageFromTempFileAndDelete(String fileName) {
+        File file = new File(getApplicationContext().getFilesDir(), fileName);
+        StringBuilder message = new StringBuilder();
+
+        try (FileInputStream fis = new FileInputStream(file)) {
+            int ch;
+            while ((ch = fis.read()) != -1) {
+                message.append((char) ch);
+            }
+
+            if (!file.delete()) {
+                RaygunLogger.e("Failed to delete the file: " + fileName);
+            }
+        } catch (IOException e) {
+            RaygunLogger.e("Failed to read message from file: " + e.getMessage());
+        }
+
+        return message.toString();
     }
 }
