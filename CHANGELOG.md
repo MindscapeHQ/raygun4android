@@ -1,5 +1,13 @@
 ## Changelog
 
+### 4.2.0
+
+- feat(provider): #70 custom OkHttpClient (#150) (2025-03-11)
+- fix(provider): Support message payloads larger than 10KB (#151) (2025-03-18)
+- fix(provider): missing archives and bump version to 4.1.1 (#149) (2025-03-11)
+- docs: Update README.md (2025-03-12)
+- docs: Update CHANGELOG.md (2025-03-11)
+
 ### v4.1.1
 
 - feat: RUM support for Fragments (#131) (2025-01-17)
