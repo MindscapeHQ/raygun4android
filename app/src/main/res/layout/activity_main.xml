@@ -122,4 +122,13 @@
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/button_navigationActivity" />
 
+    <Button
+        android:id="@+id/button_send_large"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Send large error payload"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/button_navigationFragmentSwapActivity" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

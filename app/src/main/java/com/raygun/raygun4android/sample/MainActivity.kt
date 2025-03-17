@@ -13,6 +13,8 @@ import com.raygun.raygun4android.RaygunClient
 import com.raygun.raygun4android.messages.shared.RaygunUserInfo
 import com.raygun.raygun4android.sample.fragments.NavigationActivity
 import com.raygun.raygun4android.sample.fragments.NavigationFragmentSwapActivity
+import java.nio.file.Files.size
+import java.util.Arrays
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -50,6 +52,7 @@ class MainActivity : AppCompatActivity() {
         val buttonNavigationActivity = findViewById<Button>(R.id.button_navigationActivity)
         val buttonFragmentSwapActivity =
             findViewById<Button>(R.id.button_navigationFragmentSwapActivity)
+        val buttonSendLargePayload = findViewById<Button>(R.id.button_send_large)
 
         buttonSend.setOnClickListener {
             val tw = HashMap<String, String>()
@@ -64,6 +67,26 @@ class MainActivity : AppCompatActivity() {
 
             // Manual exception creation & sending via 2 strings
             RaygunClient.send("My custom message", "The reason for the error", null, tw)
+
+            Snackbar
+                .make(
+                    it,
+                    getString(R.string.you_have_just_sent_an_error_with_raygun4android),
+                    Snackbar.LENGTH_SHORT,
+                ).show()
+        }
+
+        // Test 10KB limit on Workmanager.
+        // Raygun API accepts up to 128 KB.
+        buttonSendLargePayload.setOnClickListener {
+            // Generate a large String to attach as message
+            val size = 100_000 // 100 KB
+            val chars = CharArray(size)
+            Arrays.fill(chars, 'a')
+            val message = String(chars)
+
+            // Send payload
+            RaygunClient.send("large crash", message, null, null)
 
             Snackbar
                 .make(
