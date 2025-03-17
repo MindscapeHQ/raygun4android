@@ -16,7 +16,6 @@ import com.raygun.raygun4android.sample.fragments.NavigationFragmentSwapActivity
 import java.nio.file.Files.size
 import java.util.Arrays
 
-
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
