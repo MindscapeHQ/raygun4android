@@ -16,6 +16,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -39,12 +40,15 @@ public class CrashReportingWorker extends Worker {
     @Override
     public Result doWork() {
         // Retrieve data from WorkManager
-        String message = getInputData().getString("msg");
+        byte[] encoded = getInputData().getByteArray("msg");
         String file = getInputData().getString("file");
         String apiKey = getInputData().getString("apikey");
 
-        if (message == null && file != null) {
+        String message = null;
+        if (encoded == null && file != null) {
             message = readMessageFromTempFileAndDelete(file);
+        } else if (encoded != null) {
+            message = new String(encoded, StandardCharsets.UTF_8);
         }
 
         if (message != null && apiKey != null) {
