@@ -22,7 +22,10 @@ public class CrashReportingWorkerHelper {
     public static void enqueueCrashReport(Context context, String message, String apiKey) {
         Data inputData;
         byte[] encoded = message.getBytes(StandardCharsets.UTF_8);
-        if (encoded.length > MAX_DATA_SIZE) {
+        int length = encoded.length;
+        RaygunLogger.v("Message length: " + length);
+        if (length > MAX_DATA_SIZE) {
+            RaygunLogger.d("Message length (" + length + ") greater than " + MAX_DATA_SIZE + ", storing as file.");
             // Store the message in a file to circumvent the WorkManager's 10240 bytes limit
             String fileName = storeMessageInTempFile(context, encoded);
             RaygunLogger.i("Stored temp file: " + fileName);
