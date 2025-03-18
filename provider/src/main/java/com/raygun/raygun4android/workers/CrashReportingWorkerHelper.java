@@ -2,14 +2,11 @@ package com.raygun.raygun4android.workers;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-
 import androidx.work.Data;
 import androidx.work.OneTimeWorkRequest;
 import androidx.work.WorkManager;
-
 import com.raygun.raygun4android.RaygunSettings;
 import com.raygun.raygun4android.logging.RaygunLogger;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -30,22 +27,22 @@ public class CrashReportingWorkerHelper {
             String fileName = storeMessageInTempFile(context, encoded);
             RaygunLogger.i("Stored temp file: " + fileName);
             inputData =
-                new Data.Builder()
-                    .putString("file", fileName)
-                    .putString("apikey", apiKey)
-                    .build();
+                    new Data.Builder()
+                            .putString("file", fileName)
+                            .putString("apikey", apiKey)
+                            .build();
         } else {
             inputData =
-                new Data.Builder()
-                    .putByteArray("msg", encoded)
-                    .putString("apikey", apiKey)
-                    .build();
+                    new Data.Builder()
+                            .putByteArray("msg", encoded)
+                            .putString("apikey", apiKey)
+                            .build();
         }
 
         OneTimeWorkRequest workRequest =
-            new OneTimeWorkRequest.Builder(CrashReportingWorker.class)
-                .setInputData(inputData)
-                .build();
+                new OneTimeWorkRequest.Builder(CrashReportingWorker.class)
+                        .setInputData(inputData)
+                        .build();
 
         WorkManager.getInstance(context).enqueue(workRequest);
 
@@ -55,13 +52,13 @@ public class CrashReportingWorkerHelper {
     private static String storeMessageInTempFile(Context context, byte[] message) {
         @SuppressLint("SimpleDateFormat")
         String timestamp =
-            new SimpleDateFormat("yyyyMMddHHmmss").format(new Date(System.currentTimeMillis()));
+                new SimpleDateFormat("yyyyMMddHHmmss").format(new Date(System.currentTimeMillis()));
         String uuid = UUID.randomUUID().toString().replace("-", "");
 
         File file =
-            new File(
-                context.getFilesDir(),
-                timestamp + "-" + uuid + "." + RaygunSettings.DEFAULT_FILE_EXTENSION);
+                new File(
+                        context.getFilesDir(),
+                        timestamp + "-" + uuid + "." + RaygunSettings.DEFAULT_FILE_EXTENSION);
 
         try (FileOutputStream fos = new FileOutputStream(file)) {
             fos.write(message);
