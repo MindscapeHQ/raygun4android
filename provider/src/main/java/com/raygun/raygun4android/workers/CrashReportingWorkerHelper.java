@@ -25,7 +25,12 @@ public class CrashReportingWorkerHelper {
         int length = encoded.length;
         RaygunLogger.v("Message length: " + length);
         if (length > MAX_DATA_SIZE) {
-            RaygunLogger.d("Message length (" + length + ") greater than " + MAX_DATA_SIZE + ", storing as file.");
+            RaygunLogger.d(
+                    "Message length ("
+                            + length
+                            + ") greater than "
+                            + MAX_DATA_SIZE
+                            + ", storing as file.");
             // Store the message in a file to circumvent the WorkManager's 10240 bytes limit
             String fileName = storeMessageInTempFile(context, encoded);
             RaygunLogger.i("Stored temp file: " + fileName);
