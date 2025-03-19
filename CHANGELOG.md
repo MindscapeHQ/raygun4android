@@ -1,5 +1,10 @@
 ## Changelog
 
+### 4.2.1
+
+- perf(provider): encode message as bytearray check max size (#154) (2025-03-18)
+- fix(app): move buttons up to fix smaller screens (#153) (2025-03-18)
+
 ### 4.2.0
 
 - feat(provider): #70 custom OkHttpClient (#150) (2025-03-11)
