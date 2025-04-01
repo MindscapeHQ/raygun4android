@@ -23,7 +23,7 @@ gradle = "8.1.1"
 raygun = "4.1.1"
 spotless = "7.0.2"
 activity = "1.10.1"
-kotlin-version = "2.1.10"
+kotlin-version = "2.1.20"
 
 [libraries]
 android-material-material = { module = "com.google.android.material:material", version.ref = "android-material" }
