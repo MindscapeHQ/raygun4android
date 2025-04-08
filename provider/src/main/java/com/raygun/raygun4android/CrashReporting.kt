@@ -20,8 +20,7 @@ import java.io.IOException
 import java.io.ObjectInputStream
 
 object CrashReporting {
-    var exceptionHandler: RaygunUncaughtExceptionHandler? = null
-        private set
+    private var exceptionHandler: RaygunUncaughtExceptionHandler? = null
     private var onBeforeSend: CrashReportingOnBeforeSend? = null
 
     @JvmField
@@ -60,7 +59,7 @@ object CrashReporting {
             val trace = Thread.currentThread().stackTrace
             var frame: StackTraceElement? = null
 
-            if (trace != null && trace.size > 0) {
+            if (trace.isNotEmpty()) {
                 for (i in 0..<trace.size - 1) {
                     val thisFrame = trace[i]
                     val nextFrame = trace[i + 1]
@@ -167,7 +166,7 @@ object CrashReporting {
     @JvmStatic
     fun attachExceptionHandler() {
         val oldHandler = Thread.getDefaultUncaughtExceptionHandler()
-        if (oldHandler !is RaygunUncaughtExceptionHandler) {
+        if (oldHandler !is RaygunUncaughtExceptionHandler && oldHandler != null) {
             exceptionHandler = RaygunUncaughtExceptionHandler(oldHandler)
             Thread.setDefaultUncaughtExceptionHandler(exceptionHandler)
         }
@@ -233,7 +232,7 @@ object CrashReporting {
         )
     }
 
-    class RaygunUncaughtExceptionHandler(private val defaultHandler: Thread.UncaughtExceptionHandler?) :
+    class RaygunUncaughtExceptionHandler(private val defaultHandler: Thread.UncaughtExceptionHandler) :
         Thread.UncaughtExceptionHandler {
         override fun uncaughtException(thread: Thread, throwable: Throwable) {
             val tags: MutableList<String> = ArrayList()
@@ -243,7 +242,7 @@ object CrashReporting {
 
             RUM.getInstance().sendRemaining()
 
-            defaultHandler!!.uncaughtException(thread, throwable)
+            defaultHandler.uncaughtException(thread, throwable)
         }
     }
 }
