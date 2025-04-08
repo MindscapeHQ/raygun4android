@@ -23,11 +23,9 @@ object CrashReporting {
     private var exceptionHandler: RaygunUncaughtExceptionHandler? = null
     private var onBeforeSend: CrashReportingOnBeforeSend? = null
 
-    @JvmField
-    var tags: List<*>? = null
+    @JvmField var tags: List<*>? = null
 
-    @JvmField
-    var customData: Map<*, *>? = null
+    @JvmField var customData: Map<*, *>? = null
     private val breadcrumbs: MutableList<RaygunBreadcrumbMessage> = ArrayList()
     private var shouldProcessBreadcrumbLocation = false
 
@@ -53,7 +51,8 @@ object CrashReporting {
     }
 
     private fun processBreadcrumbLocation(
-        breadcrumb: RaygunBreadcrumbMessage, shouldProcessBreadcrumbLocation: Boolean
+        breadcrumb: RaygunBreadcrumbMessage,
+        shouldProcessBreadcrumbLocation: Boolean,
     ): RaygunBreadcrumbMessage {
         if (shouldProcessBreadcrumbLocation && breadcrumb.className == null) {
             val trace = Thread.currentThread().stackTrace
@@ -64,8 +63,9 @@ object CrashReporting {
                     val thisFrame = trace[i]
                     val nextFrame = trace[i + 1]
 
-                    if (thisFrame.className.contains("com.raygun.raygun4android.")
-                        && !nextFrame.className.contains("com.raygun.raygun4android.")
+                    if (
+                        thisFrame.className.contains("com.raygun.raygun4android.") &&
+                        !nextFrame.className.contains("com.raygun.raygun4android.")
                     ) {
                         frame = nextFrame
                         break
@@ -74,7 +74,8 @@ object CrashReporting {
             }
 
             if (frame != null) {
-                return RaygunBreadcrumbMessage.Builder(breadcrumb.message)
+                return RaygunBreadcrumbMessage
+                    .Builder(breadcrumb.message)
                     .category(breadcrumb.category)
                     .customData(breadcrumb.customData)
                     .level(breadcrumb.level)
@@ -88,9 +89,7 @@ object CrashReporting {
         return breadcrumb
     }
 
-    private fun shouldProcessBreadcrumbLocation(): Boolean {
-        return shouldProcessBreadcrumbLocation
-    }
+    private fun shouldProcessBreadcrumbLocation(): Boolean = shouldProcessBreadcrumbLocation
 
     @JvmStatic
     fun shouldProcessBreadcrumbLocation(shouldProcessBreadcrumbLocation: Boolean) {
@@ -99,14 +98,20 @@ object CrashReporting {
 
     @JvmStatic
     @JvmOverloads
-    fun send(throwable: Throwable, tags: List<String>?, customData: Map<String, Any?>? = null) {
+    fun send(
+        throwable: Throwable,
+        tags: List<String>?,
+        customData: Map<String, Any?>? = null,
+    ) {
         if (RaygunClient.isCrashReportingEnabled()) {
             runBlocking {
                 launch {
                     var msg = buildMessage(throwable)
 
                     if (msg == null) {
-                        RaygunLogger.e("Failed to send RaygunMessage - due to invalid message being built")
+                        RaygunLogger.e(
+                            "Failed to send RaygunMessage - due to invalid message being built",
+                        )
                         return@launch
                     }
 
@@ -127,7 +132,7 @@ object CrashReporting {
             }
         } else {
             RaygunLogger.w(
-                "Crash Reporting is not enabled, please enable to use the send() function"
+                "Crash Reporting is not enabled, please enable to use the send() function",
             )
         }
     }
@@ -176,27 +181,25 @@ object CrashReporting {
     fun postCachedMessages() {
         if (RaygunNetworkUtils.hasInternetConnection(RaygunClient.getApplicationContext())) {
             val fileList =
-                RaygunClient.getApplicationContext()
-                    .cacheDir
-                    .listFiles(RaygunFileFilter())
+                RaygunClient.getApplicationContext().cacheDir.listFiles(RaygunFileFilter())
             if (fileList != null) {
                 for (f in fileList) {
                     try {
-                        if (RaygunFileUtils.getExtension(f.name)
+                        if (
+                            RaygunFileUtils
+                                .getExtension(f.name)
                                 .equals(RaygunSettings.DEFAULT_FILE_EXTENSION, ignoreCase = true)
                         ) {
                             var ois: ObjectInputStream? = null
                             try {
                                 ois = ObjectInputStream(FileInputStream(f))
-                                val serializedMessage =
-                                    ois.readObject() as SerializedMessage
+                                val serializedMessage = ois.readObject() as SerializedMessage
                                 enqueueWorkForCrashReporting(
-                                    RaygunClient.getApiKey(), serializedMessage.message
+                                    RaygunClient.getApiKey(),
+                                    serializedMessage.message,
                                 )
                                 if (!f.delete()) {
-                                    RaygunLogger.w(
-                                        "Couldn't delete cached report (" + f.name + ")"
-                                    )
+                                    RaygunLogger.w("Couldn't delete cached report (" + f.name + ")")
                                 }
                             } finally {
                                 ois?.close()
@@ -204,37 +207,45 @@ object CrashReporting {
                         }
                     } catch (e: FileNotFoundException) {
                         RaygunLogger.e(
-                            "Error loading cached message from filesystem - " + e.message
+                            "Error loading cached message from filesystem - " + e.message,
                         )
                     } catch (e: IOException) {
                         RaygunLogger.e(
-                            "Error reading cached message from filesystem - " + e.message
+                            "Error reading cached message from filesystem - " + e.message,
                         )
                     } catch (e: ClassNotFoundException) {
                         RaygunLogger.e(
-                            "Error in handling cached message from filesystem - "
-                                + e.message
+                            "Error in handling cached message from filesystem - " + e.message,
                         )
                     }
                 }
             } else {
                 RaygunLogger.e(
-                    "Error in handling cached message from filesystem - could not get a list of"
-                        + " files from cache dir"
+                    "Error in handling cached message from filesystem - could not get a list of" +
+                        " files from cache dir",
                 )
             }
         }
     }
 
-    private fun enqueueWorkForCrashReporting(apiKey: String, jsonPayload: String) {
+    private fun enqueueWorkForCrashReporting(
+        apiKey: String,
+        jsonPayload: String,
+    ) {
         CrashReportingWorkerHelper.enqueueCrashReport(
-            RaygunClient.getApplicationContext(), jsonPayload, apiKey
+            RaygunClient.getApplicationContext(),
+            jsonPayload,
+            apiKey,
         )
     }
 
-    class RaygunUncaughtExceptionHandler(private val defaultHandler: Thread.UncaughtExceptionHandler) :
-        Thread.UncaughtExceptionHandler {
-        override fun uncaughtException(thread: Thread, throwable: Throwable) {
+    class RaygunUncaughtExceptionHandler(
+        private val defaultHandler: Thread.UncaughtExceptionHandler,
+    ) : Thread.UncaughtExceptionHandler {
+        override fun uncaughtException(
+            thread: Thread,
+            throwable: Throwable,
+        ) {
             val tags: MutableList<String> = ArrayList()
             tags.add(RaygunSettings.CRASH_REPORTING_UNHANDLED_EXCEPTION_TAG)
 

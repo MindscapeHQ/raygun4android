@@ -10,9 +10,7 @@ import com.raygun.raygun4android.messages.crashreporting.RaygunMessage
 class RaygunMessageBuilder private constructor() : IRaygunMessageBuilder {
     private val raygunMessage = RaygunMessage()
 
-    override fun build(): RaygunMessage {
-        return raygunMessage
-    }
+    override fun build(): RaygunMessage = raygunMessage
 
     override fun setMachineName(machineName: String?): IRaygunMessageBuilder {
         raygunMessage.details.machineName = machineName
@@ -30,7 +28,7 @@ class RaygunMessageBuilder private constructor() : IRaygunMessageBuilder {
     }
 
     override suspend fun setEnvironmentDetails(context: Context): IRaygunMessageBuilder {
-        raygunMessage.details.environment = RaygunEnvironmentMessage.invoke(context);
+        raygunMessage.details.environment = RaygunEnvironmentMessage.invoke(context)
         return this
     }
 
@@ -75,9 +73,6 @@ class RaygunMessageBuilder private constructor() : IRaygunMessageBuilder {
     }
 
     companion object {
-        @JvmStatic
-        fun instance(): RaygunMessageBuilder {
-            return RaygunMessageBuilder()
-        }
+        @JvmStatic fun instance(): RaygunMessageBuilder = RaygunMessageBuilder()
     }
 }

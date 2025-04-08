@@ -43,15 +43,16 @@ class RaygunEnvironmentMessage private constructor() {
 
     companion object {
         @Throws(IOException::class)
-        suspend fun getTotalRam(): String? = withContext(Dispatchers.IO) {
-            var reader: RandomAccessFile? = null
-            try {
-                reader = RandomAccessFile("/proc/meminfo", "r")
-                return@withContext reader.readLine()
-            } finally {
-                reader?.close()
+        suspend fun getTotalRam(): String? =
+            withContext(Dispatchers.IO) {
+                var reader: RandomAccessFile? = null
+                try {
+                    reader = RandomAccessFile("/proc/meminfo", "r")
+                    return@withContext reader.readLine()
+                } finally {
+                    reader?.close()
+                }
             }
-        }
 
         suspend operator fun invoke(context: Context): RaygunEnvironmentMessage {
             val raygunEnvironmentMessage = RaygunEnvironmentMessage()
@@ -67,12 +68,13 @@ class RaygunEnvironmentMessage private constructor() {
                 raygunEnvironmentMessage.processorCount = Runtime.getRuntime().availableProcessors()
 
                 val orientation = context.resources.configuration.orientation
-                raygunEnvironmentMessage.currentOrientation = when (orientation) {
-                    1 -> "Portrait"
-                    2 -> "Landscape"
-                    3 -> "Square"
-                    else -> "Undefined"
-                }
+                raygunEnvironmentMessage.currentOrientation =
+                    when (orientation) {
+                        1 -> "Portrait"
+                        2 -> "Landscape"
+                        3 -> "Square"
+                        else -> "Undefined"
+                    }
 
                 val metrics = DisplayMetrics()
                 (context.getSystemService(Context.WINDOW_SERVICE) as WindowManager)
@@ -84,31 +86,32 @@ class RaygunEnvironmentMessage private constructor() {
                 val tz = TimeZone.getDefault()
                 val now = Date()
                 raygunEnvironmentMessage.utcOffset =
-                    (TimeUnit.SECONDS.convert(
-                        tz.getOffset(now.time).toLong(),
-                        TimeUnit.MILLISECONDS
-                    )
-                        / 3600).toDouble()
-                raygunEnvironmentMessage.locale = context.resources.configuration.locale.toString()
+                    (
+                        TimeUnit.SECONDS.convert(
+                            tz.getOffset(now.time).toLong(),
+                            TimeUnit.MILLISECONDS,
+                        ) / 3600
+                    ).toDouble()
+                raygunEnvironmentMessage.locale =
+                    context.resources.configuration.locale
+                        .toString()
 
                 val mi = ActivityManager.MemoryInfo()
-                val am =
-                    context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+                val am = context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
                 am.getMemoryInfo(mi)
                 raygunEnvironmentMessage.availablePhysicalMemory = mi.availMem / 0x100000
 
-                raygunEnvironmentMessage.totalPhysicalMemory = getTotalRam()?.let {
-                    val p = Pattern.compile("^\\D*(\\d*).*$")
-                    val m = p.matcher(it)
-                    m.find()
-                    val match = m.group(1)
-                    match!!.toLong() / 0x400
-                } ?: 0
+                raygunEnvironmentMessage.totalPhysicalMemory =
+                    getTotalRam()?.let {
+                        val p = Pattern.compile("^\\D*(\\d*).*$")
+                        val m = p.matcher(it)
+                        m.find()
+                        val match = m.group(1)
+                        match!!.toLong() / 0x400
+                    } ?: 0
 
-
-                val stat = withContext(Dispatchers.IO) {
-                    StatFs(Environment.getDataDirectory().path)
-                }
+                val stat =
+                    withContext(Dispatchers.IO) { StatFs(Environment.getDataDirectory().path) }
 
                 val availableBlocks = stat.availableBlocks.toLong()
                 val blockSize = stat.blockSize.toLong()
