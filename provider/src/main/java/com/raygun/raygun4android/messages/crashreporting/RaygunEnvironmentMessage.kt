@@ -105,7 +105,10 @@ class RaygunEnvironmentMessage private constructor() {
                     match!!.toLong() / 0x400
                 } ?: 0
 
-                val stat = StatFs(Environment.getDataDirectory().path)
+
+                val stat = withContext(Dispatchers.IO) {
+                    StatFs(Environment.getDataDirectory().path)
+                }
 
                 val availableBlocks = stat.availableBlocks.toLong()
                 val blockSize = stat.blockSize.toLong()
