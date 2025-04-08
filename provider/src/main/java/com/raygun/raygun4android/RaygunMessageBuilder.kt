@@ -28,7 +28,7 @@ class RaygunMessageBuilder private constructor() : IRaygunMessageBuilder {
     }
 
     override suspend fun setEnvironmentDetails(context: Context): IRaygunMessageBuilder {
-        raygunMessage.details.environment = RaygunEnvironmentMessage.invoke(context)
+        raygunMessage.details.environment = RaygunEnvironmentMessage(context)
         return this
     }
 
