@@ -41,7 +41,7 @@ public class RaygunMessageBuilder implements IRaygunMessageBuilder {
 
     @Override
     public IRaygunMessageBuilder setEnvironmentDetails(Context context) {
-        raygunMessage.getDetails().setEnvironment(new RaygunEnvironmentMessage(context));
+//        raygunMessage.getDetails().setEnvironment(RaygunEnvironmentMessage.Companion.invoke(context));
         return this;
     }
 
