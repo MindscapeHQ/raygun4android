@@ -250,7 +250,7 @@ public class RaygunClient {
      * @param tags List object containing tags to be sent to Raygun
      */
     public static void setTags(List tags) {
-        CrashReporting.setTags(tags);
+        CrashReporting.tags = tags;
     }
 
     /**
@@ -260,7 +260,7 @@ public class RaygunClient {
      * @param customData Map with custom user data to be sent to Raygun
      */
     public static void setCustomData(Map customData) {
-        CrashReporting.setCustomData(customData);
+        CrashReporting.customData = customData;
     }
 
     /**
