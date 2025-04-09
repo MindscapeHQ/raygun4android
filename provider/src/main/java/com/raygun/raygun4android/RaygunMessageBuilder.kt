@@ -7,72 +7,68 @@ import com.raygun.raygun4android.messages.crashreporting.RaygunEnvironmentMessag
 import com.raygun.raygun4android.messages.crashreporting.RaygunErrorMessage
 import com.raygun.raygun4android.messages.crashreporting.RaygunMessage
 
-class RaygunMessageBuilder private constructor() : IRaygunMessageBuilder {
+class RaygunMessageBuilder() {
     private val raygunMessage = RaygunMessage()
 
-    override fun build(): RaygunMessage = raygunMessage
+    fun build(): RaygunMessage = raygunMessage
 
-    override fun setMachineName(machineName: String?): IRaygunMessageBuilder {
+    fun setMachineName(machineName: String?): RaygunMessageBuilder {
         raygunMessage.details.machineName = machineName
         return this
     }
 
-    override fun setExceptionDetails(throwable: Throwable?): IRaygunMessageBuilder {
+    fun setExceptionDetails(throwable: Throwable?): RaygunMessageBuilder {
         raygunMessage.details.error = RaygunErrorMessage(throwable)
         return this
     }
 
-    override fun setClientDetails(): IRaygunMessageBuilder {
+    fun setClientDetails(): RaygunMessageBuilder {
         raygunMessage.details.client = RaygunClientMessage()
         return this
     }
 
-    override suspend fun setEnvironmentDetails(context: Context): IRaygunMessageBuilder {
+    suspend fun setEnvironmentDetails(context: Context): RaygunMessageBuilder {
         raygunMessage.details.environment = RaygunEnvironmentMessage(context)
         return this
     }
 
-    override fun setVersion(version: String?): IRaygunMessageBuilder {
+    fun setVersion(version: String?): RaygunMessageBuilder {
         raygunMessage.details.version = version
         return this
     }
 
-    override fun setTags(tags: List<*>?): IRaygunMessageBuilder {
+    fun setTags(tags: List<*>?): RaygunMessageBuilder {
         raygunMessage.details.tags = tags
         return this
     }
 
-    override fun setCustomData(customData: Map<*, *>?): IRaygunMessageBuilder {
+    fun setCustomData(customData: Map<*, *>?): RaygunMessageBuilder {
         raygunMessage.details.customData = customData
         return this
     }
 
-    override fun setAppContext(identifier: String?): IRaygunMessageBuilder {
+    fun setAppContext(identifier: String?): RaygunMessageBuilder {
         raygunMessage.details.setAppContext(identifier)
         return this
     }
 
-    override fun setUserInfo(): IRaygunMessageBuilder {
+    fun setUserInfo(): RaygunMessageBuilder {
         raygunMessage.details.setUserInfo()
         return this
     }
 
-    override fun setNetworkInfo(context: Context): IRaygunMessageBuilder {
+    fun setNetworkInfo(context: Context): RaygunMessageBuilder {
         raygunMessage.details.setNetworkInfo(context)
         return this
     }
 
-    override fun setGroupingKey(groupingKey: String?): IRaygunMessageBuilder {
+    fun setGroupingKey(groupingKey: String?): RaygunMessageBuilder {
         raygunMessage.details.groupingKey = groupingKey
         return this
     }
 
-    override fun setBreadcrumbs(breadcrumbs: List<RaygunBreadcrumbMessage>?): IRaygunMessageBuilder {
+    fun setBreadcrumbs(breadcrumbs: List<RaygunBreadcrumbMessage>?): RaygunMessageBuilder {
         raygunMessage.details.breadcrumbs = breadcrumbs
         return this
-    }
-
-    companion object {
-        @JvmStatic fun instance(): RaygunMessageBuilder = RaygunMessageBuilder()
     }
 }

@@ -2,7 +2,6 @@ package com.raygun.raygun4android
 
 import android.os.Build
 import com.google.gson.Gson
-import com.raygun.raygun4android.RaygunMessageBuilder.Companion.instance
 import com.raygun.raygun4android.logging.RaygunLogger
 import com.raygun.raygun4android.messages.crashreporting.RaygunBreadcrumbMessage
 import com.raygun.raygun4android.messages.crashreporting.RaygunMessage
@@ -12,8 +11,15 @@ import com.raygun.raygun4android.utils.RaygunFileFilter
 import com.raygun.raygun4android.utils.RaygunFileUtils
 import com.raygun.raygun4android.utils.RaygunUtils
 import com.raygun.raygun4android.workers.CrashReportingWorkerHelper
+import kotlinx.coroutines.CoroutineName
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import java.io.FileInputStream
 import java.io.FileNotFoundException
 import java.io.IOException
@@ -22,10 +28,13 @@ import java.io.ObjectInputStream
 object CrashReporting {
     private var exceptionHandler: RaygunUncaughtExceptionHandler? = null
     private var onBeforeSend: CrashReportingOnBeforeSend? = null
+    private val coroutineScope = CoroutineScope(Dispatchers.IO + CoroutineName("CrashReporting"))
 
-    @JvmField var tags: List<*>? = null
+    @JvmField
+    var tags: List<*>? = null
 
-    @JvmField var customData: Map<*, *>? = null
+    @JvmField
+    var customData: Map<*, *>? = null
     private val breadcrumbs: MutableList<RaygunBreadcrumbMessage> = ArrayList()
     private var shouldProcessBreadcrumbLocation = false
 
@@ -104,31 +113,29 @@ object CrashReporting {
         customData: Map<String, Any?>? = null,
     ) {
         if (RaygunClient.isCrashReportingEnabled()) {
-            runBlocking {
-                launch {
-                    var msg = buildMessage(throwable)
+            coroutineScope.launch {
+                var msg = buildMessage(throwable)
 
+                if (msg == null) {
+                    RaygunLogger.e(
+                        "Failed to send RaygunMessage - due to invalid message being built",
+                    )
+                    return@launch
+                }
+
+                msg.details.tags = RaygunUtils.mergeLists(CrashReporting.tags, tags)
+                msg.details.customData =
+                    RaygunUtils.mergeMaps(CrashReporting.customData, customData)
+
+                if (onBeforeSend != null) {
+                    msg = onBeforeSend!!.onBeforeSend(msg)
                     if (msg == null) {
-                        RaygunLogger.e(
-                            "Failed to send RaygunMessage - due to invalid message being built",
-                        )
                         return@launch
                     }
-
-                    msg.details.tags = RaygunUtils.mergeLists(CrashReporting.tags, tags)
-                    msg.details.customData =
-                        RaygunUtils.mergeMaps(CrashReporting.customData, customData)
-
-                    if (onBeforeSend != null) {
-                        msg = onBeforeSend!!.onBeforeSend(msg)
-                        if (msg == null) {
-                            return@launch
-                        }
-                    }
-
-                    enqueueWorkForCrashReporting(RaygunClient.getApiKey(), Gson().toJson(msg))
-                    postCachedMessages()
                 }
+
+                enqueueWorkForCrashReporting(RaygunClient.getApiKey(), Gson().toJson(msg))
+                postCachedMessages()
             }
         } else {
             RaygunLogger.w(
@@ -140,7 +147,7 @@ object CrashReporting {
     private suspend fun buildMessage(throwable: Throwable): RaygunMessage? {
         try {
             val msg =
-                instance()
+                RaygunMessageBuilder()
                     .setEnvironmentDetails(RaygunClient.getApplicationContext())
                     .setMachineName(Build.MODEL)
                     .setExceptionDetails(throwable)
@@ -180,50 +187,56 @@ object CrashReporting {
     @JvmStatic
     fun postCachedMessages() {
         if (RaygunNetworkUtils.hasInternetConnection(RaygunClient.getApplicationContext())) {
-            val fileList =
-                RaygunClient.getApplicationContext().cacheDir.listFiles(RaygunFileFilter())
-            if (fileList != null) {
-                for (f in fileList) {
-                    try {
-                        if (
-                            RaygunFileUtils
-                                .getExtension(f.name)
-                                .equals(RaygunSettings.DEFAULT_FILE_EXTENSION, ignoreCase = true)
-                        ) {
-                            var ois: ObjectInputStream? = null
-                            try {
-                                ois = ObjectInputStream(FileInputStream(f))
-                                val serializedMessage = ois.readObject() as SerializedMessage
-                                enqueueWorkForCrashReporting(
-                                    RaygunClient.getApiKey(),
-                                    serializedMessage.message,
-                                )
-                                if (!f.delete()) {
-                                    RaygunLogger.w("Couldn't delete cached report (" + f.name + ")")
-                                }
-                            } finally {
-                                ois?.close()
-                            }
-                        }
-                    } catch (e: FileNotFoundException) {
-                        RaygunLogger.e(
-                            "Error loading cached message from filesystem - " + e.message,
-                        )
-                    } catch (e: IOException) {
-                        RaygunLogger.e(
-                            "Error reading cached message from filesystem - " + e.message,
-                        )
-                    } catch (e: ClassNotFoundException) {
-                        RaygunLogger.e(
-                            "Error in handling cached message from filesystem - " + e.message,
-                        )
-                    }
+            coroutineScope.launch {
+                val fileList = withContext(Dispatchers.IO) {
+                    RaygunClient.getApplicationContext().cacheDir.listFiles(RaygunFileFilter())
                 }
-            } else {
-                RaygunLogger.e(
-                    "Error in handling cached message from filesystem - could not get a list of" +
-                        " files from cache dir",
-                )
+                if (fileList != null) {
+                    for (f in fileList) {
+                        try {
+                            if (
+                                RaygunFileUtils
+                                    .getExtension(f.name)
+                                    .equals(
+                                        RaygunSettings.DEFAULT_FILE_EXTENSION,
+                                        ignoreCase = true
+                                    )
+                            ) {
+                                var ois: ObjectInputStream? = null
+                                try {
+                                    ois = ObjectInputStream(FileInputStream(f))
+                                    val serializedMessage = ois.readObject() as SerializedMessage
+                                    enqueueWorkForCrashReporting(
+                                        RaygunClient.getApiKey(),
+                                        serializedMessage.message,
+                                    )
+                                    if (!f.delete()) {
+                                        RaygunLogger.w("Couldn't delete cached report (" + f.name + ")")
+                                    }
+                                } finally {
+                                    ois?.close()
+                                }
+                            }
+                        } catch (e: FileNotFoundException) {
+                            RaygunLogger.e(
+                                "Error loading cached message from filesystem - " + e.message,
+                            )
+                        } catch (e: IOException) {
+                            RaygunLogger.e(
+                                "Error reading cached message from filesystem - " + e.message,
+                            )
+                        } catch (e: ClassNotFoundException) {
+                            RaygunLogger.e(
+                                "Error in handling cached message from filesystem - " + e.message,
+                            )
+                        }
+                    }
+                } else {
+                    RaygunLogger.e(
+                        "Error in handling cached message from filesystem - could not get a list of" +
+                            " files from cache dir",
+                    )
+                }
             }
         }
     }
