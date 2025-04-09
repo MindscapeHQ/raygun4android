@@ -1,6 +1,9 @@
 package com.raygun.raygun4android
 
 import android.content.Context
+import com.google.gson.Gson
+import com.raygun.raygun4android.messages.crashreporting.RaygunErrorMessage
+import com.raygun.raygun4android.messages.crashreporting.RaygunMessage
 import com.raygun.raygun4android.messages.shared.RaygunUserInfo
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
@@ -102,5 +105,27 @@ class RaygunMessageBuilderTest {
         assertEquals("IllegalArgumentException: Invalid parameter", message.details.error?.message)
         assertEquals(tags, message.details.tags)
         assertEquals(customData, message.details.customData)
+    }
+
+    @Test
+    fun `test serialization and deserialization of message`() {
+        val exception = IllegalArgumentException("Invalid parameter")
+        val tags = listOf("validation", "input")
+        val customData = mapOf("field" to "email", "value" to "invalid")
+
+        val message =
+            raygunMessageBuilder
+                .setExceptionDetails(exception)
+                .setTags(tags)
+                .setCustomData(customData)
+                .build()
+
+        val serialized = Gson().toJson(message)!!
+        val deserialized = Gson().fromJson(serialized,
+            RaygunMessage::class.java
+        )
+        assertEquals("IllegalArgumentException: Invalid parameter", deserialized.details.error?.message)
+        assertEquals(tags, deserialized.details.tags)
+        assertEquals(customData, deserialized.details.customData)
     }
 }
