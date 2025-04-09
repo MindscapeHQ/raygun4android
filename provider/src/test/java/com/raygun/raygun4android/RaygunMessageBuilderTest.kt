@@ -35,9 +35,9 @@ class RaygunMessageBuilderTest {
         val exception = RuntimeException("Test exception")
         val message = raygunMessageBuilder.setExceptionDetails(exception).build()
 
-        assertNotNull(message.details?.error)
-        assertEquals("RuntimeException: Test exception", message.details?.error?.message)
-        assertNotNull(message.details?.error?.stackTrace)
+        assertNotNull(message.details.error)
+        assertEquals("RuntimeException: Test exception", message.details.error?.message)
+        assertNotNull(message.details.error?.stackTrace)
     }
 
     @Test
@@ -45,7 +45,7 @@ class RaygunMessageBuilderTest {
         val tags = listOf("critical", "ui", "crash")
         val message = raygunMessageBuilder.setTags(tags).build()
 
-        assertEquals(tags, message.details?.tags)
+        assertEquals(tags, message.details.tags)
     }
 
     @Test
@@ -55,7 +55,7 @@ class RaygunMessageBuilderTest {
 
         val message = raygunMessageBuilder.setCustomData(customData).build()
 
-        assertEquals(customData, message.details?.customData)
+        assertEquals(customData, message.details.customData)
     }
 
     @Test
@@ -63,7 +63,7 @@ class RaygunMessageBuilderTest {
         val mockUser = mock<RaygunUserInfo>()
         val message = raygunMessageBuilder.setUserInfo(mockUser).build()
 
-        assertEquals(mockUser, message.details?.userInfo)
+        assertEquals(mockUser, message.details.userInfo)
     }
 
     @Test
@@ -72,7 +72,7 @@ class RaygunMessageBuilderTest {
 
         val message = raygunMessageBuilder.setVersion(version).build()
 
-        assertEquals(version, message.details?.version)
+        assertEquals(version, message.details.version)
     }
 
     @Test
@@ -82,7 +82,7 @@ class RaygunMessageBuilderTest {
 
             val message = raygunMessageBuilder.setEnvironmentDetails(mockContext).build()
 
-            assertNotNull(message.details?.environment)
+            assertNotNull(message.details.environment)
         }
     }
 
@@ -99,8 +99,8 @@ class RaygunMessageBuilderTest {
                 .setCustomData(customData)
                 .build()
 
-        assertEquals("IllegalArgumentException: Invalid parameter", message.details?.error?.message)
-        assertEquals(tags, message.details?.tags)
-        assertEquals(customData, message.details?.customData)
+        assertEquals("IllegalArgumentException: Invalid parameter", message.details.error?.message)
+        assertEquals(tags, message.details.tags)
+        assertEquals(customData, message.details.customData)
     }
 }

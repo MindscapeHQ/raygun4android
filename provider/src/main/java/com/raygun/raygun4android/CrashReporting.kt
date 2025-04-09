@@ -14,7 +14,6 @@ import com.raygun.raygun4android.workers.CrashReportingWorkerHelper
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.FileInputStream
@@ -82,7 +81,7 @@ object CrashReporting {
                     .Builder(breadcrumb.message)
                     .category(breadcrumb.category)
                     .customData(breadcrumb.customData)
-                    .level(breadcrumb.level)
+                    .level(breadcrumb.breadcrumbLevel())
                     .className(frame.className)
                     .methodName(frame.methodName)
                     .lineNumber(frame.lineNumber)
