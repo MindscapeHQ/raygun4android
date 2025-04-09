@@ -6,6 +6,7 @@ import com.raygun.raygun4android.messages.crashreporting.RaygunClientMessage
 import com.raygun.raygun4android.messages.crashreporting.RaygunEnvironmentMessage
 import com.raygun.raygun4android.messages.crashreporting.RaygunErrorMessage
 import com.raygun.raygun4android.messages.crashreporting.RaygunMessage
+import com.raygun.raygun4android.messages.shared.RaygunUserInfo
 
 class RaygunMessageBuilder {
     private val raygunMessage = RaygunMessage()
@@ -52,8 +53,8 @@ class RaygunMessageBuilder {
         return this
     }
 
-    fun setUserInfo(): RaygunMessageBuilder {
-        raygunMessage.details.setUserInfo()
+    fun setUserInfo(raygunUserInfo: RaygunUserInfo): RaygunMessageBuilder {
+        raygunMessage.details.userInfo = raygunUserInfo
         return this
     }
 
