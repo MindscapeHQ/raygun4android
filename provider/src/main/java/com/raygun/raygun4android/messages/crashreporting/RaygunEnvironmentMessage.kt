@@ -20,26 +20,25 @@ import java.util.regex.Pattern
 
 @SuppressLint("SwitchIntDef")
 class RaygunEnvironmentMessage private constructor() {
+    private val availableVirtualMemory: Long = 0
     private val cpu: String? = null
+    private val totalVirtualMemory: Long = 0
     private var architecture: String? = null
-    private var processorCount = 0
+    private var availablePhysicalMemory: Long = 0
+    private var board: String? = null
+    private var brand: String? = null
+    private var currentOrientation: String? = null
+    private var deviceCode: String? = null
+    private var deviceName: String? = null
+    private var diskSpaceFree: Long = 0
+    private var locale: String? = null
     private var oSVersion: String? = null
     private var osSDKVersion: String? = null
-    private var windowsBoundWidth = 0
-    private var windowsBoundHeight = 0
-    private var currentOrientation: String? = null
-    private var locale: String? = null
+    private var processorCount = 0
     private var totalPhysicalMemory: Long = 0
-    private var availablePhysicalMemory: Long = 0
-    private val totalVirtualMemory: Long = 0
-    private val availableVirtualMemory: Long = 0
-    private var diskSpaceFree: Long = 0
     private var utcOffset = 0.0
-    private var deviceName: String? = null
-    private var brand: String? = null
-    private var board: String? = null
-    private var deviceCode: String? = null
-    private var totalRam: String? = null
+    private var windowsBoundHeight = 0
+    private var windowsBoundWidth = 0
 
     companion object {
         @Throws(IOException::class)
