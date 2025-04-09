@@ -13,12 +13,9 @@ import com.raygun.raygun4android.utils.RaygunUtils
 import com.raygun.raygun4android.workers.CrashReportingWorkerHelper
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import java.io.FileInputStream
 import java.io.FileNotFoundException
@@ -30,11 +27,9 @@ object CrashReporting {
     private var onBeforeSend: CrashReportingOnBeforeSend? = null
     private val coroutineScope = CoroutineScope(Dispatchers.IO + CoroutineName("CrashReporting"))
 
-    @JvmField
-    var tags: List<*>? = null
+    @JvmField var tags: List<*>? = null
 
-    @JvmField
-    var customData: Map<*, *>? = null
+    @JvmField var customData: Map<*, *>? = null
     private val breadcrumbs: MutableList<RaygunBreadcrumbMessage> = ArrayList()
     private var shouldProcessBreadcrumbLocation = false
 
@@ -188,9 +183,10 @@ object CrashReporting {
     fun postCachedMessages() {
         if (RaygunNetworkUtils.hasInternetConnection(RaygunClient.getApplicationContext())) {
             coroutineScope.launch {
-                val fileList = withContext(Dispatchers.IO) {
-                    RaygunClient.getApplicationContext().cacheDir.listFiles(RaygunFileFilter())
-                }
+                val fileList =
+                    withContext(Dispatchers.IO) {
+                        RaygunClient.getApplicationContext().cacheDir.listFiles(RaygunFileFilter())
+                    }
                 if (fileList != null) {
                     for (f in fileList) {
                         try {
@@ -199,7 +195,7 @@ object CrashReporting {
                                     .getExtension(f.name)
                                     .equals(
                                         RaygunSettings.DEFAULT_FILE_EXTENSION,
-                                        ignoreCase = true
+                                        ignoreCase = true,
                                     )
                             ) {
                                 var ois: ObjectInputStream? = null
@@ -211,7 +207,9 @@ object CrashReporting {
                                         serializedMessage.message,
                                     )
                                     if (!f.delete()) {
-                                        RaygunLogger.w("Couldn't delete cached report (" + f.name + ")")
+                                        RaygunLogger.w(
+                                            "Couldn't delete cached report (" + f.name + ")",
+                                        )
                                     }
                                 } finally {
                                     ois?.close()

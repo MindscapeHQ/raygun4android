@@ -7,7 +7,7 @@ import com.raygun.raygun4android.messages.crashreporting.RaygunEnvironmentMessag
 import com.raygun.raygun4android.messages.crashreporting.RaygunErrorMessage
 import com.raygun.raygun4android.messages.crashreporting.RaygunMessage
 
-class RaygunMessageBuilder() {
+class RaygunMessageBuilder {
     private val raygunMessage = RaygunMessage()
 
     fun build(): RaygunMessage = raygunMessage
