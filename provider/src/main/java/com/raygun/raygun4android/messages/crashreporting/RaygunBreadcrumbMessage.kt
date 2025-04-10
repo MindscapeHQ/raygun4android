@@ -6,8 +6,7 @@ import java.util.WeakHashMap
 data class RaygunBreadcrumbMessage(
     var message: String?,
     var category: String?,
-    @SerializedName("level")
-    private var _level: Int,
+    @SerializedName("level") private var _level: Int,
     var type: String = "Manual",
     var customData: Map<String, Any?>,
     var timestamp: Long = System.currentTimeMillis(),
@@ -20,7 +19,6 @@ data class RaygunBreadcrumbMessage(
         set(value) {
             _level = value.ordinal
         }
-
 
     class Builder(
         internal val message: String?,
