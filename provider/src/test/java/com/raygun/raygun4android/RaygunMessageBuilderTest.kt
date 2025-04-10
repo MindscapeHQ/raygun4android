@@ -121,11 +121,8 @@ class RaygunMessageBuilderTest {
 
         val serialized = Gson().toJson(message)!!
         val deserialized = Gson().fromJson(serialized, RaygunMessage::class.java)
-        assertEquals(
-            "IllegalArgumentException: Invalid parameter",
-            deserialized.details.error?.message,
-        )
-        assertEquals(tags, deserialized.details.tags)
-        assertEquals(customData, deserialized.details.customData)
+
+        // Deserialized message should be equal to the original message
+        assertEquals(message, deserialized)
     }
 }

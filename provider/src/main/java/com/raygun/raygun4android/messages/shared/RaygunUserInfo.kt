@@ -111,4 +111,28 @@ class RaygunUserInfo
                     RaygunLogger.i("Ignored firstName because current user was deemed anonymous")
                 }
             }
+
+        override fun equals(other: Any?): Boolean {
+            if (this === other) return true
+            if (javaClass != other?.javaClass) return false
+
+            other as RaygunUserInfo
+
+            if (_isAnonymous != other._isAnonymous) return false
+            if (_identifier != other._identifier) return false
+            if (_email != other._email) return false
+            if (_fullName != other._fullName) return false
+            if (_firstName != other._firstName) return false
+
+            return true
+        }
+
+        override fun hashCode(): Int {
+            var result = _isAnonymous.hashCode()
+            result = 31 * result + _identifier.hashCode()
+            result = 31 * result + (_email?.hashCode() ?: 0)
+            result = 31 * result + (_fullName?.hashCode() ?: 0)
+            result = 31 * result + (_firstName?.hashCode() ?: 0)
+            return result
+        }
     }

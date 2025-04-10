@@ -1,11 +1,10 @@
 package com.raygun.raygun4android.messages.crashreporting
 
-@Suppress("ArrayInDataClass")
 data class RaygunErrorMessage(
     var innerError: RaygunErrorMessage? = null,
     var message: String? = null,
     var className: String? = null,
-    var stackTrace: Array<RaygunErrorStackTraceLineMessage?> = arrayOfNulls(0),
+    var stackTrace: List<RaygunErrorStackTraceLineMessage?> = emptyList(),
 ) {
     companion object {
         operator fun invoke(throwable: Throwable?): RaygunErrorMessage {
@@ -20,7 +19,8 @@ data class RaygunErrorMessage(
             }
 
             val ste = throwable.stackTrace
-            val stackTrace: Array<RaygunErrorStackTraceLineMessage?> = arrayOfNulls(ste.size)
+            val stackTrace: MutableList<RaygunErrorStackTraceLineMessage?> =
+                MutableList(size = ste.size) { null }
 
             for (i in ste.indices) {
                 stackTrace[i] = RaygunErrorStackTraceLineMessage(ste[i])
