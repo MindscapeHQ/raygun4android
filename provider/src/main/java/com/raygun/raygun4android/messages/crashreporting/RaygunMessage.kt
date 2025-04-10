@@ -13,14 +13,16 @@ data class RaygunMessage(
     var details: RaygunMessageDetails = RaygunMessageDetails(),
 ) {
     init {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val utcDateTime = LocalDateTime.now(ZoneId.of("UTC"))
-            occurredOn = utcDateTime.toString()
-        } else {
-            @SuppressLint("SimpleDateFormat")
-            val df = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss")
-            df.timeZone = TimeZone.getTimeZone("UTC")
-            occurredOn = df.format(Calendar.getInstance().time)
+        if (occurredOn == null) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                val utcDateTime = LocalDateTime.now(ZoneId.of("UTC"))
+                occurredOn = utcDateTime.toString()
+            } else {
+                @SuppressLint("SimpleDateFormat")
+                val df = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss")
+                df.timeZone = TimeZone.getTimeZone("UTC")
+                occurredOn = df.format(Calendar.getInstance().time)
+            }
         }
     }
 }
