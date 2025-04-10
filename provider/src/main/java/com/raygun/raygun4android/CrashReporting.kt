@@ -81,7 +81,7 @@ object CrashReporting {
                     .Builder(breadcrumb.message)
                     .category(breadcrumb.category)
                     .customData(breadcrumb.customData)
-                    .level(breadcrumb.breadcrumbLevel())
+                    .level(breadcrumb.level)
                     .className(frame.className)
                     .methodName(frame.methodName)
                     .lineNumber(frame.lineNumber)

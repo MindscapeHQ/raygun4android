@@ -1,11 +1,13 @@
 package com.raygun.raygun4android.messages.crashreporting
 
+import com.google.gson.annotations.SerializedName
 import java.util.WeakHashMap
 
 data class RaygunBreadcrumbMessage(
     var message: String?,
     var category: String?,
-    var level: Int,
+    @SerializedName("level")
+    private var _level: Int,
     var type: String = "Manual",
     var customData: Map<String, Any?>,
     var timestamp: Long = System.currentTimeMillis(),
@@ -13,7 +15,12 @@ data class RaygunBreadcrumbMessage(
     var methodName: String?,
     var lineNumber: Int?,
 ) {
-    fun breadcrumbLevel(): RaygunBreadcrumbLevel = RaygunBreadcrumbLevel.entries[level]
+    var level: RaygunBreadcrumbLevel
+        get() = RaygunBreadcrumbLevel.entries[_level]
+        set(value) {
+            _level = value.ordinal
+        }
+
 
     class Builder(
         internal val message: String?,
@@ -59,7 +66,7 @@ data class RaygunBreadcrumbMessage(
             RaygunBreadcrumbMessage(
                 message = message,
                 category = category,
-                level = level,
+                _level = level,
                 customData = customData,
                 className = className,
                 methodName = methodName,
