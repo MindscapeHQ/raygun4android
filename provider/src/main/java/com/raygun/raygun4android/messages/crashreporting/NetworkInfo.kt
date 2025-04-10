@@ -11,7 +11,7 @@ import java.util.Collections
 
 data class NetworkInfo(
     var iPAddress: List<String> = ArrayList(),
-    var networkConnectivityState: String
+    var networkConnectivityState: String,
 ) {
     companion object {
         operator fun invoke(context: Context): NetworkInfo {
@@ -23,8 +23,7 @@ data class NetworkInfo(
         private fun readNetworkConnectivityState(context: Context): String {
             var result = "Not connected"
 
-            val cm =
-                context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+            val cm = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
             val info = cm.activeNetworkInfo
 
             if (info != null) {
@@ -36,25 +35,32 @@ data class NetworkInfo(
                     when (type) {
                         ConnectivityManager.TYPE_WIFI -> result += "WiFi"
                         ConnectivityManager.TYPE_WIMAX -> result += "WiMax"
-                        ConnectivityManager.TYPE_MOBILE, ConnectivityManager.TYPE_MOBILE_DUN, ConnectivityManager.TYPE_MOBILE_HIPRI, ConnectivityManager.TYPE_MOBILE_MMS, ConnectivityManager.TYPE_MOBILE_SUPL -> {
+                        ConnectivityManager.TYPE_MOBILE,
+                        ConnectivityManager.TYPE_MOBILE_DUN,
+                        ConnectivityManager.TYPE_MOBILE_HIPRI,
+                        ConnectivityManager.TYPE_MOBILE_MMS,
+                        ConnectivityManager.TYPE_MOBILE_SUPL,
+                        -> {
                             result += "Mobile - "
 
                             val subtype = info.subtype
-                            result += when (subtype) {
-                                TelephonyManager.NETWORK_TYPE_1xRTT -> "1xRTT"
-                                TelephonyManager.NETWORK_TYPE_CDMA -> "CDMA"
-                                TelephonyManager.NETWORK_TYPE_EDGE -> "EDGE"
-                                TelephonyManager.NETWORK_TYPE_EVDO_0 -> "EVDO_0"
-                                TelephonyManager.NETWORK_TYPE_EVDO_A -> "EVDO_A"
-                                TelephonyManager.NETWORK_TYPE_GPRS -> "GPRS"
-                                TelephonyManager.NETWORK_TYPE_HSDPA -> "HSDPA"
-                                TelephonyManager.NETWORK_TYPE_HSPA -> "HSPA"
-                                TelephonyManager.NETWORK_TYPE_HSUPA -> "HSUPA"
-                                TelephonyManager.NETWORK_TYPE_UMTS -> "UMTS"
-                                TelephonyManager.NETWORK_TYPE_IDEN -> "IDEN"
-                                TelephonyManager.NETWORK_TYPE_UNKNOWN -> "subtype unknown/EVDO_B/EHRPD/LTE/HSPAP or similar"
-                                else -> "subtype unknown/EVDO_B/EHRPD/LTE/HSPAP or similar"
-                            }
+                            result +=
+                                when (subtype) {
+                                    TelephonyManager.NETWORK_TYPE_1xRTT -> "1xRTT"
+                                    TelephonyManager.NETWORK_TYPE_CDMA -> "CDMA"
+                                    TelephonyManager.NETWORK_TYPE_EDGE -> "EDGE"
+                                    TelephonyManager.NETWORK_TYPE_EVDO_0 -> "EVDO_0"
+                                    TelephonyManager.NETWORK_TYPE_EVDO_A -> "EVDO_A"
+                                    TelephonyManager.NETWORK_TYPE_GPRS -> "GPRS"
+                                    TelephonyManager.NETWORK_TYPE_HSDPA -> "HSDPA"
+                                    TelephonyManager.NETWORK_TYPE_HSPA -> "HSPA"
+                                    TelephonyManager.NETWORK_TYPE_HSUPA -> "HSUPA"
+                                    TelephonyManager.NETWORK_TYPE_UMTS -> "UMTS"
+                                    TelephonyManager.NETWORK_TYPE_IDEN -> "IDEN"
+                                    TelephonyManager.NETWORK_TYPE_UNKNOWN ->
+                                        "subtype unknown/EVDO_B/EHRPD/LTE/HSPAP or similar"
+                                    else -> "subtype unknown/EVDO_B/EHRPD/LTE/HSPAP or similar"
+                                }
                         }
 
                         else -> result += "unknown type"

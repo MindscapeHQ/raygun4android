@@ -3,15 +3,17 @@ package com.raygun.raygun4android.messages.shared
 import android.content.Context
 import com.raygun.raygun4android.RaygunClient
 import com.raygun.raygun4android.network.RaygunNetworkUtils
+import junit.framework.TestCase.assertEquals
+import junit.framework.TestCase.assertFalse
+import junit.framework.TestCase.assertNull
+import junit.framework.TestCase.assertTrue
 import org.junit.After
-import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
 import org.mockito.MockedStatic
 import org.mockito.Mockito
 
 class RaygunUserInfoTest {
-
     private lateinit var mockRaygunClient: MockedStatic<RaygunClient>
     private lateinit var mockRaygunNetworkUtils: MockedStatic<RaygunNetworkUtils>
 
@@ -20,14 +22,15 @@ class RaygunUserInfoTest {
         mockRaygunClient = Mockito.mockStatic(RaygunClient::class.java)
         mockRaygunNetworkUtils = Mockito.mockStatic(RaygunNetworkUtils::class.java)
 
-        mockRaygunClient.`when`<Context> {
-            RaygunClient.getApplicationContext()
-        }.thenReturn(Mockito.mock(android.content.Context::class.java))
+        mockRaygunClient
+            .`when`<Context> { RaygunClient.getApplicationContext() }
+            .thenReturn(Mockito.mock(android.content.Context::class.java))
 
-        mockRaygunNetworkUtils.`when`<String> {
-            RaygunNetworkUtils.getDeviceUuid(Mockito.any())
-        }.thenReturn("mock-uuid")
+        mockRaygunNetworkUtils
+            .`when`<String> { RaygunNetworkUtils.getDeviceUuid(Mockito.any()) }
+            .thenReturn("mock-uuid")
     }
+
     @After
     fun tearDown() {
         mockRaygunClient.close()
@@ -58,12 +61,13 @@ class RaygunUserInfoTest {
 
     @Test
     fun `test create user with full details`() {
-        val user = RaygunUserInfo(
-            identifier = "user123",
-            firstName = "John",
-            fullName = "John Doe",
-            email = "john.doe@example.com"
-        )
+        val user =
+            RaygunUserInfo(
+                identifier = "user123",
+                firstName = "John",
+                fullName = "John Doe",
+                email = "john.doe@example.com",
+            )
 
         assertFalse(user.isAnonymous)
         assertEquals("user123", user.identifier)

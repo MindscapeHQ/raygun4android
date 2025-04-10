@@ -2,7 +2,6 @@ package com.raygun.raygun4android
 
 import android.content.Context
 import com.google.gson.Gson
-import com.raygun.raygun4android.messages.crashreporting.RaygunErrorMessage
 import com.raygun.raygun4android.messages.crashreporting.RaygunMessage
 import com.raygun.raygun4android.messages.shared.RaygunUserInfo
 import kotlinx.coroutines.runBlocking
@@ -121,10 +120,11 @@ class RaygunMessageBuilderTest {
                 .build()
 
         val serialized = Gson().toJson(message)!!
-        val deserialized = Gson().fromJson(serialized,
-            RaygunMessage::class.java
+        val deserialized = Gson().fromJson(serialized, RaygunMessage::class.java)
+        assertEquals(
+            "IllegalArgumentException: Invalid parameter",
+            deserialized.details.error?.message,
         )
-        assertEquals("IllegalArgumentException: Invalid parameter", deserialized.details.error?.message)
         assertEquals(tags, deserialized.details.tags)
         assertEquals(customData, deserialized.details.customData)
     }

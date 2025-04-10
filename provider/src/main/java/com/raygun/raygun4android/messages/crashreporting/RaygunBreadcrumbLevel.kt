@@ -4,5 +4,5 @@ enum class RaygunBreadcrumbLevel {
     DEBUG,
     INFO,
     WARNING,
-    ERROR
+    ERROR,
 }

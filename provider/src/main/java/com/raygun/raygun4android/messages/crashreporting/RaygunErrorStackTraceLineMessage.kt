@@ -7,15 +7,12 @@ data class RaygunErrorStackTraceLineMessage(
     var methodName: String,
 ) {
     companion object {
-        operator fun invoke(
-            element: StackTraceElement,
-        ): RaygunErrorStackTraceLineMessage {
-            return RaygunErrorStackTraceLineMessage(
+        operator fun invoke(element: StackTraceElement): RaygunErrorStackTraceLineMessage =
+            RaygunErrorStackTraceLineMessage(
                 lineNumber = element.lineNumber,
                 className = element.className,
                 fileName = element.fileName ?: "",
                 methodName = element.methodName,
             )
-        }
     }
 }

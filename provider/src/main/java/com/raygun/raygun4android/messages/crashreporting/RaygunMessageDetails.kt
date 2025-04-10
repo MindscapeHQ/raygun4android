@@ -20,8 +20,7 @@ data class RaygunMessageDetails(
     // Tags
     var tags: List<*>? = null,
     // Custom Data
-    @SerializedName("userCustomData")
-    var customData: Map<*, *>? = null,
+    @SerializedName("userCustomData") var customData: Map<*, *>? = null,
     // App Context
     var appContext: RaygunAppContext? = null,
     // User
@@ -30,7 +29,6 @@ data class RaygunMessageDetails(
     var networkInfo: NetworkInfo? = null,
     var breadcrumbs: List<RaygunBreadcrumbMessage>? = null,
 ) {
-
     fun setAppContext(identifier: String?) {
         this.appContext = RaygunAppContext(identifier)
     }

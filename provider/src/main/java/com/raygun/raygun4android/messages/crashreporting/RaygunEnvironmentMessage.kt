@@ -37,7 +37,7 @@ data class RaygunEnvironmentMessage(
     var totalPhysicalMemory: Long = 0,
     var utcOffset: Double = 0.0,
     var windowsBoundHeight: Int = 0,
-    var windowsBoundWidth: Int = 0
+    var windowsBoundWidth: Int = 0,
 ) {
     companion object {
         @Throws(IOException::class)

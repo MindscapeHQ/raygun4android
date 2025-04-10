@@ -13,11 +13,11 @@ data class RaygunBreadcrumbMessage(
     var methodName: String?,
     var lineNumber: Int?,
 ) {
-    fun breadcrumbLevel(): RaygunBreadcrumbLevel {
-        return RaygunBreadcrumbLevel.entries[level]
-    }
+    fun breadcrumbLevel(): RaygunBreadcrumbLevel = RaygunBreadcrumbLevel.entries[level]
 
-    class Builder(internal val message: String?) {
+    class Builder(
+        internal val message: String?,
+    ) {
         private var category: String? = null
         private var level: Int = RaygunBreadcrumbLevel.INFO.ordinal
         private var customData: Map<String, Any?> = WeakHashMap()
@@ -55,16 +55,15 @@ data class RaygunBreadcrumbMessage(
             return this
         }
 
-        fun build(): RaygunBreadcrumbMessage {
-            return RaygunBreadcrumbMessage(
+        fun build(): RaygunBreadcrumbMessage =
+            RaygunBreadcrumbMessage(
                 message = message,
                 category = category,
                 level = level,
                 customData = customData,
                 className = className,
                 methodName = methodName,
-                lineNumber = lineNumber
+                lineNumber = lineNumber,
             )
-        }
     }
 }
