@@ -1,6 +1,8 @@
 package com.raygun.raygun4android
 
 import android.content.Context
+import com.google.gson.Gson
+import com.raygun.raygun4android.messages.crashreporting.RaygunMessage
 import com.raygun.raygun4android.messages.shared.RaygunUserInfo
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
@@ -35,9 +37,9 @@ class RaygunMessageBuilderTest {
         val exception = RuntimeException("Test exception")
         val message = raygunMessageBuilder.setExceptionDetails(exception).build()
 
-        assertNotNull(message.details?.error)
-        assertEquals("RuntimeException: Test exception", message.details?.error?.message)
-        assertNotNull(message.details?.error?.stackTrace)
+        assertNotNull(message.details.error)
+        assertEquals("RuntimeException: Test exception", message.details.error?.message)
+        assertNotNull(message.details.error?.stackTrace)
     }
 
     @Test
@@ -45,7 +47,7 @@ class RaygunMessageBuilderTest {
         val tags = listOf("critical", "ui", "crash")
         val message = raygunMessageBuilder.setTags(tags).build()
 
-        assertEquals(tags, message.details?.tags)
+        assertEquals(tags, message.details.tags)
     }
 
     @Test
@@ -55,7 +57,7 @@ class RaygunMessageBuilderTest {
 
         val message = raygunMessageBuilder.setCustomData(customData).build()
 
-        assertEquals(customData, message.details?.customData)
+        assertEquals(customData, message.details.customData)
     }
 
     @Test
@@ -63,7 +65,7 @@ class RaygunMessageBuilderTest {
         val mockUser = mock<RaygunUserInfo>()
         val message = raygunMessageBuilder.setUserInfo(mockUser).build()
 
-        assertEquals(mockUser, message.details?.userInfo)
+        assertEquals(mockUser, message.details.userInfo)
     }
 
     @Test
@@ -72,7 +74,7 @@ class RaygunMessageBuilderTest {
 
         val message = raygunMessageBuilder.setVersion(version).build()
 
-        assertEquals(version, message.details?.version)
+        assertEquals(version, message.details.version)
     }
 
     @Test
@@ -82,7 +84,7 @@ class RaygunMessageBuilderTest {
 
             val message = raygunMessageBuilder.setEnvironmentDetails(mockContext).build()
 
-            assertNotNull(message.details?.environment)
+            assertNotNull(message.details.environment)
         }
     }
 
@@ -99,8 +101,28 @@ class RaygunMessageBuilderTest {
                 .setCustomData(customData)
                 .build()
 
-        assertEquals("IllegalArgumentException: Invalid parameter", message.details?.error?.message)
-        assertEquals(tags, message.details?.tags)
-        assertEquals(customData, message.details?.customData)
+        assertEquals("IllegalArgumentException: Invalid parameter", message.details.error?.message)
+        assertEquals(tags, message.details.tags)
+        assertEquals(customData, message.details.customData)
+    }
+
+    @Test
+    fun `test serialization and deserialization of message`() {
+        val exception = IllegalArgumentException("Invalid parameter")
+        val tags = listOf("validation", "input")
+        val customData = mapOf("field" to "email", "value" to "invalid")
+
+        val message =
+            raygunMessageBuilder
+                .setExceptionDetails(exception)
+                .setTags(tags)
+                .setCustomData(customData)
+                .build()
+
+        val serialized = Gson().toJson(message)!!
+        val deserialized = Gson().fromJson(serialized, RaygunMessage::class.java)
+
+        // Deserialized message should be equal to the original message
+        assertEquals(message, deserialized)
     }
 }

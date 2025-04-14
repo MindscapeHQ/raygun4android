@@ -87,7 +87,7 @@ public class RUM {
 
     public void updateCurrentSessionUser(RaygunUserInfo userInfo) {
         if (currentSessionUser != null) {
-            boolean currentSessionUserIsAnon = currentSessionUser.getIsAnonymous();
+            boolean currentSessionUserIsAnon = currentSessionUser.isAnonymous();
             boolean usersAreTheSame =
                     currentSessionUser.getIdentifier().equals(userInfo.getIdentifier());
             boolean changedUser = !usersAreTheSame && !currentSessionUserIsAnon;

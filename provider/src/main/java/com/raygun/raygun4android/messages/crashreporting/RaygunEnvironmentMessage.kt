@@ -18,28 +18,27 @@ import java.util.TimeZone
 import java.util.concurrent.TimeUnit
 import java.util.regex.Pattern
 
-@SuppressLint("SwitchIntDef")
-class RaygunEnvironmentMessage private constructor() {
-    private val availableVirtualMemory: Long = 0
-    private val cpu: String? = null
-    private val totalVirtualMemory: Long = 0
-    private var architecture: String? = null
-    private var availablePhysicalMemory: Long = 0
-    private var board: String? = null
-    private var brand: String? = null
-    private var currentOrientation: String? = null
-    private var deviceCode: String? = null
-    private var deviceName: String? = null
-    private var diskSpaceFree: Long = 0
-    private var locale: String? = null
-    private var oSVersion: String? = null
-    private var osSDKVersion: String? = null
-    private var processorCount = 0
-    private var totalPhysicalMemory: Long = 0
-    private var utcOffset = 0.0
-    private var windowsBoundHeight = 0
-    private var windowsBoundWidth = 0
-
+data class RaygunEnvironmentMessage(
+    var availableVirtualMemory: Long = 0,
+    var cpu: String? = null,
+    var totalVirtualMemory: Long = 0,
+    var architecture: String? = null,
+    var availablePhysicalMemory: Long = 0,
+    var board: String? = null,
+    var brand: String? = null,
+    var currentOrientation: String? = null,
+    var deviceCode: String? = null,
+    var deviceName: String? = null,
+    var diskSpaceFree: Long = 0,
+    var locale: String? = null,
+    var oSVersion: String? = null,
+    var osSDKVersion: String? = null,
+    var processorCount: Int = 0,
+    var totalPhysicalMemory: Long = 0,
+    var utcOffset: Double = 0.0,
+    var windowsBoundHeight: Int = 0,
+    var windowsBoundWidth: Int = 0,
+) {
     companion object {
         @Throws(IOException::class)
         suspend fun getTotalRam(): String? =
@@ -53,6 +52,7 @@ class RaygunEnvironmentMessage private constructor() {
                 }
             }
 
+        @SuppressLint("SwitchIntDef")
         suspend operator fun invoke(context: Context): RaygunEnvironmentMessage {
             val raygunEnvironmentMessage = RaygunEnvironmentMessage()
             try {
