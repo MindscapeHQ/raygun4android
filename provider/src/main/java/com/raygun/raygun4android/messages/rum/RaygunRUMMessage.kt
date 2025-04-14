@@ -1,7 +1,7 @@
 package com.raygun.raygun4android.messages.rum
 
 data class RaygunRUMMessage(
-    var eventData: Array<RaygunRUMDataMessage> = emptyArray()
+    var eventData: Array<RaygunRUMDataMessage> = emptyArray(),
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -12,7 +12,5 @@ data class RaygunRUMMessage(
         return eventData.contentEquals(other.eventData)
     }
 
-    override fun hashCode(): Int {
-        return eventData.contentHashCode()
-    }
+    override fun hashCode(): Int = eventData.contentHashCode()
 }

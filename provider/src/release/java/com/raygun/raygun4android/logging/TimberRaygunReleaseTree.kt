@@ -6,7 +6,10 @@ import kotlin.math.min
 
 internal class TimberRaygunReleaseTree : Timber.Tree() {
     override fun log(
-        priority: Int, tag: String?, message: String, t: Throwable?
+        priority: Int,
+        tag: String?,
+        message: String,
+        t: Throwable?,
     ) {
         if (priority == Log.ERROR || priority == Log.WARN) {
             if (message.length < MAX_LOG_LENGTH) {

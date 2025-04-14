@@ -4,7 +4,9 @@ data class RaygunRUMData(
     val name: String,
     val timing: RaygunRUMTimingMessage?,
 ) {
-    class Builder(internal val name: String) {
+    class Builder(
+        internal val name: String,
+    ) {
         private var timing: RaygunRUMTimingMessage? = null
 
         fun timing(timing: RaygunRUMTimingMessage?): Builder {
@@ -12,8 +14,6 @@ data class RaygunRUMData(
             return this
         }
 
-        fun build(): RaygunRUMData {
-            return RaygunRUMData(name, timing)
-        }
+        fun build(): RaygunRUMData = RaygunRUMData(name, timing)
     }
 }

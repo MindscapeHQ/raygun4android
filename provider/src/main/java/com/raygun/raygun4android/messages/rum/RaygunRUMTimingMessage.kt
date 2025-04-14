@@ -4,7 +4,9 @@ data class RaygunRUMTimingMessage(
     val type: String,
     val duration: Long,
 ) {
-    class Builder(internal val type: String) {
+    class Builder(
+        internal val type: String,
+    ) {
         private var duration: Long = 0
 
         fun duration(duration: Long): Builder {
@@ -12,8 +14,6 @@ data class RaygunRUMTimingMessage(
             return this
         }
 
-        fun build(): RaygunRUMTimingMessage {
-            return RaygunRUMTimingMessage(type, duration)
-        }
+        fun build(): RaygunRUMTimingMessage = RaygunRUMTimingMessage(type, duration)
     }
 }

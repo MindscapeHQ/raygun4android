@@ -4,7 +4,6 @@ import android.content.Context
 import android.os.Build
 import com.google.gson.Gson
 import com.raygun.raygun4android.RaygunClient
-import com.raygun.raygun4android.RaygunRUMEventType
 import com.raygun.raygun4android.RaygunSettings
 import com.raygun.raygun4android.messages.shared.RaygunUserInfo
 import com.raygun.raygun4android.network.RaygunNetworkUtils
@@ -35,22 +34,21 @@ class RaygunRUMMessageTest {
             .thenReturn("mock-uuid")
         val userInfo = RaygunUserInfo(identifier = "123")
         val dataMessage: RaygunRUMDataMessage =
-            RaygunRUMDataMessage.Builder(RaygunSettings.RUM_EVENT_TIMING)
-                .timestamp("2023-10-01T12:00:00").sessionId("123")
-                .version(RaygunClient.getVersion()).os("Android").osVersion(Build.VERSION.RELEASE)
-                .platform(String.format("%s %s", Build.MANUFACTURER, Build.MODEL)).user(userInfo)
-                .data("DATA").build()
-        message = RaygunRUMMessage()
-        message.eventData = arrayOf(
-            dataMessage
-        )
-
-        val timingMessage =
-            RaygunRUMTimingMessage.Builder(
-                "p"
-            )
-                .duration(1234)
+            RaygunRUMDataMessage
+                .Builder(RaygunSettings.RUM_EVENT_TIMING)
+                .timestamp("2023-10-01T12:00:00")
+                .sessionId("123")
+                .version(RaygunClient.getVersion())
+                .os("Android")
+                .osVersion(Build.VERSION.RELEASE)
+                .platform(String.format("%s %s", Build.MANUFACTURER, Build.MODEL))
+                .user(userInfo)
+                .data("DATA")
                 .build()
+        message = RaygunRUMMessage()
+        message.eventData = arrayOf(dataMessage)
+
+        val timingMessage = RaygunRUMTimingMessage.Builder("p").duration(1234).build()
 
         data = RaygunRUMData.Builder("name").timing(timingMessage).build()
     }

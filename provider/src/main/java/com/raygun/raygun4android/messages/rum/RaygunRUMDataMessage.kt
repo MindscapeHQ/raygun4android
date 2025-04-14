@@ -13,8 +13,9 @@ data class RaygunRUMDataMessage(
     val platform: String?,
     val data: String?,
 ) {
-
-    class Builder(internal val type: String) {
+    class Builder(
+        internal val type: String,
+    ) {
         private var sessionId: String? = null
         private var timestamp: String? = null
         private var user: RaygunUserInfo? = null
@@ -64,8 +65,8 @@ data class RaygunRUMDataMessage(
             return this
         }
 
-        fun build(): RaygunRUMDataMessage {
-            return RaygunRUMDataMessage(
+        fun build(): RaygunRUMDataMessage =
+            RaygunRUMDataMessage(
                 sessionId = sessionId,
                 timestamp = timestamp,
                 type = type,
@@ -76,6 +77,5 @@ data class RaygunRUMDataMessage(
                 platform = platform,
                 data = data,
             )
-        }
     }
 }
