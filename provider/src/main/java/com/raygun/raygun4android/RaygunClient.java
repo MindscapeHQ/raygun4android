@@ -89,7 +89,7 @@ public class RaygunClient {
 
     private static void sharedSetup(String apiKey, String version) {
 
-        TimberRaygunLoggerImplementation.init();
+        TimberRaygunLoggerImplementation.INSTANCE.init();
 
         RaygunLogger.d(
                 "Configuring Raygun4Android (v" + RaygunSettings.RAYGUN_CLIENT_VERSION + ")");
