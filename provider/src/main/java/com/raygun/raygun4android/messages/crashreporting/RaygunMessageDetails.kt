@@ -33,8 +33,8 @@ data class RaygunMessageDetails(
         this.appContext = RaygunAppContext(identifier)
     }
 
-    fun setUserInfo() {
-        this.userInfo = RaygunUserInfo()
+    suspend fun setUserInfo() {
+        this.userInfo = RaygunUserInfo.anonymous()
     }
 
     fun setNetworkInfo(context: Context) {

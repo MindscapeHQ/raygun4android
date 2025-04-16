@@ -1,3 +1,5 @@
+@file:OptIn(DelicateCoroutinesApi::class)
+
 package com.raygun.raygun4android.sample
 
 import android.app.Application
@@ -146,18 +148,20 @@ class MainActivity : AppCompatActivity() {
         }
 
         buttonSetUserAnon.setOnClickListener {
-            val user = RaygunUserInfo()
-            RaygunClient.setUser(user)
-            Snackbar
-                .make(
-                    it,
-                    getString(R.string.user_is_now_set_to_anonymous_for_future_raygun_reports),
-                    Snackbar.LENGTH_SHORT,
-                ).show()
+            GlobalScope.launch {
+                val user = RaygunUserInfo.anonymous()
+                RaygunClient.setUser(user)
+                Snackbar
+                    .make(
+                        it,
+                        getString(R.string.user_is_now_set_to_anonymous_for_future_raygun_reports),
+                        Snackbar.LENGTH_SHORT,
+                    ).show()
+            }
         }
 
         buttonSetUserA.setOnClickListener {
-            val user = RaygunUserInfo("superuser3")
+            val user = RaygunUserInfo.create("superuser3")
             user.fullName = "User Name A"
             user.firstName = "User A"
             user.email = "e@f.com.com"
@@ -172,7 +176,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         buttonSetUserB.setOnClickListener {
-            val user = RaygunUserInfo("superuser4")
+            val user = RaygunUserInfo.create("superuser4")
             user.fullName = "User Name B"
             user.firstName = "User B"
             user.email = "g@h.com"

@@ -14,9 +14,13 @@ import com.raygun.raygun4android.RaygunClient
 import com.raygun.raygun4android.messages.crashreporting.RaygunBreadcrumbLevel
 import com.raygun.raygun4android.messages.crashreporting.RaygunBreadcrumbMessage
 import com.raygun.raygun4android.messages.shared.RaygunUserInfo
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import java.util.WeakHashMap
 
 class SecondActivity : AppCompatActivity() {
+    @OptIn(DelicateCoroutinesApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_second)
@@ -88,18 +92,20 @@ class SecondActivity : AppCompatActivity() {
         }
 
         buttonSetUserAnon.setOnClickListener {
-            val user = RaygunUserInfo()
-            RaygunClient.setUser(user)
-            Snackbar
-                .make(
-                    it,
-                    getString(R.string.user_is_now_set_to_anonymous_for_future_raygun_reports),
-                    Snackbar.LENGTH_SHORT,
-                ).show()
+            GlobalScope.launch {
+                val user = RaygunUserInfo.anonymous()
+                RaygunClient.setUser(user)
+                Snackbar
+                    .make(
+                        it,
+                        getString(R.string.user_is_now_set_to_anonymous_for_future_raygun_reports),
+                        Snackbar.LENGTH_SHORT,
+                    ).show()
+            }
         }
 
         buttonSetUserA.setOnClickListener {
-            val user = RaygunUserInfo("superuser3")
+            val user = RaygunUserInfo.create("superuser3")
             user.fullName = "User Name A"
             user.firstName = "User A"
             user.email = "e@f.com.com"
@@ -114,7 +120,7 @@ class SecondActivity : AppCompatActivity() {
         }
 
         buttonSetUserB.setOnClickListener {
-            val user = RaygunUserInfo("superuser4")
+            val user = RaygunUserInfo.create("superuser4")
             user.fullName = "User Name B"
             user.firstName = "User B"
             user.email = "g@h.com"

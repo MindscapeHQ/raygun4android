@@ -145,7 +145,7 @@ public class RUM {
             }
 
             RaygunUserInfo user =
-                    userInfo == null ? new RaygunUserInfo(null, null, null, null) : userInfo;
+                    userInfo == null ? RaygunUserInfo.anonymousSync() : userInfo;
 
             RaygunRUMDataMessage dataMessage =
                     new RaygunRUMDataMessage.Builder(eventName)
@@ -170,7 +170,7 @@ public class RUM {
     private void sendRUMEvent(String eventName) {
         RaygunUserInfo user =
                 RaygunClient.getUser() == null
-                        ? new RaygunUserInfo(null, null, null, null)
+                        ? RaygunUserInfo.anonymousSync()
                         : RaygunClient.getUser();
         sendRUMEvent(eventName, user);
     }
@@ -214,7 +214,7 @@ public class RUM {
 
             RaygunUserInfo user =
                     RaygunClient.getUser() == null
-                            ? new RaygunUserInfo(null, null, null, null)
+                            ? RaygunUserInfo.anonymousSync()
                             : RaygunClient.getUser();
 
             RaygunRUMTimingMessage timingMessage =

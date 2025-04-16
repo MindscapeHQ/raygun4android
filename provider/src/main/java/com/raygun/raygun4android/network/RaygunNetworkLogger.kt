@@ -84,7 +84,7 @@ object RaygunNetworkLogger {
 
     @Synchronized
     private fun sendNetworkTimingEvent(
-        url: String,
+        url: String?,
         requestMethod: String,
         startTime: Long,
         endTime: Long,
