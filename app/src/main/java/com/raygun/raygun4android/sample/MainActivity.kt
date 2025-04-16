@@ -13,8 +13,20 @@ import com.raygun.raygun4android.RaygunClient
 import com.raygun.raygun4android.messages.shared.RaygunUserInfo
 import com.raygun.raygun4android.sample.fragments.NavigationActivity
 import com.raygun.raygun4android.sample.fragments.NavigationFragmentSwapActivity
-import java.nio.file.Files.size
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import okhttp3.OkHttpClient
+import java.io.BufferedReader
+import java.io.IOException
+import java.io.InputStreamReader
+import java.net.HttpURLConnection
+import java.net.URL
+import java.net.URLConnection
 import java.util.Arrays
+import java.net.HttpURLConnection as HttpURLConnection1
+
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -67,6 +79,8 @@ class MainActivity : AppCompatActivity() {
 
             // Manual exception creation & sending via 2 strings
             RaygunClient.send("My custom message", "The reason for the error", null, tw)
+
+            sendNetworkRequest()
 
             Snackbar
                 .make(
@@ -216,4 +230,31 @@ class MainActivity : AppCompatActivity() {
                     ).show()
             }
         }
+
+    @OptIn(DelicateCoroutinesApi::class)
+    fun sendNetworkRequest() {
+        GlobalScope.launch(Dispatchers.IO) {
+            Log.d("Raygun4Android-Sample", "Sending network request")
+
+            try {
+                val url = URL("https://example.com")
+                val urlConnection = url.openConnection() as HttpURLConnection
+                urlConnection.requestMethod = "GET"
+
+                val `in` = BufferedReader(
+                    InputStreamReader(urlConnection.inputStream)
+                )
+                var content: String? = ""
+                var current: String?
+                while ((`in`.readLine().also { current = it }) != null) {
+                    content += current
+                }
+                urlConnection.disconnect()
+                Log.d("Raygun4Android-Sample", "Network Response: $content")
+            } catch (e: IOException) {
+                e.printStackTrace()
+                Log.e("Raygun4Android-Sample", "Network error: $e")
+            }
+        }
+    }
 }
