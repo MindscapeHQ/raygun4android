@@ -34,8 +34,7 @@ class RUM private constructor() {
     private var lastSeenTime: Long = 0
     private var sessionId: String? = null
     private var currentSessionUser: RaygunUserInfo? = null
-    private val rumActivity =
-        RUMActivity(this, RUMFragment(this))
+    private val rumActivity = RUMActivity(this, RUMFragment(this))
     private val coroutineScope = CoroutineScope(Dispatchers.IO + CoroutineName("RUM"))
 
     /**
@@ -44,7 +43,10 @@ class RUM private constructor() {
      * @param mainActivity The main activity of the application.
      * @param networkLogging Whether to log network requests.
      */
-    fun attach(mainActivity: Activity, networkLogging: Boolean) {
+    fun attach(
+        mainActivity: Activity,
+        networkLogging: Boolean,
+    ) {
         v("attached RUM")
         setEnabled(networkLogging)
         if (!rumActivity.isAttached) {
@@ -55,35 +57,34 @@ class RUM private constructor() {
         seen()
     }
 
-    /** Send all remaining RUM events before the app is closed.  */
-    fun sendRemaining() = coroutineScope.launch {
-        rumActivity.sendRemaining()
-        sendRUMEvent(RaygunSettings.RUM_EVENT_SESSION_END, currentSessionUser)
-        seen()
-    }
+    /** Send all remaining RUM events before the app is closed. */
+    fun sendRemaining() =
+        coroutineScope.launch {
+            rumActivity.sendRemaining()
+            sendRUMEvent(RaygunSettings.RUM_EVENT_SESSION_END, currentSessionUser)
+            seen()
+        }
 
-    /** Call this method everytime there is a lifecycle event in activities or fragments.  */
+    /** Call this method everytime there is a lifecycle event in activities or fragments. */
     fun seen() {
         lastSeenTime = System.currentTimeMillis()
     }
 
-    /** Rotates the User session if expired  */
+    /** Rotates the User session if expired */
     fun maybeRotateSession() {
         if (doesNeedSessionRotation()) {
             rotateSession(currentSessionUser, currentSessionUser)
         }
     }
 
-    private fun doesNeedSessionRotation(): Boolean {
-        return lastSeenTime > 0
-            && System.currentTimeMillis() - lastSeenTime > RaygunSettings.RUM_SESSION_EXPIRY
-    }
+    private fun doesNeedSessionRotation(): Boolean =
+        lastSeenTime > 0 &&
+            System.currentTimeMillis() - lastSeenTime > RaygunSettings.RUM_SESSION_EXPIRY
 
     fun updateCurrentSessionUser(userInfo: RaygunUserInfo) {
         if (currentSessionUser != null) {
             val currentSessionUserIsAnon = currentSessionUser!!.isAnonymous
-            val usersAreTheSame =
-                currentSessionUser!!.identifier == userInfo.identifier
+            val usersAreTheSame = currentSessionUser!!.identifier == userInfo.identifier
             val changedUser = !usersAreTheSame && !currentSessionUserIsAnon
 
             if (changedUser) {
@@ -104,7 +105,7 @@ class RUM private constructor() {
 
     private fun rotateSession(
         currentSessionUser: RaygunUserInfo?,
-        newSessionUser: RaygunUserInfo?
+        newSessionUser: RaygunUserInfo?,
     ) = coroutineScope.launch {
         sendRUMEvent(RaygunSettings.RUM_EVENT_SESSION_END, currentSessionUser)
         sessionId = UUID.randomUUID().toString()
@@ -116,7 +117,10 @@ class RUM private constructor() {
      *
      * @param eventName Tracks if this is a session start or session end event.
      */
-    private suspend fun sendRUMEvent(eventName: String, userInfo: RaygunUserInfo?) {
+    private suspend fun sendRUMEvent(
+        eventName: String,
+        userInfo: RaygunUserInfo?,
+    ) {
         if (RaygunClient.isRUMEnabled()) {
             val timestamp: String
 
@@ -127,7 +131,8 @@ class RUM private constructor() {
                 }
                 timestamp = utcDateTime.toString()
             } else {
-                @SuppressLint("SimpleDateFormat") val df = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss")
+                @SuppressLint("SimpleDateFormat")
+                val df = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss")
                 df.timeZone = TimeZone.getTimeZone("UTC")
                 val c = Calendar.getInstance()
                 if (RaygunSettings.RUM_EVENT_SESSION_END == eventName) {
@@ -139,7 +144,8 @@ class RUM private constructor() {
             val user = userInfo ?: anonymous()
 
             val dataMessage =
-                RaygunRUMDataMessage.Builder(eventName)
+                RaygunRUMDataMessage
+                    .Builder(eventName)
                     .timestamp(timestamp)
                     .sessionId(sessionId)
                     .version(RaygunClient.getVersion())
@@ -159,11 +165,7 @@ class RUM private constructor() {
     }
 
     private suspend fun sendRUMEvent(eventName: String) {
-        val user =
-            if (RaygunClient.getUser() == null)
-                anonymous()
-            else
-                RaygunClient.getUser()
+        val user = if (RaygunClient.getUser() == null) anonymous() else RaygunClient.getUser()
         sendRUMEvent(eventName, user)
     }
 
@@ -172,13 +174,13 @@ class RUM private constructor() {
      *
      * @param eventType The type of event that occurred.
      * @param name The name of the event resource such as the activity name or URL of a network
-     * call.
+     *   call.
      * @param milliseconds The duration of the event in milliseconds.
      */
     fun sendRUMTimingEvent(
         eventType: RaygunRUMEventType,
         name: String,
-        milliseconds: Long
+        milliseconds: Long,
     ) = coroutineScope.launch {
         if (RaygunClient.isRUMEnabled()) {
             if (sessionId == null) {
@@ -199,7 +201,8 @@ class RUM private constructor() {
                 utcDateTime.minus(milliseconds, ChronoUnit.MILLIS)
                 timestamp = utcDateTime.toString()
             } else {
-                @SuppressLint("SimpleDateFormat") val df = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss")
+                @SuppressLint("SimpleDateFormat")
+                val df = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss")
                 df.timeZone = TimeZone.getTimeZone("UTC")
                 val c = Calendar.getInstance()
                 c.add(Calendar.MILLISECOND, -milliseconds.toInt())
@@ -207,22 +210,20 @@ class RUM private constructor() {
             }
 
             val user =
-                if (RaygunClient.getUser() == null)
-                    anonymous()
-                else
-                    RaygunClient.getUser()
+                if (RaygunClient.getUser() == null) anonymous() else RaygunClient.getUser()
 
             val timingMessage =
-                RaygunRUMTimingMessage.Builder(
-                    if (eventType == RaygunRUMEventType.ACTIVITY_LOADED
-                        || (eventType
-                            == RaygunRUMEventType.FRAGMENT_LOADED)
-                    )
-                        "p"
-                    else
-                        "n"
-                )
-                    .duration(milliseconds)
+                RaygunRUMTimingMessage
+                    .Builder(
+                        if (
+                            eventType == RaygunRUMEventType.ACTIVITY_LOADED ||
+                            (eventType == RaygunRUMEventType.FRAGMENT_LOADED)
+                        ) {
+                            "p"
+                        } else {
+                            "n"
+                        },
+                    ).duration(milliseconds)
                     .build()
 
             val data = RaygunRUMData.Builder(name).timing(timingMessage).build()
@@ -231,7 +232,8 @@ class RUM private constructor() {
             val dataStr = Gson().toJson(dataArray)
 
             val dataMessage =
-                RaygunRUMDataMessage.Builder(RaygunSettings.RUM_EVENT_TIMING)
+                RaygunRUMDataMessage
+                    .Builder(RaygunSettings.RUM_EVENT_TIMING)
                     .timestamp(timestamp)
                     .sessionId(sessionId)
                     .version(RaygunClient.getVersion())
@@ -247,9 +249,7 @@ class RUM private constructor() {
 
             enqueueWorkForRUMService(RaygunClient.getApiKey(), Gson().toJson(message))
         } else {
-            w(
-                "RUM is not enabled, please enable to use the sendRUMTimingEvent() function"
-            )
+            w("RUM is not enabled, please enable to use the sendRUMTimingEvent() function")
         }
     }
 
@@ -266,7 +266,6 @@ class RUM private constructor() {
     }
 
     companion object {
-
         // Singleton instance
         private var _instance: RUM? = null
 
@@ -279,7 +278,10 @@ class RUM private constructor() {
                 return _instance!!
             }
 
-        private fun enqueueWorkForRUMService(apiKey: String, jsonPayload: String) {
+        private fun enqueueWorkForRUMService(
+            apiKey: String,
+            jsonPayload: String,
+        ) {
             RUMWorkerHelper.enqueueRUM(RaygunClient.getApplicationContext(), jsonPayload, apiKey)
         }
     }

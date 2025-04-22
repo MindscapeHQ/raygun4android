@@ -4,7 +4,6 @@ import com.raygun.raygun4android.RaygunRUMEventType
 import com.raygun.raygun4android.RaygunSettings
 import com.raygun.raygun4android.network.http.RaygunUrlStreamHandlerFactory
 import com.raygun.raygun4android.rum.RUM
-import kotlinx.coroutines.launch
 import java.net.URL
 
 object RaygunNetworkLogger {
@@ -103,13 +102,11 @@ object RaygunNetworkLogger {
     ) {
         if (!shouldIgnoreURL(url) && loggingEnabled) {
             val sanitizedUrl = sanitiseURL(url)
-            RUM
-                .instance
-                .sendRUMTimingEvent(
-                    RaygunRUMEventType.NETWORK_CALL,
-                    "$requestMethod $sanitizedUrl",
-                    endTime - startTime,
-                )
+            RUM.instance.sendRUMTimingEvent(
+                RaygunRUMEventType.NETWORK_CALL,
+                "$requestMethod $sanitizedUrl",
+                endTime - startTime,
+            )
         }
     }
 

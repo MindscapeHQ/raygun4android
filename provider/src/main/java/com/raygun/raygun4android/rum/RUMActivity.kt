@@ -14,7 +14,7 @@ class RUMActivity(
     private val rum: RUM,
     // Each time a new Activity is created, attach to the FragmentManager
     // When the Activity is destroyed, detach from the FragmentManager
-    private val rumFragment: RUMFragment
+    private val rumFragment: RUMFragment,
 ) : ActivityLifecycleCallbacks {
     private var mainActivity: WeakReference<Activity?>? = null
     private var currentActivity: WeakReference<Activity?>? = null
@@ -49,7 +49,7 @@ class RUMActivity(
             mainActivity!!.get()!!.application.unregisterActivityLifecycleCallbacks(this)
             if (mainActivity!!.get() is FragmentActivity) {
                 rumFragment.detach(
-                    (mainActivity!!.get() as FragmentActivity).supportFragmentManager
+                    (mainActivity!!.get() as FragmentActivity).supportFragmentManager,
                 )
             }
         }
@@ -68,7 +68,10 @@ class RUMActivity(
         }
     }
 
-    override fun onActivityCreated(activity: Activity, bundle: Bundle?) {
+    override fun onActivityCreated(
+        activity: Activity,
+        bundle: Bundle?,
+    ) {
         v("RUM - Activity created: " + getActivityName(activity))
         if (currentActivity == null || currentActivity!!.get() == null) {
             rum.maybeRotateSession()
@@ -130,7 +133,10 @@ class RUMActivity(
         rum.seen()
     }
 
-    override fun onActivitySaveInstanceState(activity: Activity, bundle: Bundle) {
+    override fun onActivitySaveInstanceState(
+        activity: Activity,
+        bundle: Bundle,
+    ) {
         v("RUM - onActivitySaveInstanceState: " + getActivityName(activity))
         rum.seen()
     }
@@ -144,7 +150,5 @@ class RUMActivity(
         rum.seen()
     }
 
-    private fun getActivityName(activity: Activity): String {
-        return activity.javaClass.simpleName
-    }
+    private fun getActivityName(activity: Activity): String = activity.javaClass.simpleName
 }
