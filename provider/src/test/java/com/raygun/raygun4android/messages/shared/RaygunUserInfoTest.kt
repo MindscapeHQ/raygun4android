@@ -26,11 +26,10 @@ class RaygunUserInfoTest {
             .`when`<Context> { RaygunClient.getApplicationContext() }
             .thenReturn(Mockito.mock(android.content.Context::class.java))
 
-        RaygunNetworkUtils.uuidProvider = object : UuidProvider {
-            override suspend fun getDeviceUuid(context: Context): String {
-                return "mock-uuid"
+        RaygunNetworkUtils.uuidProvider =
+            object : UuidProvider {
+                override suspend fun getDeviceUuid(context: Context): String = "mock-uuid"
             }
-        }
     }
 
     @After
@@ -39,15 +38,16 @@ class RaygunUserInfoTest {
     }
 
     @Test
-    fun `test create anonymous user`() = runBlocking {
-        val user = RaygunUserInfo.anonymous()
+    fun `test create anonymous user`() =
+        runBlocking {
+            val user = RaygunUserInfo.anonymous()
 
-        assertTrue(user.isAnonymous)
-        assertEquals("mock-uuid", user.identifier)
-        assertNull(user.email)
-        assertNull(user.fullName)
-        assertNull(user.firstName)
-    }
+            assertTrue(user.isAnonymous)
+            assertEquals("mock-uuid", user.identifier)
+            assertNull(user.email)
+            assertNull(user.fullName)
+            assertNull(user.firstName)
+        }
 
     @Test
     fun `test create user with identifier`() {
@@ -78,21 +78,23 @@ class RaygunUserInfoTest {
     }
 
     @Test
-    fun `test set identifier for anonymous user`() = runBlocking {
-        val user = RaygunUserInfo.anonymous()
-        user.setIdentifier("new-identifier")
+    fun `test set identifier for anonymous user`() =
+        runBlocking {
+            val user = RaygunUserInfo.anonymous()
+            user.setIdentifier("new-identifier")
 
-        assertFalse(user.isAnonymous)
-        assertEquals("new-identifier", user.identifier)
-    }
+            assertFalse(user.isAnonymous)
+            assertEquals("new-identifier", user.identifier)
+        }
 
     @Test
-    fun `test set email for anonymous user is ignored`() = runBlocking {
-        val user = RaygunUserInfo.anonymous()
-        user.email = "anonymous@example.com"
+    fun `test set email for anonymous user is ignored`() =
+        runBlocking {
+            val user = RaygunUserInfo.anonymous()
+            user.email = "anonymous@example.com"
 
-        assertNull(user.email)
-    }
+            assertNull(user.email)
+        }
 
     @Test
     fun `test set email for non-anonymous user`() {
@@ -103,12 +105,13 @@ class RaygunUserInfoTest {
     }
 
     @Test
-    fun `test set fullName for anonymous user is ignored`() = runBlocking {
-        val user = RaygunUserInfo.anonymous()
-        user.fullName = "Anonymous User"
+    fun `test set fullName for anonymous user is ignored`() =
+        runBlocking {
+            val user = RaygunUserInfo.anonymous()
+            user.fullName = "Anonymous User"
 
-        assertNull(user.fullName)
-    }
+            assertNull(user.fullName)
+        }
 
     @Test
     fun `test set fullName for non-anonymous user`() {
@@ -119,12 +122,13 @@ class RaygunUserInfoTest {
     }
 
     @Test
-    fun `test set firstName for anonymous user is ignored`() = runBlocking {
-        val user = RaygunUserInfo.anonymous()
-        user.firstName = "Anonymous"
+    fun `test set firstName for anonymous user is ignored`() =
+        runBlocking {
+            val user = RaygunUserInfo.anonymous()
+            user.firstName = "Anonymous"
 
-        assertNull(user.firstName)
-    }
+            assertNull(user.firstName)
+        }
 
     @Test
     fun `test set firstName for non-anonymous user`() {

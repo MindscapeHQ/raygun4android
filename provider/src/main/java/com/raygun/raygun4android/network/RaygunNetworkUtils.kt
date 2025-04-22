@@ -5,13 +5,13 @@ import android.content.Context
 import android.net.ConnectivityManager
 import android.provider.Settings
 import androidx.annotation.VisibleForTesting
+import androidx.core.content.edit
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.net.HttpURLConnection
 import java.net.URLConnection
 import java.nio.charset.StandardCharsets
 import java.util.UUID
-import androidx.core.content.edit
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 
 internal interface UuidProvider {
     suspend fun getDeviceUuid(context: Context): String
@@ -37,9 +37,8 @@ object RaygunNetworkUtils {
     @JvmStatic
     fun hasInternetConnection(appContext: Context): Boolean {
         val cm =
-            appContext
-                .applicationContext
-                .getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager?
+            appContext.applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE)
+                as ConnectivityManager?
 
         if (cm != null) {
             val activeNetwork = cm.activeNetworkInfo
@@ -49,37 +48,41 @@ object RaygunNetworkUtils {
         return false
     }
 
-    suspend fun getDeviceUuid(context: Context): String {
-        return uuidProvider.getDeviceUuid(context)
-    }
+    suspend fun getDeviceUuid(context: Context): String = uuidProvider.getDeviceUuid(context)
 
     @VisibleForTesting
-    internal var uuidProvider: UuidProvider = object : UuidProvider {
-        override suspend fun getDeviceUuid(context: Context): String {
-            return withContext(Dispatchers.IO) {
-                synchronized(this) {
-                    val prefs = context.getSharedPreferences(PREFS_FILE, 0)
-                    var id = prefs.getString(PREFS_DEVICE_ID, null)
-                    if (id != null) {
-                        return@withContext UUID.fromString(id).toString()
-                    } else {
-                        @SuppressLint("HardwareIds") val androidId =
-                            Settings.Secure.getString(
-                                context.contentResolver, Settings.Secure.ANDROID_ID
-                            )
-
-                        id = if ("9774d56d682e549c" != androidId) {
-                            UUID.nameUUIDFromBytes(androidId.toByteArray(StandardCharsets.UTF_8))
-                                .toString()
+    internal var uuidProvider: UuidProvider =
+        object : UuidProvider {
+            override suspend fun getDeviceUuid(context: Context): String {
+                return withContext(Dispatchers.IO) {
+                    synchronized(this) {
+                        val prefs = context.getSharedPreferences(PREFS_FILE, 0)
+                        var id = prefs.getString(PREFS_DEVICE_ID, null)
+                        if (id != null) {
+                            return@withContext UUID.fromString(id).toString()
                         } else {
-                            UUID.randomUUID().toString()
-                        }
+                            @SuppressLint("HardwareIds")
+                            val androidId =
+                                Settings.Secure.getString(
+                                    context.contentResolver,
+                                    Settings.Secure.ANDROID_ID,
+                                )
 
-                        prefs.edit() { putString(PREFS_DEVICE_ID, id) }
-                        return@withContext id
+                            id =
+                                if ("9774d56d682e549c" != androidId) {
+                                    UUID
+                                        .nameUUIDFromBytes(
+                                            androidId.toByteArray(StandardCharsets.UTF_8),
+                                        ).toString()
+                                } else {
+                                    UUID.randomUUID().toString()
+                                }
+
+                            prefs.edit { putString(PREFS_DEVICE_ID, id) }
+                            return@withContext id
+                        }
                     }
                 }
             }
         }
-    }
 }

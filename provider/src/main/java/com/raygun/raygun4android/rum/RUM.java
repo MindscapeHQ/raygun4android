@@ -144,8 +144,7 @@ public class RUM {
                 timestamp = df.format(c.getTime());
             }
 
-            RaygunUserInfo user =
-                    userInfo == null ? RaygunUserInfo.anonymousSync() : userInfo;
+            RaygunUserInfo user = userInfo == null ? RaygunUserInfo.anonymousSync() : userInfo;
 
             RaygunRUMDataMessage dataMessage =
                     new RaygunRUMDataMessage.Builder(eventName)

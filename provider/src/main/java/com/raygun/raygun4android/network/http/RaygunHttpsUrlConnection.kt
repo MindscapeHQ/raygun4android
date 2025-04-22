@@ -14,13 +14,13 @@ import java.security.cert.Certificate
 import javax.net.ssl.HttpsURLConnection
 import javax.net.ssl.SSLPeerUnverifiedException
 
-internal class RaygunHttpsUrlConnection(private val connectionInstance: URLConnection) :
-    HttpsURLConnection(
-        connectionInstance.url
-    ) {
+internal class RaygunHttpsUrlConnection(
+    private val connectionInstance: URLConnection,
+) : HttpsURLConnection(connectionInstance.url) {
     init {
         RaygunNetworkLogger.startNetworkCall(
-            connectionInstance.url.toExternalForm(), System.currentTimeMillis()
+            connectionInstance.url.toExternalForm(),
+            System.currentTimeMillis(),
         )
     }
 
@@ -33,7 +33,7 @@ internal class RaygunHttpsUrlConnection(private val connectionInstance: URLConne
                 url.toExternalForm(),
                 requestMethod,
                 System.currentTimeMillis(),
-                e.message
+                e.message,
             )
             throw e
         }
@@ -42,7 +42,10 @@ internal class RaygunHttpsUrlConnection(private val connectionInstance: URLConne
     override fun disconnect() {
         val statusCode = RaygunNetworkUtils.getStatusCode(connectionInstance)
         RaygunNetworkLogger.endNetworkCall(
-            url.toExternalForm(), requestMethod, System.currentTimeMillis(), statusCode
+            url.toExternalForm(),
+            requestMethod,
+            System.currentTimeMillis(),
+            statusCode,
         )
 
         if ((connectionInstance is HttpURLConnection)) {
@@ -59,7 +62,7 @@ internal class RaygunHttpsUrlConnection(private val connectionInstance: URLConne
                 url.toExternalForm(),
                 requestMethod,
                 System.currentTimeMillis(),
-                e.message
+                e.message,
             )
             throw e
         }
@@ -74,23 +77,22 @@ internal class RaygunHttpsUrlConnection(private val connectionInstance: URLConne
                 url.toExternalForm(),
                 requestMethod,
                 System.currentTimeMillis(),
-                e.message
+                e.message,
             )
             throw e
         }
     }
 
-    override fun getAllowUserInteraction(): Boolean {
-        return connectionInstance.allowUserInteraction
-    }
+    override fun getAllowUserInteraction(): Boolean = connectionInstance.allowUserInteraction
 
-    override fun addRequestProperty(field: String, newValue: String) {
+    override fun addRequestProperty(
+        field: String,
+        newValue: String,
+    ) {
         connectionInstance.addRequestProperty(field, newValue)
     }
 
-    override fun getConnectTimeout(): Int {
-        return connectionInstance.connectTimeout
-    }
+    override fun getConnectTimeout(): Int = connectionInstance.connectTimeout
 
     @Throws(IOException::class)
     override fun getContent(): Any {
@@ -101,7 +103,7 @@ internal class RaygunHttpsUrlConnection(private val connectionInstance: URLConne
                 url.toExternalForm(),
                 requestMethod,
                 System.currentTimeMillis(),
-                e.message
+                e.message,
             )
             throw e
         }
@@ -116,75 +118,49 @@ internal class RaygunHttpsUrlConnection(private val connectionInstance: URLConne
                 url.toExternalForm(),
                 requestMethod,
                 System.currentTimeMillis(),
-                e.message
+                e.message,
             )
             throw e
         }
     }
 
-    override fun getContentEncoding(): String {
-        return connectionInstance.contentEncoding
-    }
+    override fun getContentEncoding(): String = connectionInstance.contentEncoding
 
-    override fun getContentLength(): Int {
-        return connectionInstance.contentLength
-    }
+    override fun getContentLength(): Int = connectionInstance.contentLength
 
-    override fun getContentType(): String {
-        return connectionInstance.contentType
-    }
+    override fun getContentType(): String = connectionInstance.contentType
 
-    override fun getDate(): Long {
-        return connectionInstance.date
-    }
+    override fun getDate(): Long = connectionInstance.date
 
-    override fun getDefaultUseCaches(): Boolean {
-        return connectionInstance.defaultUseCaches
-    }
+    override fun getDefaultUseCaches(): Boolean = connectionInstance.defaultUseCaches
 
-    override fun getDoInput(): Boolean {
-        return connectionInstance.doInput
-    }
+    override fun getDoInput(): Boolean = connectionInstance.doInput
 
-    override fun getDoOutput(): Boolean {
-        return connectionInstance.doOutput
-    }
+    override fun getDoOutput(): Boolean = connectionInstance.doOutput
 
-    override fun getExpiration(): Long {
-        return connectionInstance.expiration
-    }
+    override fun getExpiration(): Long = connectionInstance.expiration
 
-    override fun getHeaderField(pos: Int): String {
-        return connectionInstance.getHeaderField(pos)
-    }
+    override fun getHeaderField(pos: Int): String = connectionInstance.getHeaderField(pos)
 
-    override fun getHeaderField(key: String): String {
-        return connectionInstance.getHeaderField(key)
-    }
+    override fun getHeaderField(key: String): String = connectionInstance.getHeaderField(key)
 
-    override fun getHeaderFieldDate(field: String, defaultValue: Long): Long {
-        return connectionInstance.getHeaderFieldDate(field, defaultValue)
-    }
+    override fun getHeaderFieldDate(
+        field: String,
+        defaultValue: Long,
+    ): Long = connectionInstance.getHeaderFieldDate(field, defaultValue)
 
-    override fun getHeaderFieldInt(field: String, defaultValue: Int): Int {
-        return connectionInstance.getHeaderFieldInt(field, defaultValue)
-    }
+    override fun getHeaderFieldInt(
+        field: String,
+        defaultValue: Int,
+    ): Int = connectionInstance.getHeaderFieldInt(field, defaultValue)
 
-    override fun getHeaderFieldKey(posn: Int): String {
-        return connectionInstance.getHeaderFieldKey(posn)
-    }
+    override fun getHeaderFieldKey(posn: Int): String = connectionInstance.getHeaderFieldKey(posn)
 
-    override fun getHeaderFields(): Map<String, List<String>> {
-        return connectionInstance.headerFields
-    }
+    override fun getHeaderFields(): Map<String, List<String>> = connectionInstance.headerFields
 
-    override fun getIfModifiedSince(): Long {
-        return connectionInstance.getIfModifiedSince()
-    }
+    override fun getIfModifiedSince(): Long = connectionInstance.getIfModifiedSince()
 
-    override fun getLastModified(): Long {
-        return connectionInstance.lastModified
-    }
+    override fun getLastModified(): Long = connectionInstance.lastModified
 
     @Throws(IOException::class)
     override fun getPermission(): Permission {
@@ -195,31 +171,21 @@ internal class RaygunHttpsUrlConnection(private val connectionInstance: URLConne
                 url.toExternalForm(),
                 requestMethod,
                 System.currentTimeMillis(),
-                e.message
+                e.message,
             )
             throw e
         }
     }
 
-    override fun getReadTimeout(): Int {
-        return connectionInstance.readTimeout
-    }
+    override fun getReadTimeout(): Int = connectionInstance.readTimeout
 
-    override fun getRequestProperties(): Map<String, List<String>> {
-        return connectionInstance.requestProperties
-    }
+    override fun getRequestProperties(): Map<String, List<String>> = connectionInstance.requestProperties
 
-    override fun getRequestProperty(field: String): String {
-        return connectionInstance.getRequestProperty(field)
-    }
+    override fun getRequestProperty(field: String): String = connectionInstance.getRequestProperty(field)
 
-    override fun getURL(): URL {
-        return connectionInstance.url
-    }
+    override fun getURL(): URL = connectionInstance.url
 
-    override fun getUseCaches(): Boolean {
-        return connectionInstance.useCaches
-    }
+    override fun getUseCaches(): Boolean = connectionInstance.useCaches
 
     override fun setAllowUserInteraction(newValue: Boolean) {
         connectionInstance.allowUserInteraction = newValue
@@ -249,7 +215,10 @@ internal class RaygunHttpsUrlConnection(private val connectionInstance: URLConne
         connectionInstance.readTimeout = timeoutMillis
     }
 
-    override fun setRequestProperty(field: String, newValue: String) {
+    override fun setRequestProperty(
+        field: String,
+        newValue: String,
+    ) {
         connectionInstance.setRequestProperty(field, newValue)
     }
 
@@ -315,8 +284,7 @@ internal class RaygunHttpsUrlConnection(private val connectionInstance: URLConne
 
     override fun setInstanceFollowRedirects(followRedirects: Boolean) {
         if ((connectionInstance is HttpsURLConnection)) {
-            connectionInstance.instanceFollowRedirects =
-                followRedirects
+            connectionInstance.instanceFollowRedirects = followRedirects
         }
     }
 

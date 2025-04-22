@@ -19,16 +19,12 @@ import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import okhttp3.OkHttpClient
 import java.io.BufferedReader
 import java.io.IOException
 import java.io.InputStreamReader
 import java.net.HttpURLConnection
 import java.net.URL
-import java.net.URLConnection
 import java.util.Arrays
-import java.net.HttpURLConnection as HttpURLConnection1
-
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -245,9 +241,7 @@ class MainActivity : AppCompatActivity() {
                 val urlConnection = url.openConnection() as HttpURLConnection
                 urlConnection.requestMethod = "GET"
 
-                val `in` = BufferedReader(
-                    InputStreamReader(urlConnection.inputStream)
-                )
+                val `in` = BufferedReader(InputStreamReader(urlConnection.inputStream))
                 var content: String? = ""
                 var current: String?
                 while ((`in`.readLine().also { current = it }) != null) {

@@ -25,15 +25,19 @@ class RaygunUrlStreamHandlerFactory : URLStreamHandlerFactory {
         val contextClassLoader = Thread.currentThread().contextClassLoader
 
         if (packageList != null && contextClassLoader != null) {
-            for (packageName in packageList.split("\\|".toRegex()).dropLastWhile { it.isEmpty() }
-                .toTypedArray()) {
+            for (
+            packageName in
+            packageList.split("\\|".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+            ) {
                 val className = "$packageName.$protocol.Handler"
                 try {
                     val c = contextClassLoader.loadClass(className)
                     streamHandler = c.newInstance() as URLStreamHandler
                     return streamHandler
                 } catch (ignore: IllegalAccessException) {
-                } catch (ignore: InstantiationException) {
+                } catch (
+                    ignore: InstantiationException,
+                ) {
                 } catch (ignore: ClassNotFoundException) {
                 }
             }
@@ -65,7 +69,5 @@ class RaygunUrlStreamHandlerFactory : URLStreamHandlerFactory {
         return null
     }
 
-    override fun createURLStreamHandler(protocol: String): URLStreamHandler? {
-        return handlers[protocol]
-    }
+    override fun createURLStreamHandler(protocol: String): URLStreamHandler? = handlers[protocol]
 }

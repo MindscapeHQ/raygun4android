@@ -28,11 +28,10 @@ class RaygunRUMMessageTest {
             .`when`<Context> { RaygunClient.getApplicationContext() }
             .thenReturn(Mockito.mock(android.content.Context::class.java))
 
-        RaygunNetworkUtils.uuidProvider = object : UuidProvider {
-            override suspend fun getDeviceUuid(context: Context): String {
-                return "mock-uuid"
+        RaygunNetworkUtils.uuidProvider =
+            object : UuidProvider {
+                override suspend fun getDeviceUuid(context: Context): String = "mock-uuid"
             }
-        }
 
         val userInfo = RaygunUserInfo.create(identifier = "123")
         val dataMessage: RaygunRUMDataMessage =

@@ -9,8 +9,9 @@ import java.net.URL
 import java.net.URLConnection
 import java.net.URLStreamHandler
 
-internal class RaygunHttpsUrlStreamHandler(private val originalHandler: URLStreamHandler) :
-    URLStreamHandler() {
+internal class RaygunHttpsUrlStreamHandler(
+    private val originalHandler: URLStreamHandler,
+) : URLStreamHandler() {
     @Throws(IOException::class)
     override fun openConnection(url: URL): URLConnection {
         try {
@@ -18,12 +19,13 @@ internal class RaygunHttpsUrlStreamHandler(private val originalHandler: URLStrea
                 RaygunReflectionUtils.findMethod(
                     originalHandler.javaClass,
                     "openConnection",
-                    arrayOf<Class<*>>(URL::class.java)
+                    arrayOf<Class<*>>(URL::class.java),
                 )
             method.isAccessible = true
 
-            val urlConnection = method.invoke(originalHandler, url) as URLConnection
-                ?: throw IOException("Failed to create connection")
+            val urlConnection =
+                method.invoke(originalHandler, url) as URLConnection
+                    ?: throw IOException("Failed to create connection")
 
             return RaygunHttpsUrlConnection(urlConnection)
         } catch (e: NoSuchMethodException) {
@@ -38,13 +40,16 @@ internal class RaygunHttpsUrlStreamHandler(private val originalHandler: URLStrea
     }
 
     @Throws(IOException::class)
-    override fun openConnection(url: URL, proxy: Proxy): URLConnection {
+    override fun openConnection(
+        url: URL,
+        proxy: Proxy,
+    ): URLConnection {
         try {
             val method =
                 RaygunReflectionUtils.findMethod(
                     originalHandler.javaClass,
                     "openConnection",
-                    arrayOf(URL::class.java, Proxy::class.java)
+                    arrayOf(URL::class.java, Proxy::class.java),
                 )
             method.isAccessible = true
 
@@ -64,9 +69,7 @@ internal class RaygunHttpsUrlStreamHandler(private val originalHandler: URLStrea
         throw IOException()
     }
 
-    public override fun getDefaultPort(): Int {
-        return PORT
-    }
+    public override fun getDefaultPort(): Int = PORT
 
     companion object {
         private const val PORT = 443

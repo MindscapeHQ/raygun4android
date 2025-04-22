@@ -31,7 +31,10 @@ object RaygunNetworkLogger {
     }
 
     @Synchronized
-    fun startNetworkCall(url: String?, startTime: Long) {
+    fun startNetworkCall(
+        url: String?,
+        startTime: Long,
+    ) {
         if (!shouldIgnoreURL(url) && loggingEnabled) {
             removeOldEntries()
             val id = sanitiseURL(url)
@@ -41,7 +44,10 @@ object RaygunNetworkLogger {
 
     @Synchronized
     fun endNetworkCall(
-        url: String?, requestMethod: String, endTime: Long, statusCode: Int
+        url: String?,
+        requestMethod: String,
+        endTime: Long,
+        statusCode: Int,
     ) {
         if (url != null) {
             val id = sanitiseURL(url)
@@ -54,7 +60,7 @@ object RaygunNetworkLogger {
                         request.startTime,
                         endTime,
                         statusCode,
-                        null
+                        null,
                     )
                     connections.remove(id)
                 }
@@ -74,7 +80,10 @@ object RaygunNetworkLogger {
      */
     @Synchronized
     fun cancelNetworkCall(
-        url: String?, requestMethod: String?, endTime: Long, exception: String?
+        url: String?,
+        requestMethod: String?,
+        endTime: Long,
+        exception: String?,
     ) {
         if (url != null) {
             val id = sanitiseURL(url)
@@ -89,15 +98,16 @@ object RaygunNetworkLogger {
         startTime: Long,
         endTime: Long,
         statusCode: Int,
-        exception: String?
+        exception: String?,
     ) {
         if (!shouldIgnoreURL(url) && loggingEnabled) {
             val sanitizedUrl = sanitiseURL(url)
-            RUM.getInstance()
+            RUM
+                .getInstance()
                 .sendRUMTimingEvent(
                     RaygunRUMEventType.NETWORK_CALL,
                     "$requestMethod $sanitizedUrl",
-                    endTime - startTime
+                    endTime - startTime,
                 )
         }
     }
