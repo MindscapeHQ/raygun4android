@@ -14,10 +14,14 @@ import com.raygun.raygun4android.messages.rum.RaygunRUMDataMessage
 import com.raygun.raygun4android.messages.rum.RaygunRUMMessage
 import com.raygun.raygun4android.messages.rum.RaygunRUMTimingMessage
 import com.raygun.raygun4android.messages.shared.RaygunUserInfo
-import com.raygun.raygun4android.messages.shared.RaygunUserInfo.Companion.anonymousSync
+import com.raygun.raygun4android.messages.shared.RaygunUserInfo.Companion.anonymous
 import com.raygun.raygun4android.network.RaygunNetworkLogger.init
 import com.raygun.raygun4android.network.RaygunNetworkLogger.setEnabled
 import com.raygun.raygun4android.workers.RUMWorkerHelper
+import kotlinx.coroutines.CoroutineName
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.time.LocalDateTime
 import java.time.ZoneId
@@ -32,6 +36,7 @@ class RUM private constructor() {
     private var currentSessionUser: RaygunUserInfo? = null
     private val rumActivity =
         RUMActivity(this, RUMFragment(this))
+    private val coroutineScope = CoroutineScope(Dispatchers.IO + CoroutineName("RUM"))
 
     /**
      * Attaches the RUM instance to the main activity and starts tracking RUM events.
@@ -51,7 +56,7 @@ class RUM private constructor() {
     }
 
     /** Send all remaining RUM events before the app is closed.  */
-    fun sendRemaining() {
+    fun sendRemaining() = coroutineScope.launch {
         rumActivity.sendRemaining()
         sendRUMEvent(RaygunSettings.RUM_EVENT_SESSION_END, currentSessionUser)
         seen()
@@ -71,7 +76,7 @@ class RUM private constructor() {
 
     private fun doesNeedSessionRotation(): Boolean {
         return lastSeenTime > 0
-                && System.currentTimeMillis() - lastSeenTime > RaygunSettings.RUM_SESSION_EXPIRY
+            && System.currentTimeMillis() - lastSeenTime > RaygunSettings.RUM_SESSION_EXPIRY
     }
 
     fun updateCurrentSessionUser(userInfo: RaygunUserInfo) {
@@ -100,7 +105,7 @@ class RUM private constructor() {
     private fun rotateSession(
         currentSessionUser: RaygunUserInfo?,
         newSessionUser: RaygunUserInfo?
-    ) {
+    ) = coroutineScope.launch {
         sendRUMEvent(RaygunSettings.RUM_EVENT_SESSION_END, currentSessionUser)
         sessionId = UUID.randomUUID().toString()
         sendRUMEvent(RaygunSettings.RUM_EVENT_SESSION_START, newSessionUser)
@@ -111,7 +116,7 @@ class RUM private constructor() {
      *
      * @param eventName Tracks if this is a session start or session end event.
      */
-    private fun sendRUMEvent(eventName: String, userInfo: RaygunUserInfo?) {
+    private suspend fun sendRUMEvent(eventName: String, userInfo: RaygunUserInfo?) {
         if (RaygunClient.isRUMEnabled()) {
             val timestamp: String
 
@@ -131,7 +136,7 @@ class RUM private constructor() {
                 timestamp = df.format(c.time)
             }
 
-            val user = userInfo ?: anonymousSync()
+            val user = userInfo ?: anonymous()
 
             val dataMessage =
                 RaygunRUMDataMessage.Builder(eventName)
@@ -153,10 +158,10 @@ class RUM private constructor() {
         }
     }
 
-    private fun sendRUMEvent(eventName: String) {
+    private suspend fun sendRUMEvent(eventName: String) {
         val user =
             if (RaygunClient.getUser() == null)
-                anonymousSync()
+                anonymous()
             else
                 RaygunClient.getUser()
         sendRUMEvent(eventName, user)
@@ -170,7 +175,11 @@ class RUM private constructor() {
      * call.
      * @param milliseconds The duration of the event in milliseconds.
      */
-    fun sendRUMTimingEvent(eventType: RaygunRUMEventType, name: String, milliseconds: Long) {
+    fun sendRUMTimingEvent(
+        eventType: RaygunRUMEventType,
+        name: String,
+        milliseconds: Long
+    ) = coroutineScope.launch {
         if (RaygunClient.isRUMEnabled()) {
             if (sessionId == null) {
                 sessionId = UUID.randomUUID().toString()
@@ -179,7 +188,7 @@ class RUM private constructor() {
 
             if (eventType == RaygunRUMEventType.ACTIVITY_LOADED) {
                 if (shouldIgnoreView(name)) {
-                    return
+                    return@launch
                 }
             }
 
@@ -199,7 +208,7 @@ class RUM private constructor() {
 
             val user =
                 if (RaygunClient.getUser() == null)
-                    anonymousSync()
+                    anonymous()
                 else
                     RaygunClient.getUser()
 
@@ -207,7 +216,7 @@ class RUM private constructor() {
                 RaygunRUMTimingMessage.Builder(
                     if (eventType == RaygunRUMEventType.ACTIVITY_LOADED
                         || (eventType
-                                == RaygunRUMEventType.FRAGMENT_LOADED)
+                            == RaygunRUMEventType.FRAGMENT_LOADED)
                     )
                         "p"
                     else
@@ -257,6 +266,7 @@ class RUM private constructor() {
     }
 
     companion object {
+
         // Singleton instance
         private var _instance: RUM? = null
 

@@ -261,7 +261,7 @@ object CrashReporting {
 
             send(throwable, tags)
 
-            RUM.getInstance().sendRemaining()
+            RUM.instance.sendRemaining()
 
             defaultHandler.uncaughtException(thread, throwable)
         }
