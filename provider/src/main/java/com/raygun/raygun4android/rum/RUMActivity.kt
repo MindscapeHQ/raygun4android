@@ -32,6 +32,8 @@ class RUMActivity(
 
         // Register the ActivityLifecycleCallbacks of the Application
         val application = mainActivity.application
+        // Unregister any existing callbacks to avoid duplicates
+        application.unregisterActivityLifecycleCallbacks(this)
         application.registerActivityLifecycleCallbacks(this)
 
         // Attach to the FragmentManager from Main Activity
