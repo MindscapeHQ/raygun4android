@@ -8,16 +8,12 @@ import com.raygun.raygun4android.RaygunSettings
 import com.raygun.raygun4android.messages.shared.RaygunUserInfo
 import com.raygun.raygun4android.network.RaygunNetworkUtils
 import com.raygun.raygun4android.network.UuidProvider
-import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 import org.mockito.MockedStatic
 import org.mockito.Mockito
-import org.mockito.kotlin.doReturn
-import org.mockito.kotlin.stub
-import org.mockito.kotlin.whenever
 
 class RaygunRUMMessageTest {
     private lateinit var message: RaygunRUMMessage
@@ -25,7 +21,7 @@ class RaygunRUMMessageTest {
     private lateinit var mockRaygunClient: MockedStatic<RaygunClient>
 
     @Before
-    fun setup() = runBlocking {
+    fun setup() {
         mockRaygunClient = Mockito.mockStatic(RaygunClient::class.java)
 
         mockRaygunClient
