@@ -28,7 +28,8 @@ object RaygunFileUtils {
             val fileList = context.cacheDir.listFiles(RaygunFileFilter())
             if (fileList != null) {
                 for (f in fileList) {
-                    if (getExtension(f.name)
+                    if (
+                        getExtension(f.name)
                             .equals(RaygunSettings.DEFAULT_FILE_EXTENSION, ignoreCase = true)
                     ) {
                         if (!f.delete()) {
@@ -38,8 +39,8 @@ object RaygunFileUtils {
                 }
             } else {
                 e(
-                    "Error in handling cached message from filesystem - could not get a list of"
-                            + " files from cache dir"
+                    "Error in handling cached message from filesystem - could not get a list of" +
+                        " files from cache dir",
                 )
             }
         }

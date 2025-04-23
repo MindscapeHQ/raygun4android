@@ -1,7 +1,10 @@
 package com.raygun.raygun4android.utils
 
 object RaygunUtils {
-    fun mergeLists(firstList: List<*>?, secondList: List<*>?): List<*> {
+    fun mergeLists(
+        firstList: List<*>?,
+        secondList: List<*>?,
+    ): List<*> {
         if (firstList == null && secondList == null) {
             return emptyList<Any?>()
         }
@@ -20,7 +23,10 @@ object RaygunUtils {
         return firstList!! + secondList!!
     }
 
-    fun mergeMaps(firstMap: Map<*, *>?, secondMap: Map<*, *>?): Map<*, *> {
+    fun mergeMaps(
+        firstMap: Map<*, *>?,
+        secondMap: Map<*, *>?,
+    ): Map<*, *> {
         if (firstMap == null && secondMap == null) {
             return emptyMap<Any?, Any?>()
         }

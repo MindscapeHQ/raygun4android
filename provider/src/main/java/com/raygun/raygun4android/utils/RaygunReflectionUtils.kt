@@ -1,11 +1,14 @@
 package com.raygun.raygun4android.utils
 
 import java.lang.reflect.Method
-import java.util.Arrays
 
 object RaygunReflectionUtils {
     @Throws(NoSuchMethodException::class)
-    fun findMethod(clazz: Class<*>, methodName: String, args: Array<Class<*>>): Method {
+    fun findMethod(
+        clazz: Class<*>,
+        methodName: String,
+        args: Array<Class<*>>,
+    ): Method {
         var methodMatched: Method? = null
 
         for (m in getAllMethods(clazz)) {
