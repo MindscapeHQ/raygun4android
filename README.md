@@ -206,10 +206,14 @@ If you do not set it, it will be automatically set to the device UUID.
 
 If the customer context changes, for instance on log in/out,
 you should remember to call setUser again to store the updated customer identifier.
+
+#### Anonymous users
+
 If a customer logs out and you want to use the default device identifier again,
 just create an anonymous `RaygunUserInfo` object. In this case `isAnonymous` will be set to true.
 
 To create an anonymous user, call to `RaygunUserInfo.anonymous()`.
+
 This static method creates a new `RaygunUserInfo` instance with a random UUID as the identifier.
 This method is a `suspend` function, because it reads/writes to disk through `SharedPreferences`,
 so you need to call it from a coroutine when using Kotlin.

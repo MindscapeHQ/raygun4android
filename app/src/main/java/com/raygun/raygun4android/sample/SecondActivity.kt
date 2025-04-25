@@ -1,3 +1,5 @@
+@file:OptIn(DelicateCoroutinesApi::class)
+
 package com.raygun.raygun4android.sample
 
 import android.content.Context
