@@ -7,6 +7,7 @@ import com.raygun.raygun4android.RaygunClient
 import com.raygun.raygun4android.RaygunSettings
 import com.raygun.raygun4android.messages.shared.RaygunUserInfo
 import com.raygun.raygun4android.network.RaygunNetworkUtils
+import com.raygun.raygun4android.network.UuidProvider
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Before
@@ -18,21 +19,21 @@ class RaygunRUMMessageTest {
     private lateinit var message: RaygunRUMMessage
     private lateinit var data: RaygunRUMData
     private lateinit var mockRaygunClient: MockedStatic<RaygunClient>
-    private lateinit var mockRaygunNetworkUtils: MockedStatic<RaygunNetworkUtils>
 
     @Before
     fun setup() {
         mockRaygunClient = Mockito.mockStatic(RaygunClient::class.java)
-        mockRaygunNetworkUtils = Mockito.mockStatic(RaygunNetworkUtils::class.java)
 
         mockRaygunClient
             .`when`<Context> { RaygunClient.getApplicationContext() }
             .thenReturn(Mockito.mock(android.content.Context::class.java))
 
-        mockRaygunNetworkUtils
-            .`when`<String> { RaygunNetworkUtils.getDeviceUuid(Mockito.any()) }
-            .thenReturn("mock-uuid")
-        val userInfo = RaygunUserInfo(identifier = "123")
+        RaygunNetworkUtils.uuidProvider =
+            object : UuidProvider {
+                override suspend fun getDeviceUuid(context: Context): String = "mock-uuid"
+            }
+
+        val userInfo = RaygunUserInfo.create(identifier = "123")
         val dataMessage: RaygunRUMDataMessage =
             RaygunRUMDataMessage
                 .Builder(RaygunSettings.RUM_EVENT_TIMING)
@@ -56,7 +57,6 @@ class RaygunRUMMessageTest {
     @After
     fun tearDown() {
         mockRaygunClient.close()
-        mockRaygunNetworkUtils.close()
     }
 
     @Test

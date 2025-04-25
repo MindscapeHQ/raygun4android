@@ -185,12 +185,14 @@ The project contains a small sample application in the `:app` module. It demonst
 
 Raygun supports tracking the unique customers who encounter bugs in your apps.
 
-By default a device-derived UUID is transmitted. You can also add the currently logged in customer's data like this:
+By default a device-derived UUID is transmitted.
+
+You can also add the currently logged in customer's data like this:
 
 ```java
 String userIdentifier = "12345";
 ...
-RaygunUserInfo user = new RaygunUserInfo(userIdentifier);
+RaygunUserInfo user = RaygunUserInfo.create(userIdentifier);
 user.setFirstName("User");
 user.setFullName("User Name");
 user.setEmail("a@b.com");
@@ -198,11 +200,28 @@ user.setEmail("a@b.com");
 RaygunClient.setUser(user);
 ```
 
-Any of the properties but `identifier` and `isAnonymous` are optional. `isAnonymous` will be set to true if the identifier is null or an empty string. There is also a constructor overload if you prefer to specify all in one statement and a convenience constructor to only set an identifier.
+`identifier` should be a unique representation of the current logged in customer -
+we will assume that messages with the same identifier are the same customer.
+If you do not set it, it will be automatically set to the device UUID.
 
-`identifier` should be a unique representation of the current logged in customer - we will assume that messages with the same identifier are the same customer. If you do not set it, it will be automatically set to the device UUID.
+If the customer context changes, for instance on log in/out,
+you should remember to call setUser again to store the updated customer identifier.
 
-If the customer context changes, for instance on log in/out, you should remember to call setUser again to store the updated customer identifier. If a customer logs out and you want to use the default device identifier again, just create an empty `RaygunUserInfo` object without an identifier. In this case `isAnonymous` will be set to true.
+#### Anonymous users
+
+If a customer logs out and you want to use the default device identifier again,
+just create an anonymous `RaygunUserInfo` object. In this case `isAnonymous` will be set to true.
+
+To create an anonymous user, call to `RaygunUserInfo.anonymous()`.
+
+This static method creates a new `RaygunUserInfo` instance with a random UUID as the identifier.
+This method is a `suspend` function, because it reads/writes to disk through `SharedPreferences`,
+so you need to call it from a coroutine when using Kotlin.
+
+For Java developers, or for situations where coroutines are not available,
+the method is available as `RaygunUserInfo.anonymousSync()`,
+which creates an anonymous user synchronously.
+This method is not recommended for use in the main thread, as it may block the UI and cause ANR errors.
 
 ### Custom endpoints
 

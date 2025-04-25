@@ -1,3 +1,5 @@
+@file:OptIn(DelicateCoroutinesApi::class)
+
 package com.raygun.raygun4android.sample
 
 import android.app.Application
@@ -13,7 +15,15 @@ import com.raygun.raygun4android.RaygunClient
 import com.raygun.raygun4android.messages.shared.RaygunUserInfo
 import com.raygun.raygun4android.sample.fragments.NavigationActivity
 import com.raygun.raygun4android.sample.fragments.NavigationFragmentSwapActivity
-import java.nio.file.Files.size
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import java.io.BufferedReader
+import java.io.IOException
+import java.io.InputStreamReader
+import java.net.HttpURLConnection
+import java.net.URL
 import java.util.Arrays
 
 class MainActivity : AppCompatActivity() {
@@ -67,6 +77,8 @@ class MainActivity : AppCompatActivity() {
 
             // Manual exception creation & sending via 2 strings
             RaygunClient.send("My custom message", "The reason for the error", null, tw)
+
+            sendNetworkRequest()
 
             Snackbar
                 .make(
@@ -132,18 +144,20 @@ class MainActivity : AppCompatActivity() {
         }
 
         buttonSetUserAnon.setOnClickListener {
-            val user = RaygunUserInfo()
-            RaygunClient.setUser(user)
-            Snackbar
-                .make(
-                    it,
-                    getString(R.string.user_is_now_set_to_anonymous_for_future_raygun_reports),
-                    Snackbar.LENGTH_SHORT,
-                ).show()
+            GlobalScope.launch {
+                val user = RaygunUserInfo.anonymous()
+                RaygunClient.setUser(user)
+                Snackbar
+                    .make(
+                        it,
+                        getString(R.string.user_is_now_set_to_anonymous_for_future_raygun_reports),
+                        Snackbar.LENGTH_SHORT,
+                    ).show()
+            }
         }
 
         buttonSetUserA.setOnClickListener {
-            val user = RaygunUserInfo("superuser3")
+            val user = RaygunUserInfo.create("superuser3")
             user.fullName = "User Name A"
             user.firstName = "User A"
             user.email = "e@f.com.com"
@@ -158,7 +172,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         buttonSetUserB.setOnClickListener {
-            val user = RaygunUserInfo("superuser4")
+            val user = RaygunUserInfo.create("superuser4")
             user.fullName = "User Name B"
             user.firstName = "User B"
             user.email = "g@h.com"
@@ -216,4 +230,28 @@ class MainActivity : AppCompatActivity() {
                     ).show()
             }
         }
+
+    private fun sendNetworkRequest() {
+        GlobalScope.launch(Dispatchers.IO) {
+            Log.d("Raygun4Android-Sample", "Sending network request")
+
+            try {
+                val url = URL("https://example.com")
+                val urlConnection = url.openConnection() as HttpURLConnection
+                urlConnection.requestMethod = "GET"
+
+                val `in` = BufferedReader(InputStreamReader(urlConnection.inputStream))
+                var content: String? = ""
+                var current: String?
+                while ((`in`.readLine().also { current = it }) != null) {
+                    content += current
+                }
+                urlConnection.disconnect()
+                Log.d("Raygun4Android-Sample", "Network Response: $content")
+            } catch (e: IOException) {
+                e.printStackTrace()
+                Log.e("Raygun4Android-Sample", "Network error: $e")
+            }
+        }
+    }
 }

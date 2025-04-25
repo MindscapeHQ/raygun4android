@@ -192,7 +192,7 @@ public class RaygunClient {
      * @param user A user name or email address representing the current user.
      */
     public static void setUser(String user) {
-        RaygunUserInfo newUser = new RaygunUserInfo(user);
+        RaygunUserInfo newUser = RaygunUserInfo.create(user);
         setUser(newUser);
     }
 
