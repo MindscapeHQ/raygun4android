@@ -102,13 +102,11 @@ object RaygunNetworkLogger {
     ) {
         if (!shouldIgnoreURL(url) && loggingEnabled) {
             val sanitizedUrl = sanitiseURL(url)
-            RUM
-                .getInstance()
-                .sendRUMTimingEvent(
-                    RaygunRUMEventType.NETWORK_CALL,
-                    "$requestMethod $sanitizedUrl",
-                    endTime - startTime,
-                )
+            RUM.instance.sendRUMTimingEvent(
+                RaygunRUMEventType.NETWORK_CALL,
+                "$requestMethod $sanitizedUrl",
+                endTime - startTime,
+            )
         }
     }
 
