@@ -1,3 +1,5 @@
+@file:OptIn(DelicateCoroutinesApi::class)
+
 package com.raygun.raygun4android.sample
 
 import android.content.Context
@@ -20,7 +22,6 @@ import kotlinx.coroutines.launch
 import java.util.WeakHashMap
 
 class SecondActivity : AppCompatActivity() {
-    @OptIn(DelicateCoroutinesApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_second)

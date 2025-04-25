@@ -231,8 +231,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-    @OptIn(DelicateCoroutinesApi::class)
-    fun sendNetworkRequest() {
+    private fun sendNetworkRequest() {
         GlobalScope.launch(Dispatchers.IO) {
             Log.d("Raygun4Android-Sample", "Sending network request")
 
