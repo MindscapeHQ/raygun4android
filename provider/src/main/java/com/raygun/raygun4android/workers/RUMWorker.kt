@@ -46,7 +46,16 @@ class RUMWorker(
          * Raw post method that delivers a pre-built RUM payload to the Raygun API.
          *
          * @param apiKey The API key of the app to deliver to
-         * @param jsonPayload The JSON representation of a ??? to be delivered over HTTPS.
+         * @param jsonPayload The JSON representation of a RUM event to be delivered over HTTPS.
+         *   The payload should be a JSON object with the following structure:
+         *   {
+         *     "eventName": "string", // The name of the event (e.g., "pageView", "click").
+         *     "timestamp": "string", // The ISO 8601 timestamp of the event.
+         *     "properties": {        // Additional properties related to the event.
+         *       "key1": "value1",
+         *       "key2": "value2"
+         *     }
+         *   }
          * @return HTTP result code - 202 if successful, 403 if API key invalid, 400 if bad message
          *   (invalid properties)
          */
