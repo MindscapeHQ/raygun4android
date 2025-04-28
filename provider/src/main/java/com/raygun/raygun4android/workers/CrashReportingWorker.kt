@@ -150,19 +150,22 @@ class CrashReportingWorker(
         val message = StringBuilder()
 
         try {
-            FileInputStream(file).use { fis ->
-                var ch: Int
-                while ((fis.read().also { ch = it }) != -1) {
-                    message.append(ch.toChar())
+            file.inputStream().use { fis ->
+                InputStreamReader(fis, StandardCharsets.UTF_8).use { isr ->
+                    isr.buffered().use { reader ->
+                        reader.forEachLine { line ->
+                            message.append(line).append("\n")
+                        }
+                    }
                 }
-                if (!file.delete()) {
-                    e("Failed to delete the file: $fileName")
-                }
+            }
+            if (!file.delete()) {
+                e("Failed to delete the file: $fileName")
             }
         } catch (e: IOException) {
             e("Failed to read message from file: " + e.message)
         }
 
-        return message.toString()
+        return message.toString().trimEnd()
     }
 }
