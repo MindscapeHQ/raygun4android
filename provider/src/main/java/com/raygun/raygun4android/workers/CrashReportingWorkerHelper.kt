@@ -21,37 +21,46 @@ import java.util.UUID
 object CrashReportingWorkerHelper {
     private const val MAX_DATA_SIZE = 10000
 
-    fun enqueueCrashReport(context: Context, message: String, apiKey: String?) {
+    fun enqueueCrashReport(
+        context: Context,
+        message: String,
+        apiKey: String?,
+    ) {
         val inputData: Data
         val encoded = message.toByteArray(StandardCharsets.UTF_8)
         val length = encoded.size
         v("Message length: $length")
         if (length > MAX_DATA_SIZE) {
             d(
-                ("Message length ("
-                        + length
-                        + ") greater than "
-                        + MAX_DATA_SIZE
-                        + ", storing as file.")
+                (
+                    "Message length (" +
+                        length +
+                        ") greater than " +
+                        MAX_DATA_SIZE +
+                        ", storing as file."
+                ),
             )
             // Store the message in a file to circumvent the WorkManager's 10240 bytes limit
             val fileName = storeMessageInTempFile(context, encoded)
             i("Stored temp file: $fileName")
             inputData =
-                Data.Builder()
+                Data
+                    .Builder()
                     .putString("file", fileName)
                     .putString("apikey", apiKey)
                     .build()
         } else {
             inputData =
-                Data.Builder()
+                Data
+                    .Builder()
                     .putByteArray("msg", encoded)
                     .putString("apikey", apiKey)
                     .build()
         }
 
         val workRequest =
-            OneTimeWorkRequest.Builder(CrashReportingWorker::class.java)
+            OneTimeWorkRequest
+                .Builder(CrashReportingWorker::class.java)
                 .setInputData(inputData)
                 .build()
 
@@ -60,15 +69,18 @@ object CrashReportingWorkerHelper {
         i("Work for CrashReportingWorker has been put into the queue.")
     }
 
-    private fun storeMessageInTempFile(context: Context, message: ByteArray): String {
-        @SuppressLint("SimpleDateFormat") val timestamp =
-            SimpleDateFormat("yyyyMMddHHmmss").format(Date(System.currentTimeMillis()))
+    private fun storeMessageInTempFile(
+        context: Context,
+        message: ByteArray,
+    ): String {
+        @SuppressLint("SimpleDateFormat")
+        val timestamp = SimpleDateFormat("yyyyMMddHHmmss").format(Date(System.currentTimeMillis()))
         val uuid = UUID.randomUUID().toString().replace("-", "")
 
         val file =
             File(
                 context.filesDir,
-                timestamp + "-" + uuid + "." + RaygunSettings.DEFAULT_FILE_EXTENSION
+                timestamp + "-" + uuid + "." + RaygunSettings.DEFAULT_FILE_EXTENSION,
             )
 
         try {

@@ -7,9 +7,17 @@ import androidx.work.WorkManager
 import com.raygun.raygun4android.logging.RaygunLogger.i
 
 object RUMWorkerHelper {
-    fun enqueueRUM(context: Context, message: String?, apiKey: String?) {
+    fun enqueueRUM(
+        context: Context,
+        message: String?,
+        apiKey: String?,
+    ) {
         val inputData =
-            Data.Builder().putString("msg", message).putString("apikey", apiKey).build()
+            Data
+                .Builder()
+                .putString("msg", message)
+                .putString("apikey", apiKey)
+                .build()
 
         val workRequest =
             OneTimeWorkRequest.Builder(RUMWorker::class.java).setInputData(inputData).build()

@@ -28,8 +28,10 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.UUID
 
-class CrashReportingWorker(context: Context, workerParams: WorkerParameters) :
-    Worker(context, workerParams) {
+class CrashReportingWorker(
+    context: Context,
+    workerParams: WorkerParameters,
+) : Worker(context, workerParams) {
     override fun doWork(): Result {
         // Retrieve data from WorkManager
         val encoded = inputData.getByteArray("msg")
@@ -65,23 +67,17 @@ class CrashReportingWorker(context: Context, workerParams: WorkerParameters) :
         synchronized(this) {
             val cachedFiles =
                 arrayListOf(
-                    applicationContext
-                        .cacheDir
-                        .listFiles(RaygunFileFilter()) ?: emptyList<File>()
+                    applicationContext.cacheDir.listFiles(RaygunFileFilter()) ?: emptyList<File>(),
                 )
             if (cachedFiles.size < RaygunSettings.getMaxReportsStoredOnDevice()) {
-                @SuppressLint("SimpleDateFormat") val timestamp =
-                    SimpleDateFormat("yyyyMMddHHmmss")
-                        .format(Date(System.currentTimeMillis()))
+                @SuppressLint("SimpleDateFormat")
+                val timestamp =
+                    SimpleDateFormat("yyyyMMddHHmmss").format(Date(System.currentTimeMillis()))
                 val uuid = UUID.randomUUID().toString().replace("-", "")
                 val file =
                     File(
                         applicationContext.cacheDir,
-                        (timestamp
-                            + "-"
-                            + uuid
-                            + "."
-                            + RaygunSettings.DEFAULT_FILE_EXTENSION)
+                        (timestamp + "-" + uuid + "." + RaygunSettings.DEFAULT_FILE_EXTENSION),
                     )
 
                 try {
@@ -91,10 +87,7 @@ class CrashReportingWorker(context: Context, workerParams: WorkerParameters) :
                         out.close()
                     }
                 } catch (e: FileNotFoundException) {
-                    e(
-                        "Error creating file when caching message to filesystem: "
-                            + e.message
-                    )
+                    e("Error creating file when caching message to filesystem: " + e.message)
                 } catch (e: IOException) {
                     e("Error writing message to filesystem: " + e.message)
                 }
@@ -110,9 +103,12 @@ class CrashReportingWorker(context: Context, workerParams: WorkerParameters) :
      * @param apiKey The API key of the app to deliver to
      * @param jsonPayload The JSON representation of a RaygunMessage to be delivered over HTTPS.
      * @return HTTP result code - 202 if successful, 403 if API key invalid, 400 if bad message
-     * (invalid properties), 429 if rate limited
+     *   (invalid properties), 429 if rate limited
      */
-    private fun postCrashReporting(apiKey: String, jsonPayload: String): Int {
+    private fun postCrashReporting(
+        apiKey: String,
+        jsonPayload: String,
+    ): Int {
         try {
             if (RaygunWorkerHelper.validateApiKey(apiKey)) {
                 val endpoint = RaygunSettings.getCrashReportingEndpoint()
@@ -120,7 +116,8 @@ class CrashReportingWorker(context: Context, workerParams: WorkerParameters) :
                 val client = RaygunSettings.getHttpClient()
                 val body = jsonPayload.toRequestBody(mediaType)
                 val request =
-                    Request.Builder()
+                    Request
+                        .Builder()
                         .url(endpoint)
                         .header("X-ApiKey", apiKey)
                         .post(body)
@@ -131,10 +128,7 @@ class CrashReportingWorker(context: Context, workerParams: WorkerParameters) :
                     d("Crash Reporting HTTP POST result: " + response.code)
                     return response.code
                 } catch (ioe: IOException) {
-                    e(
-                        "OkHttp POST to Raygun Crash Reporting backend failed: "
-                            + ioe.message
-                    )
+                    e("OkHttp POST to Raygun Crash Reporting backend failed: " + ioe.message)
                     ioe.printStackTrace()
                 } finally {
                     if (response != null) {

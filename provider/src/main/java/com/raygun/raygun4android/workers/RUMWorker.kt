@@ -17,8 +17,10 @@ import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.Response
 import java.io.IOException
 
-class RUMWorker(context: Context, workerParams: WorkerParameters) :
-    Worker(context, workerParams) {
+class RUMWorker(
+    context: Context,
+    workerParams: WorkerParameters,
+) : Worker(context, workerParams) {
     override fun doWork(): Result {
         // Retrieve data from WorkManager
         val message = inputData.getString("msg")
@@ -46,18 +48,23 @@ class RUMWorker(context: Context, workerParams: WorkerParameters) :
          * @param apiKey The API key of the app to deliver to
          * @param jsonPayload The JSON representation of a ??? to be delivered over HTTPS.
          * @return HTTP result code - 202 if successful, 403 if API key invalid, 400 if bad message
-         * (invalid properties)
+         *   (invalid properties)
          */
-        private fun postRUM(apiKey: String, jsonPayload: String): Int {
+        private fun postRUM(
+            apiKey: String,
+            jsonPayload: String,
+        ): Int {
             try {
                 if (validateApiKey(apiKey)) {
                     val endpoint = RaygunSettings.getRUMEndpoint()
-                    val mediaType: MediaType? = "application/json; charset=utf-8".toMediaTypeOrNull()
+                    val mediaType: MediaType? =
+                        "application/json; charset=utf-8".toMediaTypeOrNull()
                     val client = RaygunSettings.getHttpClient()
                     val body = jsonPayload.toRequestBody(mediaType)
 
                     val request =
-                        Request.Builder()
+                        Request
+                            .Builder()
                             .url(endpoint)
                             .header("X-ApiKey", apiKey)
                             .post(body)
