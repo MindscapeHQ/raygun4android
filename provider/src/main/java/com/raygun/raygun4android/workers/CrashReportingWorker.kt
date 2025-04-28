@@ -18,7 +18,6 @@ import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.Response
 import java.io.File
-import java.io.FileInputStream
 import java.io.FileNotFoundException
 import java.io.FileOutputStream
 import java.io.IOException
@@ -154,9 +153,7 @@ class CrashReportingWorker(
             file.inputStream().use { fis ->
                 InputStreamReader(fis, StandardCharsets.UTF_8).use { isr ->
                     isr.buffered().use { reader ->
-                        reader.forEachLine { line ->
-                            message.append(line).append("\n")
-                        }
+                        reader.forEachLine { line -> message.append(line).append("\n") }
                     }
                 }
             }
