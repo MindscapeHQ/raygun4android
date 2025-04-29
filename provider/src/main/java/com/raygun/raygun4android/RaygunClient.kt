@@ -7,7 +7,7 @@ import android.app.Application
 import android.content.Context
 import android.content.pm.PackageManager
 import com.raygun.raygun4android.CrashReporting.postCachedMessages
-import com.raygun.raygun4android.RaygunSettings.RUMEndpoint
+import com.raygun.raygun4android.RaygunSettings.rumEndpoint
 import com.raygun.raygun4android.logging.RaygunLogger.d
 import com.raygun.raygun4android.logging.RaygunLogger.e
 import com.raygun.raygun4android.logging.RaygunLogger.w
@@ -23,9 +23,8 @@ import java.util.UUID
  * The official Raygun provider for Android. This is the main class that provides functionality for
  * automatically sending exceptions to the Raygun service.
  *
- *
- * You should call init() on the static RaygunClient instance, passing in the application,
- * instead of instantiating this class.
+ * You should call init() on the static RaygunClient instance, passing in the application, instead
+ * of instantiating this class.
  */
 object RaygunClient {
     var apiKey: String? = null
@@ -65,16 +64,20 @@ object RaygunClient {
      * Initializes the Raygun client with an Android application context, your Raygun API key and
      * the version of your application.
      *
-     * This method is intended to be used by 3rd-party libraries such as Raygun for React Native
-     * or Raygun for Flutter etc.
+     * This method is intended to be used by 3rd-party libraries such as Raygun for React Native or
+     * Raygun for Flutter etc.
      *
      * @param applicationContext The Android applicationContext
      * @param apiKey An API key that belongs to a Raygun application created in your dashboard
      * @param version The version of your application, format x.x.x.x, where x is a positive
-     * integer.
+     *   integer.
      */
     @JvmOverloads
-    fun init(applicationContext: Context, apiKey: String? = null, version: String? = null) {
+    fun init(
+        applicationContext: Context,
+        apiKey: String? = null,
+        version: String? = null,
+    ) {
         RaygunClient.applicationContext = applicationContext
         sharedSetup(apiKey, version)
     }
@@ -86,20 +89,25 @@ object RaygunClient {
      * @param application The Android application
      * @param apiKey An API key that belongs to a Raygun application created in your dashboard
      * @param version The version of your application, format x.x.x.x, where x is a positive
-     * integer.
+     *   integer.
      */
     @JvmOverloads
-    fun init(application: Application, apiKey: String? = null, version: String? = null) {
+    fun init(
+        application: Application,
+        apiKey: String? = null,
+        version: String? = null,
+    ) {
         RaygunClient.application = application
         sharedSetup(apiKey, version)
     }
 
-    private fun sharedSetup(apiKey: String?, version: String?) {
+    private fun sharedSetup(
+        apiKey: String?,
+        version: String?,
+    ) {
         init()
 
-        d(
-            "Configuring Raygun4Android (v" + RaygunSettings.RAYGUN_CLIENT_VERSION + ")"
-        )
+        d("Configuring Raygun4Android (v" + RaygunSettings.RAYGUN_CLIENT_VERSION + ")")
 
         if (apiKey == null || apiKey.trim { it <= ' ' }.isEmpty()) {
             RaygunClient.apiKey = readApiKey(getApplicationContext())
@@ -131,7 +139,7 @@ object RaygunClient {
      * Sends an exception-type object to Raygun.
      *
      * @param throwable The Throwable object that occurred in your application that will be sent to
-     * Raygun.
+     *   Raygun.
      */
     fun send(throwable: Throwable) {
         CrashReporting.send(throwable, null, null)
@@ -141,12 +149,15 @@ object RaygunClient {
      * Sends an exception-type object to Raygun with a list of tags you specify.
      *
      * @param throwable The Throwable object that occurred in your application that will be sent to
-     * Raygun.
+     *   Raygun.
      * @param tags A list of data that will be attached to the Raygun message and visible on the
-     * error in the dashboard. This could be a build tag, lifecycle state, debug/production
-     * version etc.
+     *   error in the dashboard. This could be a build tag, lifecycle state, debug/production
+     *   version etc.
      */
-    fun send(throwable: Throwable, tags: Tags?) {
+    fun send(
+        throwable: Throwable,
+        tags: Tags?,
+    ) {
         CrashReporting.send(throwable, tags, null)
     }
 
@@ -155,15 +166,19 @@ object RaygunClient {
      * data.
      *
      * @param throwable The Throwable object that occurred in your application that will be sent to
-     * Raygun.
+     *   Raygun.
      * @param tags A list of data that will be attached to the Raygun message and visible on the
-     * error in the dashboard. This could be a build tag, lifecycle state, debug/production
-     * version etc.
+     *   error in the dashboard. This could be a build tag, lifecycle state, debug/production
+     *   version etc.
      * @param customData A set of custom key-value pairs relating to your application and its
-     * current state. This is a bucket where you can attach any related data you want to see to
-     * the error.
+     *   current state. This is a bucket where you can attach any related data you want to see to
+     *   the error.
      */
-    fun send(throwable: Throwable, tags: Tags?, customData: CustomData?) {
+    fun send(
+        throwable: Throwable,
+        tags: Tags?,
+        customData: CustomData?,
+    ) {
         CrashReporting.send(throwable, tags, customData)
     }
 
@@ -172,21 +187,21 @@ object RaygunClient {
      * a list of tags you specify, and a set of custom data.
      *
      * @param exceptionName The name or description of the exception that occurred in your
-     * application that will be sent to Raygun.
+     *   application that will be sent to Raygun.
      * @param reason The reason for the exception that occurred in your application that will be
-     * sent to Raygun.
+     *   sent to Raygun.
      * @param tags A list of data that will be attached to the Raygun message and visible on the
-     * error in the dashboard. This could be a build tag, lifecycle state, debug/production
-     * version etc.
+     *   error in the dashboard. This could be a build tag, lifecycle state, debug/production
+     *   version etc.
      * @param customData A set of custom key-value pairs relating to your application and its
-     * current state. This is a bucket where you can attach any related data you want to see to
-     * the error.
+     *   current state. This is a bucket where you can attach any related data you want to see to
+     *   the error.
      */
     fun send(
         exceptionName: String?,
         reason: String?,
         tags: Tags?,
-        customData: CustomData?
+        customData: CustomData?,
     ) {
         CrashReporting.send(Throwable(exceptionName, Throwable(reason)), tags, customData)
     }
@@ -196,7 +211,6 @@ object RaygunClient {
      * with a Gravatar, their picture will be displayed in the error view. If setUser is not called,
      * a random ID will be assigned. If the user context changes in your application (i.e log
      * in/out), be sure to call this again with the updated user name/email address.
-     *
      *
      * If you use an email address to identify the user, please consider using
      * setUser(RaygunUserInfo userInfo) instead of this method as it would allow you to set the
@@ -216,7 +230,7 @@ object RaygunClient {
      * in/out), be sure to call this again with the updated user name/email address.
      *
      * @param userInfo A RaygunUserInfo object containing the user data you want to send in its
-     * fields.
+     *   fields.
      */
     fun setUser(userInfo: RaygunUserInfo) {
         if (isRUMEnabled) {
@@ -232,7 +246,7 @@ object RaygunClient {
      * convenience.
      *
      * @param version The version of your application, format x.x.x.x, where x is a positive
-     * integer.
+     *   integer.
      */
     fun setVersion(version: String?) {
         if (version != null) {
@@ -278,7 +292,7 @@ object RaygunClient {
         CrashReporting.recordBreadcrumb(breadcrumb)
     }
 
-    /** Clears breadcrumbs  */
+    /** Clears breadcrumbs */
     fun clearBreadcrumbs() {
         CrashReporting.clearBreadcrumbs()
     }
@@ -289,7 +303,7 @@ object RaygunClient {
      * application.
      *
      * @param shouldProcessBreadcrumbLocation enable or disable the full location processing of
-     * breadcrumb messages
+     *   breadcrumb messages
      */
     fun shouldProcessBreadcrumbLocation(shouldProcessBreadcrumbLocation: Boolean) {
         CrashReporting.shouldProcessBreadcrumbLocation(shouldProcessBreadcrumbLocation)
@@ -335,8 +349,8 @@ object RaygunClient {
             RaygunSettings.crashReportingEndpoint = url
         } else {
             w(
-                "A custom crash reporting endpoint can't be null or empty. Custom endpoint has"
-                    + " NOT been applied and default will be used."
+                "A custom crash reporting endpoint can't be null or empty. Custom endpoint has" +
+                    " NOT been applied and default will be used.",
             )
         }
     }
@@ -348,11 +362,11 @@ object RaygunClient {
      */
     fun setCustomRUMEndpoint(url: String?) {
         if (!url.isNullOrEmpty()) {
-            RUMEndpoint = url
+            rumEndpoint = url
         } else {
             w(
-                "A custom RUM endpoint can't be null or empty. Custom endpoint has NOT been"
-                    + " applied and default will be used."
+                "A custom RUM endpoint can't be null or empty. Custom endpoint has NOT been" +
+                    " applied and default will be used.",
             )
         }
     }
@@ -360,13 +374,11 @@ object RaygunClient {
     /**
      * Allows the user to set the maximum number of crash reports stored on the device.
      *
-     *
      * The default and maximum value for this is 64. We do not recommend to change this setting
      * unless you have a very good reason and use case.
      *
-     *
-     * If you decrease the value of maxReportsStoredOnDevice, all currently cached reports will
-     * be deleted.
+     * If you decrease the value of maxReportsStoredOnDevice, all currently cached reports will be
+     * deleted.
      *
      * @param maxReportsStoredOnDevice An int with the new maximum number of crash reports
      */
@@ -403,7 +415,10 @@ object RaygunClient {
      * @param networkLogging Automatically report the performance of network requests.
      */
     @JvmOverloads
-    fun enableRUM(activity: Activity, networkLogging: Boolean = true) {
+    fun enableRUM(
+        activity: Activity,
+        networkLogging: Boolean = true,
+    ) {
         isRUMEnabled = true
         instance.attach(activity, networkLogging)
         if (user != null) {
@@ -414,23 +429,27 @@ object RaygunClient {
     private fun readApiKey(context: Context): String? {
         try {
             val ai =
-                context.packageManager
-                    .getApplicationInfo(
-                        context.packageName, PackageManager.GET_META_DATA
-                    )
+                context.packageManager.getApplicationInfo(
+                    context.packageName,
+                    PackageManager.GET_META_DATA,
+                )
             val bundle = ai.metaData
             return bundle.getString(RaygunSettings.APIKEY_MANIFEST_FIELD)
         } catch (e: PackageManager.NameNotFoundException) {
             e(
-                ("Couldn't read API key from your AndroidManifest.xml <meta-data /> element;"
-                    + " cannot send. Detailed error: "
-                    + e.message)
+                (
+                    "Couldn't read API key from your AndroidManifest.xml <meta-data /> element;" +
+                        " cannot send. Detailed error: " +
+                        e.message
+                ),
             )
         } catch (e: NullPointerException) {
             e(
-                ("Couldn't find <meta-data /> element for your API key in the"
-                    + " AndroidManifest.xml element; cannot send. Detailed error: "
-                    + e.message)
+                (
+                    "Couldn't find <meta-data /> element for your API key in the" +
+                        " AndroidManifest.xml element; cannot send. Detailed error: " +
+                        e.message
+                ),
             )
         }
 

@@ -7,8 +7,6 @@ import okhttp3.OkHttpClient
  * OkHttpClient, e.g. to set custom SSLContext.
  */
 interface OkHttpClientBuilder {
-    /**
-     * @return new instance of OkHttpClient
-     */
+    /** @return new instance of OkHttpClient */
     fun build(): OkHttpClient
 }

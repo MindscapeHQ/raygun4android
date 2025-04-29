@@ -209,8 +209,7 @@ class RUM private constructor() {
                 timestamp = df.format(c.time)
             }
 
-            val user =
-                if (RaygunClient.user == null) anonymous() else RaygunClient.user
+            val user = if (RaygunClient.user == null) anonymous() else RaygunClient.user
 
             val timingMessage =
                 RaygunRUMTimingMessage

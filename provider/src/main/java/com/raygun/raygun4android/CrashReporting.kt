@@ -21,8 +21,8 @@ import java.io.FileNotFoundException
 import java.io.IOException
 import java.io.ObjectInputStream
 
-
 typealias Tags = List<String>
+
 typealias CustomData = Map<String, Any?>
 
 object CrashReporting {
@@ -30,11 +30,9 @@ object CrashReporting {
     private var onBeforeSend: CrashReportingOnBeforeSend? = null
     private val coroutineScope = CoroutineScope(Dispatchers.IO + CoroutineName("CrashReporting"))
 
-    @JvmField
-    var tags: Tags? = null
+    @JvmField var tags: Tags? = null
 
-    @JvmField
-    var customData: CustomData? = null
+    @JvmField var customData: CustomData? = null
 
     private val breadcrumbs: MutableList<RaygunBreadcrumbMessage> = ArrayList()
     private var shouldProcessBreadcrumbLocation = false

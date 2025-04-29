@@ -5,7 +5,6 @@ package com.raygun.raygun4android
 import com.raygun.raygun4android.logging.RaygunLogger.w
 import com.raygun.raygun4android.network.RaygunOkHttpClientBuilder
 import okhttp3.OkHttpClient
-import java.util.Arrays
 
 object RaygunSettings {
     // General
@@ -46,25 +45,23 @@ object RaygunSettings {
                 field = maxReportsStoredOnDevice
             } else {
                 w(
-                    ("It's not possible to exceed the value "
-                        + DEFAULT_MAX_REPORTS_STORED_ON_DEVICE
-                        + " for the number of reports stored on the device. The setting has not"
-                        + " been applied.")
+                    (
+                        "It's not possible to exceed the value " +
+                            DEFAULT_MAX_REPORTS_STORED_ON_DEVICE +
+                            " for the number of reports stored on the device. The setting has not" +
+                            " been applied."
+                    ),
                 )
             }
         }
 
-    @JvmField
-    var crashReportingEndpoint: String = DEFAULT_CRASHREPORTING_ENDPOINT
+    @JvmField var crashReportingEndpoint: String = DEFAULT_CRASHREPORTING_ENDPOINT
 
-    var RUMEndpoint: String = DEFAULT_RUM_ENDPOINT
+    var rumEndpoint: String = DEFAULT_RUM_ENDPOINT
 
-    @JvmField
-    var okHttpClientBuilder: OkHttpClientBuilder? = null
+    @JvmField var okHttpClientBuilder: OkHttpClientBuilder? = null
 
-    fun getIgnoredURLs(): HashSet<String> {
-        return ignoredURLs
-    }
+    fun getIgnoredURLs(): HashSet<String> = ignoredURLs
 
     fun ignoreURLs(urls: Array<String?>?) {
         if (urls != null) {
@@ -95,8 +92,9 @@ object RaygunSettings {
             }
         }
 
-    class IgnoredURLs internal constructor(vararg defaultIgnoredUrls: String) :
-        HashSet<String>() {
+    class IgnoredURLs internal constructor(
+        vararg defaultIgnoredUrls: String,
+    ) : HashSet<String>() {
         init {
             this.addAll(defaultIgnoredUrls.toList())
         }
