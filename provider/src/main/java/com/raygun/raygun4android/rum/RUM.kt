@@ -121,7 +121,7 @@ class RUM private constructor() {
         eventName: String,
         userInfo: RaygunUserInfo?,
     ) {
-        if (RaygunClient.isRUMEnabled()) {
+        if (RaygunClient.isRUMEnabled) {
             val timestamp: String
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -148,7 +148,7 @@ class RUM private constructor() {
                     .Builder(eventName)
                     .timestamp(timestamp)
                     .sessionId(sessionId)
-                    .version(RaygunClient.getVersion())
+                    .version(RaygunClient.version)
                     .os("Android")
                     .osVersion(Build.VERSION.RELEASE)
                     .platform(String.format("%s %s", Build.MANUFACTURER, Build.MODEL))
@@ -158,14 +158,14 @@ class RUM private constructor() {
             val message = RaygunRUMMessage()
             message.eventData = arrayOf(dataMessage)
 
-            enqueueWorkForRUMService(RaygunClient.getApiKey(), Gson().toJson(message))
+            enqueueWorkForRUMService(RaygunClient.apiKey, Gson().toJson(message))
         } else {
             w("RUM is not enabled, please enable to use the sendRUMEvent() function")
         }
     }
 
     private suspend fun sendRUMEvent(eventName: String) {
-        val user = if (RaygunClient.getUser() == null) anonymous() else RaygunClient.getUser()
+        val user = if (RaygunClient.user == null) anonymous() else RaygunClient.user
         sendRUMEvent(eventName, user)
     }
 
@@ -182,7 +182,7 @@ class RUM private constructor() {
         name: String,
         milliseconds: Long,
     ) = coroutineScope.launch {
-        if (RaygunClient.isRUMEnabled()) {
+        if (RaygunClient.isRUMEnabled) {
             if (sessionId == null) {
                 sessionId = UUID.randomUUID().toString()
                 sendRUMEvent(RaygunSettings.RUM_EVENT_SESSION_START)
@@ -210,7 +210,7 @@ class RUM private constructor() {
             }
 
             val user =
-                if (RaygunClient.getUser() == null) anonymous() else RaygunClient.getUser()
+                if (RaygunClient.user == null) anonymous() else RaygunClient.user
 
             val timingMessage =
                 RaygunRUMTimingMessage
@@ -236,7 +236,7 @@ class RUM private constructor() {
                     .Builder(RaygunSettings.RUM_EVENT_TIMING)
                     .timestamp(timestamp)
                     .sessionId(sessionId)
-                    .version(RaygunClient.getVersion())
+                    .version(RaygunClient.version)
                     .os("Android")
                     .osVersion(Build.VERSION.RELEASE)
                     .platform(String.format("%s %s", Build.MANUFACTURER, Build.MODEL))
@@ -247,7 +247,7 @@ class RUM private constructor() {
             val message = RaygunRUMMessage()
             message.eventData = arrayOf(dataMessage)
 
-            enqueueWorkForRUMService(RaygunClient.getApiKey(), Gson().toJson(message))
+            enqueueWorkForRUMService(RaygunClient.apiKey, Gson().toJson(message))
         } else {
             w("RUM is not enabled, please enable to use the sendRUMTimingEvent() function")
         }
@@ -257,7 +257,7 @@ class RUM private constructor() {
         if (viewName == null) {
             return true
         }
-        for (ignoredView in RaygunSettings.getIgnoredViews()) {
+        for (ignoredView in RaygunSettings.ignoredViews) {
             if (viewName.contains(ignoredView) || ignoredView.contains(viewName)) {
                 return true
             }
@@ -279,7 +279,7 @@ class RUM private constructor() {
             }
 
         private fun enqueueWorkForRUMService(
-            apiKey: String,
+            apiKey: String?,
             jsonPayload: String,
         ) {
             RUMWorkerHelper.enqueueRUM(RaygunClient.getApplicationContext(), jsonPayload, apiKey)

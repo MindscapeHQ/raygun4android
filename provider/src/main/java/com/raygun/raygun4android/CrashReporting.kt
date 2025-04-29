@@ -21,14 +21,21 @@ import java.io.FileNotFoundException
 import java.io.IOException
 import java.io.ObjectInputStream
 
+
+typealias Tags = List<String>
+typealias CustomData = Map<String, Any?>
+
 object CrashReporting {
     private var exceptionHandler: RaygunUncaughtExceptionHandler? = null
     private var onBeforeSend: CrashReportingOnBeforeSend? = null
     private val coroutineScope = CoroutineScope(Dispatchers.IO + CoroutineName("CrashReporting"))
 
-    @JvmField var tags: List<*>? = null
+    @JvmField
+    var tags: Tags? = null
 
-    @JvmField var customData: Map<*, *>? = null
+    @JvmField
+    var customData: CustomData? = null
+
     private val breadcrumbs: MutableList<RaygunBreadcrumbMessage> = ArrayList()
     private var shouldProcessBreadcrumbLocation = false
 
@@ -103,10 +110,10 @@ object CrashReporting {
     @JvmOverloads
     fun send(
         throwable: Throwable,
-        tags: List<String>?,
-        customData: Map<String, Any?>? = null,
+        tags: Tags?,
+        customData: CustomData? = null,
     ) {
-        if (RaygunClient.isCrashReportingEnabled()) {
+        if (RaygunClient.isCrashReportingEnabled) {
             coroutineScope.launch {
                 var msg = buildMessage(throwable)
 
@@ -128,7 +135,7 @@ object CrashReporting {
                     }
                 }
 
-                enqueueWorkForCrashReporting(RaygunClient.getApiKey(), Gson().toJson(msg))
+                enqueueWorkForCrashReporting(RaygunClient.apiKey, Gson().toJson(msg))
                 postCachedMessages()
             }
         } else {
@@ -146,18 +153,18 @@ object CrashReporting {
                     .setMachineName(Build.MODEL)
                     .setExceptionDetails(throwable)
                     .setClientDetails()
-                    .setAppContext(RaygunClient.getAppContextIdentifier())
-                    .setVersion(RaygunClient.getVersion())
+                    .setAppContext(RaygunClient.appContextIdentifier)
+                    .setVersion(RaygunClient.version)
                     .setNetworkInfo(RaygunClient.getApplicationContext())
                     .setBreadcrumbs(breadcrumbs)
                     .build()
 
-            if (RaygunClient.getVersion() != null) {
-                msg.details.version = RaygunClient.getVersion()
+            if (RaygunClient.version != null) {
+                msg.details.version = RaygunClient.version
             }
 
-            if (RaygunClient.getUser() != null) {
-                msg.details.userInfo = RaygunClient.getUser()
+            if (RaygunClient.user != null) {
+                msg.details.userInfo = RaygunClient.user
             } else {
                 msg.details.setUserInfo()
             }
@@ -202,7 +209,7 @@ object CrashReporting {
                                     ois = ObjectInputStream(FileInputStream(f))
                                     val serializedMessage = ois.readObject() as SerializedMessage
                                     enqueueWorkForCrashReporting(
-                                        RaygunClient.getApiKey(),
+                                        RaygunClient.apiKey,
                                         serializedMessage.message,
                                     )
                                     if (!f.delete()) {
@@ -239,7 +246,7 @@ object CrashReporting {
     }
 
     private fun enqueueWorkForCrashReporting(
-        apiKey: String,
+        apiKey: String?,
         jsonPayload: String,
     ) {
         CrashReportingWorkerHelper.enqueueCrashReport(
@@ -256,13 +263,9 @@ object CrashReporting {
             thread: Thread,
             throwable: Throwable,
         ) {
-            val tags: MutableList<String> = ArrayList()
-            tags.add(RaygunSettings.CRASH_REPORTING_UNHANDLED_EXCEPTION_TAG)
-
+            val tags = listOf(RaygunSettings.CRASH_REPORTING_UNHANDLED_EXCEPTION_TAG)
             send(throwable, tags)
-
             RUM.instance.sendRemaining()
-
             defaultHandler.uncaughtException(thread, throwable)
         }
     }
