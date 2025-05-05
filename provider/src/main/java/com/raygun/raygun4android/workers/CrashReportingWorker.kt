@@ -69,6 +69,7 @@ class CrashReportingWorker(
                 arrayListOf(
                     applicationContext.cacheDir.listFiles(RaygunFileFilter()) ?: emptyList<File>(),
                 )
+
             if (cachedFiles.size < RaygunSettings.maxReportsStoredOnDevice) {
                 @SuppressLint("SimpleDateFormat")
                 val timestamp =
