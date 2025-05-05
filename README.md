@@ -15,15 +15,13 @@ This means that the library is now fully compatible with Kotlin Coroutines and p
 We recommend using those if you are using Kotlin in your project.
 As well, the library is still compatible with pure Java Android applications.
 
-Raygun4Android 4.1.1 is currently considered to be the stable release of the provider and is tagged in the repository and supports Android 5+.
+Raygun4Android 5.0.0 is currently considered to be the stable release of the provider and is tagged in the repository and supports Android 5+.
 
-Raygun4Android is functionally equal to 4.1.0, which was unfortunately deployed to Maven Central in an incomplete state. Please use 4.1.1 instead.
+Raygun4Android 4.1.1 is functionally equal to 4.1.0, which was unfortunately deployed to Maven Central in an incomplete state. Please use 4.1.1 instead.
 
-The `develop` branch reflects ongoing work on the 4.1/5 line as tagged snapshots and only support
+The `develop` branch reflects ongoing work on the version 5 line as tagged snapshots and only support
 
 The `master` branch used to be the branch for ongoing work and releases until `4.1.0-alpha1`. In the future, the `master` branch will reflect release builds.
-
-Raygun4Android is currently actively being worked on towards a release of version 5 in the near future.
 
 If you want the *very old* stable version 3.0.6 please check out the change set labelled with `v3.0.6` and go from there.
 
@@ -251,7 +249,7 @@ Ensure you call again if the customer context changes (usually login/logout).
 
 ### Version tracking
 
-If you want track the version of your app with a crash report, you can do that in different ways:
+If you want track the version of your app with a crash report or a RUM message, you can do that in different ways:
 
 1. Set the versionName attribute on `<manifest>` in your AndroidManifest.xml to be of the form x.x.x.x, where x is a positive integer
 2. Set the version in the overloaded `init` method when initialising RaygunClient: `public static voide init(Application application, String apiKey, String version)`
@@ -268,23 +266,15 @@ To enable crash reporting, you need to call one of the following methods in your
 * `RaygunClient.enableCrashReporting()`
 * `RaygunClient.enableCrashReporting(boolean attachDefaultHandler)`
 
-Both methods will enable crash reporting. By default, a pre-made Uncaught Exception Handler,
-which will automatically send an exception when one reaches it (ie. just before your app crashes),
-will be setup. If you want to have control over this behaviour, use the second method.
+Both methods will enable crash reporting. By default, a pre-made Uncaught Exception Handler, which will automatically send an exception when one reaches it (ie. just before your app crashes), will be setup. If you want to have control over this behaviour, use the second method.
 
-Tags and custom data will be attached to all exceptions that reaches it.
-This allows you to automatically send crash data when your app crashes.
-The handler will call any other pre-existing exception handlers
-you have set up before it sends to Raygun. After it is complete,
-it will call the default handler, which will crash the app and display the 'close app' user dialog.
-Exceptions are guaranteed to be sent if your app crashes.
+Tags and custom data will be attached to all exceptions that reaches it. This allows you to automatically send crash data when your app crashes. The handler will call any other pre-existing exception handlers you have set up before it sends to Raygun. After it is complete, it will call the default handler, which will crash the app and display the 'close app' user dialog. Exceptions are guaranteed to be sent if your app crashes.
 
 ### Tags and custom data
 
 * `RaygunClient.setCustomData(Map customData)`
 
-Sets a key-value Map which will be sent along with every exception.
-This will be merged with any other custom data passed as the third param of send().
+Sets a key-value Map which will be sent along with every exception. This will be merged with any other custom data passed as the third param of send().
 
 * `RaygunClient.setTags(List tags)`
 
