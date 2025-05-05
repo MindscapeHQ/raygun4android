@@ -35,8 +35,8 @@ class RaygunClientTest {
 
         RaygunClient.init(mockApplication, apiKey, "1.0.0")
 
-        assertEquals(apiKey, RaygunClient.getApiKey())
-        assertEquals("1.0.0", RaygunClient.getVersion())
+        assertEquals(apiKey, RaygunClient.apiKey)
+        assertEquals("1.0.0", RaygunClient.version)
         assertNotNull(RaygunClient.getApplicationContext())
     }
 }

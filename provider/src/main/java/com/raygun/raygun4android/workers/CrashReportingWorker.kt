@@ -69,7 +69,8 @@ class CrashReportingWorker(
                 arrayListOf(
                     applicationContext.cacheDir.listFiles(RaygunFileFilter()) ?: emptyList<File>(),
                 )
-            if (cachedFiles.size < RaygunSettings.getMaxReportsStoredOnDevice()) {
+
+            if (cachedFiles.size < RaygunSettings.maxReportsStoredOnDevice) {
                 @SuppressLint("SimpleDateFormat")
                 val timestamp =
                     SimpleDateFormat("yyyyMMddHHmmss").format(Date(System.currentTimeMillis()))
@@ -111,9 +112,9 @@ class CrashReportingWorker(
     ): Int {
         try {
             if (RaygunWorkerHelper.validateApiKey(apiKey)) {
-                val endpoint = RaygunSettings.getCrashReportingEndpoint()
+                val endpoint = RaygunSettings.crashReportingEndpoint
                 val mediaType: MediaType? = "application/json; charset=utf-8".toMediaTypeOrNull()
-                val client = RaygunSettings.getHttpClient()
+                val client = RaygunSettings.httpClient
                 val body = jsonPayload.toRequestBody(mediaType)
                 val request =
                     Request

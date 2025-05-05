@@ -39,7 +39,7 @@ class RaygunRUMMessageTest {
                 .Builder(RaygunSettings.RUM_EVENT_TIMING)
                 .timestamp("2023-10-01T12:00:00")
                 .sessionId("123")
-                .version(RaygunClient.getVersion())
+                .version(RaygunClient.version)
                 .os("Android")
                 .osVersion(Build.VERSION.RELEASE)
                 .platform(String.format("%s %s", Build.MANUFACTURER, Build.MODEL))

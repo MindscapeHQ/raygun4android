@@ -60,10 +60,10 @@ class RUMWorker(
         ): Int {
             try {
                 if (validateApiKey(apiKey)) {
-                    val endpoint = RaygunSettings.getRUMEndpoint()
+                    val endpoint = RaygunSettings.rumEndpoint
                     val mediaType: MediaType? =
                         "application/json; charset=utf-8".toMediaTypeOrNull()
-                    val client = RaygunSettings.getHttpClient()
+                    val client = RaygunSettings.httpClient
                     val body = jsonPayload.toRequestBody(mediaType)
 
                     val request =
