@@ -6,26 +6,31 @@ Supports Android 5+ (API 21+).
 
 If you need to support Android 4.1+, please use Raygun4Android 4.0.1.
 
-## IMPORTANT
+## Library structure
 
-Raygun4Android 4.1.1 is currently considered to be the stable release of the provider and is tagged in the repository and supports Android 5+.
+### Compatibility
 
-Raygun4Android is functionally equal to 4.1.0, which was unfortunately deployed to Maven Central in an incomplete state. Please use 4.1.1 instead.
+Starting from version 5.0.0, the library has been migrated from Java to Kotlin.
+This means that the library is now fully compatible with Kotlin Coroutines and property accessors.
+We recommend using those if you are using Kotlin in your project.
+As well, the library is still compatible with pure Java Android applications.
 
-The `develop` branch reflects ongoing work on the 4.1/5 line as tagged snapshots and only support
+Raygun4Android 5.0.0 is currently considered to be the stable release of the provider and is tagged in the repository and supports Android 5+.
+
+Raygun4Android 4.1.1 is functionally equal to 4.1.0, which was unfortunately deployed to Maven Central in an incomplete state. Please use 4.1.1 instead.
+
+The `develop` branch reflects ongoing work on the version 5 line as tagged snapshots and only support
 
 The `master` branch used to be the branch for ongoing work and releases until `4.1.0-alpha1`. In the future, the `master` branch will reflect release builds.
 
-Raygun4Android is currently actively being worked on towards a release of version 5 in the near future.
-
 If you want the *very old* stable version 3.0.6 please check out the change set labelled with `v3.0.6` and go from there.
 
-## Requirements
+### Requirements
 
 - minSdkVersion 21+
 - compileSdkVersion 34
 
-## Internal dependencies
+### Internal dependencies
 
 - Gson
 - OKHttp
@@ -179,7 +184,18 @@ The project contains a small sample application in the `:app` module. It demonst
 [!image1](app-1.jpg)
 [!image2](app-2.jpg)
 
-## Advanced Features
+## Basic Features
+
+### Initialisation
+
+The following method overloads are available for initializing RaygunClient:
+
+* `RaygunClient.init(Application application)`
+* `RaygunClient.init(Application application, String apiKey)`
+* `RaygunClient.init(Application application, String apiKey, String version)`
+
+The first method reads the API key from the application's AndroidManifest.xml.
+If you want to specify your API key programmatically, use one of the latter two methods.
 
 ### Affected Customers
 
@@ -223,38 +239,57 @@ the method is available as `RaygunUserInfo.anonymousSync()`,
 which creates an anonymous user synchronously.
 This method is not recommended for use in the main thread, as it may block the UI and cause ANR errors.
 
-### Custom endpoints
+#### Customer management
 
-Raygun supports sending data from Crash Reporting and Real User Monitoring to your own endpoints. If you want to set custom endpoints, could can do so by setting them after you've initialised RaygunClient:
+* `RaygunClient.setUser(String user)`
+* `RaygunClient.setUser(RaygunUserInfo userInfo)`
 
-```java
-// Crash Reporting
-RaygunClient.setCustomCrashReportingEndpoint("http://...");
-// RUM
-RaygunClient.setCustomRUMEndpoint("http://...");
-```
-
-Please note that setting a custom endpoint will stop Crash Report or Real User Monitoring data from being sent to the Raygun backend.
-
-### Storing crash reports on the device
-
-If the device can't connect because it is offline, Raygun4Android will save the crash report to the device storage. At the next start of the application, (along with the provider) it will check if the internet is now available. If it is, send the cached messages. A maximum of 64 messages will be cached. Once the storage limit is reached, no further crash reports are stored locally until the storage has been cleared. You can change the amount by calling:
-
-```java
-RaygunClient.setMaxReportsStoredOnDevice(amount)
-```
-
-You cannot increase the amount beyond the maximum of 64. If you decrease the amount, any currently stored cached reports will be deleted.
+The first method internally builds a `RaygunUserInfo` with `user` being used at the identifier field.
+Ensure you call again if the customer context changes (usually login/logout).
 
 ### Version tracking
 
-If you want track the version of your app with a crash report, you can do that in different ways:
+If you want track the version of your app with a crash report or a RUM message, you can do that in different ways:
 
 1. Set the versionName attribute on `<manifest>` in your AndroidManifest.xml to be of the form x.x.x.x, where x is a positive integer
 2. Set the version in the overloaded `init` method when initialising RaygunClient: `public static voide init(Application application, String apiKey, String version)`
 3. Use the `setVersion` method in RaygunClient: `public static void setVersion(String version)`
 
 The app's version will then be sent with each message and you can then filter by version in the Raygun dashboard.
+
+## Crash Reporting
+
+### Enable crash reporting
+
+To enable crash reporting, you need to call one of the following methods in your code:
+
+* `RaygunClient.enableCrashReporting()`
+* `RaygunClient.enableCrashReporting(boolean attachDefaultHandler)`
+
+Both methods will enable crash reporting. By default, a pre-made Uncaught Exception Handler, which will automatically send an exception when one reaches it (ie. just before your app crashes), will be setup. If you want to have control over this behaviour, use the second method.
+
+Tags and custom data will be attached to all exceptions that reaches it. This allows you to automatically send crash data when your app crashes. The handler will call any other pre-existing exception handlers you have set up before it sends to Raygun. After it is complete, it will call the default handler, which will crash the app and display the 'close app' user dialog. Exceptions are guaranteed to be sent if your app crashes.
+
+### Tags and custom data
+
+* `RaygunClient.setCustomData(Map customData)`
+
+Sets a key-value Map which will be sent along with every exception. This will be merged with any other custom data passed as the third param of send().
+
+* `RaygunClient.setTags(List tags)`
+
+Sets a list of tags which will be sent along with every exception. This will be merged with any other tags passed as the second param of send().
+
+### Sending crash reports manually
+
+The following methods are available for sending manually; pick one depending on how much extra data you'd like to send:
+
+* `RaygunClient.send(Throwable throwable)`
+* `RaygunClient.send(Throwable throwable, List tags)`
+* `RaygunClient.send(Throwable throwable, List tags, Map customData)`
+* `RaygunClient.send(String exceptionName, String reason, List tags, Map customData)`
+
+The `send` function builds a RaygunMessage for you and then sends it.
 
 ### Getting/setting/cancelling the error before it is sent
 
@@ -328,76 +363,42 @@ public RaygunMessage onBeforeSend(RaygunMessage message) {
 
 Any error instances with a certain key will be grouped together. The example above will place all errors within one group (as the key is hardcoded to 'foo'). The grouping key is a String and must be between 1 and 100 characters long. You should send all data you care about (for instance, parts of the exception message, stacktrace frames, class names etc) to a hash function (for instance MD5), then pass that to `setGroupingKey`.
 
-## API Overview
+## Real User Monitoring (RUM)
 
-#### Initialisation
+### Enable RUM
 
-The following method overloads are available for initializing RaygunClient:
-
-* `RaygunClient.init(Application application)`
-* `RaygunClient.init(Application application, String apiKey)`
-* `RaygunClient.init(Application application, String apiKey, String version)`
-
-The first method reads the API key from the application's AndroidManifest.xml. If you want to specify your API key programmatically, use one of the latter two methods.
-
-#### Enabling features
-
-Crash Reporting:
-
-* `RaygunClient.enableCrashReporting()`
-* `RaygunClient.enableCrashReporting(boolean attachDefaultHandler)`
-
-Both methods will enable crash reporting. By default, a pre-made Uncaught Exception Handler, which will automatically send an exception when one reaches it (ie. just before your app crashes), will be setup. If you want to have control over this behaviour, use the second method.
-
-Tags and custom data will be attached to all exceptions that reaches it. This allows you to automatically send crash data when your app crashes. The handler will call any other pre-existing exception handlers you have set up before it sends to Raygun. After it is complete, it will call the default handler, which will crash the app and display the 'close app' user dialog. Exceptions are guaranteed to be sent if your app crashes.
-
-RUM:
+To enable RUM, you need to call one of the following methods in your code:
 
 * `RaygunClient.enableRUM(Activity activity)`
 * `RaygunClient.enableRUM(Activity activity, boolean networkLogging)`
 
-Both methods enable RUM. By default, network activity details are being logged. If you want to change this behaviour, please use the second method.
+Both methods enable RUM. By default, network activity details are being logged.
+If you want to change this behaviour, please use the second method.
 
-#### Sending crash reports manually
+## Advanced Features
 
-The following methods are available for sending manually; pick one depending on how much extra data you'd like to send:
+### Custom endpoints
 
-* `RaygunClient.send(Throwable throwable)`
-* `RaygunClient.send(Throwable throwable, List tags)`
-* `RaygunClient.send(Throwable throwable, List tags, Map customData)`
-* `RaygunClient.send(String exceptionName, String reason, List tags, Map customData)`
+Raygun supports sending data from Crash Reporting and Real User Monitoring to your own endpoints. If you want to set custom endpoints, could can do so by setting them after you've initialised RaygunClient:
 
-The `send` function builds a RaygunMessage for you and then sends it.
+```java
+// Crash Reporting
+RaygunClient.setCustomCrashReportingEndpoint("http://...");
+// RUM
+RaygunClient.setCustomRUMEndpoint("http://...");
+```
 
-#### Customer management
+Please note that setting a custom endpoint will stop Crash Report or Real User Monitoring data from being sent to the Raygun backend.
 
-* `RaygunClient.setUser(String user)`
-* `RaygunClient.setUser(RaygunUserInfo userInfo)`
+### Storing crash reports on the device
 
-The first method internally builds a `RaygunUserInfo` with `user` being used at the identifier field. Ensure you call again if the customer context changes (usually login/logout).
+If the device can't connect because it is offline, Raygun4Android will save the crash report to the device storage. At the next start of the application, (along with the provider) it will check if the internet is now available. If it is, send the cached messages. A maximum of 64 messages will be cached. Once the storage limit is reached, no further crash reports are stored locally until the storage has been cleared. You can change the amount by calling:
 
-* `RaygunClient.setCustomData(Map customData)`
+```java
+RaygunClient.setMaxReportsStoredOnDevice(amount)
+```
 
-Sets a key-value Map which will be sent along with every exception. This will be merged with any other custom data passed as the third param of send().
-
-#### Misc
-
-* `RaygunClient.setCustomCrashReportingEndpoint(String url)`
-* `RaygunClient.setCustomRUMEndpoint(String url)`
-
-The above methods allow setting custom reporting endpoints for Crash Reporting resp. RUM.
-
-* `RaygunClient.setVersion(String version)`
-
-Stores the version of your application manually. Normally, this is automatically read from AndroidManifest (the versionName attribute on <manifest>) and is provided as a convenience.
-
-* `RaygunClient.setTags(List tags)`
-
-Sets a list of tags which will be sent along with every exception. This will be merged with any other tags passed as the second param of send().
-
-* `RaygunClient.setOnBeforeSend(CrashReportingOnBeforeSend onBeforeSendImplementation)`
-
-Provides an instance of a class which has an onBeforeSend method that can be used to inspect, mutate or cancel the send to the Raygun API immediately before it happens. Can be used to filter arbitrary data.
+You cannot increase the amount beyond the maximum of 64. If you decrease the amount, any currently stored cached reports will be deleted.
 
 ## Frequently Asked Questions
 
