@@ -82,6 +82,10 @@ afterEvaluate { project ->
                             id = POM_DEVELOPER_2_ID
                             name = POM_DEVELOPER_2_NAME
                         }
+                        developer {
+                            id = POM_DEVELOPER_3_ID
+                            name = POM_DEVELOPER_3_NAME
+                        }
                     }
                 }
 
