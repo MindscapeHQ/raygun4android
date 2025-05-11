@@ -1,6 +1,6 @@
 ## Changelog
 
-### 5.0.0
+### 5.0.0-alpha1
 
 - feat: convert "util" packages to Kotlin (#167) (2025-04-25)
 - feat: RUM package to Kotlin (#166) (2025-04-25)
