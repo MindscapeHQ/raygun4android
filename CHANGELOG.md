@@ -1,5 +1,30 @@
 ## Changelog
 
+### 5.0.0-alpha1
+
+- feat: convert "util" packages to Kotlin (#167) (2025-04-25)
+- feat: RUM package to Kotlin (#166) (2025-04-25)
+- feat!: Convert network package to Kotlin (#165) (2025-04-25)
+- feat!: Raygun Logger and RUM data classes to Kotlin (#164) (2025-04-18)
+- feat!: Crash reporting message as Kotlin dataclasses (#162) (2025-04-14)
+- feat: Converted RaygunEnvironmentMessage to Kotlin (#161) (2025-04-09)
+- docs: restructure README.md (#175) (2025-05-06)
+- refactor: root package classes to Kotlin (#169) (2025-05-05)
+- refactor: converted workers to Kotlin (#168) (2025-05-05)
+- chore(deps): bump com.android.tools.build:gradle from 8.9.1 to 8.9.2 (#174) (2025-05-01)
+- chore(deps): bump com.google.code.gson:gson from 2.12.1 to 2.13.1 (#173) (2025-05-01)
+- chore(deps): bump com.diffplug.spotless from 7.0.2 to 7.0.3 (#172) (2025-05-01)
+- chore(deps): bump androidx.work:work-runtime from 2.10.0 to 2.10.1 (#171) (2025-05-01)
+- chore(deps): bump androidx.core:core from 1.15.0 to 1.16.0 (#170) (2025-05-01)
+- chore(deps): bump com.android.tools.build:gradle from 8.8.2 to 8.9.1 (#158) (2025-04-01)
+- chore(deps): bump com.raygun:raygun4android from 4.1.1 to 4.2.1 (#159) (2025-04-01)
+- chore(deps): bump org.jetbrains.kotlin:kotlin-gradle-plugin (#157) (2025-04-01)
+- chore(deps): bump org.jetbrains.kotlin.android from 2.1.10 to 2.1.20 (#156) (2025-04-01)
+
+BREAKING CHANGE: Migration from Java to Kotlin
+
+The library has been fully migrated from Java to Kotlin. Although most public methods have retained their previous signatures and behavior, there are some changes you should be aware of. For detailed information on what has changed and to ensure smooth integration, please consult the updated README.md.
+
 ### 4.2.1
 
 - perf(provider): encode message as bytearray check max size (#154) (2025-03-18)
