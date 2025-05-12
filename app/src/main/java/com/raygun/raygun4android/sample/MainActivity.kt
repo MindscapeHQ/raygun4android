@@ -242,10 +242,10 @@ class MainActivity : AppCompatActivity() {
 
                 urlConnection.inputStream.use { inputStream ->
                     InputStreamReader(inputStream).use { inputStreamReader ->
-                        val `in` = BufferedReader(inputStreamReader)
+                        val bufferedReader = BufferedReader(inputStreamReader)
                         var content: String? = ""
                         var current: String?
-                        while ((`in`.readLine().also { current = it }) != null) {
+                        while ((bufferedReader.readLine().also { current = it }) != null) {
                             content += current
                         }
                         Log.d("Raygun4Android-Sample", "Network Response: $content")
