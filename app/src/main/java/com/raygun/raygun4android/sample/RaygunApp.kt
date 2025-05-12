@@ -6,8 +6,7 @@ import android.os.StrictMode
 
 class RaygunApp : Application() {
     override fun onCreate() {
-        // Enable strict mode for debugging on API 35
-        if (BuildConfig.DEBUG && Build.VERSION.SDK_INT >= 35) {
+        if (BuildConfig.DEBUG) {
             enableStrictMode()
         }
         super.onCreate()
