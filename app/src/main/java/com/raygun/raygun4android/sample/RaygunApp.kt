@@ -22,7 +22,6 @@ class RaygunApp : Application() {
                 .detectLeakedSqlLiteObjects()
                 .detectLeakedClosableObjects()
                 .penaltyLog()
-                .penaltyDeath()
                 .build(),
         )
     }

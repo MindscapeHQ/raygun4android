@@ -240,14 +240,19 @@ class MainActivity : AppCompatActivity() {
                 val urlConnection = url.openConnection() as HttpURLConnection
                 urlConnection.requestMethod = "GET"
 
-                val `in` = BufferedReader(InputStreamReader(urlConnection.inputStream))
-                var content: String? = ""
-                var current: String?
-                while ((`in`.readLine().also { current = it }) != null) {
-                    content += current
+                urlConnection.inputStream.use { inputStream ->
+                    InputStreamReader(inputStream).use { inputStreamReader ->
+                        val bufferedReader = BufferedReader(inputStreamReader)
+                        var content: String? = ""
+                        var current: String?
+                        while ((bufferedReader.readLine().also { current = it }) != null) {
+                            content += current
+                        }
+                        Log.d("Raygun4Android-Sample", "Network Response: $content")
+                    }
                 }
+
                 urlConnection.disconnect()
-                Log.d("Raygun4Android-Sample", "Network Response: $content")
             } catch (e: IOException) {
                 e.printStackTrace()
                 Log.e("Raygun4Android-Sample", "Network error: $e")
