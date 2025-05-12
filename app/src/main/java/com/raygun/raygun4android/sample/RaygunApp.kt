@@ -6,13 +6,7 @@ import android.os.StrictMode
 
 class RaygunApp : Application() {
     override fun onCreate() {
-        if (BuildConfig.DEBUG) {
-            enableStrictMode()
-        }
         super.onCreate()
-    }
-
-    private fun enableStrictMode() {
         StrictMode.setThreadPolicy(
             StrictMode.ThreadPolicy
                 .Builder()
