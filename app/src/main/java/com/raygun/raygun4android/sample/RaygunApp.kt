@@ -5,7 +5,6 @@ import android.os.StrictMode
 
 class RaygunApp : Application() {
     override fun onCreate() {
-        super.onCreate()
         StrictMode.setThreadPolicy(
             StrictMode.ThreadPolicy
                 .Builder()
@@ -25,5 +24,6 @@ class RaygunApp : Application() {
                 .penaltyDeath()
                 .build(),
         )
+        super.onCreate()
     }
 }
