@@ -1,7 +1,6 @@
 package com.raygun.raygun4android.sample
 
 import android.app.Application
-import android.os.Build
 import android.os.StrictMode
 
 class RaygunApp : Application() {
