@@ -73,7 +73,8 @@ object ConnectivityUtils {
     // From the Android documentation:
     // On Android, a network can have multiple transports at the same time.
     // An example of this is a VPN operating over both Wi-Fi and mobile networks.
-    // See https://developer.android.com/develop/connectivity/network-ops/reading-network-state#introducing-net-capabilities
+    // See
+    // https://developer.android.com/develop/connectivity/network-ops/reading-network-state#introducing-net-capabilities
     @RequiresApi(android.os.Build.VERSION_CODES.M)
     private fun readNetworkConnectivityState23(context: Context): String {
         var result = "Connected"
