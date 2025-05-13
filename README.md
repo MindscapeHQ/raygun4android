@@ -402,11 +402,11 @@ You cannot increase the amount beyond the maximum of 64. If you decrease the amo
 
 ### Mobile network type information
 
-Raygun will automatically attach the mobile network type information to the crash report.
+Raygun attaches information about the current network capabilities in every crash report.
 
-In order to include mobile network type information (e.g. "UMTS"), you need to explicitly request the `READ_PHONE_STATE` permission.
+In order to include details about the mobile network type (e.g. "UMTS"), you need to explicitly request the `READ_PHONE_STATE` permission.
 
-This functionality is optional. If this permission is not granted, the mobile network type will appear as "Unknown".
+This functionality is optional. If this permission is not granted, the mobile network type will appear as "Unknown". The library does not request permissions automatically.
 
 ## Frequently Asked Questions
 
