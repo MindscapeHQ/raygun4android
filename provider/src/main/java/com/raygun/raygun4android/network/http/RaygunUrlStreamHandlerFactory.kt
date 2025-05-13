@@ -62,7 +62,8 @@ class RaygunUrlStreamHandlerFactory : URLStreamHandlerFactory {
 
     private fun createStreamHandler(className: String): URLStreamHandler? {
         try {
-            return Class.forName(className).getDeclaredConstructor().newInstance() as URLStreamHandler
+            return Class.forName(className).getDeclaredConstructor().newInstance()
+                as URLStreamHandler
         } catch (e: Exception) {
             e("Exception occurred in createStreamHandler: " + e.message)
         }
