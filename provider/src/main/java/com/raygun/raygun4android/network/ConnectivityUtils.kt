@@ -1,4 +1,4 @@
-@file:Suppress("DEPRECATION")
+//@file:Suppress("DEPRECATION")
 
 package com.raygun.raygun4android.network
 
@@ -78,15 +78,15 @@ object ConnectivityUtils {
                 capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> result += "WiFi"
                 capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) -> {
                     result += "Mobile - "
+                    result += TelephonyUtils.getNetworkType(context)
                     val linkProperties = linkProperties(context)
                     if (linkProperties != null) {
-                        result += linkProperties.interfaceName
+                        result += " - " + linkProperties.interfaceName
                     }
                 }
                 else -> result += "unknown type"
             }
         }
-        Timber.d("Raygun4", "Network capabilities: $result")
         return result
     }
 
