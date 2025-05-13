@@ -34,20 +34,6 @@ object RaygunNetworkUtils {
         return statusCode
     }
 
-    @JvmStatic
-    fun hasInternetConnection(appContext: Context): Boolean {
-        val cm =
-            appContext.applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE)
-                as ConnectivityManager?
-
-        if (cm != null) {
-            val activeNetwork = cm.activeNetworkInfo
-            return activeNetwork != null && activeNetwork.isConnected
-        }
-
-        return false
-    }
-
     suspend fun getDeviceUuid(context: Context): String = uuidProvider.getDeviceUuid(context)
 
     @VisibleForTesting

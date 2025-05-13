@@ -10,7 +10,7 @@ import com.raygun.raygun4android.logging.RaygunLogger.d
 import com.raygun.raygun4android.logging.RaygunLogger.e
 import com.raygun.raygun4android.logging.RaygunLogger.responseCode
 import com.raygun.raygun4android.logging.RaygunLogger.w
-import com.raygun.raygun4android.network.RaygunNetworkUtils.hasInternetConnection
+import com.raygun.raygun4android.network.ConnectivityUtils
 import com.raygun.raygun4android.utils.RaygunFileFilter
 import okhttp3.MediaType
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -46,7 +46,7 @@ class CrashReportingWorker(
         }
 
         if (message != null && apiKey != null) {
-            if (hasInternetConnection(applicationContext)) {
+            if (ConnectivityUtils.isNetworkAvailable(applicationContext)) {
                 val responseCode = postCrashReporting(apiKey, message)
                 responseCode(responseCode)
 
