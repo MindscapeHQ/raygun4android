@@ -6,7 +6,6 @@ import android.net.LinkProperties
 import android.net.Network
 import android.net.NetworkCapabilities
 import android.net.NetworkInfo
-import android.telephony.TelephonyManager
 import androidx.annotation.RequiresApi
 
 // Provides methods to check network connectivity and get network type.
@@ -85,6 +84,7 @@ object ConnectivityUtils {
                         result += " - " + linkProperties.interfaceName
                     }
                 }
+
                 else -> result += "unknown type"
             }
         }
@@ -107,27 +107,8 @@ object ConnectivityUtils {
                     result += "Mobile - "
                     // Note: subtype seems to always return TelephonyManager.NETWORK_TYPE_UNKNOWN
                     // probably because this API is deprecated
-                    result +=
-                        when (info.subtype) {
-                            TelephonyManager.NETWORK_TYPE_1xRTT -> "1xRTT"
-                            TelephonyManager.NETWORK_TYPE_CDMA -> "CDMA"
-                            TelephonyManager.NETWORK_TYPE_EDGE -> "EDGE"
-                            TelephonyManager.NETWORK_TYPE_EHRPD -> "eHRPD"
-                            TelephonyManager.NETWORK_TYPE_EVDO_0 -> "EVDO_0"
-                            TelephonyManager.NETWORK_TYPE_EVDO_A -> "EVDO_A"
-                            TelephonyManager.NETWORK_TYPE_EVDO_B -> "EVDO rev. B"
-                            TelephonyManager.NETWORK_TYPE_GPRS -> "GPRS"
-                            TelephonyManager.NETWORK_TYPE_HSDPA -> "HSDPA"
-                            TelephonyManager.NETWORK_TYPE_HSPA -> "HSPA"
-                            TelephonyManager.NETWORK_TYPE_HSPAP -> "HSPA+"
-                            TelephonyManager.NETWORK_TYPE_HSUPA -> "HSUPA"
-                            TelephonyManager.NETWORK_TYPE_IDEN -> "IDEN"
-                            TelephonyManager.NETWORK_TYPE_LTE -> "LTE"
-                            TelephonyManager.NETWORK_TYPE_UMTS -> "UMTS"
-                            else -> TelephonyUtils.UNKNOWN
-                        }
+                    result += TelephonyUtils.networkTypeToString(info.subtype)
                 }
-
                 else -> result += "unknown type"
             }
         }

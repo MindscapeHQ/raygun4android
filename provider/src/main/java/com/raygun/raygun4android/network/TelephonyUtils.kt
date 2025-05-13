@@ -12,7 +12,7 @@ import androidx.core.content.ContextCompat
 // Utils class to obtain the mobile network type using the TelephonyManager API.
 // Requires READ_PHONE_STATE permission in app, otherwise it will return "Unknown".
 object TelephonyUtils {
-    const val UNKNOWN = "Unknown"
+    private const val UNKNOWN = "Unknown"
 
     // Obtains the mobile network type as a string.
     // Requires permission READ_PHONE_STATE.
@@ -44,7 +44,7 @@ object TelephonyUtils {
     @RequiresApi(android.os.Build.VERSION_CODES.N)
     private fun networkType24(context: Context): Int = telephonyManager(context).dataNetworkType
 
-    private fun networkTypeToString(networkType: Int): String =
+    fun networkTypeToString(networkType: Int): String =
         when (networkType) {
             TelephonyManager.NETWORK_TYPE_1xRTT -> "1xRTT"
             TelephonyManager.NETWORK_TYPE_CDMA -> "CDMA"
