@@ -34,18 +34,19 @@ object ConnectivityUtils {
         }
     }
 
-    private fun connectivityManager(context: Context): ConnectivityManager =
+    // Note: this returns null in unit tests
+    private fun connectivityManager(context: Context): ConnectivityManager? =
         context.applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE)
-            as ConnectivityManager
+            as ConnectivityManager?
 
     @Suppress("DEPRECATION")
-    private fun currentNetworkInfoLegacy(context: Context): NetworkInfo? = connectivityManager(context).activeNetworkInfo
+    private fun currentNetworkInfoLegacy(context: Context): NetworkInfo? = connectivityManager(context)?.activeNetworkInfo
 
     @Suppress("DEPRECATION")
     private fun isNetworkAvailableLegacy(context: Context): Boolean = currentNetworkInfoLegacy(context)?.isConnected ?: false
 
     @RequiresApi(android.os.Build.VERSION_CODES.M)
-    private fun currentNetwork(context: Context): Network? = connectivityManager(context).activeNetwork
+    private fun currentNetwork(context: Context): Network? = connectivityManager(context)?.activeNetwork
 
     @RequiresApi(android.os.Build.VERSION_CODES.M)
     private fun isNetworkAvailable23(context: Context): Boolean {
@@ -58,14 +59,14 @@ object ConnectivityUtils {
     private fun networkCapabilities(context: Context): NetworkCapabilities? {
         val connectivityManager = connectivityManager(context)
         val currentNetwork = currentNetwork(context)
-        return connectivityManager.getNetworkCapabilities(currentNetwork)
+        return connectivityManager?.getNetworkCapabilities(currentNetwork)
     }
 
     @RequiresApi(android.os.Build.VERSION_CODES.M)
     private fun linkProperties(context: Context): LinkProperties? {
         val connectivityManager = connectivityManager(context)
         val currentNetwork = currentNetwork(context)
-        return connectivityManager.getLinkProperties(currentNetwork)
+        return connectivityManager?.getLinkProperties(currentNetwork)
     }
 
     @RequiresApi(android.os.Build.VERSION_CODES.M)
