@@ -34,11 +34,8 @@ class RaygunUrlStreamHandlerFactory : URLStreamHandlerFactory {
                     val c = contextClassLoader.loadClass(className)
                     streamHandler = c.getDeclaredConstructor().newInstance() as URLStreamHandler
                     return streamHandler
-                } catch (ignore: IllegalAccessException) {
-                } catch (
-                    ignore: InstantiationException,
-                ) {
-                } catch (ignore: ClassNotFoundException) {
+                } catch (ignore: Exception) {
+                    // Ignore the exception and continue searching
                 }
             }
         }
