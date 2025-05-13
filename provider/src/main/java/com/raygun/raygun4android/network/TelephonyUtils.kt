@@ -12,6 +12,8 @@ import androidx.core.content.ContextCompat
 // Utils class to obtain the mobile network type using the TelephonyManager API.
 // Requires READ_PHONE_STATE permission in app, otherwise it will return "Unknown".
 object TelephonyUtils {
+    const val UNKNOWN = "Unknown"
+
     // Obtains the mobile network type as a string.
     // Requires permission READ_PHONE_STATE.
     // Returns "Unknown" if permission is not granted or if the network type cannot be determined.
@@ -20,7 +22,7 @@ object TelephonyUtils {
         val permissionCheck =
             ContextCompat.checkSelfPermission(context, Manifest.permission.READ_PHONE_STATE)
         if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
-            return "Unknown"
+            return UNKNOWN
         }
         val type =
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
@@ -58,6 +60,6 @@ object TelephonyUtils {
             TelephonyManager.NETWORK_TYPE_HSUPA -> "HSUPA"
             TelephonyManager.NETWORK_TYPE_LTE -> "LTE"
             TelephonyManager.NETWORK_TYPE_UMTS -> "UMTS"
-            else -> "Unknown"
+            else -> UNKNOWN
         }
 }

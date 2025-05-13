@@ -112,18 +112,19 @@ object ConnectivityUtils {
                             TelephonyManager.NETWORK_TYPE_1xRTT -> "1xRTT"
                             TelephonyManager.NETWORK_TYPE_CDMA -> "CDMA"
                             TelephonyManager.NETWORK_TYPE_EDGE -> "EDGE"
+                            TelephonyManager.NETWORK_TYPE_EHRPD -> "eHRPD"
                             TelephonyManager.NETWORK_TYPE_EVDO_0 -> "EVDO_0"
                             TelephonyManager.NETWORK_TYPE_EVDO_A -> "EVDO_A"
+                            TelephonyManager.NETWORK_TYPE_EVDO_B -> "EVDO rev. B"
                             TelephonyManager.NETWORK_TYPE_GPRS -> "GPRS"
                             TelephonyManager.NETWORK_TYPE_HSDPA -> "HSDPA"
                             TelephonyManager.NETWORK_TYPE_HSPA -> "HSPA"
+                            TelephonyManager.NETWORK_TYPE_HSPAP -> "HSPA+"
                             TelephonyManager.NETWORK_TYPE_HSUPA -> "HSUPA"
-                            TelephonyManager.NETWORK_TYPE_UMTS -> "UMTS"
                             TelephonyManager.NETWORK_TYPE_IDEN -> "IDEN"
-                            TelephonyManager.NETWORK_TYPE_UNKNOWN ->
-                                "subtype unknown/EVDO_B/EHRPD/LTE/HSPAP or similar"
-
-                            else -> "subtype unknown/EVDO_B/EHRPD/LTE/HSPAP or similar"
+                            TelephonyManager.NETWORK_TYPE_LTE -> "LTE"
+                            TelephonyManager.NETWORK_TYPE_UMTS -> "UMTS"
+                            else -> TelephonyUtils.UNKNOWN
                         }
                 }
 
