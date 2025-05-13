@@ -68,29 +68,63 @@ object ConnectivityUtils {
         return connectivityManager?.getLinkProperties(currentNetwork)
     }
 
+    // Obtain a string representing the connectivity state.
+    // e.g. "Connected - VPN - WiFi - tun0" or "Connected - WiFi - wlan0"
+    // From the Android documentation:
+    // On Android, a network can have multiple transports at the same time.
+    // An example of this is a VPN operating over both Wi-Fi and mobile networks.
+    // See https://developer.android.com/develop/connectivity/network-ops/reading-network-state#introducing-net-capabilities
     @RequiresApi(android.os.Build.VERSION_CODES.M)
     private fun readNetworkConnectivityState23(context: Context): String {
-        var result = "Connected - "
+        var result = "Connected"
         networkCapabilities(context)?.let { capabilities ->
-            when {
-                capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> result += "WiFi"
-                capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) -> {
-                    result += "Mobile - "
-                    // Note: getNetworkType requires READ_PHONE_STATE permission
-                    // without it the result is always "unknown"
-                    result += TelephonyUtils.getNetworkType(context)
-                    val linkProperties = linkProperties(context)
-                    if (linkProperties != null) {
-                        result += " - " + linkProperties.interfaceName
-                    }
-                }
+            if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_VPN)) {
+                result += " - VPN"
+            }
+            if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)) {
+                result += " - WiFi"
+            }
+            if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI_AWARE)) {
+                result += " - WiFi Aware"
+            }
+            if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_LOWPAN)) {
+                result += " - Low pan"
+            }
+            if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET)) {
+                result += " - Ethernet"
+            }
+            if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_BLUETOOTH)) {
+                result += " - Bluetooth"
+            }
+            if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_USB)) {
+                result += " - USB"
+            }
+            if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_SATELLITE)) {
+                result += " - Satellite"
+            }
+            if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)) {
+                result += " - Mobile"
+                // Note: getNetworkType requires READ_PHONE_STATE permission
+                // without it the result is always "unknown"
+                result += " - " + TelephonyUtils.getNetworkType(context)
+            }
 
-                else -> result += "unknown type"
+            // Attaches LinkProperties.interfaceName to the result if available
+            // e.g. wlan0
+            linkProperties(context)?.interfaceName?.let {
+                if (it.isNotEmpty()) {
+                    result += " - $it"
+                }
             }
         }
         return result
     }
 
+    // Obtain a string representing the connectivity state.
+    // e.g. "Connected - WiFi" or "Connected - Mobile - LTE"
+    // Uses the old API (pre-23) to get the network type.
+    // Only one network type is returned, and does not support reporting on VPN
+    // or other transport types.
     @Suppress("DEPRECATION")
     private fun readNetworkConnectivityStateLegacy(context: Context): String {
         var result = "Connected - "
