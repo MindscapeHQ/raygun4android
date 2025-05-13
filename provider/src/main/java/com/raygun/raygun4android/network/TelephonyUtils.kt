@@ -34,6 +34,7 @@ object TelephonyUtils {
     private fun telephonyManager(context: Context): TelephonyManager =
         context.applicationContext.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
 
+    @Suppress("DEPRECATION")
     @RequiresPermission(Manifest.permission.READ_PHONE_STATE)
     private fun networkTypeLegacy(context: Context): Int = telephonyManager(context).networkType
 
@@ -55,7 +56,6 @@ object TelephonyUtils {
             TelephonyManager.NETWORK_TYPE_HSPA -> "HSPA"
             TelephonyManager.NETWORK_TYPE_HSPAP -> "HSPA+"
             TelephonyManager.NETWORK_TYPE_HSUPA -> "HSUPA"
-            TelephonyManager.NETWORK_TYPE_IDEN -> "iDen"
             TelephonyManager.NETWORK_TYPE_LTE -> "LTE"
             TelephonyManager.NETWORK_TYPE_UMTS -> "UMTS"
             else -> "Unknown"

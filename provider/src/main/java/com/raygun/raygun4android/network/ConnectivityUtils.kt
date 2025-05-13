@@ -1,7 +1,3 @@
-// @file:Suppress("DEPRECATION")
-
-@file:Suppress("DEPRECATION")
-
 package com.raygun.raygun4android.network
 
 import android.content.Context
@@ -42,8 +38,10 @@ object ConnectivityUtils {
         context.applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE)
             as ConnectivityManager
 
+    @Suppress("DEPRECATION")
     private fun currentNetworkInfoLegacy(context: Context): NetworkInfo? = connectivityManager(context).activeNetworkInfo
 
+    @Suppress("DEPRECATION")
     private fun isNetworkAvailableLegacy(context: Context): Boolean = currentNetworkInfoLegacy(context)?.isConnected ?: false
 
     @RequiresApi(android.os.Build.VERSION_CODES.M)
@@ -92,6 +90,7 @@ object ConnectivityUtils {
         return result
     }
 
+    @Suppress("DEPRECATION")
     private fun readNetworkConnectivityStateLegacy(context: Context): String {
         var result = "Connected - "
         currentNetworkInfoLegacy(context)?.let { info ->
