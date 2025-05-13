@@ -2,7 +2,6 @@ package com.raygun.raygun4android.network
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.net.ConnectivityManager
 import android.provider.Settings
 import androidx.annotation.VisibleForTesting
 import androidx.core.content.edit

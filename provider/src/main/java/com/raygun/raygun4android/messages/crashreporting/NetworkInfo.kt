@@ -1,8 +1,6 @@
 package com.raygun.raygun4android.messages.crashreporting
 
 import android.content.Context
-import android.net.ConnectivityManager
-import android.telephony.TelephonyManager
 import com.raygun.raygun4android.logging.RaygunLogger
 import com.raygun.raygun4android.network.ConnectivityUtils
 import java.net.Inet4Address

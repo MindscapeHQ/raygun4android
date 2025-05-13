@@ -1,4 +1,6 @@
-//@file:Suppress("DEPRECATION")
+// @file:Suppress("DEPRECATION")
+
+@file:Suppress("DEPRECATION")
 
 package com.raygun.raygun4android.network
 
@@ -10,44 +12,42 @@ import android.net.NetworkCapabilities
 import android.net.NetworkInfo
 import android.telephony.TelephonyManager
 import androidx.annotation.RequiresApi
-import timber.log.Timber
 
+// Provides methods to check network connectivity and get network type.
+// Handles both pre-23 and post-23 APIs. The SDK minimum API is 21.
+// Once we increase the minimum API to 23, we can remove the legacy methods.
 object ConnectivityUtils {
-    fun isNetworkAvailable(context: Context): Boolean {
-        return if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+    // Returns true when the device is connected to a network
+    fun isNetworkAvailable(context: Context): Boolean =
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
             isNetworkAvailable23(context)
         } else {
             isNetworkAvailableLegacy(context)
         }
-    }
 
+    // Returns the current network type (e.g., WiFi, Mobile, etc.)
+    // otherwise return "Not connected" if not connected to a network
     fun networkConnectivityState(context: Context): String {
         if (!isNetworkAvailable(context)) {
             return "Not connected"
         }
         return if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
-            readNetworkConnectivityState(context)
+            readNetworkConnectivityState23(context)
         } else {
             readNetworkConnectivityStateLegacy(context)
         }
     }
 
-    private fun connectivityManager(context: Context): ConnectivityManager {
-        return context.applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-    }
+    private fun connectivityManager(context: Context): ConnectivityManager =
+        context.applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE)
+            as ConnectivityManager
 
-    private fun currentNetworkInfoLegacy(context: Context): NetworkInfo? {
-        return connectivityManager(context).activeNetworkInfo
-    }
+    private fun currentNetworkInfoLegacy(context: Context): NetworkInfo? = connectivityManager(context).activeNetworkInfo
 
-    private fun isNetworkAvailableLegacy(context: Context): Boolean {
-        return currentNetworkInfoLegacy(context)?.isConnected ?: false
-    }
+    private fun isNetworkAvailableLegacy(context: Context): Boolean = currentNetworkInfoLegacy(context)?.isConnected ?: false
 
     @RequiresApi(android.os.Build.VERSION_CODES.M)
-    private fun currentNetwork(context: Context): Network? {
-        return connectivityManager(context).activeNetwork
-    }
+    private fun currentNetwork(context: Context): Network? = connectivityManager(context).activeNetwork
 
     @RequiresApi(android.os.Build.VERSION_CODES.M)
     private fun isNetworkAvailable23(context: Context): Boolean {
@@ -71,13 +71,15 @@ object ConnectivityUtils {
     }
 
     @RequiresApi(android.os.Build.VERSION_CODES.M)
-    private fun readNetworkConnectivityState(context: Context): String {
+    private fun readNetworkConnectivityState23(context: Context): String {
         var result = "Connected - "
         networkCapabilities(context)?.let { capabilities ->
             when {
                 capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> result += "WiFi"
                 capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) -> {
                     result += "Mobile - "
+                    // Note: getNetworkType requires READ_PHONE_STATE permission
+                    // without it the result is always "unknown"
                     result += TelephonyUtils.getNetworkType(context)
                     val linkProperties = linkProperties(context)
                     if (linkProperties != null) {
@@ -101,8 +103,10 @@ object ConnectivityUtils {
                 ConnectivityManager.TYPE_MOBILE_HIPRI,
                 ConnectivityManager.TYPE_MOBILE_MMS,
                 ConnectivityManager.TYPE_MOBILE_SUPL,
-                    -> {
+                -> {
                     result += "Mobile - "
+                    // Note: subtype seems to always return TelephonyManager.NETWORK_TYPE_UNKNOWN
+                    // probably because this API is deprecated
                     result +=
                         when (info.subtype) {
                             TelephonyManager.NETWORK_TYPE_1xRTT -> "1xRTT"

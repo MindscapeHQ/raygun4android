@@ -6,7 +6,6 @@ import com.raygun.raygun4android.logging.RaygunLogger
 import com.raygun.raygun4android.messages.crashreporting.RaygunBreadcrumbMessage
 import com.raygun.raygun4android.messages.crashreporting.RaygunMessage
 import com.raygun.raygun4android.network.ConnectivityUtils
-import com.raygun.raygun4android.network.RaygunNetworkUtils
 import com.raygun.raygun4android.rum.RUM
 import com.raygun.raygun4android.utils.RaygunFileFilter
 import com.raygun.raygun4android.utils.RaygunFileUtils
