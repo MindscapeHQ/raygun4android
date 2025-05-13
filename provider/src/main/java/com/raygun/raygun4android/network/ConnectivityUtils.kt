@@ -140,8 +140,6 @@ object ConnectivityUtils {
                 ConnectivityManager.TYPE_MOBILE_SUPL,
                 -> {
                     result += "Mobile - "
-                    // Note: subtype seems to always return TelephonyManager.NETWORK_TYPE_UNKNOWN
-                    // probably because this API is deprecated
                     result += TelephonyUtils.networkTypeToString(info.subtype)
                 }
                 else -> result += "unknown type"
