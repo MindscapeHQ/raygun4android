@@ -9,6 +9,7 @@ import android.os.StatFs
 import android.util.DisplayMetrics
 import android.view.WindowManager
 import com.raygun.raygun4android.logging.RaygunLogger
+import com.raygun.raygun4android.utils.DisplayUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.IOException
@@ -65,22 +66,11 @@ data class RaygunEnvironmentMessage(
                 raygunEnvironmentMessage.board = Build.BOARD
 
                 raygunEnvironmentMessage.processorCount = Runtime.getRuntime().availableProcessors()
+                raygunEnvironmentMessage.currentOrientation = DisplayUtils.getOrientation(context)
 
-                val orientation = context.resources.configuration.orientation
-                raygunEnvironmentMessage.currentOrientation =
-                    when (orientation) {
-                        1 -> "Portrait"
-                        2 -> "Landscape"
-                        3 -> "Square"
-                        else -> "Undefined"
-                    }
-
-                val metrics = DisplayMetrics()
-                (context.getSystemService(Context.WINDOW_SERVICE) as WindowManager)
-                    .defaultDisplay
-                    .getMetrics(metrics)
-                raygunEnvironmentMessage.windowsBoundWidth = metrics.widthPixels
-                raygunEnvironmentMessage.windowsBoundHeight = metrics.heightPixels
+                val metrics = DisplayUtils.getResolution(context)
+                raygunEnvironmentMessage.windowsBoundWidth = metrics.width
+                raygunEnvironmentMessage.windowsBoundHeight = metrics.height
 
                 val tz = TimeZone.getDefault()
                 val now = Date()
