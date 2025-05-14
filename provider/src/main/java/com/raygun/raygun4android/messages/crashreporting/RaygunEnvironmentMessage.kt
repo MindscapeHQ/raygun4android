@@ -112,8 +112,8 @@ data class RaygunEnvironmentMessage(
                 val stat =
                     withContext(Dispatchers.IO) { StatFs(Environment.getDataDirectory().path) }
 
-                val availableBlocks = stat.availableBlocks.toLong()
-                val blockSize = stat.blockSize.toLong()
+                val availableBlocks = stat.availableBlocksLong
+                val blockSize = stat.blockSizeLong
                 raygunEnvironmentMessage.diskSpaceFree = (availableBlocks * blockSize) / 0x100000
             } catch (e: Exception) {
                 RaygunLogger.w("Couldn't get all env data: $e")
