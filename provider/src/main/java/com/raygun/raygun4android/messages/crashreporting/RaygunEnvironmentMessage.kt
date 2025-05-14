@@ -9,6 +9,7 @@ import android.os.StatFs
 import android.util.DisplayMetrics
 import android.view.WindowManager
 import com.raygun.raygun4android.logging.RaygunLogger
+import com.raygun.raygun4android.utils.LocaleUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.IOException
@@ -91,9 +92,8 @@ data class RaygunEnvironmentMessage(
                             TimeUnit.MILLISECONDS,
                         ) / 3600
                     ).toDouble()
-                raygunEnvironmentMessage.locale =
-                    context.resources.configuration.locale
-                        .toString()
+
+                raygunEnvironmentMessage.locale = LocaleUtils.getLocale(context)
 
                 val mi = ActivityManager.MemoryInfo()
                 val am = context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
