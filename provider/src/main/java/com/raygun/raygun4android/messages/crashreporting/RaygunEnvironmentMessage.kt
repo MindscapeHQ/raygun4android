@@ -6,8 +6,6 @@ import android.content.Context
 import android.os.Build
 import android.os.Environment
 import android.os.StatFs
-import android.util.DisplayMetrics
-import android.view.WindowManager
 import com.raygun.raygun4android.logging.RaygunLogger
 import com.raygun.raygun4android.utils.DisplayUtils
 import kotlinx.coroutines.Dispatchers

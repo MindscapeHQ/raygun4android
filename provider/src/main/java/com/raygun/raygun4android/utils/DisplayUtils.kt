@@ -3,7 +3,10 @@ package com.raygun.raygun4android.utils
 import android.content.Context
 import android.content.res.Configuration
 
-data class Resolution(val width: Int, val height: Int)
+data class Resolution(
+    val width: Int,
+    val height: Int,
+)
 
 object DisplayUtils {
     // Returns the screen resolution of the device display metrics
