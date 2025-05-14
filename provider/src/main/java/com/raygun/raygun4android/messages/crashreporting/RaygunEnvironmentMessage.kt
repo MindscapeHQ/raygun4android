@@ -56,7 +56,7 @@ data class RaygunEnvironmentMessage(
         suspend operator fun invoke(context: Context): RaygunEnvironmentMessage {
             val raygunEnvironmentMessage = RaygunEnvironmentMessage()
             try {
-                raygunEnvironmentMessage.architecture = System.getProperty("os.arch")
+                raygunEnvironmentMessage.architecture = System.getProperty("os.arch") ?: "unknown"
                 raygunEnvironmentMessage.oSVersion = Build.VERSION.RELEASE
                 raygunEnvironmentMessage.osSDKVersion = Build.VERSION.SDK_INT.toString()
                 raygunEnvironmentMessage.deviceName = Build.MODEL
