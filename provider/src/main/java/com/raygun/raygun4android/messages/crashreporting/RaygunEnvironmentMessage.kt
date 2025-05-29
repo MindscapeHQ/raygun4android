@@ -7,6 +7,7 @@ import android.os.Build
 import android.os.Environment
 import android.os.StatFs
 import com.raygun.raygun4android.logging.RaygunLogger
+import com.raygun.raygun4android.utils.LocaleUtils
 import com.raygun.raygun4android.utils.DisplayUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -79,9 +80,8 @@ data class RaygunEnvironmentMessage(
                             TimeUnit.MILLISECONDS,
                         ) / 3600
                     ).toDouble()
-                raygunEnvironmentMessage.locale =
-                    context.resources.configuration.locale
-                        .toString()
+
+                raygunEnvironmentMessage.locale = LocaleUtils.getLocale(context)
 
                 val mi = ActivityManager.MemoryInfo()
                 val am = context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
