@@ -7,8 +7,8 @@ import android.os.Build
 import android.os.Environment
 import android.os.StatFs
 import com.raygun.raygun4android.logging.RaygunLogger
-import com.raygun.raygun4android.utils.LocaleUtils
 import com.raygun.raygun4android.utils.DisplayUtils
+import com.raygun.raygun4android.utils.LocaleUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.IOException
