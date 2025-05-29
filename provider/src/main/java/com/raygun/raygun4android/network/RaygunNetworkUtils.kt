@@ -2,7 +2,6 @@ package com.raygun.raygun4android.network
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.net.ConnectivityManager
 import android.provider.Settings
 import androidx.annotation.VisibleForTesting
 import androidx.core.content.edit
@@ -32,20 +31,6 @@ object RaygunNetworkUtils {
             }
         }
         return statusCode
-    }
-
-    @JvmStatic
-    fun hasInternetConnection(appContext: Context): Boolean {
-        val cm =
-            appContext.applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE)
-                as ConnectivityManager?
-
-        if (cm != null) {
-            val activeNetwork = cm.activeNetworkInfo
-            return activeNetwork != null && activeNetwork.isConnected
-        }
-
-        return false
     }
 
     suspend fun getDeviceUuid(context: Context): String = uuidProvider.getDeviceUuid(context)

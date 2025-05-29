@@ -32,13 +32,10 @@ class RaygunUrlStreamHandlerFactory : URLStreamHandlerFactory {
                 val className = "$packageName.$protocol.Handler"
                 try {
                     val c = contextClassLoader.loadClass(className)
-                    streamHandler = c.newInstance() as URLStreamHandler
+                    streamHandler = c.getDeclaredConstructor().newInstance() as URLStreamHandler
                     return streamHandler
-                } catch (ignore: IllegalAccessException) {
-                } catch (
-                    ignore: InstantiationException,
-                ) {
-                } catch (ignore: ClassNotFoundException) {
+                } catch (ignore: Exception) {
+                    // Ignore the exception and continue searching
                 }
             }
         }
@@ -62,7 +59,8 @@ class RaygunUrlStreamHandlerFactory : URLStreamHandlerFactory {
 
     private fun createStreamHandler(className: String): URLStreamHandler? {
         try {
-            return Class.forName(className).newInstance() as URLStreamHandler
+            return Class.forName(className).getDeclaredConstructor().newInstance()
+                as URLStreamHandler
         } catch (e: Exception) {
             e("Exception occurred in createStreamHandler: " + e.message)
         }
