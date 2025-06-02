@@ -1,5 +1,20 @@
 ## Changelog
 
+### 5.0.0-alpha2
+
+- fix(provider): order of imports triggered spotless (2025-05-30)
+- fix(provider): deprecated statFs props (#188) (2025-05-29)
+- fix(provider): deprecate locale (#187) (2025-05-29)
+- fix(provider): #180 deprecated display metrics (#185) (2025-05-29)
+- fix(provider): #179 deprecated CPU_ABI (#186) (2025-05-29)
+- fix(provider): #178 replace deprecated connectivity APIs (#184) (2025-05-29)
+- fix(provider): #182 replace deprecated newInstance (#183) (2025-05-29)
+- fix(app): StrictMode rules fixes in demo app (#177) (2025-05-12)
+- chore(deps): bump com.android.tools.build:gradle from 8.9.2 to 8.10.1 (#191) (2025-06-02)
+- chore(deps): bump org.jetbrains.kotlin:kotlin-gradle-plugin (#193) (2025-06-02)
+- chore(deps): bump org.jetbrains.kotlin.android from 2.1.20 to 2.1.21 (#194) (2025-06-02)
+- chore(deps): bump com.diffplug.spotless from 7.0.3 to 7.0.4 (#192) (2025-06-02)
+
 ### 5.0.0-alpha1
 
 - feat: convert "util" packages to Kotlin (#167) (2025-04-25)
