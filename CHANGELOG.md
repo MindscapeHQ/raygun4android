@@ -1,5 +1,9 @@
 ## Changelog
 
+### 4.2.2
+
+- fix(provider): pass messages as files to workmanager to avoid max size limit
+
 ### 4.2.1
 
 - perf(provider): encode message as bytearray check max size (#154) (2025-03-18)
