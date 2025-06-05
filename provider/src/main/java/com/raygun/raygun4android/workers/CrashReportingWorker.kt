@@ -34,18 +34,17 @@ class CrashReportingWorker(
 ) : Worker(context, workerParams) {
     override fun doWork(): Result {
         // Retrieve data from WorkManager
-        val encoded = inputData.getByteArray("msg")
         val file = inputData.getString("file")
         val apiKey = inputData.getString("apikey")
 
-        var message: String? = null
-        if (encoded == null && file != null) {
-            message = readMessageFromTempFileAndDelete(file)
-        } else if (encoded != null) {
-            message = String(encoded, StandardCharsets.UTF_8)
+        if (file.isNullOrEmpty()) {
+            e("No file provided in input data.")
+            return Result.failure()
         }
 
-        if (message != null && apiKey != null) {
+        val message = readMessageFromTempFileAndDelete(file)
+
+        if (apiKey != null) {
             if (ConnectivityUtils.isNetworkAvailable(applicationContext)) {
                 val responseCode = postCrashReporting(apiKey, message)
                 responseCode(responseCode)

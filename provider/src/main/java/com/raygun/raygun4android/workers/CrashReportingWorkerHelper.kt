@@ -28,35 +28,16 @@ object CrashReportingWorkerHelper {
     ) {
         val inputData: Data
         val encoded = message.toByteArray(StandardCharsets.UTF_8)
-        val length = encoded.size
-        v("Message length: $length")
-        if (length > MAX_DATA_SIZE) {
-            d(
-                (
-                    "Message length (" +
-                        length +
-                        ") greater than " +
-                        MAX_DATA_SIZE +
-                        ", storing as file."
-                ),
-            )
-            // Store the message in a file to circumvent the WorkManager's 10240 bytes limit
-            val fileName = storeMessageInTempFile(context, encoded)
-            i("Stored temp file: $fileName")
-            inputData =
-                Data
-                    .Builder()
-                    .putString("file", fileName)
-                    .putString("apikey", apiKey)
-                    .build()
-        } else {
-            inputData =
-                Data
-                    .Builder()
-                    .putByteArray("msg", encoded)
-                    .putString("apikey", apiKey)
-                    .build()
-        }
+
+        // Store the message in a file to circumvent the WorkManager's 10240 bytes limit
+        val fileName = storeMessageInTempFile(context, encoded)
+        i("Stored temp file: $fileName")
+        inputData =
+            Data
+                .Builder()
+                .putString("file", fileName)
+                .putString("apikey", apiKey)
+                .build()
 
         val workRequest =
             OneTimeWorkRequest
