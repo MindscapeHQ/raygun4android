@@ -1,5 +1,10 @@
 ## Changelog
 
+### 5.0.0-alpha3
+
+- backport changes in hotfix 4.2.2
+- fix(provider): pass messages as files to workmanager to avoid max size limit
+
 ### 5.0.0-alpha2
 
 - fix(provider): order of imports triggered spotless (2025-05-30)
@@ -39,6 +44,10 @@
 BREAKING CHANGE: Migration from Java to Kotlin
 
 The library has been fully migrated from Java to Kotlin. Although most public methods have retained their previous signatures and behavior, there are some changes you should be aware of. For detailed information on what has changed and to ensure smooth integration, please consult the updated README.md.
+
+### 4.2.2
+
+- fix(provider): pass messages as files to workmanager to avoid max size limit
 
 ### 4.2.1
 
