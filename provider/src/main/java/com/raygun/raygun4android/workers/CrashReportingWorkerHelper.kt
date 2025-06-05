@@ -6,10 +6,8 @@ import androidx.work.Data
 import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkManager
 import com.raygun.raygun4android.RaygunSettings
-import com.raygun.raygun4android.logging.RaygunLogger.d
 import com.raygun.raygun4android.logging.RaygunLogger.e
 import com.raygun.raygun4android.logging.RaygunLogger.i
-import com.raygun.raygun4android.logging.RaygunLogger.v
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
