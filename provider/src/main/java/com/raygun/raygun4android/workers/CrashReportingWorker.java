@@ -16,7 +16,6 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
-import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -40,18 +39,12 @@ public class CrashReportingWorker extends Worker {
     @Override
     public Result doWork() {
         // Retrieve data from WorkManager
-        byte[] encoded = getInputData().getByteArray("msg");
         String file = getInputData().getString("file");
         String apiKey = getInputData().getString("apikey");
 
-        String message = null;
-        if (encoded == null && file != null) {
-            message = readMessageFromTempFileAndDelete(file);
-        } else if (encoded != null) {
-            message = new String(encoded, StandardCharsets.UTF_8);
-        }
+        String message = readMessageFromTempFileAndDelete(file);
 
-        if (message != null && apiKey != null) {
+        if (apiKey != null) {
             if (RaygunNetworkUtils.hasInternetConnection(getApplicationContext())) {
                 int responseCode = postCrashReporting(apiKey, message);
                 RaygunLogger.responseCode(responseCode);
