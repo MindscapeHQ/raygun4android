@@ -1,5 +1,18 @@
 ## Changelog
 
+### 5.0.0
+
+- chore(deps): bump org.jetbrains.kotlin:kotlin-gradle-plugin (#202) (2025-07-01)
+- chore(deps): bump org.jetbrains.kotlin.android from 2.1.21 to 2.2.0 (#201) (2025-07-01)
+- chore(deps): bump com.raygun:raygun4android from 4.2.1 to 4.2.2 (#200) (2025-07-01)
+- chore(deps): bump androidx.appcompat:appcompat from 1.7.0 to 1.7.1 (#199) (2025-07-01)
+- chore(deps): bump androidx.work:work-runtime from 2.10.1 to 2.10.2 (#198) (2025-07-01)
+- chore(deps): bump com.android.tools.build:gradle from 8.10.1 to 8.11.0 (#197) (2025-07-01)
+
+BREAKING CHANGE: Migration from Java to Kotlin
+
+The library has been fully migrated from Java to Kotlin. Although most public methods have retained their previous signatures and behavior, there are some changes you should be aware of. For detailed information on what has changed and to ensure smooth integration, please consult the updated README.md.
+
 ### 5.0.0-alpha3
 
 - backport changes in hotfix 4.2.2
