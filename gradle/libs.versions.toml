@@ -24,6 +24,7 @@ raygun = "4.2.2"
 spotless = "7.0.4"
 activity = "1.10.1"
 kotlin-version = "2.2.0"
+maven-central-publish = "0.34.0"
 
 [libraries]
 android-material-material = { module = "com.google.android.material:material", version.ref = "android-material" }
@@ -56,3 +57,4 @@ androidx-activity = { group = "androidx.activity", name = "activity", version.re
 [plugins]
 spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin-version" }
+maven-central-publish = { id = "com.vanniktech.maven.publish", version.ref = "maven-central-publish" }
