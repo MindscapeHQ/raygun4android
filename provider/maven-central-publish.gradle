@@ -1,0 +1,48 @@
+// Plugin docs: https://vanniktech.github.io/gradle-maven-publish-plugin/central/
+apply plugin: "com.vanniktech.maven.publish"
+
+afterEvaluate { project ->
+    mavenPublishing {
+        coordinates(GROUP, POM_ARTIFACT_ID, VERSION_NAME)
+
+        pom {
+            name = POM_NAME
+            packaging = POM_PACKAGING
+            description = POM_DESCRIPTION
+            url = POM_URL
+
+            scm {
+                url = POM_SCM_URL
+                connection = POM_SCM_CONNECTION
+                developerConnection = POM_SCM_DEV_CONNECTION
+            }
+
+            licenses {
+                license {
+                    name = POM_LICENCE_NAME
+                    url = POM_LICENCE_URL
+                    distribution = POM_LICENCE_DIST
+                }
+            }
+
+            developers {
+                developer {
+                    id = POM_DEVELOPER_1_ID
+                    name = POM_DEVELOPER_1_NAME
+                }
+                developer {
+                    id = POM_DEVELOPER_2_ID
+                    name = POM_DEVELOPER_2_NAME
+                }
+                developer {
+                    id = POM_DEVELOPER_3_ID
+                    name = POM_DEVELOPER_3_NAME
+                }
+            }
+        }
+
+        publishToMavenCentral()
+
+        signAllPublications()
+    }
+}

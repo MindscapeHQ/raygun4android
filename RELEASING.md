@@ -2,27 +2,25 @@
 
 Official development or production releases of Raygun4Android are usually done by the Raygun team. This file documents the setup needed to do snapshot and production releases.
 
-The release process is implemented in the Gradle file `provider/gradle-mv-push.gradle` which uses the `maven-publish` plugin.
+The release process is implemented in the Gradle file `provider/maven-central-publish.gradle` which uses the `com.vanniktech.maven.publish` plugin.
 
-Plugin documentation can be found here: https://docs.gradle.org/current/userguide/publishing_maven.html
+Plugin documentation can be found here: https://vanniktech.github.io/gradle-maven-publish-plugin/central/
 
 ## Preparation
 
-Create a local `gradle.properties` file in your home directory or add to an already existing one. The default is `<HOME>/.gradle/gradle.properties`. It is important that the content of this file
-does not get added to the repository. The file specified in the `secretKeyRingFile` property should also never be add to and shared in a repository.
+Create a local `gradle.properties` file in your home directory or add to an already existing one. The default is `<HOME>/.gradle/gradle.properties`. It is important that the content of this file does not get added to the repository. The file specified in the `secretKeyRingFile` property should also never be add to and shared in a repository.
 
 The structure to be added is:
 
 ```
-NEXUS_USERNAME={to be provided}
-NEXUS_PASSWORD={to be provided}
+mavenCentralUsername={to be provided}
+mavenCentralPassword={to be provided}
 signing.keyId={to be provided}
 signing.password={to be provided}
 signing.secretKeyRingFile={to be provided}
 ```
 
-All keys have to populated with the appropriate values and file paths to allow a successful publication on Maven Central. These values will be provided to people with the appropriate level
-of access by the Raygun team.
+All keys have to populated with the appropriate values and file paths to allow a successful publication on Maven Central. These values will be provided to people with the appropriate level of access by the Raygun team.
 
 ## Publish a build
 
@@ -112,18 +110,13 @@ Here you can manually upload artifacts.
 1. Build the provider for release and upload it to Nexus by running the following command in the terminal:
 
 ```
-./gradlew clean :provider:build :provider:publish
+./gradlew clean :provider:build :provider:publishToMavenCentral
 ```
 
-2. Login to the [Nexus Repository Manager](https://oss.sonatype.org) and go to the **Staging Repositories**.
-3. Locate the repository named 'comraygun-100*' near the bottom.
-4. Mark this repository as **closed** by clicking the **Close** button.
-5. The repository will sent to the Target Groups defined in the **Staging Profiles** (for us it's **Staging**).
-6. Test the artifacts that are now in our staging target group (**Staging**).
-7. Release the artifacts by clicking the **Release** button on our staging repository (which we marked as **closed**).
-8. Artifacts are sent to the Release repository defined in the staging profile.
-9. The temp staging repository will be automatically deleted.
-10. Artifacts will take a few days to be made available to clients and should be listed in the [public repositories](https://oss.sonatype.org/content/repositories/public/com/raygun/raygun4android/) first and on [mvnrepository.com](https://mvnrepository.com/artifact/com.raygun/raygun4android) eventually.
+1. Login to the [Maven Central Deployments](https://central.sonatype.com/publishing/deployments).
+2. Select the deployment named `com.raygun:raygun4android` in the list of deployments.
+3. Release the artifacts by clicking the **Publish** button.
+4. The artifact status will change to **Publishing**, it will take between 10 to 30 minutes for the artifacts to be available in Maven Central.
 
 ## Maven local testing
 
