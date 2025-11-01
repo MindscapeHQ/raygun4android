@@ -23,7 +23,7 @@ gradle = "8.1.1"
 raygun = "5.0.0"
 spotless = "8.0.0"
 activity = "1.10.1"
-kotlin-version = "2.2.10"
+kotlin-version = "2.2.21"
 maven-central-publish = "0.34.0"
 
 [libraries]
