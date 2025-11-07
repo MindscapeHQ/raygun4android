@@ -30,11 +30,9 @@ object CrashReporting {
     private var onBeforeSend: CrashReportingOnBeforeSend? = null
     private val coroutineScope = CoroutineScope(Dispatchers.IO + CoroutineName("CrashReporting"))
 
-    @JvmField
-    var tags: Tags? = null
+    @JvmField var tags: Tags? = null
 
-    @JvmField
-    var customData: CustomData? = null
+    @JvmField var customData: CustomData? = null
 
     private val breadcrumbs: MutableList<RaygunBreadcrumbMessage> = ArrayList()
     private var shouldProcessBreadcrumbLocation = false
@@ -56,10 +54,7 @@ object CrashReporting {
     fun recordBreadcrumb(breadcrumb: RaygunBreadcrumbMessage) {
         synchronized(breadcrumbLock) {
             breadcrumbs.add(
-                processBreadcrumbLocation(
-                    breadcrumb,
-                    shouldProcessBreadcrumbLocation()
-                )
+                processBreadcrumbLocation(breadcrumb, shouldProcessBreadcrumbLocation()),
             )
         }
     }
@@ -247,7 +242,7 @@ object CrashReporting {
                 } else {
                     RaygunLogger.e(
                         "Error in handling cached message from filesystem - could not get a list of" +
-                                " files from cache dir",
+                            " files from cache dir",
                     )
                 }
             }
