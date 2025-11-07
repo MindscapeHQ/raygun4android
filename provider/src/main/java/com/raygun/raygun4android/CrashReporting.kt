@@ -30,9 +30,11 @@ object CrashReporting {
     private var onBeforeSend: CrashReportingOnBeforeSend? = null
     private val coroutineScope = CoroutineScope(Dispatchers.IO + CoroutineName("CrashReporting"))
 
-    @JvmField var tags: Tags? = null
+    @JvmField
+    var tags: Tags? = null
 
-    @JvmField var customData: CustomData? = null
+    @JvmField
+    var customData: CustomData? = null
 
     private val breadcrumbs: MutableList<RaygunBreadcrumbMessage> = ArrayList()
     private var shouldProcessBreadcrumbLocation = false
@@ -48,14 +50,23 @@ object CrashReporting {
         recordBreadcrumb(breadcrumb)
     }
 
+    private val breadcrumbLock = Any()
+
     @JvmStatic
     fun recordBreadcrumb(breadcrumb: RaygunBreadcrumbMessage) {
-        breadcrumbs.add(processBreadcrumbLocation(breadcrumb, shouldProcessBreadcrumbLocation()))
+        synchronized(breadcrumbLock) {
+            breadcrumbs.add(
+                processBreadcrumbLocation(
+                    breadcrumb,
+                    shouldProcessBreadcrumbLocation()
+                )
+            )
+        }
     }
 
     @JvmStatic
     fun clearBreadcrumbs() {
-        breadcrumbs.clear()
+        synchronized(breadcrumbLock) { breadcrumbs.clear() }
     }
 
     private fun processBreadcrumbLocation(
@@ -122,9 +133,9 @@ object CrashReporting {
                     return@launch
                 }
 
-                msg.details.tags = RaygunUtils.mergeLists(CrashReporting.tags, tags)
+                msg.details.tags = RaygunUtils.mergeLists(CrashReporting.tags, tags).toList()
                 msg.details.customData =
-                    RaygunUtils.mergeMaps(CrashReporting.customData, customData)
+                    RaygunUtils.mergeMaps(CrashReporting.customData, customData).toMap()
 
                 if (onBeforeSend != null) {
                     msg = onBeforeSend!!.onBeforeSend(msg)
@@ -154,7 +165,7 @@ object CrashReporting {
                     .setAppContext(RaygunClient.appContextIdentifier)
                     .setVersion(RaygunClient.version)
                     .setNetworkInfo(RaygunClient.getApplicationContext())
-                    .setBreadcrumbs(breadcrumbs)
+                    .setBreadcrumbs(breadcrumbs.toList())
                     .build()
 
             if (RaygunClient.version != null) {
@@ -236,7 +247,7 @@ object CrashReporting {
                 } else {
                     RaygunLogger.e(
                         "Error in handling cached message from filesystem - could not get a list of" +
-                            " files from cache dir",
+                                " files from cache dir",
                     )
                 }
             }
