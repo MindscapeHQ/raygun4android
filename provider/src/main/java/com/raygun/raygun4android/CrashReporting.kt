@@ -20,6 +20,7 @@ import java.io.FileInputStream
 import java.io.FileNotFoundException
 import java.io.IOException
 import java.io.ObjectInputStream
+import java.util.concurrent.CopyOnWriteArrayList
 
 typealias Tags = List<String>
 
@@ -34,7 +35,7 @@ object CrashReporting {
 
     @JvmField var customData: CustomData? = null
 
-    private val breadcrumbs: MutableList<RaygunBreadcrumbMessage> = ArrayList()
+    private val breadcrumbs: CopyOnWriteArrayList<RaygunBreadcrumbMessage> = CopyOnWriteArrayList()
     private var shouldProcessBreadcrumbLocation = false
 
     @JvmStatic
@@ -48,20 +49,14 @@ object CrashReporting {
         recordBreadcrumb(breadcrumb)
     }
 
-    private val breadcrumbLock = Any()
-
     @JvmStatic
     fun recordBreadcrumb(breadcrumb: RaygunBreadcrumbMessage) {
-        synchronized(breadcrumbLock) {
-            breadcrumbs.add(
-                processBreadcrumbLocation(breadcrumb, shouldProcessBreadcrumbLocation()),
-            )
-        }
+        breadcrumbs.add(processBreadcrumbLocation(breadcrumb, shouldProcessBreadcrumbLocation()))
     }
 
     @JvmStatic
     fun clearBreadcrumbs() {
-        synchronized(breadcrumbLock) { breadcrumbs.clear() }
+        breadcrumbs.clear()
     }
 
     private fun processBreadcrumbLocation(
@@ -128,9 +123,9 @@ object CrashReporting {
                     return@launch
                 }
 
-                msg.details.tags = RaygunUtils.mergeLists(CrashReporting.tags, tags).toList()
+                msg.details.tags = RaygunUtils.mergeLists(CrashReporting.tags, tags)
                 msg.details.customData =
-                    RaygunUtils.mergeMaps(CrashReporting.customData, customData).toMap()
+                    RaygunUtils.mergeMaps(CrashReporting.customData, customData)
 
                 if (onBeforeSend != null) {
                     msg = onBeforeSend!!.onBeforeSend(msg)
@@ -160,7 +155,7 @@ object CrashReporting {
                     .setAppContext(RaygunClient.appContextIdentifier)
                     .setVersion(RaygunClient.version)
                     .setNetworkInfo(RaygunClient.getApplicationContext())
-                    .setBreadcrumbs(breadcrumbs.toList())
+                    .setBreadcrumbs(breadcrumbs)
                     .build()
 
             if (RaygunClient.version != null) {
