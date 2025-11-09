@@ -1,5 +1,31 @@
 ## Changelog
 
+### 5.0.1
+
+- fix: #227 concurrent modification error (#228) (2025-11-09)
+- chore(deps): bump androidx.core:core from 1.16.0 to 1.17.0 (#223) (2025-11-01)
+- chore(deps): bump com.android.tools.build:gradle from 8.11.0 to 8.13.0 (#225) (2025-11-01)
+- chore(deps): bump org.jetbrains.kotlin.android from 2.2.10 to 2.2.21 (#226) (2025-11-01)
+- chore(deps): bump org.jetbrains.kotlin:kotlin-gradle-plugin (#224) (2025-11-01)
+- chore(deps): bump com.squareup.okhttp3:okhttp from 5.1.0 to 5.3.0 (#222) (2025-11-01)
+- chore(deps): bump com.diffplug.spotless from 7.2.1 to 8.0.0 (#220) (2025-10-01)
+- chore(deps): bump org.jetbrains.kotlin:kotlin-gradle-plugin (#221) (2025-10-01)
+- chore(deps): bump com.google.android.material:material (#218) (2025-10-01)
+- chore(deps): bump com.google.code.gson:gson from 2.13.1 to 2.13.2 (#219) (2025-10-01)
+- chore(deps): bump org.mockito.kotlin:mockito-kotlin from 6.0.0 to 6.1.0 (#217) (2025-10-01)
+- chore(deps): bump org.mockito.kotlin:mockito-kotlin from 5.4.0 to 6.0.0 (#213) (2025-09-02)
+- chore(deps): bump com.squareup.okhttp3:okhttp from 4.12.0 to 5.1.0 (#216) (2025-09-02)
+- chore(deps): bump org.jetbrains.kotlin.android from 2.2.0 to 2.2.10 (#212) (2025-09-02)
+- chore(deps): bump com.diffplug.spotless from 7.0.4 to 7.2.1 (#214) (2025-09-02)
+- chore(deps): bump org.jetbrains.kotlin:kotlin-gradle-plugin (#215) (2025-09-02)
+- chore(deps): bump actions/setup-java from 4 to 5 (#209) (2025-09-02)
+- chore(deps): bump amannn/action-semantic-pull-request from 5 to 6 (#211) (2025-09-02)
+- chore(deps): bump actions/checkout from 4 to 5 (#210) (2025-09-02)
+- chore(deps): bump androidx.work:work-runtime from 2.10.2 to 2.10.3 (#207) (2025-08-01)
+- chore(deps): bump androidx.test:runner from 1.6.2 to 1.7.0 (#206) (2025-08-01)
+- chore(deps): bump androidx-test-espresso from 3.6.1 to 3.7.0 (#208) (2025-08-01)
+- chore(deps): bump androidx.test:rules from 1.6.1 to 1.7.0 (#205) (2025-08-01)
+
 ### 5.0.0
 
 - chore(deps): bump org.jetbrains.kotlin:kotlin-gradle-plugin (#202) (2025-07-01)
