@@ -2,6 +2,7 @@ package com.raygun.raygun4android
 
 import com.raygun.raygun4android.utils.RaygunUtils
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Test
 
 class RaygunUtilsTest {
@@ -16,6 +17,7 @@ class RaygunUtilsTest {
         val secondList = listOf("test1", "test2")
         val result = RaygunUtils.mergeLists(null, secondList)
         assertEquals(secondList, result)
+        assertFalse("should be a new instance", secondList === result)
     }
 
     @Test
@@ -23,6 +25,7 @@ class RaygunUtilsTest {
         val firstList = listOf("test1", "test2")
         val result = RaygunUtils.mergeLists(firstList, null)
         assertEquals(firstList, result)
+        assertFalse("should be a new instance", firstList === result)
     }
 
     @Test
@@ -32,6 +35,8 @@ class RaygunUtilsTest {
         val expected = listOf("test1", "test2", "test3", "test4")
         val result = RaygunUtils.mergeLists(firstList, secondList)
         assertEquals(expected, result)
+        assertFalse("should be a new instance", firstList === result)
+        assertFalse("should be a new instance", secondList === result)
     }
 
     @Test
@@ -45,6 +50,7 @@ class RaygunUtilsTest {
         val secondMap = mapOf("key1" to "value1")
         val result = RaygunUtils.mergeMaps(null, secondMap)
         assertEquals(secondMap, result)
+        assertFalse("should be a new instance", secondMap === result)
     }
 
     @Test
@@ -52,6 +58,7 @@ class RaygunUtilsTest {
         val firstMap = mapOf("key1" to "value1")
         val result = RaygunUtils.mergeMaps(firstMap, null)
         assertEquals(firstMap, result)
+        assertFalse("should be a new instance", firstMap === result)
     }
 
     @Test
@@ -61,5 +68,7 @@ class RaygunUtilsTest {
         val expected = mapOf("key1" to "value1", "key2" to "value2")
         val result = RaygunUtils.mergeMaps(firstMap, secondMap)
         assertEquals(expected, result)
+        assertFalse("should be a new instance", secondMap === result)
+        assertFalse("should be a new instance", firstMap === result)
     }
 }

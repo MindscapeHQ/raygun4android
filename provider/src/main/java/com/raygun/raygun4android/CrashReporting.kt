@@ -20,6 +20,7 @@ import java.io.FileInputStream
 import java.io.FileNotFoundException
 import java.io.IOException
 import java.io.ObjectInputStream
+import java.util.concurrent.CopyOnWriteArrayList
 
 typealias Tags = List<String>
 
@@ -34,7 +35,7 @@ object CrashReporting {
 
     @JvmField var customData: CustomData? = null
 
-    private val breadcrumbs: MutableList<RaygunBreadcrumbMessage> = ArrayList()
+    private val breadcrumbs: CopyOnWriteArrayList<RaygunBreadcrumbMessage> = CopyOnWriteArrayList()
     private var shouldProcessBreadcrumbLocation = false
 
     @JvmStatic
