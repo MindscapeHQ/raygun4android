@@ -65,7 +65,7 @@ class RaygunMessageBuilderTest {
         val mockUser = mock<RaygunUserInfo>()
         val message = raygunMessageBuilder.setUserInfo(mockUser).build()
 
-        assertEquals(mockUser, message.details.userInfo)
+        assertEquals(mockUser, message.details.user)
     }
 
     @Test
