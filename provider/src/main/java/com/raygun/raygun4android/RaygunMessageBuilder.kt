@@ -54,7 +54,7 @@ class RaygunMessageBuilder {
     }
 
     fun setUserInfo(raygunUserInfo: RaygunUserInfo): RaygunMessageBuilder {
-        raygunMessage.details.userInfo = raygunUserInfo
+        raygunMessage.details.user = raygunUserInfo
         return this
     }
 

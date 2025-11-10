@@ -22,22 +22,22 @@ data class RaygunMessageDetails(
     // Custom Data
     @SerializedName("userCustomData") var customData: Map<*, *>? = null,
     // App Context
-    var appContext: RaygunAppContext? = null,
+    var context: RaygunAppContext? = null,
     // User
-    var userInfo: RaygunUserInfo? = null,
+    var user: RaygunUserInfo? = null,
     // Network Info
-    var networkInfo: NetworkInfo? = null,
+    var request: NetworkInfo? = null,
     var breadcrumbs: List<RaygunBreadcrumbMessage>? = null,
 ) {
     fun setAppContext(identifier: String?) {
-        this.appContext = RaygunAppContext(identifier)
+        this.context = RaygunAppContext(identifier)
     }
 
     suspend fun setUserInfo() {
-        this.userInfo = RaygunUserInfo.anonymous()
+        this.user = RaygunUserInfo.anonymous()
     }
 
     fun setNetworkInfo(context: Context) {
-        this.networkInfo = NetworkInfo(context)
+        this.request = NetworkInfo(context)
     }
 }
