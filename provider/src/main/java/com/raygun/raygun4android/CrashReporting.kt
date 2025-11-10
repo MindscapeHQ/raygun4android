@@ -163,7 +163,7 @@ object CrashReporting {
             }
 
             if (RaygunClient.user != null) {
-                msg.details.userInfo = RaygunClient.user
+                msg.details.user = RaygunClient.user
             } else {
                 msg.details.setUserInfo()
             }
