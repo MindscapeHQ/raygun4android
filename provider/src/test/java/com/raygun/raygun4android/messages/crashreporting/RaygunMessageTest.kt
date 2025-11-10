@@ -1,8 +1,5 @@
 package com.raygun.raygun4android.messages.crashreporting
 
-import com.google.gson.Gson
-import com.google.gson.JsonParser
-import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
