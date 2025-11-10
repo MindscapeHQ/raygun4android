@@ -2,6 +2,7 @@
 
 ### 5.0.1
 
+- fix: RaygunMessage property names (#230) (2025-11-10)
 - fix: #227 concurrent modification error (#228) (2025-11-09)
 - chore(deps): bump androidx.core:core from 1.16.0 to 1.17.0 (#223) (2025-11-01)
 - chore(deps): bump com.android.tools.build:gradle from 8.11.0 to 8.13.0 (#225) (2025-11-01)
