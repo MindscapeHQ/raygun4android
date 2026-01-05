@@ -44,11 +44,11 @@ $ gpg --gen-key
 
 3. Upload the public key to a keyserver:
 ```
-$ gpg --keyserver keyserver.ubuntu.com --send-keys <key id>
-gpg: sending key <key id>> to hkp://keyserver.ubuntu.com
+$ gpg --keyserver keyserver.ubuntu.com --send-keys <keyId>
+gpg: sending key <keyId> to hkp://keyserver.ubuntu.com
 ```
 
-4. Click generate key and do upload the public key. To export the secring file needed to sign the artifacts, run the following command:
+4. To export the secring file needed to sign the artifacts, run the following command:
 ```
 $ gpg --export-secret-keys -o secring.gpg
 ```
