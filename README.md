@@ -2,9 +2,10 @@
 
 The world's best Android Crash Reporting and Real User Monitoring solution
 
-Supports Android 5+ (API 21+).
+Supports Android 6+ (API 23+).
 
-If you need to support Android 4.1+, please use Raygun4Android 4.0.1.
+- If you need to support Android 4.1+, please use Raygun4Android 4.0.1.
+- If you need to support Android 5+, please use Raygun4Android 5.0.1.
 
 ## Library structure
 
@@ -15,7 +16,7 @@ This means that the library is now fully compatible with Kotlin Coroutines and p
 We recommend using those if you are using Kotlin in your project.
 As well, the library is still compatible with pure Java Android applications.
 
-Raygun4Android 5.0.0 is currently considered to be the stable release of the provider and is tagged in the repository and supports Android 5+.
+Raygun4Android 5.1.0 is currently considered to be the stable release of the provider and is tagged in the repository and supports Android 5+.
 
 Raygun4Android 4.1.1 is functionally equal to 4.1.0, which was unfortunately deployed to Maven Central in an incomplete state. Please use 4.1.1 instead.
 
@@ -27,8 +28,8 @@ If you want the *very old* stable version 3.0.6 please check out the change set 
 
 ### Requirements
 
-- minSdkVersion 21+
-- compileSdkVersion 34
+- minSdkVersion 23+
+- compileSdkVersion 36
 
 ### Internal dependencies
 
@@ -56,7 +57,7 @@ Then add the following to your **module's** build.gradle:
 ```gradle
 dependencies {
     ...
-    implementation 'com.raygun:raygun4android:4.0.1'
+    implementation 'com.raygun:raygun4android:5.1.0'
 }
 ```
 

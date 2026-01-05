@@ -1,5 +1,16 @@
 ## Changelog
 
+### 5.1.0
+
+- fix: Update minSDKVersion for both provider and app from 21 to 23 due to dependency requirements (2026-01-04)
+- fix: Update compileSDK from 35 to 36 due to dependency requirements (2026-01-04)
+- chore(deps): bump AGP from 8.13.1 to 8.13.2 (2026-01-04)
+- chore(deps): bump androidx.test.ext:junit from 1.2.1 to 1.3.0 (#237) (2026-01-04)
+- chore(deps): bump com.diffplug.spotless from 8.0.0 to 8.1.0 (#238) (2026-01-04)
+- chore(deps): bump androidx.activity:activity from 1.10.1 to 1.12.2 (2026-01-04)
+- chore(deps): bump androidx.work:work-runtime from 2.10.3 to 2.11.0 (2026-01-04)
+- chore(deps): bump androidx.core:core from 1.16.0 to 1.17.0 (2026-01-04)
+
 ### 5.0.1
 
 - fix: RaygunMessage property names (#230) (2025-11-10)
