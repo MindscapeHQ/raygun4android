@@ -23,7 +23,6 @@ gradle = "8.1.1"
 raygun = "5.1.0"
 spotless = "8.1.0"
 activity = "1.12.3"
-kotlin-version = "2.3.0"
 maven-central-publish = "0.35.0"
 
 [libraries]
@@ -56,5 +55,5 @@ androidx-activity = { group = "androidx.activity", name = "activity", version.re
 
 [plugins]
 spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }
-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin-version" }
+kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 maven-central-publish = { id = "com.vanniktech.maven.publish", version.ref = "maven-central-publish" }
