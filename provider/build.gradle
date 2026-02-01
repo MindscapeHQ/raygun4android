@@ -65,17 +65,17 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation(libs.androidx.core.core)
-    implementation(libs.androidx.appcompat.appcompat)
+    implementation(libs.androidx.core)
+    implementation(libs.androidx.appcompat)
     implementation(libs.gson)
     implementation(libs.okhttp)
     implementation(libs.timber)
-    implementation(libs.androidx.work.work.runtime)
+    implementation(libs.androidx.work.runtime)
 
     testImplementation(libs.junit)
     testImplementation(libs.mockito.core)
-    testImplementation(libs.mockito.mockito.inline)
-    testImplementation(libs.mockito.kotlin.mockito.kotlin)
+    testImplementation(libs.mockito.inline)
+    testImplementation(libs.mockito.kotlin)
 }
 
 // Commented code to push to lib repos as that code will need to change

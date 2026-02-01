@@ -138,20 +138,20 @@ dependencies {
     // or
     // 2. Change version in Gradle library register and use
     // implementation(libs.raygun)
-    implementation(libs.androidx.appcompat.appcompat)
-    implementation(libs.androidx.constraintlayout.constraintlayout)
-    implementation(libs.android.material.material)
-    implementation(libs.androidx.multidex.multidex)
+    implementation(libs.androidx.appcompat)
+    implementation(libs.androidx.constraintlayout)
+    implementation(libs.material)
+    implementation(libs.androidx.multidex)
     implementation(libs.androidx.activity)
     implementation(libs.okhttp)
 
     testImplementation(libs.junit)
     testImplementation(libs.mockito.core)
-    testImplementation(libs.mockito.mockito.inline)
+    testImplementation(libs.mockito.inline)
 
     androidTestImplementation(libs.androidx.test.ext.junit)
     androidTestImplementation(libs.androidx.test.espresso.core)
-    androidTestDebugImplementation(libs.androidx.espresso.intents)
+    androidTestDebugImplementation(libs.androidx.test.espresso.intents)
     androidTestImplementation(libs.androidx.test.runner)
     androidTestImplementation(libs.androidx.test.rules)
 
