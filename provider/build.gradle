@@ -5,22 +5,26 @@ android {
     compileSdk = 36
 
     defaultConfig {
-        minSdkVersion 23
-        targetSdkVersion 34
+        minSdkVersion = 23
+        targetSdkVersion = 34
         buildConfigField("long", "VERSION_CODE", VERSION_CODE)
         buildConfigField("String","VERSION_NAME","\"${VERSION_NAME}\"")
     }
 
     buildTypes {
         debug {
-            debuggable true
-            minifyEnabled false
+            debuggable = true
+            minifyEnabled = false
         }
         release {
-            debuggable false
-            minifyEnabled false
-            consumerProguardFiles 'proguard-rules.pro'
+            debuggable = false
+            minifyEnabled = false
+            consumerProguardFiles = ['proguard-rules.pro']
         }
+    }
+
+    buildFeatures {
+        buildConfig = true
     }
 
     compileOptions {
@@ -34,31 +38,31 @@ android {
         jvmToolchain(17)
     }
 
-    namespace 'com.raygun.raygun4android'
+    namespace = 'com.raygun.raygun4android'
 
-    libraryVariants.all { variant ->
-        variant.outputs.all { output ->
-            if (outputFile != null && outputFileName.endsWith('.aar')) {
-                if (variant.name == 'debug') {
-                    outputFileName = "raygun4android-debug.aar"
-                } else {
-                    outputFileName = "raygun4android.aar"
-                }
-            }
+}
+
+afterEvaluate {
+    android.libraryVariants.all { variant ->
+        def variantName = variant.name
+        def capitalizedName = variantName.capitalize()
+
+        tasks.named("bundle${capitalizedName}Aar").configure {
+            archiveFileName.set(variantName == 'debug' ? "raygun4android-debug.aar" : "raygun4android.aar")
         }
     }
+}
 
-    libraryVariants.all { variant ->
-        if (variant.name == 'release') {
-            task androidJavadocs(type: Javadoc) {
-                source = android.sourceSets.main.java.srcDirs
-                source += android.sourceSets.release.java.srcDirs
-                classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
-                classpath += variant.javaCompiler.classpath
-                classpath += files("build/generated/source/buildConfig/release")
+android.libraryVariants.all { variant ->
+    if (variant.name == 'release') {
+        tasks.register("androidJavadocs", Javadoc) {
+            source = android.sourceSets.main.java.srcDirs
+            source += android.sourceSets.release.java.srcDirs
+            classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+            classpath += variant.javaCompileProvider.get().classpath
+            classpath += files("build/generated/source/buildConfig/release")
 
-                options.windowTitle = "Raygun4Android"
-            }
+            options.windowTitle = "Raygun4Android"
         }
     }
 }

@@ -20,8 +20,8 @@ def RAYGUN_APP_PATH = "<YOUR RG APP UPLOAD PATH>"
  */
 def createRaygunNotifyDeploymentTask(token,key,groupName,version,userName,userEmail) {
 
-    task "notifyDeployment" {
-        group "${groupName}"
+    tasks.register("notifyDeployment") {
+        group = "${groupName}"
 
         doLast {
             def result = configure {
@@ -47,8 +47,8 @@ def createRaygunNotifyDeploymentTask(token,key,groupName,version,userName,userEm
  */
 def createRaygunProguardTask(token,raygunAppPath,groupName,version) {
 
-    task "uploadProguardMapping" {
-        group "${groupName}"
+    tasks.register("uploadProguardMapping") {
+        group = "${groupName}"
 
         doLast {
             def proguardMappingFileParam = "file=@${project.rootDir}/app/build/outputs/mapping/release/mapping.txt"
@@ -79,13 +79,13 @@ android {
     compileSdk = 36
 
     defaultConfig {
-        applicationId "com.raygun.raygun4android"
-        minSdkVersion 23
-        targetSdkVersion 36
+        applicationId = "com.raygun.raygun4android"
+        minSdkVersion = 23
+        targetSdkVersion = 36
         buildConfigField("long", "VERSION_CODE", VERSION_CODE)
         buildConfigField("String","VERSION_NAME","\"${VERSION_NAME}-sample\"")
-        multiDexEnabled true
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        multiDexEnabled = true
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
     lintOptions {
@@ -94,21 +94,22 @@ android {
 
     buildTypes {
         release {
-            debuggable false
-            minifyEnabled true
+            debuggable = false
+            minifyEnabled = true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            signingConfig signingConfigs.releaseConfig
+            signingConfig = signingConfigs.releaseConfig
         }
         debug {
-            debuggable true
-            minifyEnabled false
-            applicationIdSuffix '.debug'
-            versionNameSuffix '-DEBUG'
+            debuggable = true
+            minifyEnabled = false
+            applicationIdSuffix = '.debug'
+            versionNameSuffix = '-DEBUG'
         }
     }
 
     buildFeatures {
-        viewBinding true
+        viewBinding = true
+        buildConfig = true
     }
 
     compileOptions {
@@ -125,7 +126,7 @@ android {
     // Setup RG tasks
     createRaygunNotifyDeploymentTask(RAYGUN_API_TOKEN, RAYGUN_API_KEY, RAYGUN_GROUP, defaultConfig.versionName, localUserName, localUserEmail)
     createRaygunProguardTask(RAYGUN_API_TOKEN, RAYGUN_APP_PATH, RAYGUN_GROUP, defaultConfig.versionName)
-    namespace 'com.raygun.raygun4android.sample'
+    namespace = 'com.raygun.raygun4android.sample'
 }
 
 dependencies {
