@@ -4,7 +4,7 @@ spotless {
         googleJavaFormat().aosp().reflowLongStrings(true)
         removeUnusedImports()
         trimTrailingWhitespace()
-        indentWithSpaces()
+        leadingTabsToSpaces()
         endWithNewline()
     }
     kotlin {
@@ -15,25 +15,25 @@ spotless {
         }
         ktlint()
         trimTrailingWhitespace()
-        indentWithSpaces()
+        leadingTabsToSpaces()
         endWithNewline()
     }
     format 'misc', {
         target '**/*.gradle', '**/*.md', '**/.gitignore'
-        indentWithSpaces()
+        leadingTabsToSpaces()
         trimTrailingWhitespace()
         endWithNewline()
     }
     format 'xml', {
         target '**/*.xml'
         targetExclude '.idea/**/*.xml'
-        indentWithSpaces()
+        leadingTabsToSpaces()
         trimTrailingWhitespace()
         endWithNewline()
     }
     format 'yml', {
         target '**/*.yml'
-        indentWithSpaces()
+        leadingTabsToSpaces()
         trimTrailingWhitespace()
         endWithNewline()
     }

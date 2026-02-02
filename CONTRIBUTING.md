@@ -2,7 +2,7 @@
 
 ## Project and library organisation
 
-Building the project requires Android Studio 2022.3.1 and Gradle 8.
+Building the project requires Android Studio 2024.2.1 or later, Gradle 9.3.1, and JDK 17 or later.
 
 The project consists of two modules:
 
