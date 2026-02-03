@@ -1,5 +1,13 @@
 ## Changelog
 
+### 5.2.0
+
+- chore: Upgrade Gradle wrapper from 8.14.2 to 9.3.1 (#247)
+- chore(deps): bump org.jetbrains.kotlin.android from 2.2.21 to 2.3.0 (#246)
+- chore(deps): bump org.jetbrains.kotlin:kotlin-gradle-plugin (#244)
+- chore(deps): bump com.raygun:raygun4android from 5.0.1 to 5.1.0 (#245)
+- chore(deps): bump androidx.activity:activity from 1.12.2 to 1.12.3 (#242)
+
 ### 5.1.0
 
 - fix: Update minSDKVersion for both provider and app from 21 to 23 due to dependency requirements (2026-01-04)

@@ -16,13 +16,9 @@ This means that the library is now fully compatible with Kotlin Coroutines and p
 We recommend using those if you are using Kotlin in your project.
 As well, the library is still compatible with pure Java Android applications.
 
-Raygun4Android 5.1.0 is currently considered to be the stable release of the provider and is tagged in the repository and supports Android 5+.
-
-Raygun4Android 4.1.1 is functionally equal to 4.1.0, which was unfortunately deployed to Maven Central in an incomplete state. Please use 4.1.1 instead.
+Raygun4Android 5.2.0 is currently considered to be the stable release of the provider and is tagged in the repository and supports Android 6+.
 
 The `develop` branch reflects ongoing work on the version 5 line as tagged snapshots and only support
-
-The `master` branch used to be the branch for ongoing work and releases until `4.1.0-alpha1`. In the future, the `master` branch will reflect release builds.
 
 If you want the *very old* stable version 3.0.6 please check out the change set labelled with `v3.0.6` and go from there.
 
@@ -57,7 +53,7 @@ Then add the following to your **module's** build.gradle:
 ```gradle
 dependencies {
     ...
-    implementation 'com.raygun:raygun4android:5.1.0'
+    implementation 'com.raygun:raygun4android:5.2.0'
 }
 ```
 
