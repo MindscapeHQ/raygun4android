@@ -1,6 +1,6 @@
 [versions]
 activity = "1.12.3"
-agp = "8.13.2"
+agp = "9.0.1"
 android-material = "1.13.0"
 androidx-appcompat = "1.7.1"
 androidx-constraintlayout = "2.2.1"
