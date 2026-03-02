@@ -1,5 +1,12 @@
 ## Changelog
 
+### 5.2.1
+
+- chore(deps): bump com.vanniktech.maven.publish from 0.35.0 to 0.36.0 (#250)
+- chore(deps): bump com.raygun:raygun4android from 5.1.0 to 5.2.0 (#251)
+- chore(deps): bump androidx.activity:activity from 1.12.3 to 1.12.4 (#252)
+- chore(deps): bump org.mockito.kotlin:mockito-kotlin from 6.1.0 to 6.2.3 (#253)
+
 ### 5.2.0
 
 - chore: Upgrade Gradle wrapper from 8.14.2 to 9.3.1 (#247)
