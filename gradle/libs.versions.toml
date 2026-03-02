@@ -1,5 +1,5 @@
 [versions]
-activity = "1.12.3"
+activity = "1.12.4"
 agp = "8.13.2"
 android-material = "1.13.0"
 androidx-appcompat = "1.7.1"
