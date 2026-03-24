@@ -45,7 +45,6 @@ afterEvaluate {
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation(libs.androidx.core)
     implementation(libs.androidx.appcompat)
     implementation(libs.gson)

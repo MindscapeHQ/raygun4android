@@ -123,7 +123,6 @@ android {
 }
 
 dependencies {
-    implementation fileTree(include: ['*.jar'], dir: 'libs')
     // Usage option A: Use and build from local provider library src
     implementation project(':provider')
     // Usage option B: Use and build from external repo
