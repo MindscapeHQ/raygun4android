@@ -4,7 +4,6 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath(libs.github.http.builder.core)
         classpath(libs.android.tools.build.gradle)
         classpath(libs.kotlin.gradle)
     }

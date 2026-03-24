@@ -1,5 +1,5 @@
-import static groovyx.net.http.HttpBuilder.configure
-import static groovyx.net.http.ContentTypes.JSON
+import groovy.json.JsonSlurper
+import groovy.json.JsonOutput
 
 apply plugin: 'com.android.application'
 
@@ -23,13 +23,22 @@ def createRaygunNotifyDeploymentTask(token,key,groupName,version,userName,userEm
         group = "${groupName}"
 
         doLast {
-            def result = configure {
-                request.uri = 'https://app.raygun.io/deployments?authToken=' + token
-                request.contentType = JSON[0]
-            }.post {
-                request.body = '{"apiKey":"' + key + '","version":"' + version + '","ownerName":"' + userName + '","emailAddress":"' + userEmail + '"}'
-                request.contentType = 'application/json'
-            }
+            def url = new URL("https://app.raygun.io/deployments?authToken=${token}")
+            def connection = url.openConnection() as HttpURLConnection
+            connection.requestMethod = 'POST'
+            connection.setRequestProperty('Content-Type', 'application/json')
+            connection.doOutput = true
+
+            def body = JsonOutput.toJson([
+                apiKey: key,
+                version: version,
+                ownerName: userName,
+                emailAddress: userEmail
+            ])
+            connection.outputStream.withWriter('UTF-8') { it.write(body) }
+
+            def response = connection.inputStream.withReader('UTF-8') { it.text }
+            def result = new JsonSlurper().parseText(response)
 
             println result
             def depId = result.deploymentId as Long
