@@ -1,8 +1,9 @@
-import static groovyx.net.http.HttpBuilder.configure
-import static groovyx.net.http.ContentTypes.JSON
+import groovy.json.JsonSlurper
+import groovy.json.JsonOutput
 
-apply plugin: 'com.android.application'
-apply plugin: 'kotlin-android'
+plugins {
+    alias(libs.plugins.android.application)
+}
 
 // Used for Raygun notifyDeployment task. In the real world this would come from a local user.properties file etc.
 def localUserName = "Change Me"
@@ -24,13 +25,22 @@ def createRaygunNotifyDeploymentTask(token,key,groupName,version,userName,userEm
         group = "${groupName}"
 
         doLast {
-            def result = configure {
-                request.uri = 'https://app.raygun.io/deployments?authToken=' + token
-                request.contentType = JSON[0]
-            }.post {
-                request.body = '{"apiKey":"' + key + '","version":"' + version + '","ownerName":"' + userName + '","emailAddress":"' + userEmail + '"}'
-                request.contentType = 'application/json'
-            }
+            def url = new URL("https://app.raygun.io/deployments?authToken=${token}")
+            def connection = url.openConnection() as HttpURLConnection
+            connection.requestMethod = 'POST'
+            connection.setRequestProperty('Content-Type', 'application/json')
+            connection.doOutput = true
+
+            def body = JsonOutput.toJson([
+                apiKey: key,
+                version: version,
+                ownerName: userName,
+                emailAddress: userEmail
+            ])
+            connection.outputStream.withWriter('UTF-8') { it.write(body) }
+
+            def response = connection.inputStream.withReader('UTF-8') { it.text }
+            def result = new JsonSlurper().parseText(response)
 
             println result
             def depId = result.deploymentId as Long
@@ -80,23 +90,22 @@ android {
 
     defaultConfig {
         applicationId = "com.raygun.raygun4android"
-        minSdkVersion = 23
-        targetSdkVersion = 36
+        minSdk = 23
+        targetSdk = 36
         buildConfigField("long", "VERSION_CODE", VERSION_CODE)
         buildConfigField("String","VERSION_NAME","\"${VERSION_NAME}-sample\"")
-        multiDexEnabled = true
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
-    lintOptions {
-        disable 'LogNotTimber','StringFormatInTimber', 'ThrowableNotAtBeginning', 'BinaryOperationInTimber', 'TimberArgCount', 'TimberArgTypes', 'TimberTagLength'
+    lint {
+        disable += ['LogNotTimber', 'StringFormatInTimber', 'ThrowableNotAtBeginning', 'BinaryOperationInTimber', 'TimberArgCount', 'TimberArgTypes', 'TimberTagLength']
     }
 
     buildTypes {
         release {
             debuggable = false
             minifyEnabled = true
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             signingConfig = signingConfigs.releaseConfig
         }
         debug {
@@ -116,12 +125,6 @@ android {
         sourceCompatibility JavaVersion.VERSION_17
         targetCompatibility JavaVersion.VERSION_17
     }
-    kotlinOptions {
-        jvmTarget = "17"
-    }
-    kotlin {
-        jvmToolchain(17)
-    }
 
     // Setup RG tasks
     createRaygunNotifyDeploymentTask(RAYGUN_API_TOKEN, RAYGUN_API_KEY, RAYGUN_GROUP, defaultConfig.versionName, localUserName, localUserEmail)
@@ -130,7 +133,6 @@ android {
 }
 
 dependencies {
-    implementation fileTree(include: ['*.jar'], dir: 'libs')
     // Usage option A: Use and build from local provider library src
     implementation project(':provider')
     // Usage option B: Use and build from external repo
@@ -142,7 +144,6 @@ dependencies {
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.constraintlayout)
     implementation(libs.material)
-    implementation(libs.androidx.multidex)
     implementation(libs.androidx.activity)
     implementation(libs.okhttp)
 

@@ -1,12 +1,13 @@
-apply plugin: 'com.android.library'
-apply plugin: 'kotlin-android'
+plugins {
+    alias(libs.plugins.android.library)
+}
 
 android {
     compileSdk = 36
 
     defaultConfig {
-        minSdkVersion = 23
-        targetSdkVersion = 34
+        minSdk = 23
+        targetSdk = 34
         buildConfigField("long", "VERSION_CODE", VERSION_CODE)
         buildConfigField("String","VERSION_NAME","\"${VERSION_NAME}\"")
     }
@@ -31,44 +32,21 @@ android {
         sourceCompatibility JavaVersion.VERSION_17
         targetCompatibility JavaVersion.VERSION_17
     }
-    kotlinOptions {
-        jvmTarget = "17"
-    }
-    kotlin {
-        jvmToolchain(17)
-    }
 
     namespace = 'com.raygun.raygun4android'
 
 }
 
 afterEvaluate {
-    android.libraryVariants.all { variant ->
-        def variantName = variant.name
-        def capitalizedName = variantName.capitalize()
-
-        tasks.named("bundle${capitalizedName}Aar").configure {
-            archiveFileName.set(variantName == 'debug' ? "raygun4android-debug.aar" : "raygun4android.aar")
-        }
+    tasks.named("bundleDebugAar").configure {
+        archiveFileName.set("raygun4android-debug.aar")
     }
-}
-
-android.libraryVariants.all { variant ->
-    if (variant.name == 'release') {
-        tasks.register("androidJavadocs", Javadoc) {
-            source = android.sourceSets.main.java.srcDirs
-            source += android.sourceSets.release.java.srcDirs
-            classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
-            classpath += variant.javaCompileProvider.get().classpath
-            classpath += files("build/generated/source/buildConfig/release")
-
-            options.windowTitle = "Raygun4Android"
-        }
+    tasks.named("bundleReleaseAar").configure {
+        archiveFileName.set("raygun4android.aar")
     }
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation(libs.androidx.core)
     implementation(libs.androidx.appcompat)
     implementation(libs.gson)
