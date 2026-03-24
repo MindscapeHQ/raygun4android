@@ -4,14 +4,15 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath(libs.android.tools.build.gradle)
-        classpath(libs.kotlin.gradle)
+        classpath(libs.kotlin.gradle) // pins KGP 2.3.0 (higher than AGP 9's bundled 2.2.10)
     }
 }
 
 plugins {
+    alias(libs.plugins.android.application) apply false
+    alias(libs.plugins.android.library) apply false
+    alias(libs.plugins.maven.central.publish) apply false
     alias(libs.plugins.spotless)
-    alias(libs.plugins.maven.central.publish)
 }
 
 allprojects {
