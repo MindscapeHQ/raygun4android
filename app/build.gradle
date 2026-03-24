@@ -2,7 +2,6 @@ import static groovyx.net.http.HttpBuilder.configure
 import static groovyx.net.http.ContentTypes.JSON
 
 apply plugin: 'com.android.application'
-apply plugin: 'kotlin-android'
 
 // Used for Raygun notifyDeployment task. In the real world this would come from a local user.properties file etc.
 def localUserName = "Change Me"
@@ -80,23 +79,23 @@ android {
 
     defaultConfig {
         applicationId = "com.raygun.raygun4android"
-        minSdkVersion = 23
-        targetSdkVersion = 36
+        minSdk = 23
+        targetSdk = 36
         buildConfigField("long", "VERSION_CODE", VERSION_CODE)
         buildConfigField("String","VERSION_NAME","\"${VERSION_NAME}-sample\"")
         multiDexEnabled = true
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
-    lintOptions {
-        disable 'LogNotTimber','StringFormatInTimber', 'ThrowableNotAtBeginning', 'BinaryOperationInTimber', 'TimberArgCount', 'TimberArgTypes', 'TimberTagLength'
+    lint {
+        disable += ['LogNotTimber', 'StringFormatInTimber', 'ThrowableNotAtBeginning', 'BinaryOperationInTimber', 'TimberArgCount', 'TimberArgTypes', 'TimberTagLength']
     }
 
     buildTypes {
         release {
             debuggable = false
             minifyEnabled = true
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             signingConfig = signingConfigs.releaseConfig
         }
         debug {
@@ -115,12 +114,6 @@ android {
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_17
         targetCompatibility JavaVersion.VERSION_17
-    }
-    kotlinOptions {
-        jvmTarget = "17"
-    }
-    kotlin {
-        jvmToolchain(17)
     }
 
     // Setup RG tasks

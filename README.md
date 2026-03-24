@@ -442,8 +442,8 @@ This functionality is optional. If this permission is not granted, the mobile ne
 ```groovy
 android {
     ...
-    lintOptions {
-        disable 'LogNotTimber', 'StringFormatInTimber', 'ThrowableNotAtBeginning', 'BinaryOperationInTimber', 'TimberArgCount', 'TimberArgTypes', 'TimberTagLength'
+    lint {
+        disable += ['LogNotTimber', 'StringFormatInTimber', 'ThrowableNotAtBeginning', 'BinaryOperationInTimber', 'TimberArgCount', 'TimberArgTypes', 'TimberTagLength']
     }
     ...
 }
