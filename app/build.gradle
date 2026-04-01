@@ -52,8 +52,6 @@ def createRaygunNotifyDeploymentTask(token,key,groupName,version,userName,userEm
 /*
  * Setup a sample Gradle task for upload proguard mapping files
  * This is done as a function so that there's more flexibility when it comes to dealing with creating the tasks for multiple flavours etc.
- *
- * TODO The function as of now requires curl to be available on the PATH of the machine running it and probably doesn't work out of the box on Windows. Should be refactored to using the Groovy HTTP library
  */
 def createRaygunProguardTask(token,raygunAppPath,groupName,version) {
 
@@ -61,15 +59,43 @@ def createRaygunProguardTask(token,raygunAppPath,groupName,version) {
         group = "${groupName}"
 
         doLast {
-            def proguardMappingFileParam = "file=@${project.rootDir}/app/build/outputs/mapping/release/mapping.txt"
-            def versionIdentifierParam = "version=${version}"
-            def raygunProguardEndpointUrlParam = "https://app.raygun.com/upload/proguardsymbols/${raygunAppPath}?authToken=${token}"
+            def mappingFile = file("${project.rootDir}/app/build/outputs/mapping/release/mapping.txt")
+            if (!mappingFile.exists()) {
+                throw new GradleException("Mapping file not found: ${mappingFile.absolutePath}")
+            }
 
-            def p = ['curl', '-F', proguardMappingFileParam, '-F', versionIdentifierParam, raygunProguardEndpointUrlParam].execute()
-            p.waitFor()
+            def boundary = "----RaygunBoundary" + System.currentTimeMillis()
+            def endpointUrl = "https://app.raygun.com/upload/proguardsymbols/${raygunAppPath}?authToken=${token}"
+            def url = new URL(endpointUrl)
+            def connection = url.openConnection() as HttpURLConnection
+            connection.requestMethod = 'POST'
+            connection.setRequestProperty('Content-Type', "multipart/form-data; boundary=${boundary}")
+            connection.doOutput = true
 
-            def result = p.text
-            println result
+            connection.outputStream.withStream { out ->
+                def writer = new PrintWriter(new OutputStreamWriter(out, 'UTF-8'), true)
+
+                // version field
+                writer.append("--${boundary}\r\n")
+                writer.append("Content-Disposition: form-data; name=\"version\"\r\n\r\n")
+                writer.append("${version}\r\n")
+
+                // file field
+                writer.append("--${boundary}\r\n")
+                writer.append("Content-Disposition: form-data; name=\"file\"; filename=\"${mappingFile.name}\"\r\n")
+                writer.append("Content-Type: application/octet-stream\r\n\r\n")
+                writer.flush()
+                mappingFile.withInputStream { input -> out << input }
+                out.flush()
+                writer.append("\r\n")
+
+                writer.append("--${boundary}--\r\n")
+                writer.flush()
+            }
+
+            def responseCode = connection.responseCode
+            def result = connection.inputStream.withReader('UTF-8') { it.text }
+            println "HTTP ${responseCode}: ${result}"
             assert result == "true"
         }
     }
@@ -77,12 +103,15 @@ def createRaygunProguardTask(token,raygunAppPath,groupName,version) {
 
 android {
 
-    signingConfigs {
-        releaseConfig {
-            keyAlias 'testkey'
-            keyPassword '123456'
-            storeFile file('testkeystore.jks')
-            storePassword '123456'
+    def keystoreFile = file('testkeystore.jks')
+    if (keystoreFile.exists()) {
+        signingConfigs {
+            releaseConfig {
+                keyAlias 'testkey'
+                keyPassword '123456'
+                storeFile keystoreFile
+                storePassword '123456'
+            }
         }
     }
 
@@ -106,7 +135,9 @@ android {
             debuggable = false
             minifyEnabled = true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-            signingConfig = signingConfigs.releaseConfig
+            if (keystoreFile.exists()) {
+                signingConfig = signingConfigs.releaseConfig
+            }
         }
         debug {
             debuggable = true
