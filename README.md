@@ -16,9 +16,9 @@ This means that the library is now fully compatible with Kotlin Coroutines and p
 We recommend using those if you are using Kotlin in your project.
 As well, the library is still compatible with pure Java Android applications.
 
-Raygun4Android 5.2.0 is currently considered to be the stable release of the provider and is tagged in the repository and supports Android 6+.
+Raygun4Android 5.2.1 is currently considered to be the stable release of the provider and is tagged in the repository and supports Android 6+.
 
-The `develop` branch reflects ongoing work on the version 5 line as tagged snapshots and only support
+The `develop` branch reflects ongoing work on the version 5 line as tagged snapshots and only supports Android 6+.
 
 If you want the *very old* stable version 3.0.6 please check out the change set labelled with `v3.0.6` and go from there.
 
@@ -37,23 +37,22 @@ If you want the *very old* stable version 3.0.6 please check out the change set 
 
 ### With Android Studio and Gradle
 
-Ensure jcenter() or mavenCentral() are present in your **project's** build.gradle:
+Ensure `mavenCentral()` is present in your **project's** root `build.gradle.kts`:
 
-```gradle
+```kotlin
 allprojects {
     repositories {
-        jcenter()
+        google()
         mavenCentral()
     }
 }
 ```
 
-Then add the following to your **module's** build.gradle:
+Then add the following to your **module's** `build.gradle.kts`:
 
-```gradle
+```kotlin
 dependencies {
-    ...
-    implementation 'com.raygun:raygun4android:5.2.0'
+    implementation("com.raygun:raygun4android:5.2.1")
 }
 ```
 
@@ -115,64 +114,75 @@ Add the following lines to your proguard-rules.pro file so that Raygun and ProGu
 
 Instead of uploading mapping.txt manually after each deployment, you can use the **uploadProguardMapping** task in the Raygun group of Gradle tasks.
 
-You will find an example of how to do this in the sample app. Go to the **app** module's build.gradle file and look for the **createRaygunProguardTask** function.
+You will find an example of how to do this in the sample app. Go to the **app** module's `build.gradle.kts` file and look for the **registerRaygunProguardTask** function.
 
-```groovy
-def createRaygunProguardTask(token,raygunAppPath,groupName,version) {
-
-    task "uploadProguardMapping" {
-        group "${groupName}"
+```kotlin
+fun Project.registerRaygunProguardTask(
+    token: String,
+    raygunAppPath: String,
+    groupName: String,
+    version: String,
+) {
+    tasks.register("uploadProguardMapping") {
+        group = groupName
 
         doLast {
-            def proguardMappingFileParam = "file=@${project.rootDir}/app/build/outputs/mapping/release/mapping.txt"
-            def versionIdentifierParam = "version=${version}"
-            def raygunProguardEndpointUrlParam = "https://app.raygun.com/upload/proguardsymbols/${raygunAppPath}?authToken=${token}"
+            val mappingFile =
+                file("${project.rootDir}/app/build/outputs/mapping/release/mapping.txt")
+            check(mappingFile.exists()) { "Mapping file not found: ${mappingFile.absolutePath}" }
 
-            def p = ['curl', '-F', proguardMappingFileParam, '-F', versionIdentifierParam, raygunProguardEndpointUrlParam].execute()
-            p.waitFor()
-
-            def result = p.text
-            println result
-            assert result == "true"
+            val endpointUrl =
+                "https://app.raygun.com/upload/proguardsymbols/$raygunAppPath?authToken=$token"
+            val url = URI(endpointUrl).toURL()
+            val connection = url.openConnection() as HttpURLConnection
+            connection.requestMethod = "POST"
+            // ... write multipart form data (version + mapping file) and send
+            // See app/build.gradle.kts for the full implementation
         }
     }
 }
 ```
 
-This function gets called from within the ```android {...}``` block of the Gradle file at each build in Android Studio and creates the appropriate parameterised task to push the file into the Raygun backend.
-
-The example shown requires curl to be on the PATH of your machine. Depending on your project structure and module names you also might have to adjust the path used in **proguardMappingFileParam**.
+This function is called at the top level of the `build.gradle.kts` file and creates the appropriate parameterised task to push the mapping file into the Raygun backend. Depending on your project structure and module names you may have to adjust the path to the mapping file.
 
 ### Release Notification Gradle Task
 
 Raygun4Android also comes with a second Gradle task intended to notify the Raygun backend when you deploy a new version of your app. The idea behind this functionality is that it will allow you to see changes in error rate or user behaviour by version.
 
-Raygun offers a REST API for this notification. The sample app contains a function **createRaygunNotifyDeploymentTask** that creates a **notifyDeployment** task.
+Raygun offers a REST API for this notification. The sample app contains a function **registerRaygunNotifyDeploymentTask** that creates a **notifyDeployment** task.
 
-```groovy
-def createRaygunNotifyDeploymentTask(token,key,groupName,version,userName,userEmail) {
-
-    task "notifyDeployment" {
-        group "${groupName}"
+```kotlin
+fun Project.registerRaygunNotifyDeploymentTask(
+    token: String,
+    key: String,
+    groupName: String,
+    version: String,
+    userName: String,
+    userEmail: String,
+) {
+    tasks.register("notifyDeployment") {
+        group = groupName
 
         doLast {
-            def result = configure {
-                request.uri = 'https://app.raygun.io/deployments?authToken=' + token
-                request.contentType = JSON[0]
-            }.post {
-                request.body = '{"apiKey":"' + key + '","version":"' + version + '","ownerName":"' + userName + '","emailAddress":"' + userEmail + '"}'
-                request.contentType = 'application/json'
-            }
+            val url = URI("https://app.raygun.io/deployments?authToken=$token").toURL()
+            val connection = url.openConnection() as HttpURLConnection
+            connection.requestMethod = "POST"
+            connection.setRequestProperty("Content-Type", "application/json")
+            connection.doOutput = true
 
-            println result
-            def depId = result.deploymentId as Long
-            assert depId != null && depId != '' && depId > 0
+            val body =
+                """{"apiKey":"$key","version":"$version","ownerName":"$userName","emailAddress":"$userEmail"}"""
+            connection.outputStream.bufferedWriter(Charsets.UTF_8).use { it.write(body) }
+
+            val response =
+                connection.inputStream.bufferedReader(Charsets.UTF_8).use { it.readText() }
+            println(response)
         }
     }
 }
 ```
 
-This function gets called from within the ```android {...}``` block of the Gradle file at each build in Android Studio and creates the appropriate parameterised task to notify the Raygun backend of your app's deployment.
+This function is called at the top level of the `build.gradle.kts` file and creates the appropriate parameterised task to notify the Raygun backend of your app's deployment.
 
 ## Sample application
 
@@ -417,7 +427,7 @@ This functionality is optional. If this permission is not granted, the mobile ne
 
 * My build fails with `Default interface methods are only supported starting with Android N (--min-api 24)`. Why is that?
 
-  Raygun4Android uses Timber for internal logging. This requires some language features that are only available with Java 8. Make sure that your project, using the library, has set the compilation compatibility to Java 8 as the minimum.
+  Raygun4Android uses Timber for internal logging. This requires some language features that are only available with Java 8 or higher. Make sure that your project, using the library, has set the compilation compatibility to at least Java 17 (the version currently used by the library).
 
   Google's documentation has more information on the reasons and implications of this requirement: https://developer.android.com/studio/write/java8-support
 
@@ -439,12 +449,13 @@ This functionality is optional. If this permission is not granted, the mobile ne
 
   The solution for the time being is to disable linting for those specific lint warning in your app:
 
-```groovy
+```kotlin
 android {
-    ...
     lint {
-        disable += ['LogNotTimber', 'StringFormatInTimber', 'ThrowableNotAtBeginning', 'BinaryOperationInTimber', 'TimberArgCount', 'TimberArgTypes', 'TimberTagLength']
+        disable += setOf(
+            "LogNotTimber", "StringFormatInTimber", "ThrowableNotAtBeginning",
+            "BinaryOperationInTimber", "TimberArgCount", "TimberArgTypes", "TimberTagLength"
+        )
     }
-    ...
 }
 ```
