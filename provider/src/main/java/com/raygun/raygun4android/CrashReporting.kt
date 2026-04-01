@@ -134,7 +134,8 @@ object CrashReporting {
                     }
                 }
 
-                enqueueWorkForCrashReporting(RaygunClient.apiKey, Gson().toJson(msg))
+                val json = PayloadCapper.capIfNeeded(msg) { Gson().toJson(it) }
+                enqueueWorkForCrashReporting(RaygunClient.apiKey, json)
                 postCachedMessages()
             }
         } else {
