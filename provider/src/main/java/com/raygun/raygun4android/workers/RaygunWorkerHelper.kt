@@ -31,9 +31,11 @@ object RaygunWorkerHelper {
     fun toWorkerResult(responseCode: Int): Result =
         when {
             responseCode in 200..299 -> Result.success()
+
             responseCode == RaygunSettings.RESPONSE_CODE_BAD_MESSAGE ||
                 responseCode == RaygunSettings.RESPONSE_CODE_INVALID_API_KEY ||
                 responseCode == RaygunSettings.RESPONSE_CODE_LARGE_PAYLOAD -> Result.failure()
+
             else -> Result.retry()
         }
 }

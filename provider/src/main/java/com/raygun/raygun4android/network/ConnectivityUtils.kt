@@ -131,8 +131,14 @@ object ConnectivityUtils {
         var result = "Connected - "
         currentNetworkInfoLegacy(context)?.let { info ->
             when (info.type) {
-                ConnectivityManager.TYPE_WIFI -> result += "WiFi"
-                ConnectivityManager.TYPE_WIMAX -> result += "WiMax"
+                ConnectivityManager.TYPE_WIFI -> {
+                    result += "WiFi"
+                }
+
+                ConnectivityManager.TYPE_WIMAX -> {
+                    result += "WiMax"
+                }
+
                 ConnectivityManager.TYPE_MOBILE,
                 ConnectivityManager.TYPE_MOBILE_DUN,
                 ConnectivityManager.TYPE_MOBILE_HIPRI,
@@ -142,7 +148,10 @@ object ConnectivityUtils {
                     result += "Mobile - "
                     result += TelephonyUtils.networkTypeToString(info.subtype)
                 }
-                else -> result += "unknown type"
+
+                else -> {
+                    result += "unknown type"
+                }
             }
         }
         return result
