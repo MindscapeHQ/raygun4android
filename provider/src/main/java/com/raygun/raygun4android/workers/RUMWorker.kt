@@ -9,6 +9,7 @@ import com.raygun.raygun4android.logging.RaygunLogger.e
 import com.raygun.raygun4android.logging.RaygunLogger.responseCode
 import com.raygun.raygun4android.logging.RaygunLogger.v
 import com.raygun.raygun4android.network.ConnectivityUtils
+import com.raygun.raygun4android.workers.RaygunWorkerHelper.toWorkerResult
 import com.raygun.raygun4android.workers.RaygunWorkerHelper.validateApiKey
 import okhttp3.MediaType
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -34,8 +35,9 @@ class RUMWorker(
             if (ConnectivityUtils.isNetworkAvailable(applicationContext)) {
                 val responseCode = postRUM(apiKey, message)
                 responseCode(responseCode)
+                return toWorkerResult(responseCode)
             }
-            return Result.success()
+            return Result.retry()
         }
         e("No message or API key was provided.")
         return Result.failure()

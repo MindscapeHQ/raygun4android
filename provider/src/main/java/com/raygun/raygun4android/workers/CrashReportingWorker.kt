@@ -49,13 +49,20 @@ class CrashReportingWorker(
                 val responseCode = postCrashReporting(apiKey, message)
                 responseCode(responseCode)
 
-                if (responseCode == RaygunSettings.RESPONSE_CODE_RATE_LIMITED) {
-                    saveMessage(message)
+                return when {
+                    responseCode in 200..299 -> Result.success()
+                    responseCode == RaygunSettings.RESPONSE_CODE_BAD_MESSAGE ||
+                        responseCode == RaygunSettings.RESPONSE_CODE_INVALID_API_KEY ||
+                        responseCode == RaygunSettings.RESPONSE_CODE_LARGE_PAYLOAD -> Result.failure()
+                    else -> {
+                        saveMessage(message)
+                        Result.success()
+                    }
                 }
             } else {
                 saveMessage(message)
+                return Result.success()
             }
-            return Result.success()
         }
 
         e("No message or API key was provided.")
