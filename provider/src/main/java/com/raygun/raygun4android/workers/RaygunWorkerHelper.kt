@@ -23,7 +23,6 @@ object RaygunWorkerHelper {
 
     /**
      * Maps an HTTP response code to a WorkManager [Result].
-     *
      * - 2xx → [Result.success]
      * - 400, 403 → [Result.failure] (permanent client errors, retrying won't help)
      * - 429, 5xx, -1 (network/exception) → [Result.retry]

@@ -5,7 +5,6 @@ import org.junit.Assert.assertEquals
 import org.junit.Test
 
 class RaygunWorkerHelperTest {
-
     @Test
     fun toWorkerResult_returns_success_for_2xx() {
         assertEquals(Result.success(), RaygunWorkerHelper.toWorkerResult(200))
