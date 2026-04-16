@@ -1,5 +1,17 @@
 ## Changelog
 
+### 6.0.0
+
+- chore: build overhaul — Kotlin DSL migration, configuration cache, and build fixes (#269)
+- chore(deps): migrate from AGP 8.13.2 to AGP 9.0.1 (#261)
+- fix: return appropriate WorkManager Result based on HTTP response code (#260) (#267)
+- chore(deps): update dependencies to latest stable versions (#270, #271) (#273)
+- chore(deps): bump org.mockito.kotlin:mockito-kotlin from 6.2.3 to 6.3.0 (#276)
+- chore(deps): bump androidx.core:core from 1.17.0 to 1.18.0 (#277)
+- chore(deps): bump org.jetbrains.kotlin:kotlin-gradle-plugin (#279)
+- chore(deps): bump marocchino/sticky-pull-request-comment from 2 to 3 (#274)
+- docs: update README examples from Groovy to Kotlin DSL (#280)
+
 ### 5.2.1
 
 - chore(deps): bump com.vanniktech.maven.publish from 0.35.0 to 0.36.0 (#250)

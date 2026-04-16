@@ -2,7 +2,7 @@
 
 Official development or production releases of Raygun4Android are usually done by the Raygun team. This file documents the setup needed to do snapshot and production releases.
 
-The release process is implemented in the Gradle file `provider/maven-central-publish.gradle` which uses the `com.vanniktech.maven.publish` plugin.
+The release process is configured in `provider/build.gradle.kts` which uses the `com.vanniktech.maven.publish` plugin.
 
 Plugin documentation can be found here: https://vanniktech.github.io/gradle-maven-publish-plugin/central/
 
@@ -80,25 +80,22 @@ Then verify that the package exists in your Maven local folder, e.g. `/home/<use
 
 You can now test the local package distribution locally by changing the following:
 
-1. Add `mavenLocal()` to the top `build.gradle`:
+1. Add `mavenLocal()` to the root `build.gradle.kts`:
 
-```groovy
+```kotlin
 allprojects {
     repositories {
         google()
         mavenLocal()
         mavenCentral()
-        jcenter()
     }
 }
 ```
 
-2. Change the Raygun dependency on `app/build.gradle`, where `x.y.z` is the newly build version.
+2. Change the Raygun dependency in `app/build.gradle.kts`, where `x.y.z` is the newly built version:
 
-```groovy
+```kotlin
 dependencies {
-    // ...
-    implementation 'com.raygun:raygun4android:x.y.z'
-    // ...
+    implementation("com.raygun:raygun4android:x.y.z")
 }
 ```
