@@ -8,6 +8,15 @@ updates:
     commit-message:
       prefix: "chore"
       include: "scope"
+    # AGP minor/major bumps must be coordinated with the Android Studio version
+    # the team has installed (see CONTRIBUTING.md). Only allow patch updates
+    # automatically; major/minor bumps should be done manually with an IDE
+    # upgrade.
+    ignore:
+      - dependency-name: "com.android.application"
+        update-types: ["version-update:semver-major", "version-update:semver-minor"]
+      - dependency-name: "com.android.library"
+        update-types: ["version-update:semver-major", "version-update:semver-minor"]
 
   - package-ecosystem: "github-actions"
     directory: "/"
