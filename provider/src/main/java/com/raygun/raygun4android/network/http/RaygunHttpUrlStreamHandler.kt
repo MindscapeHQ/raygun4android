@@ -24,7 +24,7 @@ internal class RaygunHttpUrlStreamHandler(
             method.isAccessible = true
 
             val urlConnection =
-                method.invoke(originalHandler, url) as URLConnection
+                method.invoke(originalHandler, url) as? URLConnection
                     ?: throw IOException("Failed to create connection")
 
             return RaygunHttpUrlConnection(urlConnection)
@@ -54,7 +54,7 @@ internal class RaygunHttpUrlStreamHandler(
             method.isAccessible = true
 
             val urlConnection =
-                method.invoke(originalHandler, url, proxy) as URLConnection
+                method.invoke(originalHandler, url, proxy) as? URLConnection
                     ?: throw IOException("Failed to create connection")
 
             return RaygunHttpUrlConnection(urlConnection)
