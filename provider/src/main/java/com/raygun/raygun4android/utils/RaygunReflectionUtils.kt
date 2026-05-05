@@ -63,7 +63,12 @@ object RaygunReflectionUtils {
     }
 
     private fun getAllSuperClasses(clazz: Class<*>?): Collection<Class<*>> {
-        val classes = HashSet<Class<*>>()
+        // LinkedHashSet preserves insertion order so the chain is walked
+        // most-derived first (clazz, then superclass chain, then interfaces).
+        // Combined with the LinkedHashSet in getAllMethods this makes
+        // findMethod's match order fully deterministic across the whole
+        // class hierarchy.
+        val classes = LinkedHashSet<Class<*>>()
 
         if ((clazz != null) && (clazz != Any::class.java)) {
             classes.add(clazz)
