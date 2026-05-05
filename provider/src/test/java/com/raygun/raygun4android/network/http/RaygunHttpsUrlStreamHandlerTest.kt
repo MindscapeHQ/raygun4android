@@ -1,6 +1,8 @@
 package com.raygun.raygun4android.network.http
 
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertThrows
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import java.io.IOException
@@ -12,7 +14,13 @@ import java.net.URL
 import java.net.URLConnection
 import java.net.URLStreamHandler
 
-/** Mirror of [RaygunHttpUrlStreamHandlerTest] for the HTTPS variant. */
+/**
+ * Mirror of [RaygunHttpUrlStreamHandlerTest] for the HTTPS variant.
+ *
+ * The `*ReturnsNull` tests assert on the IOException message ("Failed to create connection") so
+ * they pin to the safe-cast path and don't accidentally pass against the catch-chain fallthrough
+ * that throws an empty-message [IOException].
+ */
 class RaygunHttpsUrlStreamHandlerTest {
     @Test
     fun openConnectionWrapsUnderlyingConnection() {
@@ -28,12 +36,13 @@ class RaygunHttpsUrlStreamHandlerTest {
         )
     }
 
-    @Test(expected = IOException::class)
+    @Test
     fun openConnectionThrowsIoExceptionWhenUnderlyingReturnsNull() {
         val handler = RaygunHttpsUrlStreamHandler(NullReturningFakeHandler())
         val url = URL("https", "example.com", -1, "/", handler)
 
-        url.openConnection()
+        val thrown = assertThrows(IOException::class.java) { url.openConnection() }
+        assertEquals("Failed to create connection", thrown.message)
     }
 
     @Test
@@ -47,12 +56,13 @@ class RaygunHttpsUrlStreamHandlerTest {
         assertTrue(connection is RaygunHttpsUrlConnection)
     }
 
-    @Test(expected = IOException::class)
+    @Test
     fun openConnectionWithProxyThrowsIoExceptionWhenUnderlyingReturnsNull() {
         val handler = RaygunHttpsUrlStreamHandler(NullReturningFakeHandler())
         val url = URL("https", "example.com", -1, "/", handler)
 
-        url.openConnection(Proxy.NO_PROXY)
+        val thrown = assertThrows(IOException::class.java) { url.openConnection(Proxy.NO_PROXY) }
+        assertEquals("Failed to create connection", thrown.message)
     }
 
     private class WrappingFakeHandler : URLStreamHandler() {

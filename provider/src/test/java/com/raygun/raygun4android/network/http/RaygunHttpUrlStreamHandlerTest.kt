@@ -1,6 +1,8 @@
 package com.raygun.raygun4android.network.http
 
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertThrows
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import java.io.IOException
@@ -21,7 +23,10 @@ import java.net.URLStreamHandler
  * The `*ReturnsNull` tests are regression guards for the Kotlin warning "Elvis operator (?:) always
  * returns the left operand of non-nullable type 'URLConnection'". Before that fix, an underlying
  * handler that returns `null` would surface as a [NullPointerException] from the unchecked cast;
- * after the fix it must surface as the documented [IOException].
+ * after the fix it must surface as the documented [IOException] from the safe-cast path. The
+ * assertion on the exception message ("Failed to create connection") pins the test to that specific
+ * path and prevents regressions where a future change might silently route the null case through
+ * the catch-chain fallthrough that throws an empty-message [IOException].
  */
 class RaygunHttpUrlStreamHandlerTest {
     @Test
@@ -38,12 +43,13 @@ class RaygunHttpUrlStreamHandlerTest {
         )
     }
 
-    @Test(expected = IOException::class)
+    @Test
     fun openConnectionThrowsIoExceptionWhenUnderlyingReturnsNull() {
         val handler = RaygunHttpUrlStreamHandler(NullReturningFakeHandler())
         val url = URL("http", "example.com", -1, "/", handler)
 
-        url.openConnection()
+        val thrown = assertThrows(IOException::class.java) { url.openConnection() }
+        assertEquals("Failed to create connection", thrown.message)
     }
 
     @Test
@@ -57,12 +63,13 @@ class RaygunHttpUrlStreamHandlerTest {
         assertTrue(connection is RaygunHttpUrlConnection)
     }
 
-    @Test(expected = IOException::class)
+    @Test
     fun openConnectionWithProxyThrowsIoExceptionWhenUnderlyingReturnsNull() {
         val handler = RaygunHttpUrlStreamHandler(NullReturningFakeHandler())
         val url = URL("http", "example.com", -1, "/", handler)
 
-        url.openConnection(Proxy.NO_PROXY)
+        val thrown = assertThrows(IOException::class.java) { url.openConnection(Proxy.NO_PROXY) }
+        assertEquals("Failed to create connection", thrown.message)
     }
 
     private class WrappingFakeHandler : URLStreamHandler() {
