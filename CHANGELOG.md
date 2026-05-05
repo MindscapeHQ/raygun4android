@@ -1,5 +1,13 @@
 ## Changelog
 
+### 6.0.1
+
+- chore(deps): bump com.squareup.okhttp3:okhttp from 5.3.0 to 5.3.2 (#282)
+- chore(deps): bump org.jetbrains.kotlin:kotlin-gradle-plugin from 2.3.0 to 2.3.21 (#284)
+- chore(deps): bump com.raygun:raygun4android in sample app from 5.2.0 to 6.0.0 (#286)
+- chore(deps): bump gradle-wrapper from 9.3.1 to 9.5.0 (#285)
+- chore(deps): bump agp from 9.0.1 to 9.2.0 (#283)
+
 ### 6.0.0
 
 - chore: build overhaul — Kotlin DSL migration, configuration cache, and build fixes (#269)
