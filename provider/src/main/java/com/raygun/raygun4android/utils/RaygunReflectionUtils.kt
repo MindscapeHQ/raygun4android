@@ -44,7 +44,14 @@ object RaygunReflectionUtils {
     }
 
     private fun getAllMethods(clazz: Class<*>): Collection<Method> {
-        val methods = HashSet<Method>()
+        // LinkedHashSet preserves insertion order so the class's own declared
+        // methods are visited before those inherited from superclasses. This
+        // makes findMethod deterministically prefer the most-derived
+        // declaration of a method, which avoids an unnecessary setAccessible
+        // call on a JDK base-class method (e.g. URLStreamHandler.openConnection)
+        // that can fail with InaccessibleObjectException under the JVM module
+        // system in unit tests.
+        val methods = LinkedHashSet<Method>()
 
         methods.addAll(listOf(*clazz.declaredMethods))
 
@@ -56,7 +63,12 @@ object RaygunReflectionUtils {
     }
 
     private fun getAllSuperClasses(clazz: Class<*>?): Collection<Class<*>> {
-        val classes = HashSet<Class<*>>()
+        // LinkedHashSet preserves insertion order so the chain is walked
+        // most-derived first (clazz, then superclass chain, then interfaces).
+        // Combined with the LinkedHashSet in getAllMethods this makes
+        // findMethod's match order fully deterministic across the whole
+        // class hierarchy.
+        val classes = LinkedHashSet<Class<*>>()
 
         if ((clazz != null) && (clazz != Any::class.java)) {
             classes.add(clazz)

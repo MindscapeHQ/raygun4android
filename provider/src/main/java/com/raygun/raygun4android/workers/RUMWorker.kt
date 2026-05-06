@@ -86,11 +86,7 @@ class RUMWorker(
                         e("OkHttp POST to Raygun RUM backend failed: " + ioe.message)
                         ioe.printStackTrace()
                     } finally {
-                        if (response != null) {
-                            if (response.body != null) {
-                                response.body!!.close()
-                            }
-                        }
+                        response?.body?.close()
                     }
                 }
             } catch (e: Exception) {

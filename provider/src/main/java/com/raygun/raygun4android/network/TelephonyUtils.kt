@@ -44,6 +44,11 @@ object TelephonyUtils {
     @RequiresApi(android.os.Build.VERSION_CODES.N)
     private fun networkType24(context: Context): Int = telephonyManager(context).dataNetworkType
 
+    // The CDMA-era NETWORK_TYPE_* constants below (1xRTT, CDMA, EHRPD,
+    // EVDO_0/A/B) were deprecated in API 30 but are intentionally kept in
+    // the mapping so that crash report payloads from older devices that
+    // still report these values render correctly.
+    @Suppress("DEPRECATION")
     fun networkTypeToString(networkType: Int): String =
         when (networkType) {
             TelephonyManager.NETWORK_TYPE_1xRTT -> "1xRTT"
