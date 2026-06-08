@@ -1,5 +1,15 @@
 ## Changelog
 
+### 6.1.0
+
+- chore: harden Gradle dependency resolution (#295)
+- chore: clean up provider compile warnings (#289)
+- chore(deps): bump Gradle wrapper from 9.5.0 to 9.5.1 (#293)
+- chore(deps): bump Android Gradle Plugin from 9.2.0 to 9.2.1 (#290)
+- chore(deps): bump Spotless from 8.4.0 to 8.6.0 (#291)
+- chore(deps): bump Raygun sample app dependency from 6.0.0 to 6.0.1 (#292)
+- chore(deps): bump Material Components from 1.13.0 to 1.14.0 (#294)
+
 ### 6.0.1
 
 - chore(deps): bump com.squareup.okhttp3:okhttp from 5.3.0 to 5.3.2 (#282)
