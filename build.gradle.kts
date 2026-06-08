@@ -20,6 +20,25 @@ allprojects {
         google()
         mavenCentral()
     }
+
+    dependencyLocking {
+        lockAllConfigurations()
+    }
+}
+
+tasks.register("resolveAndLockAll") {
+    group = "verification"
+    description = "Resolves build, test, lint, and formatting dependencies used to generate lockfiles."
+
+    dependsOn(
+        "spotlessCheck",
+        "app:lint",
+        "provider:lint",
+        "app:assembleDebug",
+        "provider:assembleDebug",
+        "app:assembleDebugAndroidTest",
+        "provider:test",
+    )
 }
 
 spotless {
