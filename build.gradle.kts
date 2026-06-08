@@ -19,11 +19,6 @@ plugins {
 }
 
 allprojects {
-    repositories {
-        google()
-        mavenCentral()
-    }
-
     dependencyLocking {
         lockAllConfigurations()
     }
