@@ -138,6 +138,8 @@ android {
         applicationId = "com.raygun.raygun4android"
         minSdk = 23
         targetSdk = 36
+        versionCode = VERSION_CODE.toInt()
+        versionName = sampleVersionName
         buildConfigField("long", "VERSION_CODE", VERSION_CODE)
         buildConfigField("String", "VERSION_NAME", "\"$sampleVersionName\"")
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"

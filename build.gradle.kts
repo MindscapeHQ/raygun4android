@@ -35,6 +35,10 @@ tasks.register("resolveAndLockAll") {
         "app:assembleDebug",
         "provider:assembleDebug",
         "app:assembleDebugAndroidTest",
+        "app:assembleRelease",
+        "app:bundleRelease",
+        "provider:assembleRelease",
+        "provider:publishToMavenLocal",
         "provider:test",
     )
 }
