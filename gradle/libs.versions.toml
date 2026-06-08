@@ -1,6 +1,6 @@
 [versions]
 activity = "1.13.0"
-agp = "9.2.0"
+agp = "9.2.1"
 android-material = "1.14.0"
 androidx-appcompat = "1.7.1"
 androidx-constraintlayout = "2.2.1"
@@ -18,8 +18,8 @@ maven-central-publish = "0.36.0"
 mockito = "5.23.0"
 mockito-kotlin = "6.3.0"
 okhttp = "5.3.2"
-raygun = "6.0.0"
-spotless = "8.4.0"
+raygun = "6.0.1"
+spotless = "8.6.0"
 timber = "5.0.1"
 
 [libraries]
