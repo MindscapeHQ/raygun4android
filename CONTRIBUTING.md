@@ -2,7 +2,7 @@
 
 ## Project and library organisation
 
-Building the project requires Android Studio Panda 4 (2025.3.4) or later, Gradle 9.5.0, and JDK 17 or later. The minimum Studio version is driven by the AGP 9.2.x requirement.
+Building the project requires Android Studio Panda 4 (2025.3.4) or later, Gradle 9.5.1, and JDK 17 or later. The minimum Studio version is driven by the AGP 9.2.x requirement.
 
 The project consists of two modules:
 
@@ -46,6 +46,31 @@ To generate the library locally run in the terminal:
 
 ````
 ./gradlew clean :provider:build
+````
+
+## Updating Gradle dependencies
+
+The build uses Gradle dependency verification and dependency locking. When changing Gradle, plugin, or library dependency versions, update the checked-in verification metadata and lockfiles as part of the same change.
+
+The root `resolveAndLockAll` task is the deliberately maintained lock and verification surface for the build. Both dependency lockfiles (`--write-locks`) and verification metadata (`--write-verification-metadata sha256`) only cover configurations resolved by this task. When adding a new module, variant, or configuration that should be locked and verified, add the relevant task to `resolveAndLockAll` in the root `build.gradle.kts`.
+
+To refresh dependency lockfiles, run:
+
+````
+./gradlew resolveAndLockAll --write-locks
+./gradlew buildEnvironment --write-locks
+````
+
+To refresh verification checksums after dependency changes, run the verification tasks with metadata writing enabled:
+
+````
+./gradlew --write-verification-metadata sha256 resolveAndLockAll
+````
+
+Then validate the normal build path before opening a pull request:
+
+````
+./gradlew --no-daemon spotlessCheck provider:test app:assembleDebug provider:assembleDebug
 ````
 
 ## How to contribute?

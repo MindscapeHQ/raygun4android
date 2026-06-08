@@ -33,6 +33,12 @@ If you want the *very old* stable version 3.0.6 please check out the change set 
 - OKHttp
 - Timber
 
+### Dependency lock and verification surface
+
+This repository uses Gradle dependency locking and SHA-256 dependency verification for the build. The root `resolveAndLockAll` task is the deliberately maintained resolution surface used to refresh lockfiles and verification metadata.
+
+When adding a new module, variant, or Gradle configuration that should be locked and verified, update `resolveAndLockAll` in the root `build.gradle.kts` so the new dependency graph is resolved during lockfile and verification metadata refreshes. See [Contributing](CONTRIBUTING.md#updating-gradle-dependencies) for the update workflow.
+
 ## Installation
 
 ### With Android Studio and Gradle

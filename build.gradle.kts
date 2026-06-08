@@ -3,6 +3,9 @@ buildscript {
         google()
         mavenCentral()
     }
+    configurations.classpath {
+        resolutionStrategy.activateDependencyLocking()
+    }
     dependencies {
         classpath(libs.kotlin.gradle) // pins KGP 2.3.0 (higher than AGP 9's bundled 2.2.10)
     }
@@ -16,10 +19,28 @@ plugins {
 }
 
 allprojects {
-    repositories {
-        google()
-        mavenCentral()
+    dependencyLocking {
+        lockAllConfigurations()
     }
+}
+
+tasks.register("resolveAndLockAll") {
+    group = "verification"
+    description = "Resolves build, test, lint, and formatting dependencies used to generate lockfiles."
+
+    dependsOn(
+        "spotlessCheck",
+        "app:lint",
+        "provider:lint",
+        "app:assembleDebug",
+        "provider:assembleDebug",
+        "app:assembleDebugAndroidTest",
+        "app:assembleRelease",
+        "app:bundleRelease",
+        "provider:assembleRelease",
+        "provider:publishToMavenLocal",
+        "provider:test",
+    )
 }
 
 spotless {
