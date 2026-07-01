@@ -18,7 +18,7 @@ jobs:
     name: "Spotless"
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@v7
     - uses: actions/setup-java@v5
       with:
         distribution: ${{ env.JAVA_DISTRIBUTION }}
@@ -29,7 +29,7 @@ jobs:
     name: "app:lint"
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@v7
     - uses: actions/setup-java@v5
       with:
         distribution: ${{ env.JAVA_DISTRIBUTION }}
@@ -40,7 +40,7 @@ jobs:
     name: "provider:lint"
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@v7
     - uses: actions/setup-java@v5
       with:
         distribution: ${{ env.JAVA_DISTRIBUTION }}
@@ -51,7 +51,7 @@ jobs:
     name: "app:assembleDebug"
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@v7
     - uses: actions/setup-java@v5
       with:
         distribution: ${{ env.JAVA_DISTRIBUTION }}
@@ -62,7 +62,7 @@ jobs:
     name: "provider:assembleDebug"
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@v7
     - uses: actions/setup-java@v5
       with:
         distribution: ${{ env.JAVA_DISTRIBUTION }}
@@ -73,7 +73,7 @@ jobs:
     name: "provider:test"
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@v7
     - uses: actions/setup-java@v5
       with:
         distribution: ${{ env.JAVA_DISTRIBUTION }}
@@ -84,7 +84,7 @@ jobs:
     name: "app:connectedTest"
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@v7
     - uses: actions/setup-java@v5
       with:
         distribution: ${{ env.JAVA_DISTRIBUTION }}
