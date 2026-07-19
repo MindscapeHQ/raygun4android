@@ -2,7 +2,7 @@
 
 ## Project and library organisation
 
-Building the project requires Android Studio Panda 4 (2025.3.4) or later, Gradle 9.5.1, and JDK 17 or later. The minimum Studio version is driven by the AGP 9.2.x requirement.
+Building the project requires Android Studio Panda 4 (2025.3.4) or later, Gradle 9.6.1, and JDK 17 or later. The minimum Studio version is driven by the AGP 9.2.x requirement.
 
 The project consists of two modules:
 
