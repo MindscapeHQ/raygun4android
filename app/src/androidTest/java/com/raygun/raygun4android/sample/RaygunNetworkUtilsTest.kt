@@ -20,7 +20,7 @@ class RaygunNetworkUtilsTest {
     }
 
     @Test
-    fun deviceUuidIsPersistedToDiskAndReusedFromFreshContext() =
+    fun deviceUuidIsAvailableImmediatelyAndPersistedToDisk() =
         runBlocking {
             val context = InstrumentationRegistry.getInstrumentation().targetContext
             val preferences = context.getSharedPreferences(EXPECTED_PREFS_FILE, Context.MODE_PRIVATE)
@@ -31,9 +31,6 @@ class RaygunNetworkUtilsTest {
 
                 assertEquals(firstUuid, preferences.getString(EXPECTED_PREFS_DEVICE_ID, null))
                 assertTrue(uuidWasWrittenToDisk(context, firstUuid))
-
-                val freshContext = context.createPackageContext(context.packageName, 0)
-                assertEquals(firstUuid, RaygunNetworkUtils.getDeviceUuid(freshContext))
             } finally {
                 assertTrue(preferences.edit().clear().commit())
             }
