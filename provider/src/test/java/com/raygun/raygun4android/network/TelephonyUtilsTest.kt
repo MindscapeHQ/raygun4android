@@ -1,8 +1,13 @@
 package com.raygun.raygun4android.network
 
+import android.Manifest
+import android.content.Context
+import android.content.pm.PackageManager
 import android.telephony.TelephonyManager
 import org.junit.Assert.assertEquals
 import org.junit.Test
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 
 /**
  * Locks in the mapping behaviour of [TelephonyUtils.networkTypeToString].
@@ -13,6 +18,15 @@ import org.junit.Test
  */
 @Suppress("DEPRECATION")
 class TelephonyUtilsTest {
+    @Test
+    fun deniedPhoneStatePermissionReturnsUnknown() {
+        val context = mock<Context>()
+        whenever(context.checkSelfPermission(Manifest.permission.READ_PHONE_STATE))
+            .thenReturn(PackageManager.PERMISSION_DENIED)
+
+        assertEquals("Unknown", TelephonyUtils.getNetworkType(context))
+    }
+
     @Test
     fun mapsCurrentNetworkTypes() {
         assertEquals("EDGE", TelephonyUtils.networkTypeToString(TelephonyManager.NETWORK_TYPE_EDGE))

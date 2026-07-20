@@ -7,7 +7,6 @@ import android.content.pm.PackageManager
 import android.telephony.TelephonyManager
 import androidx.annotation.RequiresApi
 import androidx.annotation.RequiresPermission
-import androidx.core.content.ContextCompat
 
 // Utils class to obtain the mobile network type using the TelephonyManager API.
 // Requires READ_PHONE_STATE permission in app, otherwise it will return "Unknown".
@@ -19,8 +18,7 @@ object TelephonyUtils {
     // Returns "Unknown" if permission is not granted or if the network type cannot be determined.
     @SuppressLint("MissingPermission")
     fun getNetworkType(context: Context): String {
-        val permissionCheck =
-            ContextCompat.checkSelfPermission(context, Manifest.permission.READ_PHONE_STATE)
+        val permissionCheck = context.checkSelfPermission(Manifest.permission.READ_PHONE_STATE)
         if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
             return UNKNOWN
         }

@@ -61,7 +61,6 @@ tasks.withType<Zip>().configureEach {
 }
 
 dependencies {
-    implementation(libs.androidx.core)
     implementation(libs.androidx.appcompat)
     implementation(libs.gson)
     implementation(libs.okhttp)

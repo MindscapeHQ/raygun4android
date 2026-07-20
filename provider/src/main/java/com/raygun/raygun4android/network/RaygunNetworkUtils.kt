@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.provider.Settings
 import androidx.annotation.VisibleForTesting
-import androidx.core.content.edit
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.net.HttpURLConnection
@@ -63,7 +62,7 @@ object RaygunNetworkUtils {
                                     UUID.randomUUID().toString()
                                 }
 
-                            prefs.edit { putString(PREFS_DEVICE_ID, id) }
+                            prefs.edit().putString(PREFS_DEVICE_ID, id).apply()
                             return@withContext id
                         }
                     }
