@@ -14,17 +14,22 @@ import java.io.File
 
 @RunWith(AndroidJUnit4::class)
 class RaygunNetworkUtilsTest {
+    private companion object {
+        const val EXPECTED_PREFS_FILE = "device_id.xml"
+        const val EXPECTED_PREFS_DEVICE_ID = "device_id"
+    }
+
     @Test
     fun deviceUuidIsPersistedToDiskAndReusedFromFreshContext() =
         runBlocking {
             val context = InstrumentationRegistry.getInstrumentation().targetContext
-            val preferences = context.getSharedPreferences("device_id.xml", Context.MODE_PRIVATE)
+            val preferences = context.getSharedPreferences(EXPECTED_PREFS_FILE, Context.MODE_PRIVATE)
             assertTrue(preferences.edit().clear().commit())
 
             try {
                 val firstUuid = RaygunNetworkUtils.getDeviceUuid(context)
 
-                assertEquals(firstUuid, preferences.getString("device_id", null))
+                assertEquals(firstUuid, preferences.getString(EXPECTED_PREFS_DEVICE_ID, null))
                 assertTrue(uuidWasWrittenToDisk(context, firstUuid))
 
                 val freshContext = context.createPackageContext(context.packageName, 0)
@@ -40,7 +45,7 @@ class RaygunNetworkUtilsTest {
     ): Boolean {
         // SharedPreferences appends ".xml" to the supplied preferences name.
         val preferencesFile =
-            File(context.applicationInfo.dataDir, "shared_prefs/device_id.xml.xml")
+            File(context.applicationInfo.dataDir, "shared_prefs/$EXPECTED_PREFS_FILE.xml")
 
         repeat(100) {
             val persisted =
