@@ -65,6 +65,30 @@ class TelephonyUtilsTest {
     }
 
     @Test
+    @Config(sdk = [Build.VERSION_CODES.N])
+    fun unavailableTelephonyServiceReturnsUnknown() {
+        val context = mock<Context>()
+        whenever(context.checkSelfPermission(Manifest.permission.READ_PHONE_STATE))
+            .thenReturn(PackageManager.PERMISSION_GRANTED)
+        whenever(context.applicationContext).thenReturn(context)
+        whenever(context.getSystemService(Context.TELEPHONY_SERVICE)).thenReturn(null)
+
+        assertEquals("Unknown", TelephonyUtils.getNetworkType(context))
+    }
+
+    @Test
+    @Config(sdk = [Build.VERSION_CODES.N])
+    fun securityExceptionReturnsUnknown() {
+        val context = mock<Context>()
+        whenever(context.checkSelfPermission(Manifest.permission.READ_PHONE_STATE))
+            .thenReturn(PackageManager.PERMISSION_GRANTED)
+        whenever(context.applicationContext).thenReturn(context)
+        whenever(context.getSystemService(Context.TELEPHONY_SERVICE)).thenThrow(SecurityException())
+
+        assertEquals("Unknown", TelephonyUtils.getNetworkType(context))
+    }
+
+    @Test
     fun mapsCurrentNetworkTypes() {
         assertEquals("EDGE", TelephonyUtils.networkTypeToString(TelephonyManager.NETWORK_TYPE_EDGE))
         assertEquals("GPRS", TelephonyUtils.networkTypeToString(TelephonyManager.NETWORK_TYPE_GPRS))

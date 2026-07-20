@@ -17,30 +17,34 @@ object TelephonyUtils {
     // Requires permission READ_PHONE_STATE.
     // Returns "Unknown" if permission is not granted or if the network type cannot be determined.
     @SuppressLint("MissingPermission")
-    fun getNetworkType(context: Context): String {
-        val permissionCheck = context.checkSelfPermission(Manifest.permission.READ_PHONE_STATE)
-        if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
-            return UNKNOWN
-        }
-        val type =
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-                networkType24(context)
+    fun getNetworkType(context: Context): String =
+        try {
+            val permissionCheck = context.checkSelfPermission(Manifest.permission.READ_PHONE_STATE)
+            if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
+                UNKNOWN
             } else {
-                networkTypeLegacy(context)
+                val type =
+                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+                        networkType24(context)
+                    } else {
+                        networkTypeLegacy(context)
+                    }
+                type?.let(::networkTypeToString) ?: UNKNOWN
             }
-        return networkTypeToString(type)
-    }
+        } catch (_: SecurityException) {
+            UNKNOWN
+        }
 
-    private fun telephonyManager(context: Context): TelephonyManager =
-        context.applicationContext.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
+    private fun telephonyManager(context: Context): TelephonyManager? =
+        context.applicationContext?.getSystemService(Context.TELEPHONY_SERVICE) as? TelephonyManager
 
     @Suppress("DEPRECATION")
     @RequiresPermission(Manifest.permission.READ_PHONE_STATE)
-    private fun networkTypeLegacy(context: Context): Int = telephonyManager(context).networkType
+    private fun networkTypeLegacy(context: Context): Int? = telephonyManager(context)?.networkType
 
     @RequiresPermission(Manifest.permission.READ_PHONE_STATE)
     @RequiresApi(android.os.Build.VERSION_CODES.N)
-    private fun networkType24(context: Context): Int = telephonyManager(context).dataNetworkType
+    private fun networkType24(context: Context): Int? = telephonyManager(context)?.dataNetworkType
 
     // The CDMA-era NETWORK_TYPE_* constants below (1xRTT, CDMA, EHRPD,
     // EVDO_0/A/B) were deprecated in API 30 but are intentionally kept in
