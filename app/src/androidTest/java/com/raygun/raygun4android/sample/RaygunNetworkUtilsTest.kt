@@ -38,7 +38,9 @@ class RaygunNetworkUtilsTest {
         context: Context,
         uuid: String,
     ): Boolean {
-        val preferencesFile = File(context.applicationInfo.dataDir, "shared_prefs/device_id.xml")
+        // SharedPreferences appends ".xml" to the supplied preferences name.
+        val preferencesFile =
+            File(context.applicationInfo.dataDir, "shared_prefs/device_id.xml.xml")
 
         repeat(100) {
             val persisted =
