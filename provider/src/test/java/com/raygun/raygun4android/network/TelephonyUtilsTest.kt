@@ -7,6 +7,8 @@ import android.telephony.TelephonyManager
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoMoreInteractions
 import org.mockito.kotlin.whenever
 
 /**
@@ -25,6 +27,21 @@ class TelephonyUtilsTest {
             .thenReturn(PackageManager.PERMISSION_DENIED)
 
         assertEquals("Unknown", TelephonyUtils.getNetworkType(context))
+        verify(context).checkSelfPermission(Manifest.permission.READ_PHONE_STATE)
+        verifyNoMoreInteractions(context)
+    }
+
+    @Test
+    fun grantedPhoneStatePermissionReturnsNetworkType() {
+        val context = mock<Context>()
+        val telephonyManager = mock<TelephonyManager>()
+        whenever(context.checkSelfPermission(Manifest.permission.READ_PHONE_STATE))
+            .thenReturn(PackageManager.PERMISSION_GRANTED)
+        whenever(context.applicationContext).thenReturn(context)
+        whenever(context.getSystemService(Context.TELEPHONY_SERVICE)).thenReturn(telephonyManager)
+        whenever(telephonyManager.networkType).thenReturn(TelephonyManager.NETWORK_TYPE_LTE)
+
+        assertEquals("LTE", TelephonyUtils.getNetworkType(context))
     }
 
     @Test
