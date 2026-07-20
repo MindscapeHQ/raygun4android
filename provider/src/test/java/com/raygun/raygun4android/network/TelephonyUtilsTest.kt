@@ -3,13 +3,17 @@ package com.raygun.raygun4android.network
 import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
+import android.os.Build
 import android.telephony.TelephonyManager
 import org.junit.Assert.assertEquals
 import org.junit.Test
+import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoMoreInteractions
 import org.mockito.kotlin.whenever
+import org.robolectric.RobolectricTestRunner
+import org.robolectric.annotation.Config
 
 /**
  * Locks in the mapping behaviour of [TelephonyUtils.networkTypeToString].
@@ -19,6 +23,7 @@ import org.mockito.kotlin.whenever
  * payloads render identically.
  */
 @Suppress("DEPRECATION")
+@RunWith(RobolectricTestRunner::class)
 class TelephonyUtilsTest {
     @Test
     fun deniedPhoneStatePermissionReturnsUnknown() {
@@ -32,7 +37,8 @@ class TelephonyUtilsTest {
     }
 
     @Test
-    fun grantedPhoneStatePermissionReturnsNetworkType() {
+    @Config(sdk = [Build.VERSION_CODES.M])
+    fun grantedPhoneStatePermissionReturnsLegacyNetworkTypeOnApi23() {
         val context = mock<Context>()
         val telephonyManager = mock<TelephonyManager>()
         whenever(context.checkSelfPermission(Manifest.permission.READ_PHONE_STATE))
@@ -40,6 +46,20 @@ class TelephonyUtilsTest {
         whenever(context.applicationContext).thenReturn(context)
         whenever(context.getSystemService(Context.TELEPHONY_SERVICE)).thenReturn(telephonyManager)
         whenever(telephonyManager.networkType).thenReturn(TelephonyManager.NETWORK_TYPE_LTE)
+
+        assertEquals("LTE", TelephonyUtils.getNetworkType(context))
+    }
+
+    @Test
+    @Config(sdk = [Build.VERSION_CODES.N])
+    fun grantedPhoneStatePermissionReturnsDataNetworkTypeOnApi24() {
+        val context = mock<Context>()
+        val telephonyManager = mock<TelephonyManager>()
+        whenever(context.checkSelfPermission(Manifest.permission.READ_PHONE_STATE))
+            .thenReturn(PackageManager.PERMISSION_GRANTED)
+        whenever(context.applicationContext).thenReturn(context)
+        whenever(context.getSystemService(Context.TELEPHONY_SERVICE)).thenReturn(telephonyManager)
+        whenever(telephonyManager.dataNetworkType).thenReturn(TelephonyManager.NETWORK_TYPE_LTE)
 
         assertEquals("LTE", TelephonyUtils.getNetworkType(context))
     }
