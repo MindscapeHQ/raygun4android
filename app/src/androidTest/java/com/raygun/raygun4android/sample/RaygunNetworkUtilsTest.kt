@@ -1,0 +1,58 @@
+package com.raygun.raygun4android.sample
+
+import android.content.Context
+import android.os.SystemClock
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.platform.app.InstrumentationRegistry
+import com.raygun.raygun4android.network.RaygunNetworkUtils
+import kotlinx.coroutines.runBlocking
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
+import org.junit.Test
+import org.junit.runner.RunWith
+import java.io.File
+
+@RunWith(AndroidJUnit4::class)
+class RaygunNetworkUtilsTest {
+    private companion object {
+        const val EXPECTED_PREFS_FILE = "device_id.xml"
+        const val EXPECTED_PREFS_DEVICE_ID = "device_id"
+    }
+
+    @Test
+    fun deviceUuidIsAvailableImmediatelyAndPersistedToDisk() =
+        runBlocking {
+            val context = InstrumentationRegistry.getInstrumentation().targetContext
+            val preferences = context.getSharedPreferences(EXPECTED_PREFS_FILE, Context.MODE_PRIVATE)
+            assertTrue(preferences.edit().clear().commit())
+
+            try {
+                val firstUuid = RaygunNetworkUtils.getDeviceUuid(context)
+
+                assertEquals(firstUuid, preferences.getString(EXPECTED_PREFS_DEVICE_ID, null))
+                assertTrue(uuidWasWrittenToDisk(context, firstUuid))
+            } finally {
+                assertTrue(preferences.edit().clear().commit())
+            }
+        }
+
+    private fun uuidWasWrittenToDisk(
+        context: Context,
+        uuid: String,
+    ): Boolean {
+        // SharedPreferences appends ".xml" to the supplied preferences name.
+        val preferencesFile =
+            File(context.applicationInfo.dataDir, "shared_prefs/$EXPECTED_PREFS_FILE.xml")
+
+        repeat(100) {
+            val persisted =
+                runCatching { preferencesFile.readText().contains(uuid) }.getOrDefault(false)
+            if (persisted) {
+                return true
+            }
+            SystemClock.sleep(10)
+        }
+
+        return false
+    }
+}

@@ -1,8 +1,19 @@
 package com.raygun.raygun4android.network
 
+import android.Manifest
+import android.content.Context
+import android.content.pm.PackageManager
+import android.os.Build
 import android.telephony.TelephonyManager
 import org.junit.Assert.assertEquals
 import org.junit.Test
+import org.junit.runner.RunWith
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoMoreInteractions
+import org.mockito.kotlin.whenever
+import org.robolectric.RobolectricTestRunner
+import org.robolectric.annotation.Config
 
 /**
  * Locks in the mapping behaviour of [TelephonyUtils.networkTypeToString].
@@ -12,7 +23,71 @@ import org.junit.Test
  * payloads render identically.
  */
 @Suppress("DEPRECATION")
+@RunWith(RobolectricTestRunner::class)
 class TelephonyUtilsTest {
+    @Test
+    fun deniedPhoneStatePermissionReturnsUnknown() {
+        val context = mock<Context>()
+        whenever(context.checkSelfPermission(Manifest.permission.READ_PHONE_STATE))
+            .thenReturn(PackageManager.PERMISSION_DENIED)
+
+        assertEquals("Unknown", TelephonyUtils.getNetworkType(context))
+        verify(context).checkSelfPermission(Manifest.permission.READ_PHONE_STATE)
+        verifyNoMoreInteractions(context)
+    }
+
+    @Test
+    @Config(sdk = [Build.VERSION_CODES.M])
+    fun grantedPhoneStatePermissionReturnsLegacyNetworkTypeOnApi23() {
+        val context = mock<Context>()
+        val telephonyManager = mock<TelephonyManager>()
+        whenever(context.checkSelfPermission(Manifest.permission.READ_PHONE_STATE))
+            .thenReturn(PackageManager.PERMISSION_GRANTED)
+        whenever(context.applicationContext).thenReturn(context)
+        whenever(context.getSystemService(Context.TELEPHONY_SERVICE)).thenReturn(telephonyManager)
+        whenever(telephonyManager.networkType).thenReturn(TelephonyManager.NETWORK_TYPE_LTE)
+
+        assertEquals("LTE", TelephonyUtils.getNetworkType(context))
+    }
+
+    @Test
+    @Config(sdk = [Build.VERSION_CODES.N])
+    fun grantedPhoneStatePermissionReturnsDataNetworkTypeOnApi24() {
+        val context = mock<Context>()
+        val telephonyManager = mock<TelephonyManager>()
+        whenever(context.checkSelfPermission(Manifest.permission.READ_PHONE_STATE))
+            .thenReturn(PackageManager.PERMISSION_GRANTED)
+        whenever(context.applicationContext).thenReturn(context)
+        whenever(context.getSystemService(Context.TELEPHONY_SERVICE)).thenReturn(telephonyManager)
+        whenever(telephonyManager.dataNetworkType).thenReturn(TelephonyManager.NETWORK_TYPE_LTE)
+
+        assertEquals("LTE", TelephonyUtils.getNetworkType(context))
+    }
+
+    @Test
+    @Config(sdk = [Build.VERSION_CODES.N])
+    fun unavailableTelephonyServiceReturnsUnknown() {
+        val context = mock<Context>()
+        whenever(context.checkSelfPermission(Manifest.permission.READ_PHONE_STATE))
+            .thenReturn(PackageManager.PERMISSION_GRANTED)
+        whenever(context.applicationContext).thenReturn(context)
+        whenever(context.getSystemService(Context.TELEPHONY_SERVICE)).thenReturn(null)
+
+        assertEquals("Unknown", TelephonyUtils.getNetworkType(context))
+    }
+
+    @Test
+    @Config(sdk = [Build.VERSION_CODES.N])
+    fun securityExceptionReturnsUnknown() {
+        val context = mock<Context>()
+        whenever(context.checkSelfPermission(Manifest.permission.READ_PHONE_STATE))
+            .thenReturn(PackageManager.PERMISSION_GRANTED)
+        whenever(context.applicationContext).thenReturn(context)
+        whenever(context.getSystemService(Context.TELEPHONY_SERVICE)).thenThrow(SecurityException())
+
+        assertEquals("Unknown", TelephonyUtils.getNetworkType(context))
+    }
+
     @Test
     fun mapsCurrentNetworkTypes() {
         assertEquals("EDGE", TelephonyUtils.networkTypeToString(TelephonyManager.NETWORK_TYPE_EDGE))

@@ -61,7 +61,6 @@ tasks.withType<Zip>().configureEach {
 }
 
 dependencies {
-    implementation(libs.androidx.core)
     implementation(libs.androidx.appcompat)
     implementation(libs.gson)
     implementation(libs.okhttp)
@@ -71,6 +70,7 @@ dependencies {
     testImplementation(libs.junit)
     testImplementation(libs.mockito.core)
     testImplementation(libs.mockito.kotlin)
+    testImplementation(libs.robolectric)
 }
 
 // Maven Central publishing configuration
