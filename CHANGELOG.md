@@ -1,5 +1,15 @@
 ## Changelog
 
+### 6.2.0
+
+- feat: remove the provider's direct AndroidX Core dependency while retaining compile SDK 36 compatibility (#305)
+- fix: return `Unknown` when telephony metadata is unavailable or access is denied (#305)
+- chore(deps): bump Kotlin from 2.3.21 to 2.4.0 (#304)
+- chore(deps): bump Gson from 2.13.2 to 2.14.0 (#304)
+- chore(deps): bump OkHttp from 5.3.2 to 5.4.0 (#304)
+- chore(deps): bump Gradle wrapper from 9.5.1 to 9.6.1 (#304)
+- chore(deps): bump actions/checkout from 6 to 7 (#298)
+
 ### 6.1.0
 
 - chore: harden Gradle dependency resolution (#295)
