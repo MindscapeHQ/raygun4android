@@ -1,5 +1,14 @@
 ## Changelog
 
+### 6.2.1
+
+- chore(deps): bump actions/setup-java from 5 to 5.6.0 (#307)
+- chore(deps): bump the Raygun sample app dependency from 6.0.1 to 6.2.0 (#309)
+- chore(deps): bump Kotlin from 2.4.0 to 2.4.10 (#310)
+- chore(deps): bump Spotless from 8.6.0 to 8.9.0 (#311)
+- chore(deps): bump Android Gradle Plugin from 9.2.1 to 9.3.1 (#308)
+- chore(deps): bump the Maven Publish plugin from 0.36.0 to 0.37.0 (#312)
+
 ### 6.2.0
 
 - feat: remove the provider's direct AndroidX Core dependency while retaining compile SDK 36 compatibility (#305)
