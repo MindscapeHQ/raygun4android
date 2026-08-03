@@ -19,7 +19,7 @@ mockito-kotlin = "6.3.0"
 okhttp = "5.4.0"
 raygun = "6.2.0"
 robolectric = "4.16.1"
-spotless = "8.6.0"
+spotless = "8.9.0"
 timber = "5.0.1"
 
 [libraries]
