@@ -1,8 +1,8 @@
 [versions]
 activity = "1.13.0"
-agp = "9.3.1"
+agp = "9.3.2"
 android-material = "1.14.0"
-androidx-appcompat = "1.7.1"
+androidx-appcompat = "1.8.0"
 androidx-constraintlayout = "2.2.1"
 androidx-test-espresso = "3.7.0"
 androidx-test-ext = "1.3.0"
@@ -19,7 +19,7 @@ mockito-kotlin = "6.3.0"
 okhttp = "5.4.0"
 raygun = "6.2.1"
 robolectric = "4.16.1"
-spotless = "8.9.0"
+spotless = "8.10.1"
 timber = "5.0.1"
 
 [libraries]
