@@ -1,5 +1,15 @@
 ## Changelog
 
+### 6.2.2
+
+- chore(ci): bump actions/setup-java from 5.6.0 to 6.0.0 and migrate the CI JDK distribution from AdoptOpenJDK to Eclipse Temurin (#314)
+- chore(deps): bump the Raygun sample app dependency from 6.2.0 to 6.2.1 (#318)
+- chore(deps): bump Gradle wrapper from 9.6.1 to 9.7.1 (#320)
+- chore(deps): bump Android Gradle Plugin from 9.3.1 to 9.3.2 (#320)
+- chore(deps): bump Spotless from 8.9.0 to 8.10.1 (#320)
+- chore(deps): bump the provider's AppCompat runtime dependency from 1.7.1 to 1.8.0 (#320)
+- chore(deps): refresh dependency locks and verification metadata (#320)
+
 ### 6.2.1
 
 - chore(deps): bump actions/setup-java from 5 to 5.6.0 (#307)
