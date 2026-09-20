@@ -22,6 +22,7 @@ class CrashReportingWorkerTest {
 
     @Before
     fun setUp() {
+        CrashReportCache.clear(application)
         worker = CrashReportingWorker(application, mock())
     }
 
@@ -30,7 +31,7 @@ class CrashReportingWorkerTest {
         val file = rawReport("payload to retry")
 
         val result =
-            worker.processCrashReport(file, false, "api-key", true) { apiKey, message ->
+            worker.processCrashReport(file, false, "api-key") { apiKey, message ->
                 assertEquals("api-key", apiKey)
                 assertEquals("payload to retry", message)
                 -1
@@ -41,26 +42,10 @@ class CrashReportingWorkerTest {
     }
 
     @Test
-    fun `offline delivery retains payload without attempting post`() {
-        val file = rawReport("offline payload")
-        var postAttempted = false
-
-        val result =
-            worker.processCrashReport(file, false, "api-key", false) { _, _ ->
-                postAttempted = true
-                202
-            }
-
-        assertEquals(Result.retry(), result)
-        assertFalse(postAttempted)
-        assertTrue(file.exists())
-    }
-
-    @Test
     fun `successful delivery removes raw payload`() {
         val file = rawReport("delivered payload")
 
-        val result = worker.processCrashReport(file, false, "api-key", true) { _, _ -> 202 }
+        val result = worker.processCrashReport(file, false, "api-key") { _, _ -> 202 }
 
         assertEquals(Result.success(), result)
         assertFalse(file.exists())
@@ -70,19 +55,19 @@ class CrashReportingWorkerTest {
     fun `permanent rejection removes payload`() {
         val file = rawReport("invalid payload")
 
-        val result = worker.processCrashReport(file, false, "api-key", true) { _, _ -> 400 }
+        val result = worker.processCrashReport(file, false, "api-key") { _, _ -> 400 }
 
         assertEquals(Result.failure(), result)
         assertFalse(file.exists())
     }
 
     @Test
-    fun `successful delivery reads and removes serialized cached payload`() {
-        val file = serializedReport("recovered crash")
+    fun `successful delivery reads and removes persistent cached payload`() {
+        val file = persistentReport("recovered crash")
         var deliveredMessage: String? = null
 
         val result =
-            worker.processCrashReport(file, true, "api-key", true) { _, message ->
+            worker.processCrashReport(file, false, "api-key") { _, message ->
                 deliveredMessage = message
                 202
             }
@@ -93,13 +78,29 @@ class CrashReportingWorkerTest {
     }
 
     @Test
-    fun `transient failure retains serialized cached payload`() {
-        val file = serializedReport("recovered crash to retry")
+    fun `transient failure retains persistent cached payload`() {
+        val file = persistentReport("recovered crash to retry")
 
-        val result = worker.processCrashReport(file, true, "api-key", true) { _, _ -> 503 }
+        val result = worker.processCrashReport(file, false, "api-key") { _, _ -> 503 }
 
         assertEquals(Result.retry(), result)
         assertTrue(file.exists())
+    }
+
+    @Test
+    fun `successful delivery remains compatible with legacy serialized payload`() {
+        val file = serializedReport("legacy recovered crash")
+        var deliveredMessage: String? = null
+
+        val result =
+            worker.processCrashReport(file, true, "api-key") { _, message ->
+                deliveredMessage = message
+                202
+            }
+
+        assertEquals(Result.success(), result)
+        assertEquals("legacy recovered crash", deliveredMessage)
+        assertFalse(file.exists())
     }
 
     @Test
@@ -108,7 +109,7 @@ class CrashReportingWorkerTest {
         var postAttempted = false
 
         val result =
-            worker.processCrashReport(file, false, "", true) { _, _ ->
+            worker.processCrashReport(file, false, "") { _, _ ->
                 postAttempted = true
                 202
             }
@@ -124,7 +125,27 @@ class CrashReportingWorkerTest {
         var postAttempted = false
 
         val result =
-            worker.processCrashReport(file, true, "api-key", true) { _, _ ->
+            worker.processCrashReport(file, true, "api-key") { _, _ ->
+                postAttempted = true
+                202
+            }
+
+        assertEquals(Result.failure(), result)
+        assertFalse(postAttempted)
+        assertFalse(file.exists())
+    }
+
+    @Test
+    fun `processed tombstone is never delivered again`() {
+        val directory = CrashReportCache.persistentDirectory(application).apply { mkdirs() }
+        val file =
+            File(directory, "processed.raygun4").apply {
+                writeText("RaygunCrashReport:processed\n")
+            }
+        var postAttempted = false
+
+        val result =
+            worker.processCrashReport(file, false, "api-key") { _, _ ->
                 postAttempted = true
                 202
             }
@@ -139,6 +160,8 @@ class CrashReportingWorkerTest {
             writeText(message)
             deleteOnExit()
         }
+
+    private fun persistentReport(message: String): File = requireNotNull(CrashReportCache.store(application, message))
 
     private fun serializedReport(message: String): File =
         File.createTempFile("raygun-", ".raygun4", application.cacheDir).apply {

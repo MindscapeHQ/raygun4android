@@ -8,7 +8,6 @@ import com.raygun.raygun4android.SerializedMessage
 import com.raygun.raygun4android.logging.RaygunLogger.d
 import com.raygun.raygun4android.logging.RaygunLogger.e
 import com.raygun.raygun4android.logging.RaygunLogger.responseCode
-import com.raygun.raygun4android.network.ConnectivityUtils
 import okhttp3.MediaType
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.Request
@@ -30,6 +29,8 @@ class CrashReportingWorker(
         val temporaryFile = inputData.getString(CrashReportingWorkerHelper.TEMP_FILE_INPUT)
         val cachedFile = inputData.getString(CrashReportingWorkerHelper.CACHED_FILE_INPUT)
         val apiKey = inputData.getString(CrashReportingWorkerHelper.API_KEY_INPUT)
+        val legacySerialized =
+            inputData.getBoolean(CrashReportingWorkerHelper.LEGACY_SERIALIZED_INPUT, false)
 
         if (temporaryFile.isNullOrEmpty() && cachedFile.isNullOrEmpty()) {
             e("No file provided in input data.")
@@ -45,9 +46,8 @@ class CrashReportingWorker(
 
         return processCrashReport(
             file = file,
-            isSerialized = cachedFile != null,
+            isLegacySerialized = legacySerialized,
             apiKey = apiKey,
-            networkAvailable = ConnectivityUtils.isNetworkAvailable(applicationContext),
             postCrashReport = ::postCrashReporting,
         )
     }
@@ -127,26 +127,23 @@ class CrashReportingWorker(
 
     internal fun processCrashReport(
         file: File,
-        isSerialized: Boolean,
+        isLegacySerialized: Boolean,
         apiKey: String?,
-        networkAvailable: Boolean,
         postCrashReport: (String, String) -> Int,
     ): Result {
         val message =
-            if (isSerialized) {
+            if (isLegacySerialized) {
                 readMessageFromCache(file)
-            } else {
+            } else if (file.parentFile == applicationContext.filesDir) {
                 readMessageFromTempFile(file)
+            } else {
+                CrashReportCache.readPersistent(file)
             }
 
         if (message == null || apiKey.isNullOrEmpty()) {
             e("No message or API key was provided.")
-            delete(file)
+            CrashReportCache.markProcessed(file)
             return Result.failure()
-        }
-
-        if (!networkAvailable) {
-            return Result.retry()
         }
 
         val responseCode = postCrashReport(apiKey, message)
@@ -159,15 +156,9 @@ class CrashReportingWorker(
             responseCode == RaygunSettings.RESPONSE_CODE_INVALID_API_KEY ||
             responseCode == RaygunSettings.RESPONSE_CODE_LARGE_PAYLOAD
         ) {
-            delete(file)
+            CrashReportCache.markProcessed(file)
         }
 
         return result
-    }
-
-    private fun delete(file: File) {
-        if (file.exists() && !file.delete()) {
-            e("Failed to delete the file: ${file.name}")
-        }
     }
 }

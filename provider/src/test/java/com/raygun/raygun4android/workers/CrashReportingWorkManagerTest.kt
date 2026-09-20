@@ -1,0 +1,96 @@
+package com.raygun.raygun4android.workers
+
+import androidx.work.Configuration
+import androidx.work.WorkInfo
+import androidx.work.WorkManager
+import androidx.work.testing.SynchronousExecutor
+import androidx.work.testing.WorkManagerTestInitHelper
+import com.raygun.raygun4android.OkHttpClientBuilder
+import com.raygun.raygun4android.RaygunSettings
+import okhttp3.OkHttpClient
+import okhttp3.Protocol
+import okhttp3.Response
+import okhttp3.ResponseBody.Companion.toResponseBody
+import org.junit.After
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
+import org.junit.Before
+import org.junit.Test
+import org.junit.runner.RunWith
+import org.robolectric.RobolectricTestRunner
+import org.robolectric.RuntimeEnvironment
+
+@RunWith(RobolectricTestRunner::class)
+class CrashReportingWorkManagerTest {
+    private val application = RuntimeEnvironment.getApplication()
+    private val originalMaximum = RaygunSettings.maxReportsStoredOnDevice
+
+    @Before
+    fun setUp() {
+        CrashReportCache.clear(application)
+        val configuration = Configuration.Builder().setExecutor(SynchronousExecutor()).build()
+        WorkManagerTestInitHelper.initializeTestWorkManager(application, configuration)
+        RaygunSettings.okHttpClientBuilder =
+            object : OkHttpClientBuilder {
+                override fun build(): OkHttpClient =
+                    OkHttpClient
+                        .Builder()
+                        .addInterceptor { chain ->
+                            Response
+                                .Builder()
+                                .request(chain.request())
+                                .protocol(Protocol.HTTP_1_1)
+                                .code(202)
+                                .message("Accepted")
+                                .body("".toResponseBody())
+                                .build()
+                        }.build()
+            }
+    }
+
+    @After
+    fun tearDown() {
+        RaygunSettings.okHttpClientBuilder = null
+        RaygunSettings.maxReportsStoredOnDevice = originalMaximum
+        CrashReportCache.clear(application)
+    }
+
+    @Test
+    fun `startup scheduling deduplicates and WorkManager delivers durable report`() {
+        RaygunSettings.maxReportsStoredOnDevice = 1
+        CrashReportingWorkerHelper.enqueueCrashReport(application, "{\"first\":true}", "api-key")
+        CrashReportingWorkerHelper.enqueueCrashReport(application, "{\"second\":true}", "api-key")
+        val file = CrashReportCache.files(application).single()
+        assertEquals("{\"first\":true}", CrashReportCache.readPersistent(file))
+
+        assertTrue(
+            CrashReportingWorkerHelper.enqueueCachedCrashReport(
+                application,
+                file,
+                "api-key",
+            ),
+        )
+        assertTrue(
+            CrashReportingWorkerHelper.enqueueCachedCrashReport(
+                application,
+                file,
+                "api-key",
+            ),
+        )
+
+        val workManager = WorkManager.getInstance(application)
+        val workName = CrashReportingWorkerHelper.cachedWorkName(file)
+        val queuedWork = workManager.getWorkInfosForUniqueWork(workName).get()
+        assertEquals(1, queuedWork.size)
+        assertEquals(WorkInfo.State.ENQUEUED, queuedWork.single().state)
+        assertTrue(file.exists())
+
+        val testDriver = requireNotNull(WorkManagerTestInitHelper.getTestDriver(application))
+        testDriver.setAllConstraintsMet(queuedWork.single().id)
+
+        val completedWork = workManager.getWorkInfosForUniqueWork(workName).get().single()
+        assertEquals(WorkInfo.State.SUCCEEDED, completedWork.state)
+        assertFalse(file.exists())
+    }
+}

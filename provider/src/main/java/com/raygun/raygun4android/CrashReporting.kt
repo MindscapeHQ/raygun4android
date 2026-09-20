@@ -9,10 +9,14 @@ import com.raygun.raygun4android.rum.RUM
 import com.raygun.raygun4android.utils.RaygunUtils
 import com.raygun.raygun4android.workers.CrashReportCache
 import com.raygun.raygun4android.workers.CrashReportingWorkerHelper
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runInterruptible
 import java.util.concurrent.CopyOnWriteArrayList
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
@@ -127,22 +131,25 @@ object CrashReporting {
         tags: Tags?,
         customData: CustomData?,
     ): String? {
-        var msg = buildMessage(throwable)
+        val message = buildMessage(throwable)
 
-        if (msg == null) {
+        if (message == null) {
             RaygunLogger.e("Failed to send RaygunMessage - due to invalid message being built")
             return null
         }
 
-        msg.details.tags = RaygunUtils.mergeLists(CrashReporting.tags, tags)
-        msg.details.customData = RaygunUtils.mergeMaps(CrashReporting.customData, customData)
+        message.details.tags = RaygunUtils.mergeLists(CrashReporting.tags, tags)
+        message.details.customData = RaygunUtils.mergeMaps(CrashReporting.customData, customData)
 
         val beforeSend = onBeforeSend
-        if (beforeSend != null) {
-            msg = beforeSend.onBeforeSend(msg) ?: return null
-        }
+        val filteredMessage =
+            if (beforeSend != null) {
+                runInterruptible { beforeSend.onBeforeSend(message) } ?: return null
+            } else {
+                message
+            }
 
-        return Gson().toJson(msg)
+        return Gson().toJson(filteredMessage)
     }
 
     internal fun cacheUnhandledException(
@@ -153,27 +160,34 @@ object CrashReporting {
         val completed = CountDownLatch(1)
         val stored = AtomicBoolean(false)
 
-        coroutineScope.launch {
-            try {
-                val jsonPayload = buildJsonPayload(throwable, tags, null) ?: return@launch
-                stored.set(
-                    CrashReportCache.store(RaygunClient.getApplicationContext(), jsonPayload),
-                )
-            } catch (throwable: Throwable) {
-                RaygunLogger.e("Failed to cache unhandled exception: $throwable")
-            } finally {
-                completed.countDown()
+        val persistenceJob =
+            coroutineScope.launch {
+                try {
+                    val jsonPayload = buildJsonPayload(throwable, tags, null) ?: return@launch
+                    currentCoroutineContext().ensureActive()
+                    stored.set(
+                        CrashReportCache.store(RaygunClient.getApplicationContext(), jsonPayload) !=
+                            null,
+                    )
+                } catch (exception: CancellationException) {
+                    throw exception
+                } catch (throwable: Throwable) {
+                    RaygunLogger.e("Failed to cache unhandled exception: $throwable")
+                } finally {
+                    completed.countDown()
+                }
             }
-        }
 
         return try {
             if (!completed.await(timeoutMillis, TimeUnit.MILLISECONDS)) {
+                persistenceJob.cancel()
                 RaygunLogger.w("Timed out while caching unhandled exception")
                 false
             } else {
                 stored.get()
             }
         } catch (exception: InterruptedException) {
+            persistenceJob.cancel()
             Thread.currentThread().interrupt()
             RaygunLogger.w("Interrupted while caching unhandled exception")
             false
@@ -223,12 +237,16 @@ object CrashReporting {
     @JvmStatic
     fun postCachedMessages() {
         coroutineScope.launch {
-            for (file in CrashReportCache.files(RaygunClient.getApplicationContext())) {
-                CrashReportingWorkerHelper.enqueueCachedCrashReport(
-                    RaygunClient.getApplicationContext(),
-                    file,
-                    RaygunClient.apiKey,
-                )
+            try {
+                for (file in CrashReportCache.files(RaygunClient.getApplicationContext())) {
+                    CrashReportingWorkerHelper.enqueueCachedCrashReport(
+                        RaygunClient.getApplicationContext(),
+                        file,
+                        RaygunClient.apiKey,
+                    )
+                }
+            } catch (exception: Exception) {
+                RaygunLogger.e("Failed to schedule cached crash reports: $exception")
             }
         }
     }

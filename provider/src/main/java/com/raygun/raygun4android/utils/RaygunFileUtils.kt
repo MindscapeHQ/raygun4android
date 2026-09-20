@@ -1,7 +1,6 @@
 package com.raygun.raygun4android.utils
 
 import android.content.Context
-import com.raygun.raygun4android.logging.RaygunLogger.w
 import com.raygun.raygun4android.workers.CrashReportCache
 import kotlin.math.max
 
@@ -23,12 +22,6 @@ object RaygunFileUtils {
 
     @JvmStatic
     fun clearCachedReports(context: Context) {
-        synchronized(this) {
-            for (file in CrashReportCache.files(context)) {
-                if (!file.delete()) {
-                    w("Couldn't delete cached report (" + file.name + ")")
-                }
-            }
-        }
+        CrashReportCache.clear(context)
     }
 }

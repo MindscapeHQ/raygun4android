@@ -5,7 +5,6 @@ import com.raygun.raygun4android.messages.crashreporting.RaygunMessage
 import com.raygun.raygun4android.workers.CrashReportCache
 import org.junit.After
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
@@ -13,8 +12,6 @@ import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.RuntimeEnvironment
 import java.io.File
-import java.io.FileInputStream
-import java.io.ObjectInputStream
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
@@ -48,18 +45,18 @@ class CrashReportingTest {
             },
         )
 
-        var cachedMessageAtTermination: SerializedMessage? = null
+        var cachedMessageAtTermination: String? = null
         val defaultHandler =
             Thread.UncaughtExceptionHandler { _, _ ->
                 val files = cachedReports()
                 assertEquals(1, files.size)
-                cachedMessageAtTermination = readCachedMessage(files.single())
+                cachedMessageAtTermination = CrashReportCache.readPersistent(files.single())
             }
         val handler = CrashReporting.RaygunUncaughtExceptionHandler(defaultHandler)
 
         handler.uncaughtException(Thread.currentThread(), IllegalStateException("test crash"))
 
-        val payload = JsonParser.parseString(cachedMessageAtTermination?.message).asJsonObject
+        val payload = JsonParser.parseString(cachedMessageAtTermination).asJsonObject
         val details = payload.getAsJsonObject("details")
         assertTrue(
             details
@@ -79,14 +76,16 @@ class CrashReportingTest {
     @Test
     fun `caching an uncaught exception returns after its deadline when callback blocks`() {
         val releaseCallback = CountDownLatch(1)
-        val callbackFinished = CountDownLatch(1)
+        val callbackStopped = CountDownLatch(1)
         CrashReporting.setOnBeforeSend(
             object : CrashReportingOnBeforeSend {
-                override fun onBeforeSend(message: RaygunMessage): RaygunMessage? {
-                    releaseCallback.await()
-                    callbackFinished.countDown()
-                    return null
-                }
+                override fun onBeforeSend(message: RaygunMessage): RaygunMessage? =
+                    try {
+                        releaseCallback.await()
+                        null
+                    } finally {
+                        callbackStopped.countDown()
+                    }
             },
         )
 
@@ -101,17 +100,11 @@ class CrashReportingTest {
 
         assertTrue(!stored)
         assertTrue("Crash handler blocked for $elapsedMillis ms", elapsedMillis < 1000)
+        assertTrue(callbackStopped.await(1, TimeUnit.SECONDS))
+        assertTrue(cachedReports().isEmpty())
 
         releaseCallback.countDown()
-        assertTrue(callbackFinished.await(1, TimeUnit.SECONDS))
     }
 
     private fun cachedReports(): Array<File> = CrashReportCache.files(application)
-
-    private fun readCachedMessage(file: File): SerializedMessage =
-        ObjectInputStream(FileInputStream(file)).use { input ->
-            val message = input.readObject() as SerializedMessage
-            assertNotNull(message.message)
-            message
-        }
 }

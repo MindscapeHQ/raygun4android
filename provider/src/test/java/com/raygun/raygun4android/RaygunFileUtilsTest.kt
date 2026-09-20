@@ -58,8 +58,7 @@ class RaygunFileUtilsTest {
 
     @Test
     fun clearCachedReportsDeletesPersistentAndLegacyReports() {
-        assertTrue(CrashReportCache.store(application, "persistent report"))
-        val persistentReport = CrashReportCache.files(application).single()
+        val persistentReport = CrashReportCache.store(application, "persistent report")!!
         val legacyReport =
             File(application.cacheDir, "legacy.raygun4").apply {
                 writeText("legacy report")
