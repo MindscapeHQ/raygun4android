@@ -1,9 +1,9 @@
-package com.raygun.raygun4android
+package com.raygun.raygun4android.sample
 
 import android.content.Intent
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import com.raygun.raygun4android.workers.CrashReportCache
+import com.raygun.raygun4android.RaygunSettings
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -14,16 +14,17 @@ import java.io.File
 
 @RunWith(AndroidJUnit4::class)
 class CrashProcessPersistenceTest {
-    private val context = InstrumentationRegistry.getInstrumentation().context
+    private val context = InstrumentationRegistry.getInstrumentation().targetContext
+    private val reportDirectory = File(context.noBackupFilesDir, "raygun-crash-reports")
 
     @Before
     fun setUp() {
-        CrashReportCache.clear(context)
+        clearReports()
     }
 
     @After
     fun tearDown() {
-        CrashReportCache.clear(context)
+        clearReports()
     }
 
     @Test
@@ -36,15 +37,21 @@ class CrashProcessPersistenceTest {
         val deadline = System.currentTimeMillis() + REPORT_TIMEOUT_MILLIS
         var reports: Array<File>
         do {
-            reports = CrashReportCache.files(context)
+            reports =
+                reportDirectory.listFiles { file ->
+                    file.extension == RaygunSettings.DEFAULT_FILE_EXTENSION
+                } ?: emptyArray()
             if (reports.isEmpty()) {
                 Thread.sleep(POLL_INTERVAL_MILLIS)
             }
         } while (reports.isEmpty() && System.currentTimeMillis() < deadline)
 
         assertEquals(1, reports.size)
-        val payload = CrashReportCache.readPersistent(reports.single())
-        assertTrue(payload?.contains(CrashProcessActivity.CRASH_MESSAGE) == true)
+        assertTrue(reports.single().readText().contains(CrashProcessActivity.CRASH_MESSAGE))
+    }
+
+    private fun clearReports() {
+        reportDirectory.listFiles()?.forEach(File::delete)
     }
 
     companion object {

@@ -1,8 +1,9 @@
-package com.raygun.raygun4android
+package com.raygun.raygun4android.sample
 
 import android.app.Activity
 import android.os.Bundle
 import android.os.Process
+import com.raygun.raygun4android.RaygunClient
 
 class CrashProcessActivity : Activity() {
     override fun onCreate(savedInstanceState: Bundle?) {

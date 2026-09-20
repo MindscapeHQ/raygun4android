@@ -29,7 +29,6 @@ android {
 
     defaultConfig {
         minSdk = 23
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         buildConfigField("long", "VERSION_CODE", VERSION_CODE)
         buildConfigField("String", "VERSION_NAME", "\"$VERSION_NAME\"")
     }
@@ -73,9 +72,6 @@ dependencies {
     testImplementation(libs.mockito.core)
     testImplementation(libs.mockito.kotlin)
     testImplementation(libs.robolectric)
-
-    androidTestImplementation(libs.androidx.test.ext.junit)
-    androidTestImplementation(libs.androidx.test.runner)
 }
 
 // Maven Central publishing configuration

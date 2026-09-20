@@ -1,4 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
+    <application>
+        <activity
+            android:name="com.raygun.raygun4android.sample.CrashProcessActivity"
+            android:exported="false"
+            android:process=":raygun-crash-test" />
+    </application>
 </manifest>
