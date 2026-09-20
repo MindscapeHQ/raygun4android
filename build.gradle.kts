@@ -11,6 +11,8 @@ buildscript {
     }
 }
 
+val versionName = providers.gradleProperty("VERSION_NAME").get()
+
 plugins {
     alias(libs.plugins.android.application) apply false
     alias(libs.plugins.android.library) apply false
@@ -40,6 +42,47 @@ tasks.register("resolveAndLockAll") {
         "provider:assembleRelease",
         "provider:publishToMavenLocal",
         "provider:test",
+    )
+}
+
+val okHttpAlignmentTestRepository =
+    layout.buildDirectory.dir("okhttp-alignment-test-repository")
+val prepareOkHttpAlignmentTestRepository =
+    tasks.register<Sync>("prepareOkHttpAlignmentTestRepository") {
+        dependsOn(
+            ":provider:bundleReleaseAar",
+            ":provider:generateMetadataFileForMavenPublication",
+            ":provider:generatePomFileForMavenPublication",
+        )
+
+        into(
+            okHttpAlignmentTestRepository.map {
+                it.dir("com/raygun/raygun4android/$versionName")
+            },
+        )
+        from("provider/build/outputs/aar/raygun4android.aar") {
+            rename("raygun4android.aar", "raygun4android-$versionName.aar")
+        }
+        from("provider/build/publications/maven/module.json") {
+            rename("module.json", "raygun4android-$versionName.module")
+        }
+        from("provider/build/publications/maven/pom-default.xml") {
+            rename("pom-default.xml", "raygun4android-$versionName.pom")
+        }
+    }
+
+tasks.register<Exec>("verifyOkHttpDependencyAlignment") {
+    group = "verification"
+    description = "Verifies that the published provider aligns OkHttp modules in a consumer."
+    dependsOn(prepareOkHttpAlignmentTestRepository)
+
+    commandLine(
+        rootProject.file("gradlew").absolutePath,
+        "-p",
+        rootProject.file("integration-tests/okhttp-alignment").absolutePath,
+        "verifyOkHttpAlignment",
+        "-PraygunRepository=${okHttpAlignmentTestRepository.get().asFile.toURI()}",
+        "-PraygunVersion=$versionName",
     )
 }
 

@@ -226,6 +226,4 @@ dependencies {
     androidTestImplementation(libs.androidx.test.rules)
 
     debugImplementation(libs.leakcanary)
-    // Reproduces the host dependency graph from issue #324; the provider's BOM must align it.
-    debugImplementation("com.squareup.okhttp3:okhttp-urlconnection:4.9.2")
 }
