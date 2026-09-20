@@ -90,6 +90,17 @@ class CrashReportCacheTest {
     }
 
     @Test
+    fun `processed tombstone is excluded from discovery and capacity`() {
+        RaygunSettings.maxReportsStoredOnDevice = 1
+        val directory = CrashReportCache.persistentDirectory(application).apply { mkdirs() }
+        File(directory, "processed.raygun4").writeText("RaygunCrashReport:processed\n")
+
+        assertTrue(CrashReportCache.files(application).isEmpty())
+        assertNotNull(CrashReportCache.store(application, "new payload"))
+        assertEquals(1, CrashReportCache.files(application).size)
+    }
+
+    @Test
     fun `cached work request retains durable file until worker runs`() {
         val cachedFile = CrashReportCache.store(application, "cached payload")!!
 
@@ -156,6 +167,16 @@ class CrashReportCacheTest {
             CrashReportingWorkerHelper.cachedWorkName(first) !=
                 CrashReportingWorkerHelper.cachedWorkName(second),
         )
+    }
+
+    @Test
+    fun `cached report is retained when API key is unavailable`() {
+        val cachedFile = CrashReportCache.store(application, "cached payload")!!
+
+        assertFalse(
+            CrashReportingWorkerHelper.enqueueCachedCrashReport(application, cachedFile, null),
+        )
+        assertTrue(cachedFile.exists())
     }
 
     private fun cachedReports() = CrashReportCache.files(application)

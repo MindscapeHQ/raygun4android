@@ -32,6 +32,11 @@ object CrashReportingWorkerHelper {
         file: File,
         apiKey: String?,
     ): Boolean {
+        if (apiKey.isNullOrBlank()) {
+            e("No API key was provided; cached crash report will be retained.")
+            return false
+        }
+
         val workRequest = cachedCrashReportWorkRequest(context, file, apiKey)
         return try {
             WorkManager

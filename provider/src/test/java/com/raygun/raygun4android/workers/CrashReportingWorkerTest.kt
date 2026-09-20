@@ -104,7 +104,7 @@ class CrashReportingWorkerTest {
     }
 
     @Test
-    fun `empty API key fails without posting and removes undeliverable payload`() {
+    fun `empty API key fails without posting and retains payload for later initialization`() {
         val file = rawReport("payload without API key")
         var postAttempted = false
 
@@ -116,7 +116,7 @@ class CrashReportingWorkerTest {
 
         assertEquals(Result.failure(), result)
         assertFalse(postAttempted)
-        assertFalse(file.exists())
+        assertTrue(file.exists())
     }
 
     @Test

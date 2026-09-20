@@ -59,7 +59,7 @@ class CrashReportingWorkManagerTest {
     @Test
     fun `startup scheduling deduplicates and WorkManager delivers durable report`() {
         RaygunSettings.maxReportsStoredOnDevice = 1
-        CrashReportingWorkerHelper.enqueueCrashReport(application, "{\"first\":true}", "api-key")
+        CrashReportingWorkerHelper.enqueueCrashReport(application, "{\"first\":true}", null)
         CrashReportingWorkerHelper.enqueueCrashReport(application, "{\"second\":true}", "api-key")
         val file = CrashReportCache.files(application).single()
         assertEquals("{\"first\":true}", CrashReportCache.readPersistent(file))

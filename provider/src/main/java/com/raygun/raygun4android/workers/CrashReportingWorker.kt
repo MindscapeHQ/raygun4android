@@ -140,9 +140,14 @@ class CrashReportingWorker(
                 CrashReportCache.readPersistent(file)
             }
 
-        if (message == null || apiKey.isNullOrEmpty()) {
-            e("No message or API key was provided.")
-            CrashReportCache.markProcessed(file)
+        if (message == null) {
+            e("No message was provided.")
+            CrashReportCache.markProcessed(applicationContext, file)
+            return Result.failure()
+        }
+
+        if (apiKey.isNullOrBlank()) {
+            e("No API key was provided; retaining cached crash report.")
             return Result.failure()
         }
 
@@ -156,7 +161,7 @@ class CrashReportingWorker(
             responseCode == RaygunSettings.RESPONSE_CODE_INVALID_API_KEY ||
             responseCode == RaygunSettings.RESPONSE_CODE_LARGE_PAYLOAD
         ) {
-            CrashReportCache.markProcessed(file)
+            CrashReportCache.markProcessed(applicationContext, file)
         }
 
         return result
