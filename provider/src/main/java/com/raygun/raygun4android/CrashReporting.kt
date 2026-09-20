@@ -18,10 +18,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
-import java.io.FileInputStream
-import java.io.FileNotFoundException
-import java.io.IOException
-import java.io.ObjectInputStream
 import java.util.concurrent.CopyOnWriteArrayList
 
 typealias Tags = List<String>
@@ -209,43 +205,18 @@ object CrashReporting {
                     }
                 if (fileList != null) {
                     for (f in fileList) {
-                        try {
-                            if (
-                                RaygunFileUtils
-                                    .getExtension(f.name)
-                                    .equals(
-                                        RaygunSettings.DEFAULT_FILE_EXTENSION,
-                                        ignoreCase = true,
-                                    )
-                            ) {
-                                var ois: ObjectInputStream? = null
-                                try {
-                                    ois = ObjectInputStream(FileInputStream(f))
-                                    val serializedMessage = ois.readObject() as SerializedMessage
-                                    enqueueWorkForCrashReporting(
-                                        RaygunClient.apiKey,
-                                        serializedMessage.message,
-                                    )
-                                    if (!f.delete()) {
-                                        RaygunLogger.w(
-                                            "Couldn't delete cached report (" + f.name + ")",
-                                        )
-                                    }
-                                } finally {
-                                    ois?.close()
-                                }
-                            }
-                        } catch (e: FileNotFoundException) {
-                            RaygunLogger.e(
-                                "Error loading cached message from filesystem - " + e.message,
-                            )
-                        } catch (e: IOException) {
-                            RaygunLogger.e(
-                                "Error reading cached message from filesystem - " + e.message,
-                            )
-                        } catch (e: ClassNotFoundException) {
-                            RaygunLogger.e(
-                                "Error in handling cached message from filesystem - " + e.message,
+                        if (
+                            RaygunFileUtils
+                                .getExtension(f.name)
+                                .equals(
+                                    RaygunSettings.DEFAULT_FILE_EXTENSION,
+                                    ignoreCase = true,
+                                )
+                        ) {
+                            CrashReportingWorkerHelper.enqueueCachedCrashReport(
+                                RaygunClient.getApplicationContext(),
+                                f,
+                                RaygunClient.apiKey,
                             )
                         }
                     }

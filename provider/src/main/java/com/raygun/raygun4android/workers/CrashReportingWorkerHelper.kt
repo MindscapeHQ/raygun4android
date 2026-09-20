@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import androidx.work.Constraints
 import androidx.work.Data
+import androidx.work.ExistingWorkPolicy
 import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkManager
@@ -20,6 +21,10 @@ import java.util.UUID
 
 object CrashReportingWorkerHelper {
     private const val MAX_DATA_SIZE = 10000
+    internal const val TEMP_FILE_INPUT = "file"
+    internal const val CACHED_FILE_INPUT = "cachedFile"
+    internal const val API_KEY_INPUT = "apikey"
+    private const val CACHED_WORK_PREFIX = "raygun-cached-crash-"
 
     fun enqueueCrashReport(
         context: Context,
@@ -35,8 +40,8 @@ object CrashReportingWorkerHelper {
         inputData =
             Data
                 .Builder()
-                .putString("file", fileName)
-                .putString("apikey", apiKey)
+                .putString(TEMP_FILE_INPUT, fileName)
+                .putString(API_KEY_INPUT, apiKey)
                 .build()
 
         val constraints =
@@ -53,6 +58,43 @@ object CrashReportingWorkerHelper {
 
         i("Work for CrashReportingWorker has been put into the queue.")
     }
+
+    internal fun enqueueCachedCrashReport(
+        context: Context,
+        file: File,
+        apiKey: String?,
+    ) {
+        val workRequest = cachedCrashReportWorkRequest(file, apiKey)
+        WorkManager
+            .getInstance(context)
+            .enqueueUniqueWork(
+                cachedWorkName(file),
+                ExistingWorkPolicy.KEEP,
+                workRequest,
+            )
+    }
+
+    internal fun cachedCrashReportWorkRequest(
+        file: File,
+        apiKey: String?,
+    ): OneTimeWorkRequest {
+        val inputData =
+            Data
+                .Builder()
+                .putString(CACHED_FILE_INPUT, file.name)
+                .putString(API_KEY_INPUT, apiKey)
+                .build()
+        val constraints =
+            Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build()
+
+        return OneTimeWorkRequest
+            .Builder(CrashReportingWorker::class.java)
+            .setInputData(inputData)
+            .setConstraints(constraints)
+            .build()
+    }
+
+    internal fun cachedWorkName(file: File): String = CACHED_WORK_PREFIX + file.name
 
     private fun storeMessageInTempFile(
         context: Context,

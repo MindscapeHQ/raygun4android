@@ -12,6 +12,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.RuntimeEnvironment
+import java.io.File
 import java.io.FileInputStream
 import java.io.ObjectInputStream
 
@@ -51,6 +52,47 @@ class CrashReportCacheTest {
         assertTrue(CrashReportCache.store(application, "first payload"))
         assertFalse(CrashReportCache.store(application, "second payload"))
         assertEquals(1, cachedReports().size)
+    }
+
+    @Test
+    fun `cached work request retains durable file until worker runs`() {
+        assertTrue(CrashReportCache.store(application, "cached payload"))
+        val cachedFile = cachedReports().single()
+
+        val request =
+            CrashReportingWorkerHelper.cachedCrashReportWorkRequest(
+                cachedFile,
+                "test-api-key",
+            )
+
+        assertEquals(
+            cachedFile.name,
+            request.workSpec.input.getString(CrashReportingWorkerHelper.CACHED_FILE_INPUT),
+        )
+        assertEquals(
+            "test-api-key",
+            request.workSpec.input.getString(CrashReportingWorkerHelper.API_KEY_INPUT),
+        )
+        assertEquals(
+            null,
+            request.workSpec.input.getString(CrashReportingWorkerHelper.TEMP_FILE_INPUT),
+        )
+        assertTrue(cachedFile.exists())
+    }
+
+    @Test
+    fun `cached work name is stable per file and distinct between reports`() {
+        val first = File(application.cacheDir, "first.raygun4")
+        val second = File(application.cacheDir, "second.raygun4")
+
+        assertEquals(
+            CrashReportingWorkerHelper.cachedWorkName(first),
+            CrashReportingWorkerHelper.cachedWorkName(first),
+        )
+        assertTrue(
+            CrashReportingWorkerHelper.cachedWorkName(first) !=
+                CrashReportingWorkerHelper.cachedWorkName(second),
+        )
     }
 
     private fun cachedReports() = application.cacheDir.listFiles(RaygunFileFilter()) ?: emptyArray()

@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.work.Worker
 import androidx.work.WorkerParameters
 import com.raygun.raygun4android.RaygunSettings
+import com.raygun.raygun4android.SerializedMessage
 import com.raygun.raygun4android.logging.RaygunLogger.d
 import com.raygun.raygun4android.logging.RaygunLogger.e
 import com.raygun.raygun4android.logging.RaygunLogger.responseCode
@@ -14,8 +15,10 @@ import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.Response
 import java.io.File
+import java.io.FileInputStream
 import java.io.IOException
 import java.io.InputStreamReader
+import java.io.ObjectInputStream
 import java.nio.charset.StandardCharsets
 
 class CrashReportingWorker(
@@ -24,15 +27,21 @@ class CrashReportingWorker(
 ) : Worker(context, workerParams) {
     override fun doWork(): Result {
         // Retrieve data from WorkManager
-        val file = inputData.getString("file")
-        val apiKey = inputData.getString("apikey")
+        val temporaryFile = inputData.getString(CrashReportingWorkerHelper.TEMP_FILE_INPUT)
+        val cachedFile = inputData.getString(CrashReportingWorkerHelper.CACHED_FILE_INPUT)
+        val apiKey = inputData.getString(CrashReportingWorkerHelper.API_KEY_INPUT)
 
-        if (file.isNullOrEmpty()) {
+        if (temporaryFile.isNullOrEmpty() && cachedFile.isNullOrEmpty()) {
             e("No file provided in input data.")
             return Result.failure()
         }
 
-        val message = readMessageFromTempFileAndDelete(file)
+        val message =
+            if (cachedFile != null) {
+                readMessageFromCacheAndDelete(cachedFile)
+            } else {
+                readMessageFromTempFileAndDelete(temporaryFile!!)
+            }
 
         if (apiKey != null) {
             if (ConnectivityUtils.isNetworkAvailable(applicationContext)) {
@@ -129,5 +138,26 @@ class CrashReportingWorker(
         }
 
         return message.toString().trimEnd()
+    }
+
+    private fun readMessageFromCacheAndDelete(fileName: String): String {
+        val file = File(applicationContext.cacheDir, fileName)
+
+        try {
+            val message =
+                ObjectInputStream(FileInputStream(file)).use { input ->
+                    (input.readObject() as SerializedMessage).message
+                }
+            if (!file.delete()) {
+                e("Failed to delete the file: $fileName")
+            }
+            return message
+        } catch (exception: IOException) {
+            e("Failed to read cached message: " + exception.message)
+        } catch (exception: ClassNotFoundException) {
+            e("Failed to deserialize cached message: " + exception.message)
+        }
+
+        return ""
     }
 }
