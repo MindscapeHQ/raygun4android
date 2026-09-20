@@ -1,13 +1,14 @@
 package com.raygun.raygun4android.sample
 
-import android.app.Activity
-import android.os.Bundle
+import android.app.Service
+import android.content.Intent
+import android.os.IBinder
 import android.os.Process
 import com.raygun.raygun4android.RaygunClient
 
-class CrashProcessActivity : Activity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+class CrashProcessService : Service() {
+    override fun onCreate() {
+        super.onCreate()
 
         Thread.setDefaultUncaughtExceptionHandler { _, _ ->
             Process.killProcess(Process.myPid())
@@ -19,6 +20,8 @@ class CrashProcessActivity : Activity() {
             throw IllegalStateException(CRASH_MESSAGE)
         }.start()
     }
+
+    override fun onBind(intent: Intent?): IBinder? = null
 
     companion object {
         const val CRASH_MESSAGE = "separate process crash"

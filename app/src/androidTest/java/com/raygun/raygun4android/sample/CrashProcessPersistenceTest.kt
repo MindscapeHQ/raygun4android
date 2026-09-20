@@ -1,6 +1,10 @@
 package com.raygun.raygun4android.sample
 
+import android.content.ComponentName
+import android.content.Context
 import android.content.Intent
+import android.content.ServiceConnection
+import android.os.IBinder
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.raygun.raygun4android.RaygunSettings
@@ -29,9 +33,19 @@ class CrashProcessPersistenceTest {
 
     @Test
     fun unhandledCrashSurvivesSeparateProcessTermination() {
-        context.startActivity(
-            Intent(context, CrashProcessActivity::class.java)
-                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),
+        assertTrue(
+            context.bindService(
+                Intent(context, CrashProcessService::class.java),
+                object : ServiceConnection {
+                    override fun onServiceConnected(
+                        name: ComponentName?,
+                        service: IBinder?,
+                    ) = Unit
+
+                    override fun onServiceDisconnected(name: ComponentName?) = Unit
+                },
+                Context.BIND_AUTO_CREATE,
+            ),
         )
 
         val deadline = System.currentTimeMillis() + REPORT_TIMEOUT_MILLIS
@@ -47,7 +61,7 @@ class CrashProcessPersistenceTest {
         } while (reports.isEmpty() && System.currentTimeMillis() < deadline)
 
         assertEquals(1, reports.size)
-        assertTrue(reports.single().readText().contains(CrashProcessActivity.CRASH_MESSAGE))
+        assertTrue(reports.single().readText().contains(CrashProcessService.CRASH_MESSAGE))
     }
 
     private fun clearReports() {

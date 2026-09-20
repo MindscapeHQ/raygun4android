@@ -3,8 +3,8 @@
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
     <application>
-        <activity
-            android:name="com.raygun.raygun4android.sample.CrashProcessActivity"
+        <service
+            android:name="com.raygun.raygun4android.sample.CrashProcessService"
             android:exported="false"
             android:process=":raygun-crash-test" />
     </application>
