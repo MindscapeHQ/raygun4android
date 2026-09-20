@@ -13,14 +13,17 @@ import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import java.util.concurrent.CopyOnWriteArrayList
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
+import java.util.concurrent.atomic.AtomicBoolean
 
 typealias Tags = List<String>
 
 typealias CustomData = Map<String, Any?>
 
 object CrashReporting {
+    private const val UNHANDLED_EXCEPTION_TIMEOUT_MILLIS = 2000L
     private var exceptionHandler: RaygunUncaughtExceptionHandler? = null
     private var onBeforeSend: CrashReportingOnBeforeSend? = null
     private val coroutineScope = CoroutineScope(Dispatchers.IO + CoroutineName("CrashReporting"))
@@ -134,20 +137,46 @@ object CrashReporting {
         msg.details.tags = RaygunUtils.mergeLists(CrashReporting.tags, tags)
         msg.details.customData = RaygunUtils.mergeMaps(CrashReporting.customData, customData)
 
-        if (onBeforeSend != null) {
-            msg = onBeforeSend!!.onBeforeSend(msg) ?: return null
+        val beforeSend = onBeforeSend
+        if (beforeSend != null) {
+            msg = beforeSend.onBeforeSend(msg) ?: return null
         }
 
         return Gson().toJson(msg)
     }
 
-    private fun cacheUnhandledException(
+    internal fun cacheUnhandledException(
         throwable: Throwable,
         tags: Tags,
-    ) {
-        runBlocking(Dispatchers.IO) {
-            val jsonPayload = buildJsonPayload(throwable, tags, null) ?: return@runBlocking
-            CrashReportCache.store(RaygunClient.getApplicationContext(), jsonPayload)
+        timeoutMillis: Long = UNHANDLED_EXCEPTION_TIMEOUT_MILLIS,
+    ): Boolean {
+        val completed = CountDownLatch(1)
+        val stored = AtomicBoolean(false)
+
+        coroutineScope.launch {
+            try {
+                val jsonPayload = buildJsonPayload(throwable, tags, null) ?: return@launch
+                stored.set(
+                    CrashReportCache.store(RaygunClient.getApplicationContext(), jsonPayload),
+                )
+            } catch (throwable: Throwable) {
+                RaygunLogger.e("Failed to cache unhandled exception: $throwable")
+            } finally {
+                completed.countDown()
+            }
+        }
+
+        return try {
+            if (!completed.await(timeoutMillis, TimeUnit.MILLISECONDS)) {
+                RaygunLogger.w("Timed out while caching unhandled exception")
+                false
+            } else {
+                stored.get()
+            }
+        } catch (exception: InterruptedException) {
+            Thread.currentThread().interrupt()
+            RaygunLogger.w("Interrupted while caching unhandled exception")
+            false
         }
     }
 

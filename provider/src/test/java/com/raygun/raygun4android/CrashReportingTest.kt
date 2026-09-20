@@ -15,6 +15,8 @@ import org.robolectric.RuntimeEnvironment
 import java.io.File
 import java.io.FileInputStream
 import java.io.ObjectInputStream
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
 
 @RunWith(RobolectricTestRunner::class)
 class CrashReportingTest {
@@ -72,6 +74,36 @@ class CrashReportingTest {
                 .map { it.asString }
                 .contains(RaygunSettings.CRASH_REPORTING_UNHANDLED_EXCEPTION_TAG),
         )
+    }
+
+    @Test
+    fun `caching an uncaught exception returns after its deadline when callback blocks`() {
+        val releaseCallback = CountDownLatch(1)
+        val callbackFinished = CountDownLatch(1)
+        CrashReporting.setOnBeforeSend(
+            object : CrashReportingOnBeforeSend {
+                override fun onBeforeSend(message: RaygunMessage): RaygunMessage? {
+                    releaseCallback.await()
+                    callbackFinished.countDown()
+                    return null
+                }
+            },
+        )
+
+        val startedAt = System.nanoTime()
+        val stored =
+            CrashReporting.cacheUnhandledException(
+                IllegalStateException("test crash"),
+                listOf(RaygunSettings.CRASH_REPORTING_UNHANDLED_EXCEPTION_TAG),
+                timeoutMillis = 25,
+            )
+        val elapsedMillis = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startedAt)
+
+        assertTrue(!stored)
+        assertTrue("Crash handler blocked for $elapsedMillis ms", elapsedMillis < 1000)
+
+        releaseCallback.countDown()
+        assertTrue(callbackFinished.await(1, TimeUnit.SECONDS))
     }
 
     private fun cachedReports(): Array<File> = CrashReportCache.files(application)
