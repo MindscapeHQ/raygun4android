@@ -1,32 +1,22 @@
 package com.raygun.raygun4android.workers
 
-import android.annotation.SuppressLint
 import android.content.Context
 import androidx.work.Worker
 import androidx.work.WorkerParameters
 import com.raygun.raygun4android.RaygunSettings
-import com.raygun.raygun4android.SerializedMessage
 import com.raygun.raygun4android.logging.RaygunLogger.d
 import com.raygun.raygun4android.logging.RaygunLogger.e
 import com.raygun.raygun4android.logging.RaygunLogger.responseCode
-import com.raygun.raygun4android.logging.RaygunLogger.w
 import com.raygun.raygun4android.network.ConnectivityUtils
-import com.raygun.raygun4android.utils.RaygunFileFilter
 import okhttp3.MediaType
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.Response
 import java.io.File
-import java.io.FileNotFoundException
-import java.io.FileOutputStream
 import java.io.IOException
 import java.io.InputStreamReader
-import java.io.ObjectOutputStream
 import java.nio.charset.StandardCharsets
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.UUID
 
 class CrashReportingWorker(
     context: Context,
@@ -61,53 +51,18 @@ class CrashReportingWorker(
                     }
 
                     else -> {
-                        saveMessage(message)
+                        CrashReportCache.store(applicationContext, message)
                         Result.success()
                     }
                 }
             } else {
-                saveMessage(message)
+                CrashReportCache.store(applicationContext, message)
                 return Result.success()
             }
         }
 
         e("No message or API key was provided.")
         return Result.failure()
-    }
-
-    private fun saveMessage(message: String) {
-        synchronized(this) {
-            val cachedFiles =
-                arrayListOf(
-                    applicationContext.cacheDir.listFiles(RaygunFileFilter()) ?: emptyList<File>(),
-                )
-
-            if (cachedFiles.size < RaygunSettings.maxReportsStoredOnDevice) {
-                @SuppressLint("SimpleDateFormat")
-                val timestamp =
-                    SimpleDateFormat("yyyyMMddHHmmss").format(Date(System.currentTimeMillis()))
-                val uuid = UUID.randomUUID().toString().replace("-", "")
-                val file =
-                    File(
-                        applicationContext.cacheDir,
-                        (timestamp + "-" + uuid + "." + RaygunSettings.DEFAULT_FILE_EXTENSION),
-                    )
-
-                try {
-                    ObjectOutputStream(FileOutputStream(file)).use { out ->
-                        val serializedMessage = SerializedMessage(message)
-                        out.writeObject(serializedMessage)
-                        out.close()
-                    }
-                } catch (e: FileNotFoundException) {
-                    e("Error creating file when caching message to filesystem: " + e.message)
-                } catch (e: IOException) {
-                    e("Error writing message to filesystem: " + e.message)
-                }
-            } else {
-                w("Maximum stored reports reached. Discarding message.")
-            }
-        }
     }
 
     /**

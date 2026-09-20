@@ -10,11 +10,13 @@ import com.raygun.raygun4android.rum.RUM
 import com.raygun.raygun4android.utils.RaygunFileFilter
 import com.raygun.raygun4android.utils.RaygunFileUtils
 import com.raygun.raygun4android.utils.RaygunUtils
+import com.raygun.raygun4android.workers.CrashReportCache
 import com.raygun.raygun4android.workers.CrashReportingWorkerHelper
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import java.io.FileInputStream
 import java.io.FileNotFoundException
@@ -114,33 +116,46 @@ object CrashReporting {
     ) {
         if (RaygunClient.isCrashReportingEnabled) {
             coroutineScope.launch {
-                var msg = buildMessage(throwable)
-
-                if (msg == null) {
-                    RaygunLogger.e(
-                        "Failed to send RaygunMessage - due to invalid message being built",
-                    )
-                    return@launch
-                }
-
-                msg.details.tags = RaygunUtils.mergeLists(CrashReporting.tags, tags)
-                msg.details.customData =
-                    RaygunUtils.mergeMaps(CrashReporting.customData, customData)
-
-                if (onBeforeSend != null) {
-                    msg = onBeforeSend!!.onBeforeSend(msg)
-                    if (msg == null) {
-                        return@launch
-                    }
-                }
-
-                enqueueWorkForCrashReporting(RaygunClient.apiKey, Gson().toJson(msg))
+                val jsonPayload = buildJsonPayload(throwable, tags, customData) ?: return@launch
+                enqueueWorkForCrashReporting(RaygunClient.apiKey, jsonPayload)
                 postCachedMessages()
             }
         } else {
             RaygunLogger.w(
                 "Crash Reporting is not enabled, please enable to use the send() function",
             )
+        }
+    }
+
+    private suspend fun buildJsonPayload(
+        throwable: Throwable,
+        tags: Tags?,
+        customData: CustomData?,
+    ): String? {
+        var msg = buildMessage(throwable)
+
+        if (msg == null) {
+            RaygunLogger.e("Failed to send RaygunMessage - due to invalid message being built")
+            return null
+        }
+
+        msg.details.tags = RaygunUtils.mergeLists(CrashReporting.tags, tags)
+        msg.details.customData = RaygunUtils.mergeMaps(CrashReporting.customData, customData)
+
+        if (onBeforeSend != null) {
+            msg = onBeforeSend!!.onBeforeSend(msg) ?: return null
+        }
+
+        return Gson().toJson(msg)
+    }
+
+    private fun cacheUnhandledException(
+        throwable: Throwable,
+        tags: Tags,
+    ) {
+        runBlocking(Dispatchers.IO) {
+            val jsonPayload = buildJsonPayload(throwable, tags, null) ?: return@runBlocking
+            CrashReportCache.store(RaygunClient.getApplicationContext(), jsonPayload)
         }
     }
 
@@ -263,9 +278,14 @@ object CrashReporting {
             throwable: Throwable,
         ) {
             val tags = listOf(RaygunSettings.CRASH_REPORTING_UNHANDLED_EXCEPTION_TAG)
-            send(throwable, tags)
-            RUM.instance.sendRemaining()
-            defaultHandler.uncaughtException(thread, throwable)
+            try {
+                cacheUnhandledException(throwable, tags)
+                RUM.instance.sendRemaining()
+            } catch (exception: Exception) {
+                RaygunLogger.e("Failed to cache unhandled exception: $exception")
+            } finally {
+                defaultHandler.uncaughtException(thread, throwable)
+            }
         }
     }
 }
