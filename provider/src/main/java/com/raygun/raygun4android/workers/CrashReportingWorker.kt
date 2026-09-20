@@ -36,42 +36,20 @@ class CrashReportingWorker(
             return Result.failure()
         }
 
-        val message =
+        val file =
             if (cachedFile != null) {
-                readMessageFromCacheAndDelete(cachedFile)
+                File(applicationContext.cacheDir, cachedFile)
             } else {
-                readMessageFromTempFileAndDelete(temporaryFile!!)
+                File(applicationContext.filesDir, temporaryFile!!)
             }
 
-        if (apiKey != null) {
-            if (ConnectivityUtils.isNetworkAvailable(applicationContext)) {
-                val responseCode = postCrashReporting(apiKey, message)
-                responseCode(responseCode)
-
-                return when {
-                    responseCode in 200..299 -> {
-                        Result.success()
-                    }
-
-                    responseCode == RaygunSettings.RESPONSE_CODE_BAD_MESSAGE ||
-                        responseCode == RaygunSettings.RESPONSE_CODE_INVALID_API_KEY ||
-                        responseCode == RaygunSettings.RESPONSE_CODE_LARGE_PAYLOAD -> {
-                        Result.failure()
-                    }
-
-                    else -> {
-                        CrashReportCache.store(applicationContext, message)
-                        Result.success()
-                    }
-                }
-            } else {
-                CrashReportCache.store(applicationContext, message)
-                return Result.success()
-            }
-        }
-
-        e("No message or API key was provided.")
-        return Result.failure()
+        return processCrashReport(
+            file = file,
+            isSerialized = cachedFile != null,
+            apiKey = apiKey,
+            networkAvailable = ConnectivityUtils.isNetworkAvailable(applicationContext),
+            postCrashReport = ::postCrashReporting,
+        )
     }
 
     /**
@@ -118,8 +96,7 @@ class CrashReportingWorker(
         return -1
     }
 
-    private fun readMessageFromTempFileAndDelete(fileName: String): String {
-        val file = File(applicationContext.filesDir, fileName)
+    private fun readMessageFromTempFile(file: File): String? {
         val message = StringBuilder()
 
         try {
@@ -130,34 +107,67 @@ class CrashReportingWorker(
                     }
                 }
             }
-            if (!file.delete()) {
-                e("Failed to delete the file: $fileName")
-            }
         } catch (e: IOException) {
             e("Failed to read message from file: " + e.message)
+            return null
         }
 
         return message.toString().trimEnd()
     }
 
-    private fun readMessageFromCacheAndDelete(fileName: String): String {
-        val file = File(applicationContext.cacheDir, fileName)
-
+    private fun readMessageFromCache(file: File): String? =
         try {
-            val message =
-                ObjectInputStream(FileInputStream(file)).use { input ->
-                    (input.readObject() as SerializedMessage).message
-                }
-            if (!file.delete()) {
-                e("Failed to delete the file: $fileName")
+            ObjectInputStream(FileInputStream(file)).use { input ->
+                (input.readObject() as SerializedMessage).message
             }
-            return message
-        } catch (exception: IOException) {
+        } catch (exception: Exception) {
             e("Failed to read cached message: " + exception.message)
-        } catch (exception: ClassNotFoundException) {
-            e("Failed to deserialize cached message: " + exception.message)
+            null
         }
 
-        return ""
+    internal fun processCrashReport(
+        file: File,
+        isSerialized: Boolean,
+        apiKey: String?,
+        networkAvailable: Boolean,
+        postCrashReport: (String, String) -> Int,
+    ): Result {
+        val message =
+            if (isSerialized) {
+                readMessageFromCache(file)
+            } else {
+                readMessageFromTempFile(file)
+            }
+
+        if (message == null || apiKey.isNullOrEmpty()) {
+            e("No message or API key was provided.")
+            delete(file)
+            return Result.failure()
+        }
+
+        if (!networkAvailable) {
+            return Result.retry()
+        }
+
+        val responseCode = postCrashReport(apiKey, message)
+        responseCode(responseCode)
+        val result = RaygunWorkerHelper.toWorkerResult(responseCode)
+
+        if (
+            responseCode in 200..299 ||
+            responseCode == RaygunSettings.RESPONSE_CODE_BAD_MESSAGE ||
+            responseCode == RaygunSettings.RESPONSE_CODE_INVALID_API_KEY ||
+            responseCode == RaygunSettings.RESPONSE_CODE_LARGE_PAYLOAD
+        ) {
+            delete(file)
+        }
+
+        return result
+    }
+
+    private fun delete(file: File) {
+        if (file.exists() && !file.delete()) {
+            e("Failed to delete the file: ${file.name}")
+        }
     }
 }

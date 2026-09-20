@@ -5,7 +5,6 @@ import com.google.gson.Gson
 import com.raygun.raygun4android.logging.RaygunLogger
 import com.raygun.raygun4android.messages.crashreporting.RaygunBreadcrumbMessage
 import com.raygun.raygun4android.messages.crashreporting.RaygunMessage
-import com.raygun.raygun4android.network.ConnectivityUtils
 import com.raygun.raygun4android.rum.RUM
 import com.raygun.raygun4android.utils.RaygunFileFilter
 import com.raygun.raygun4android.utils.RaygunFileUtils
@@ -197,35 +196,33 @@ object CrashReporting {
 
     @JvmStatic
     fun postCachedMessages() {
-        if (ConnectivityUtils.isNetworkAvailable(RaygunClient.getApplicationContext())) {
-            coroutineScope.launch {
-                val fileList =
-                    withContext(Dispatchers.IO) {
-                        RaygunClient.getApplicationContext().cacheDir.listFiles(RaygunFileFilter())
-                    }
-                if (fileList != null) {
-                    for (f in fileList) {
-                        if (
-                            RaygunFileUtils
-                                .getExtension(f.name)
-                                .equals(
-                                    RaygunSettings.DEFAULT_FILE_EXTENSION,
-                                    ignoreCase = true,
-                                )
-                        ) {
-                            CrashReportingWorkerHelper.enqueueCachedCrashReport(
-                                RaygunClient.getApplicationContext(),
-                                f,
-                                RaygunClient.apiKey,
-                            )
-                        }
-                    }
-                } else {
-                    RaygunLogger.e(
-                        "Error in handling cached message from filesystem - could not get a list of" +
-                            " files from cache dir",
-                    )
+        coroutineScope.launch {
+            val fileList =
+                withContext(Dispatchers.IO) {
+                    RaygunClient.getApplicationContext().cacheDir.listFiles(RaygunFileFilter())
                 }
+            if (fileList != null) {
+                for (f in fileList) {
+                    if (
+                        RaygunFileUtils
+                            .getExtension(f.name)
+                            .equals(
+                                RaygunSettings.DEFAULT_FILE_EXTENSION,
+                                ignoreCase = true,
+                            )
+                    ) {
+                        CrashReportingWorkerHelper.enqueueCachedCrashReport(
+                            RaygunClient.getApplicationContext(),
+                            f,
+                            RaygunClient.apiKey,
+                        )
+                    }
+                }
+            } else {
+                RaygunLogger.e(
+                    "Error in handling cached message from filesystem - could not get a list of" +
+                        " files from cache dir",
+                )
             }
         }
     }
