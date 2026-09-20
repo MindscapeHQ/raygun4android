@@ -136,6 +136,11 @@ class CrashReportingWorker(
         apiKey: String?,
         postCrashReport: (String, String) -> Int,
     ): Result {
+        if (!file.isFile) {
+            e("Crash report source is missing or is not a regular file.")
+            return Result.failure()
+        }
+
         val message =
             try {
                 if (isLegacySerialized) {

@@ -110,6 +110,9 @@ object CrashReporting {
     ) {
         if (RaygunClient.isCrashReportingEnabled) {
             coroutineScope.launch {
+                if (CrashReportingWorkerHelper.takeCachedReportRescanRequired()) {
+                    postCachedMessages()
+                }
                 val jsonPayload = buildJsonPayload(throwable, tags, customData) ?: return@launch
                 enqueueWorkForCrashReporting(RaygunClient.apiKey, jsonPayload)
             }
@@ -234,6 +237,7 @@ object CrashReporting {
 
     @JvmStatic
     fun postCachedMessages() {
+        CrashReportingWorkerHelper.takeCachedReportRescanRequired()
         coroutineScope.launch {
             try {
                 for (file in CrashReportCache.files(RaygunClient.getApplicationContext())) {

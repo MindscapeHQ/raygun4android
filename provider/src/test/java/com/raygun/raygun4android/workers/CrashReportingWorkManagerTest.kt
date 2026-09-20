@@ -5,7 +5,9 @@ import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import androidx.work.testing.SynchronousExecutor
 import androidx.work.testing.WorkManagerTestInitHelper
+import com.raygun.raygun4android.CrashReporting
 import com.raygun.raygun4android.OkHttpClientBuilder
+import com.raygun.raygun4android.RaygunClient
 import com.raygun.raygun4android.RaygunSettings
 import okhttp3.OkHttpClient
 import okhttp3.Protocol
@@ -29,6 +31,7 @@ class CrashReportingWorkManagerTest {
     @Before
     fun setUp() {
         CrashReportCache.clear(application)
+        CrashReportingWorkerHelper.takeCachedReportRescanRequired()
         val configuration = Configuration.Builder().setExecutor(SynchronousExecutor()).build()
         WorkManagerTestInitHelper.initializeTestWorkManager(application, configuration)
         RaygunSettings.okHttpClientBuilder =
@@ -53,6 +56,7 @@ class CrashReportingWorkManagerTest {
     fun tearDown() {
         RaygunSettings.okHttpClientBuilder = null
         RaygunSettings.maxReportsStoredOnDevice = originalMaximum
+        CrashReportingWorkerHelper.takeCachedReportRescanRequired()
         CrashReportCache.clear(application)
     }
 
@@ -92,5 +96,38 @@ class CrashReportingWorkManagerTest {
         val completedWork = workManager.getWorkInfosForUniqueWork(workName).get().single()
         assertEquals(WorkInfo.State.SUCCEEDED, completedWork.state)
         assertFalse(file.exists())
+    }
+
+    @Test
+    fun `next send rescans retained reports after a scheduling failure`() {
+        RaygunClient.init(application, "api-key", "1.0.0")
+        RaygunClient.enableCrashReporting(attachDefaultHandler = false)
+        val retainedFile =
+            requireNotNull(CrashReportCache.store(application, "{\"retained\":true}"))
+        assertFalse(
+            CrashReportingWorkerHelper.enqueueCachedCrashReport(
+                application,
+                retainedFile,
+                null,
+            ),
+        )
+
+        CrashReporting.send(IllegalStateException("trigger cached report rescan"), null)
+
+        val workManager = WorkManager.getInstance(application)
+        val workName = CrashReportingWorkerHelper.cachedWorkName(retainedFile)
+        val deadline = System.currentTimeMillis() + RESCAN_TIMEOUT_MILLIS
+        var queuedWork = workManager.getWorkInfosForUniqueWork(workName).get()
+        while (queuedWork.isEmpty() && System.currentTimeMillis() < deadline) {
+            Thread.sleep(10)
+            queuedWork = workManager.getWorkInfosForUniqueWork(workName).get()
+        }
+
+        assertEquals(1, queuedWork.size)
+        assertEquals(WorkInfo.State.ENQUEUED, queuedWork.single().state)
+    }
+
+    companion object {
+        private const val RESCAN_TIMEOUT_MILLIS = 2_000L
     }
 }

@@ -88,17 +88,48 @@ class CrashReportingWorkerTest {
     }
 
     @Test
-    fun `filesystem read failure retains persistent payload for retry`() {
-        val directory = CrashReportCache.persistentDirectory(application).apply { mkdirs() }
-        val unreadableReport = File(directory, "unreadable.raygun4").apply { mkdir() }
+    fun `missing persistent payload fails without posting`() {
+        val missingReport =
+            File(CrashReportCache.persistentDirectory(application), "missing.raygun4")
 
         val result =
-            worker.processCrashReport(unreadableReport, false, "api-key") { _, _ ->
-                throw AssertionError("Unreadable payload must not be posted")
+            worker.processCrashReport(missingReport, false, "api-key") { _, _ ->
+                throw AssertionError("Missing payload must not be posted")
             }
 
-        assertEquals(Result.retry(), result)
-        assertTrue(unreadableReport.exists())
+        assertEquals(Result.failure(), result)
+    }
+
+    @Test
+    fun `non-file persistent payload fails without posting`() {
+        val directory = CrashReportCache.persistentDirectory(application).apply { mkdirs() }
+        val invalidReport = File(directory, "invalid.raygun4").apply { mkdir() }
+
+        val result =
+            worker.processCrashReport(invalidReport, false, "api-key") { _, _ ->
+                throw AssertionError("Non-file payload must not be posted")
+            }
+
+        assertEquals(Result.failure(), result)
+        assertTrue(invalidReport.exists())
+    }
+
+    @Test
+    fun `read failure for existing persistent payload retains it for retry`() {
+        val unreadableReport = persistentReport("temporarily unreadable")
+        assertTrue(unreadableReport.setReadable(false, false))
+
+        try {
+            val result =
+                worker.processCrashReport(unreadableReport, false, "api-key") { _, _ ->
+                    throw AssertionError("Unreadable payload must not be posted")
+                }
+
+            assertEquals(Result.retry(), result)
+            assertTrue(unreadableReport.exists())
+        } finally {
+            unreadableReport.setReadable(true, false)
+        }
     }
 
     @Test
