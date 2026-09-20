@@ -2,7 +2,6 @@ package com.raygun.raygun4android.workers
 
 import com.raygun.raygun4android.RaygunSettings
 import com.raygun.raygun4android.SerializedMessage
-import com.raygun.raygun4android.utils.RaygunFileFilter
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -38,6 +37,7 @@ class CrashReportCacheTest {
 
         val files = cachedReports()
         assertEquals(1, files.size)
+        assertEquals(CrashReportCache.persistentDirectory(application), files.single().parentFile)
         val message =
             ObjectInputStream(FileInputStream(files.single())).use { input ->
                 input.readObject() as SerializedMessage
@@ -66,7 +66,7 @@ class CrashReportCacheTest {
             )
 
         assertEquals(
-            cachedFile.name,
+            cachedFile.absolutePath,
             request.workSpec.input.getString(CrashReportingWorkerHelper.CACHED_FILE_INPUT),
         )
         assertEquals(
@@ -95,5 +95,5 @@ class CrashReportCacheTest {
         )
     }
 
-    private fun cachedReports() = application.cacheDir.listFiles(RaygunFileFilter()) ?: emptyArray()
+    private fun cachedReports() = CrashReportCache.files(application)
 }

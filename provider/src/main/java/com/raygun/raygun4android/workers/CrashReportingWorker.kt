@@ -38,7 +38,7 @@ class CrashReportingWorker(
 
         val file =
             if (cachedFile != null) {
-                File(applicationContext.cacheDir, cachedFile)
+                File(cachedFile)
             } else {
                 File(applicationContext.filesDir, temporaryFile!!)
             }

@@ -13,21 +13,28 @@ import java.io.ObjectOutputStream
 import java.util.UUID
 
 internal object CrashReportCache {
+    private const val DIRECTORY_NAME = "raygun-crash-reports"
+
     @Synchronized
     fun store(
         context: Context,
         message: String,
     ): Boolean {
-        val cachedReports = context.cacheDir.listFiles(RaygunFileFilter()) ?: emptyArray()
+        val cachedReports = files(context)
         if (cachedReports.size >= RaygunSettings.maxReportsStoredOnDevice) {
             w("Maximum stored reports reached. Discarding message.")
             return false
         }
 
+        val directory = persistentDirectory(context)
+        if (!directory.exists() && !directory.mkdirs()) {
+            e("Error creating crash report storage directory")
+            return false
+        }
+
         val fileName = UUID.randomUUID().toString().replace("-", "")
-        val temporaryFile = File(context.cacheDir, ".$fileName.tmp")
-        val cachedFile =
-            File(context.cacheDir, "$fileName.${RaygunSettings.DEFAULT_FILE_EXTENSION}")
+        val temporaryFile = File(directory, ".$fileName.tmp")
+        val cachedFile = File(directory, "$fileName.${RaygunSettings.DEFAULT_FILE_EXTENSION}")
 
         try {
             ObjectOutputStream(FileOutputStream(temporaryFile)).use { output ->
@@ -47,4 +54,13 @@ internal object CrashReportCache {
 
         return true
     }
+
+    fun files(context: Context): Array<File> {
+        val persistentFiles =
+            persistentDirectory(context).listFiles(RaygunFileFilter()) ?: emptyArray()
+        val legacyCacheFiles = context.cacheDir.listFiles(RaygunFileFilter()) ?: emptyArray()
+        return persistentFiles + legacyCacheFiles
+    }
+
+    internal fun persistentDirectory(context: Context): File = File(context.noBackupFilesDir, DIRECTORY_NAME)
 }

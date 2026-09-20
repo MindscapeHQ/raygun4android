@@ -81,7 +81,7 @@ object CrashReportingWorkerHelper {
         val inputData =
             Data
                 .Builder()
-                .putString(CACHED_FILE_INPUT, file.name)
+                .putString(CACHED_FILE_INPUT, file.absolutePath)
                 .putString(API_KEY_INPUT, apiKey)
                 .build()
         val constraints =
@@ -94,7 +94,7 @@ object CrashReportingWorkerHelper {
             .build()
     }
 
-    internal fun cachedWorkName(file: File): String = CACHED_WORK_PREFIX + file.name
+    internal fun cachedWorkName(file: File): String = CACHED_WORK_PREFIX + file.absolutePath
 
     private fun storeMessageInTempFile(
         context: Context,

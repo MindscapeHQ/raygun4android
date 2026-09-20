@@ -1,9 +1,8 @@
 package com.raygun.raygun4android.utils
 
 import android.content.Context
-import com.raygun.raygun4android.RaygunSettings
-import com.raygun.raygun4android.logging.RaygunLogger.e
 import com.raygun.raygun4android.logging.RaygunLogger.w
+import com.raygun.raygun4android.workers.CrashReportCache
 import kotlin.math.max
 
 object RaygunFileUtils {
@@ -25,23 +24,10 @@ object RaygunFileUtils {
     @JvmStatic
     fun clearCachedReports(context: Context) {
         synchronized(this) {
-            val fileList = context.cacheDir.listFiles(RaygunFileFilter())
-            if (fileList != null) {
-                for (f in fileList) {
-                    if (
-                        getExtension(f.name)
-                            .equals(RaygunSettings.DEFAULT_FILE_EXTENSION, ignoreCase = true)
-                    ) {
-                        if (!f.delete()) {
-                            w("Couldn't delete cached report (" + f.name + ")")
-                        }
-                    }
+            for (file in CrashReportCache.files(context)) {
+                if (!file.delete()) {
+                    w("Couldn't delete cached report (" + file.name + ")")
                 }
-            } else {
-                e(
-                    "Error in handling cached message from filesystem - could not get a list of" +
-                        " files from cache dir",
-                )
             }
         }
     }

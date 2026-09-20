@@ -2,7 +2,7 @@ package com.raygun.raygun4android
 
 import com.google.gson.JsonParser
 import com.raygun.raygun4android.messages.crashreporting.RaygunMessage
-import com.raygun.raygun4android.utils.RaygunFileFilter
+import com.raygun.raygun4android.workers.CrashReportCache
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
@@ -74,7 +74,7 @@ class CrashReportingTest {
         )
     }
 
-    private fun cachedReports(): Array<File> = application.cacheDir.listFiles(RaygunFileFilter()) ?: emptyArray()
+    private fun cachedReports(): Array<File> = CrashReportCache.files(application)
 
     private fun readCachedMessage(file: File): SerializedMessage =
         ObjectInputStream(FileInputStream(file)).use { input ->
