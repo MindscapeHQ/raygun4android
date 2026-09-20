@@ -9,18 +9,13 @@ import com.raygun.raygun4android.rum.RUM
 import com.raygun.raygun4android.utils.RaygunUtils
 import com.raygun.raygun4android.workers.CrashReportCache
 import com.raygun.raygun4android.workers.CrashReportingWorkerHelper
-import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.currentCoroutineContext
-import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runInterruptible
+import kotlinx.coroutines.runBlocking
 import java.util.concurrent.CopyOnWriteArrayList
-import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
-import java.util.concurrent.atomic.AtomicBoolean
 
 typealias Tags = List<String>
 
@@ -117,7 +112,6 @@ object CrashReporting {
             coroutineScope.launch {
                 val jsonPayload = buildJsonPayload(throwable, tags, customData) ?: return@launch
                 enqueueWorkForCrashReporting(RaygunClient.apiKey, jsonPayload)
-                postCachedMessages()
             }
         } else {
             RaygunLogger.w(
@@ -144,7 +138,7 @@ object CrashReporting {
         val beforeSend = onBeforeSend
         val filteredMessage =
             if (beforeSend != null) {
-                runInterruptible { beforeSend.onBeforeSend(message) } ?: return null
+                beforeSend.onBeforeSend(message) ?: return null
             } else {
                 message
             }
@@ -157,37 +151,41 @@ object CrashReporting {
         tags: Tags,
         timeoutMillis: Long = UNHANDLED_EXCEPTION_TIMEOUT_MILLIS,
     ): Boolean {
-        val completed = CountDownLatch(1)
-        val stored = AtomicBoolean(false)
-
-        val persistenceJob =
-            coroutineScope.launch {
-                try {
-                    val jsonPayload = buildJsonPayload(throwable, tags, null) ?: return@launch
-                    currentCoroutineContext().ensureActive()
-                    stored.set(
-                        CrashReportCache.store(RaygunClient.getApplicationContext(), jsonPayload) !=
-                            null,
-                    )
-                } catch (exception: CancellationException) {
-                    throw exception
-                } catch (throwable: Throwable) {
-                    RaygunLogger.e("Failed to cache unhandled exception: $throwable")
-                } finally {
-                    completed.countDown()
-                }
-            }
+        var stored = false
+        val deadline = System.nanoTime() + TimeUnit.MILLISECONDS.toNanos(timeoutMillis)
+        val persistenceThread =
+            Thread(
+                {
+                    try {
+                        val jsonPayload =
+                            runBlocking { buildJsonPayload(throwable, tags, null) } ?: return@Thread
+                        if (Thread.currentThread().isInterrupted || System.nanoTime() >= deadline) {
+                            return@Thread
+                        }
+                        stored =
+                            CrashReportCache.store(
+                                RaygunClient.getApplicationContext(),
+                                jsonPayload,
+                            ) != null
+                    } catch (throwable: Throwable) {
+                        RaygunLogger.e("Failed to cache unhandled exception: $throwable")
+                    }
+                },
+                "RaygunCrashPersistence",
+            )
+        persistenceThread.start()
 
         return try {
-            if (!completed.await(timeoutMillis, TimeUnit.MILLISECONDS)) {
-                persistenceJob.cancel()
+            persistenceThread.join(timeoutMillis)
+            if (persistenceThread.isAlive) {
+                persistenceThread.interrupt()
                 RaygunLogger.w("Timed out while caching unhandled exception")
                 false
             } else {
-                stored.get()
+                stored
             }
         } catch (exception: InterruptedException) {
-            persistenceJob.cancel()
+            persistenceThread.interrupt()
             Thread.currentThread().interrupt()
             RaygunLogger.w("Interrupted while caching unhandled exception")
             false

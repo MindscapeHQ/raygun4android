@@ -88,6 +88,20 @@ class CrashReportingWorkerTest {
     }
 
     @Test
+    fun `filesystem read failure retains persistent payload for retry`() {
+        val directory = CrashReportCache.persistentDirectory(application).apply { mkdirs() }
+        val unreadableReport = File(directory, "unreadable.raygun4").apply { mkdir() }
+
+        val result =
+            worker.processCrashReport(unreadableReport, false, "api-key") { _, _ ->
+                throw AssertionError("Unreadable payload must not be posted")
+            }
+
+        assertEquals(Result.retry(), result)
+        assertTrue(unreadableReport.exists())
+    }
+
+    @Test
     fun `successful delivery remains compatible with legacy serialized payload`() {
         val file = serializedReport("legacy recovered crash")
         var deliveredMessage: String? = null
@@ -136,23 +150,29 @@ class CrashReportingWorkerTest {
     }
 
     @Test
-    fun `processed tombstone is never delivered again`() {
-        val directory = CrashReportCache.persistentDirectory(application).apply { mkdirs() }
-        val file =
-            File(directory, "processed.raygun4").apply {
-                writeText("RaygunCrashReport:processed\n")
-            }
-        var postAttempted = false
+    fun `successful delivery does not leave a discoverable source when marking fails`() {
+        val file = persistentReport("delivered before cleanup failure")
+        val processedTarget = File(file.parentFile, ".${file.name}.processed")
 
-        val result =
-            worker.processCrashReport(file, false, "api-key") { _, _ ->
-                postAttempted = true
-                202
-            }
+        try {
+            val result =
+                worker.processCrashReport(file, false, "api-key") { _, _ ->
+                    assertTrue(file.delete())
+                    assertTrue(file.mkdir())
+                    assertTrue(processedTarget.mkdir())
+                    File(processedTarget, "prevent-rename").writeText("occupied")
+                    202
+                }
 
-        assertEquals(Result.failure(), result)
-        assertFalse(postAttempted)
-        assertFalse(file.exists())
+            assertEquals(Result.success(), result)
+            assertFalse(file.exists())
+            assertTrue(
+                CrashReportCache.files(application).none { it.absolutePath == file.absolutePath },
+            )
+        } finally {
+            file.deleteRecursively()
+            processedTarget.deleteRecursively()
+        }
     }
 
     private fun rawReport(message: String): File =

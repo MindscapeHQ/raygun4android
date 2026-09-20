@@ -14,6 +14,8 @@ import org.robolectric.RuntimeEnvironment
 import java.io.File
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
+import java.util.concurrent.atomic.AtomicBoolean
+import kotlin.concurrent.thread
 
 @RunWith(RobolectricTestRunner::class)
 class CrashReportingTest {
@@ -81,8 +83,12 @@ class CrashReportingTest {
             object : CrashReportingOnBeforeSend {
                 override fun onBeforeSend(message: RaygunMessage): RaygunMessage? =
                     try {
-                        releaseCallback.await()
-                        null
+                        try {
+                            releaseCallback.await()
+                            null
+                        } catch (_: InterruptedException) {
+                            message
+                        }
                     } finally {
                         callbackStopped.countDown()
                     }
@@ -104,6 +110,64 @@ class CrashReportingTest {
         assertTrue(cachedReports().isEmpty())
 
         releaseCallback.countDown()
+    }
+
+    @Test
+    fun `timed out uncaught exception is not cached after cache monitor becomes available`() {
+        val monitorHeld = CountDownLatch(1)
+        val releaseMonitor = CountDownLatch(1)
+        val cacheAttemptCompleted = CountDownLatch(1)
+        val stored = AtomicBoolean(true)
+        val blocker =
+            thread {
+                synchronized(CrashReportCache) {
+                    monitorHeld.countDown()
+                    releaseMonitor.await()
+                }
+            }
+
+        try {
+            assertTrue(monitorHeld.await(1, TimeUnit.SECONDS))
+            thread {
+                stored.set(
+                    CrashReporting.cacheUnhandledException(
+                        IllegalStateException("timed out while waiting for cache"),
+                        listOf(RaygunSettings.CRASH_REPORTING_UNHANDLED_EXCEPTION_TAG),
+                        timeoutMillis = 500,
+                    ),
+                )
+                cacheAttemptCompleted.countDown()
+            }
+
+            assertTrue(waitForCacheStoreToBlock())
+            assertTrue(cacheAttemptCompleted.await(1, TimeUnit.SECONDS))
+            assertTrue(!stored.get())
+        } finally {
+            releaseMonitor.countDown()
+            blocker.join(1_000)
+        }
+
+        Thread.sleep(250)
+        assertTrue(cachedReports().isEmpty())
+    }
+
+    private fun waitForCacheStoreToBlock(): Boolean {
+        val deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(1)
+        while (System.nanoTime() < deadline) {
+            val blocked =
+                Thread.getAllStackTraces().any { (thread, stackTrace) ->
+                    thread.state == Thread.State.BLOCKED &&
+                        stackTrace.any { frame ->
+                            frame.className == CrashReportCache::class.java.name &&
+                                frame.methodName == "store"
+                        }
+                }
+            if (blocked) {
+                return true
+            }
+            Thread.sleep(5)
+        }
+        return false
     }
 
     private fun cachedReports(): Array<File> = CrashReportCache.files(application)

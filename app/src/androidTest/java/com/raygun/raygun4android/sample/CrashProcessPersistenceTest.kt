@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
 import android.os.IBinder
+import android.os.SystemClock
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.raygun.raygun4android.OkHttpClientBuilder
@@ -34,46 +35,27 @@ class CrashProcessPersistenceTest {
     @Before
     fun setUp() {
         clearReports()
+        RaygunClient.init(context, null, "1.0.0")
     }
 
     @After
     fun tearDown() {
         RaygunClient.setOkHttpClientBuilder(null)
+        RaygunClient.setMaxReportsStoredOnDevice(
+            RaygunSettings.DEFAULT_MAX_REPORTS_STORED_ON_DEVICE,
+        )
         clearReports()
     }
 
     @Test
     fun unhandledCrashSurvivesSeparateProcessTermination() {
-        val processConnected = CountDownLatch(1)
-        val processDisconnected = CountDownLatch(1)
-        val connection =
-            object : ServiceConnection {
-                override fun onServiceConnected(
-                    name: ComponentName?,
-                    service: IBinder?,
-                ) {
-                    processConnected.countDown()
-                }
-
-                override fun onServiceDisconnected(name: ComponentName?) {
-                    processDisconnected.countDown()
-                }
-
-                override fun onBindingDied(name: ComponentName?) {
-                    processDisconnected.countDown()
-                }
-            }
-
-        assertTrue(
-            context.bindService(
-                Intent(context, CrashProcessService::class.java),
-                connection,
-                Context.BIND_AUTO_CREATE,
-            ),
-        )
-        assertTrue(processConnected.await(PROCESS_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS))
-        assertTrue(processDisconnected.await(PROCESS_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS))
-        context.unbindService(connection)
+        val crashProcess = CrashProcessBinding(Intent(context, CrashProcessService::class.java))
+        try {
+            crashProcess.bind()
+            crashProcess.awaitTermination()
+        } finally {
+            crashProcess.close()
+        }
 
         val reports = reports()
         assertEquals(1, reports.size)
@@ -110,6 +92,35 @@ class CrashProcessPersistenceTest {
         waitForReportsToBeRemoved()
     }
 
+    @Test
+    fun concurrentWritesInSeparateProcessesRespectSharedCapacity() {
+        val writeAt = SystemClock.elapsedRealtime() + SIMULTANEOUS_WRITE_DELAY_MILLIS
+        val first =
+            CrashProcessBinding(
+                Intent(context, CapacityProcessService::class.java)
+                    .putExtra(CapacityProcessService.EXTRA_MAXIMUM_REPORTS, 1)
+                    .putExtra(CapacityProcessService.EXTRA_WRITE_AT_ELAPSED_REALTIME, writeAt),
+            )
+        val second =
+            CrashProcessBinding(
+                Intent(context, SecondCapacityProcessService::class.java)
+                    .putExtra(CapacityProcessService.EXTRA_MAXIMUM_REPORTS, 1)
+                    .putExtra(CapacityProcessService.EXTRA_WRITE_AT_ELAPSED_REALTIME, writeAt),
+            )
+
+        try {
+            first.bind()
+            second.bind()
+            first.awaitTermination()
+            second.awaitTermination()
+        } finally {
+            first.close()
+            second.close()
+        }
+
+        assertEquals(1, reports().size)
+    }
+
     private fun reports(): Array<File> =
         reportDirectory.listFiles { file ->
             file.extension == RaygunSettings.DEFAULT_FILE_EXTENSION
@@ -127,9 +138,52 @@ class CrashProcessPersistenceTest {
         reportDirectory.listFiles()?.forEach(File::delete)
     }
 
+    private inner class CrashProcessBinding(
+        private val intent: Intent,
+    ) {
+        private val connected = CountDownLatch(1)
+        private val disconnected = CountDownLatch(1)
+        private var bound = false
+        private val connection =
+            object : ServiceConnection {
+                override fun onServiceConnected(
+                    name: ComponentName?,
+                    service: IBinder?,
+                ) {
+                    connected.countDown()
+                }
+
+                override fun onServiceDisconnected(name: ComponentName?) {
+                    disconnected.countDown()
+                }
+
+                override fun onBindingDied(name: ComponentName?) {
+                    disconnected.countDown()
+                }
+            }
+
+        fun bind() {
+            bound = context.bindService(intent, connection, Context.BIND_AUTO_CREATE)
+            assertTrue(bound)
+            assertTrue(connected.await(PROCESS_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS))
+        }
+
+        fun awaitTermination() {
+            assertTrue(disconnected.await(PROCESS_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS))
+        }
+
+        fun close() {
+            if (bound) {
+                context.unbindService(connection)
+                bound = false
+            }
+        }
+    }
+
     companion object {
         private const val REPORT_TIMEOUT_MILLIS = 10_000L
         private const val PROCESS_TIMEOUT_MILLIS = 10_000L
         private const val POLL_INTERVAL_MILLIS = 50L
+        private const val SIMULTANEOUS_WRITE_DELAY_MILLIS = 2_000L
     }
 }

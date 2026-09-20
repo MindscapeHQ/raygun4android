@@ -13,11 +13,13 @@ import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.Response
+import java.io.EOFException
 import java.io.File
 import java.io.FileInputStream
 import java.io.IOException
 import java.io.InputStreamReader
 import java.io.ObjectInputStream
+import java.io.ObjectStreamException
 import java.nio.charset.StandardCharsets
 
 class CrashReportingWorker(
@@ -99,17 +101,12 @@ class CrashReportingWorker(
     private fun readMessageFromTempFile(file: File): String? {
         val message = StringBuilder()
 
-        try {
-            file.inputStream().use { fis ->
-                InputStreamReader(fis, StandardCharsets.UTF_8).use { isr ->
-                    isr.buffered().use { reader ->
-                        reader.forEachLine { line -> message.append(line).append("\n") }
-                    }
+        file.inputStream().use { fis ->
+            InputStreamReader(fis, StandardCharsets.UTF_8).use { isr ->
+                isr.buffered().use { reader ->
+                    reader.forEachLine { line -> message.append(line).append("\n") }
                 }
             }
-        } catch (e: IOException) {
-            e("Failed to read message from file: " + e.message)
-            return null
         }
 
         return message.toString().trimEnd()
@@ -120,6 +117,14 @@ class CrashReportingWorker(
             ObjectInputStream(FileInputStream(file)).use { input ->
                 (input.readObject() as SerializedMessage).message
             }
+        } catch (exception: ObjectStreamException) {
+            e("Failed to read cached message: " + exception.message)
+            null
+        } catch (exception: EOFException) {
+            e("Failed to read cached message: " + exception.message)
+            null
+        } catch (exception: IOException) {
+            throw exception
         } catch (exception: Exception) {
             e("Failed to read cached message: " + exception.message)
             null
@@ -132,12 +137,17 @@ class CrashReportingWorker(
         postCrashReport: (String, String) -> Int,
     ): Result {
         val message =
-            if (isLegacySerialized) {
-                readMessageFromCache(file)
-            } else if (file.parentFile == applicationContext.filesDir) {
-                readMessageFromTempFile(file)
-            } else {
-                CrashReportCache.readPersistent(file)
+            try {
+                if (isLegacySerialized) {
+                    readMessageFromCache(file)
+                } else if (file.parentFile == applicationContext.filesDir) {
+                    readMessageFromTempFile(file)
+                } else {
+                    CrashReportCache.readPersistent(file)
+                }
+            } catch (exception: IOException) {
+                e("Failed to read cached message; retaining for retry: " + exception.message)
+                return Result.retry()
             }
 
         if (message == null) {

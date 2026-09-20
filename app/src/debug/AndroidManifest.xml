@@ -7,5 +7,13 @@
             android:name="com.raygun.raygun4android.sample.CrashProcessService"
             android:exported="false"
             android:process=":raygun_crash_test" />
+        <service
+            android:name="com.raygun.raygun4android.sample.CapacityProcessService"
+            android:exported="false"
+            android:process=":raygun_capacity_test" />
+        <service
+            android:name="com.raygun.raygun4android.sample.SecondCapacityProcessService"
+            android:exported="false"
+            android:process=":raygun_capacity_test_2" />
     </application>
 </manifest>

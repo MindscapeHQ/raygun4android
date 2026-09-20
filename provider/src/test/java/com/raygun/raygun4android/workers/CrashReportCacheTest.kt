@@ -79,28 +79,6 @@ class CrashReportCacheTest {
     }
 
     @Test
-    fun `discovery does not delete a temporary file being written by another process`() {
-        val directory = CrashReportCache.persistentDirectory(application).apply { mkdirs() }
-        val temporaryFile = File(directory, ".active.tmp").apply { writeText("partial") }
-
-        assertTrue(CrashReportCache.files(application).isEmpty())
-        assertTrue(temporaryFile.exists())
-
-        temporaryFile.delete()
-    }
-
-    @Test
-    fun `processed tombstone is excluded from discovery and capacity`() {
-        RaygunSettings.maxReportsStoredOnDevice = 1
-        val directory = CrashReportCache.persistentDirectory(application).apply { mkdirs() }
-        File(directory, "processed.raygun4").writeText("RaygunCrashReport:processed\n")
-
-        assertTrue(CrashReportCache.files(application).isEmpty())
-        assertNotNull(CrashReportCache.store(application, "new payload"))
-        assertEquals(1, CrashReportCache.files(application).size)
-    }
-
-    @Test
     fun `cached work request retains durable file until worker runs`() {
         val cachedFile = CrashReportCache.store(application, "cached payload")!!
 
