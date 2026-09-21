@@ -33,8 +33,6 @@ internal object CrashReportCache {
             return null
         }
 
-        trim(context, RaygunSettings.maxReportsStoredOnDevice - 1)
-
         val fileName = UUID.randomUUID().toString().replace("-", "")
         val temporaryFile = File(context.cacheDir, ".$fileName$TEMPORARY_SUFFIX")
         val cachedFile = File(directory, "$fileName.${RaygunSettings.DEFAULT_FILE_EXTENSION}")
@@ -54,6 +52,12 @@ internal object CrashReportCache {
             temporaryFile.delete()
             return null
         }
+
+        trim(
+            context,
+            RaygunSettings.maxReportsStoredOnDevice,
+            preserve = cachedFile,
+        )
 
         return cachedFile
     }
@@ -78,16 +82,22 @@ internal object CrashReportCache {
      *
      * @param context The Android context
      * @param maximum The number of reports to keep
+     * @param preserve A report that must not be removed while trimming
      */
     fun trim(
         context: Context,
         maximum: Int,
+        preserve: File? = null,
     ) {
-        val reports = files(context).sortedBy(File::lastModified)
+        val reports = files(context)
         val excess = reports.size - maximum.coerceAtLeast(0)
         if (excess > 0) {
             w("Maximum stored reports reached. Removing $excess oldest report(s).")
-            reports.take(excess).forEach(::remove)
+            reports
+                .filterNot { it == preserve }
+                .sortedBy(File::lastModified)
+                .take(excess)
+                .forEach(::remove)
         }
     }
 
