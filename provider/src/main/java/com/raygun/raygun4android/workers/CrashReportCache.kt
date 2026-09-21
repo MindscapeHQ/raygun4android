@@ -15,8 +15,9 @@ import java.util.UUID
  *
  * Reports are written to a temporary file in the cache directory and renamed into the spool, so a
  * report is either absent or complete and no directory-wide lock is needed. The spool holds at most
- * [RaygunSettings.maxReportsStoredOnDevice] reports, evicting the oldest first; concurrent writers
- * in separate processes may briefly exceed it.
+ * [RaygunSettings.maxReportsStoredOnDevice] reports, evicting the oldest first. The limit is soft:
+ * concurrent writers, in one process or several, can each exceed it by one until the next write
+ * trims the spool.
  */
 internal object CrashReportCache {
     private const val DIRECTORY_NAME = "raygun-crash-reports"
