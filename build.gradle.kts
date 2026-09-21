@@ -1,3 +1,6 @@
+import org.gradle.api.attributes.Category
+import org.gradle.api.attributes.Usage
+
 buildscript {
     repositories {
         google()
@@ -41,6 +44,45 @@ tasks.register("resolveAndLockAll") {
         "provider:publishToMavenLocal",
         "provider:test",
     )
+}
+
+val okHttpAlignmentTest =
+    configurations.create("okHttpAlignmentTest") {
+        isCanBeConsumed = false
+        isCanBeResolved = true
+        resolutionStrategy.deactivateDependencyLocking()
+        attributes {
+            attribute(Category.CATEGORY_ATTRIBUTE, objects.named(Category.LIBRARY))
+            attribute(Usage.USAGE_ATTRIBUTE, objects.named(Usage.JAVA_RUNTIME))
+        }
+    }
+
+dependencies {
+    okHttpAlignmentTest(
+        project(mapOf("path" to ":provider", "configuration" to "debugRuntimeElements")),
+    )
+    okHttpAlignmentTest("com.squareup.okhttp3:okhttp-urlconnection:4.9.2") {
+        isTransitive = false
+    }
+}
+
+tasks.register("verifyOkHttpDependencyAlignment") {
+    group = "verification"
+    description = "Verifies that the provider aligns OkHttp modules in a consumer."
+    val resolutionResult = okHttpAlignmentTest.incoming.resolutionResult
+
+    doLast {
+        val okHttpVersions =
+            resolutionResult.allComponents
+                .mapNotNull { it.moduleVersion }
+                .filter { it.group == "com.squareup.okhttp3" }
+                .associate { it.name to it.version }
+
+        val coreVersion = checkNotNull(okHttpVersions["okhttp"]) { "okhttp was not resolved" }
+        check(okHttpVersions["okhttp-urlconnection"] == coreVersion) {
+            "Expected okhttp-urlconnection $coreVersion, resolved ${okHttpVersions["okhttp-urlconnection"]}"
+        }
+    }
 }
 
 spotless {

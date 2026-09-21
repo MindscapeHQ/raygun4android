@@ -78,7 +78,7 @@ jobs:
       with:
         distribution: ${{ env.JAVA_DISTRIBUTION }}
         java-version: ${{ env.JAVA_VERSION }}
-    - run: ./gradlew provider:test
+    - run: ./gradlew provider:test verifyOkHttpDependencyAlignment
 
   app-connected-test:
     name: "app:connectedTest"
