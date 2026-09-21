@@ -1,3 +1,6 @@
+import org.gradle.api.attributes.Category
+import org.gradle.api.attributes.Usage
+
 buildscript {
     repositories {
         google()
@@ -10,8 +13,6 @@ buildscript {
         classpath(libs.kotlin.gradle) // pins KGP 2.3.0 (higher than AGP 9's bundled 2.2.10)
     }
 }
-
-val versionName = providers.gradleProperty("VERSION_NAME").get()
 
 plugins {
     alias(libs.plugins.android.application) apply false
@@ -45,45 +46,43 @@ tasks.register("resolveAndLockAll") {
     )
 }
 
-val okHttpAlignmentTestRepository =
-    layout.buildDirectory.dir("okhttp-alignment-test-repository")
-val prepareOkHttpAlignmentTestRepository =
-    tasks.register<Sync>("prepareOkHttpAlignmentTestRepository") {
-        dependsOn(
-            ":provider:bundleReleaseAar",
-            ":provider:generateMetadataFileForMavenPublication",
-            ":provider:generatePomFileForMavenPublication",
-        )
-
-        into(
-            okHttpAlignmentTestRepository.map {
-                it.dir("com/raygun/raygun4android/$versionName")
-            },
-        )
-        from("provider/build/outputs/aar/raygun4android.aar") {
-            rename("raygun4android.aar", "raygun4android-$versionName.aar")
-        }
-        from("provider/build/publications/maven/module.json") {
-            rename("module.json", "raygun4android-$versionName.module")
-        }
-        from("provider/build/publications/maven/pom-default.xml") {
-            rename("pom-default.xml", "raygun4android-$versionName.pom")
+val okHttpAlignmentTest =
+    configurations.create("okHttpAlignmentTest") {
+        isCanBeConsumed = false
+        isCanBeResolved = true
+        resolutionStrategy.deactivateDependencyLocking()
+        attributes {
+            attribute(Category.CATEGORY_ATTRIBUTE, objects.named(Category.LIBRARY))
+            attribute(Usage.USAGE_ATTRIBUTE, objects.named(Usage.JAVA_RUNTIME))
         }
     }
 
-tasks.register<Exec>("verifyOkHttpDependencyAlignment") {
-    group = "verification"
-    description = "Verifies that the published provider aligns OkHttp modules in a consumer."
-    dependsOn(prepareOkHttpAlignmentTestRepository)
-
-    commandLine(
-        rootProject.file("gradlew").absolutePath,
-        "-p",
-        rootProject.file("integration-tests/okhttp-alignment").absolutePath,
-        "verifyOkHttpAlignment",
-        "-PraygunRepository=${okHttpAlignmentTestRepository.get().asFile.toURI()}",
-        "-PraygunVersion=$versionName",
+dependencies {
+    okHttpAlignmentTest(
+        project(mapOf("path" to ":provider", "configuration" to "debugRuntimeElements")),
     )
+    okHttpAlignmentTest("com.squareup.okhttp3:okhttp-urlconnection:4.9.2") {
+        isTransitive = false
+    }
+}
+
+tasks.register("verifyOkHttpDependencyAlignment") {
+    group = "verification"
+    description = "Verifies that the provider aligns OkHttp modules in a consumer."
+    val resolutionResult = okHttpAlignmentTest.incoming.resolutionResult
+
+    doLast {
+        val okHttpVersions =
+            resolutionResult.allComponents
+                .mapNotNull { it.moduleVersion }
+                .filter { it.group == "com.squareup.okhttp3" }
+                .associate { it.name to it.version }
+
+        val coreVersion = checkNotNull(okHttpVersions["okhttp"]) { "okhttp was not resolved" }
+        check(okHttpVersions["okhttp-urlconnection"] == coreVersion) {
+            "Expected okhttp-urlconnection $coreVersion, resolved ${okHttpVersions["okhttp-urlconnection"]}"
+        }
+    }
 }
 
 spotless {
