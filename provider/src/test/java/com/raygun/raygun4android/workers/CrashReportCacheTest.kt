@@ -51,10 +51,14 @@ class CrashReportCacheTest {
     fun `store evicts the oldest report when the maximum is reached`() {
         RaygunSettings.maxReportsStoredOnDevice = 1
 
-        assertNotNull(CrashReportCache.store(application, "first payload"))
+        val oldest =
+            requireNotNull(CrashReportCache.store(application, "first payload")).apply {
+                setLastModified(1_000L)
+            }
         val newest = CrashReportCache.store(application, "second payload")
 
         assertNotNull(newest)
+        assertFalse(oldest.exists())
         assertEquals("second payload", CrashReportCache.readPersistent(cachedReports().single()))
     }
 
@@ -105,6 +109,20 @@ class CrashReportCacheTest {
         assertFalse(oldest.exists())
         assertTrue(middle.exists())
         assertTrue(newest.exists())
+    }
+
+    @Test
+    fun `trim breaks equal timestamps by file path`() {
+        val directory = CrashReportCache.persistentDirectory(application).apply { mkdirs() }
+        val first = File(directory, "a.raygun4").apply { writeText("first") }
+        val second = File(directory, "b.raygun4").apply { writeText("second") }
+        assertTrue(first.setLastModified(1_000L))
+        assertTrue(second.setLastModified(1_000L))
+
+        CrashReportCache.trim(application, 1)
+
+        assertFalse(first.exists())
+        assertTrue(second.exists())
     }
 
     @Test

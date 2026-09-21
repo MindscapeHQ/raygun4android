@@ -53,11 +53,7 @@ internal object CrashReportCache {
             return null
         }
 
-        trim(
-            context,
-            RaygunSettings.maxReportsStoredOnDevice,
-            preserve = cachedFile,
-        )
+        trim(context, RaygunSettings.maxReportsStoredOnDevice)
 
         return cachedFile
     }
@@ -82,22 +78,18 @@ internal object CrashReportCache {
      *
      * @param context The Android context
      * @param maximum The number of reports to keep
-     * @param preserve A report that must not be removed while trimming
      */
     fun trim(
         context: Context,
         maximum: Int,
-        preserve: File? = null,
     ) {
-        val reports = files(context)
+        val reports =
+            files(context)
+                .sortedWith(compareBy<File>(File::lastModified).thenBy(File::getAbsolutePath))
         val excess = reports.size - maximum.coerceAtLeast(0)
         if (excess > 0) {
             w("Maximum stored reports reached. Removing $excess oldest report(s).")
-            reports
-                .filterNot { it == preserve }
-                .sortedBy(File::lastModified)
-                .take(excess)
-                .forEach(::remove)
+            reports.take(excess).forEach(::remove)
         }
     }
 
