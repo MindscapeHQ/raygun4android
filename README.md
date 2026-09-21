@@ -405,13 +405,13 @@ Please note that setting a custom endpoint will stop Crash Report or Real User M
 
 ### Storing crash reports on the device
 
-If the device can't connect because it is offline, Raygun4Android will save the crash report to the device storage. At the next start of the application, (along with the provider) it will check if the internet is now available. If it is, send the cached messages. A maximum of 64 messages will be cached. Once the storage limit is reached, no further crash reports are stored locally until the storage has been cleared. You can change the amount by calling:
+If the device can't connect because it is offline, Raygun4Android will save the crash report to the device storage. At the next start of the application, (along with the provider) it will check if the internet is now available. If it is, send the cached messages. A maximum of 64 messages will be cached. Once the storage limit is reached, the oldest stored report is removed to make room for the new one. You can change the amount by calling:
 
 ```java
 RaygunClient.setMaxReportsStoredOnDevice(amount)
 ```
 
-You cannot increase the amount beyond the maximum of 64. If you decrease the amount, any currently stored cached reports will be deleted.
+The amount must be between 1 and 64; other values are ignored. If you decrease the amount, the oldest stored reports beyond the new maximum are deleted.
 
 ### Mobile network type information
 

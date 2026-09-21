@@ -13,6 +13,7 @@ import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.RuntimeEnvironment
 import java.io.File
+import java.util.concurrent.CopyOnWriteArrayList
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
@@ -104,6 +105,41 @@ class CrashReportingTest {
             Thread.sleep(10)
         }
         assertEquals(1, cachedReports().size)
+    }
+
+    @Test
+    fun `failing onBeforeSend in a handled send does not reach the uncaught exception handler`() {
+        val uncaughtExceptions = CopyOnWriteArrayList<Throwable>()
+        val originalHandler = Thread.getDefaultUncaughtExceptionHandler()
+        Thread.setDefaultUncaughtExceptionHandler { _, exception ->
+            uncaughtExceptions.add(exception)
+        }
+
+        try {
+            val callbackFailed = CountDownLatch(1)
+            CrashReporting.setOnBeforeSend(
+                object : CrashReportingOnBeforeSend {
+                    override fun onBeforeSend(message: RaygunMessage): RaygunMessage {
+                        callbackFailed.countDown()
+                        throw IllegalStateException("callback failed")
+                    }
+                },
+            )
+            CrashReporting.send(IllegalStateException("first"), null)
+            assertTrue(callbackFailed.await(2, TimeUnit.SECONDS))
+            CrashReporting.setOnBeforeSend(null)
+            CrashReporting.send(IllegalStateException("second"), null)
+
+            val deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(2)
+            while (cachedReports().isEmpty() && System.nanoTime() < deadline) {
+                Thread.sleep(10)
+            }
+
+            assertEquals(1, cachedReports().size)
+            assertTrue(uncaughtExceptions.isEmpty())
+        } finally {
+            Thread.setDefaultUncaughtExceptionHandler(originalHandler)
+        }
     }
 
     private fun cachedReports(): Array<File> = CrashReportCache.files(application)

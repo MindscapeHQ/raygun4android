@@ -1,5 +1,6 @@
 package com.raygun.raygun4android.workers
 
+import com.raygun.raygun4android.RaygunClient
 import com.raygun.raygun4android.RaygunSettings
 import org.junit.After
 import org.junit.Assert.assertEquals
@@ -75,6 +76,33 @@ class CrashReportCacheTest {
         assertFalse(oldest.exists())
         assertTrue(middle.exists())
         assertTrue(newest.exists())
+    }
+
+    @Test
+    fun `decreasing the maximum keeps the newest reports`() {
+        RaygunClient.init(application, null, "1.0.0")
+        val oldest =
+            CrashReportCache.store(application, "oldest")!!.apply { setLastModified(1_000L) }
+        val newest =
+            CrashReportCache.store(application, "newest")!!.apply { setLastModified(2_000L) }
+
+        RaygunClient.setMaxReportsStoredOnDevice(1)
+
+        assertEquals(1, RaygunSettings.maxReportsStoredOnDevice)
+        assertFalse(oldest.exists())
+        assertTrue(newest.exists())
+    }
+
+    @Test
+    fun `maximum outside 1 to 64 is ignored`() {
+        RaygunSettings.maxReportsStoredOnDevice = 8
+
+        RaygunSettings.maxReportsStoredOnDevice = 0
+        RaygunSettings.maxReportsStoredOnDevice = -1
+        RaygunSettings.maxReportsStoredOnDevice =
+            RaygunSettings.DEFAULT_MAX_REPORTS_STORED_ON_DEVICE + 1
+
+        assertEquals(8, RaygunSettings.maxReportsStoredOnDevice)
     }
 
     @Test

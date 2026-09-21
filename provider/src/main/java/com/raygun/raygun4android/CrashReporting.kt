@@ -110,8 +110,16 @@ object CrashReporting {
         if (RaygunClient.isCrashReportingEnabled) {
             postCachedMessages()
             coroutineScope.launch {
-                val jsonPayload = buildJsonPayload(throwable, tags, customData) ?: return@launch
-                enqueueWorkForCrashReporting(RaygunClient.apiKey, jsonPayload)
+                try {
+                    val jsonPayload = buildJsonPayload(throwable, tags, customData) ?: return@launch
+                    CrashReportingWorkerHelper.enqueueCrashReport(
+                        RaygunClient.getApplicationContext(),
+                        jsonPayload,
+                        RaygunClient.apiKey,
+                    )
+                } catch (throwable: Throwable) {
+                    RaygunLogger.e("Failed to send crash report: $throwable")
+                }
             }
         } else {
             RaygunLogger.w(
@@ -242,17 +250,6 @@ object CrashReporting {
                 RaygunLogger.e("Failed to schedule cached crash reports: $exception")
             }
         }
-    }
-
-    private fun enqueueWorkForCrashReporting(
-        apiKey: String?,
-        jsonPayload: String,
-    ) {
-        CrashReportingWorkerHelper.enqueueCrashReport(
-            RaygunClient.getApplicationContext(),
-            jsonPayload,
-            apiKey,
-        )
     }
 
     class RaygunUncaughtExceptionHandler(

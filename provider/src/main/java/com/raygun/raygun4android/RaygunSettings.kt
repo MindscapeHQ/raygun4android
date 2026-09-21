@@ -41,15 +41,14 @@ object RaygunSettings {
     @JvmStatic
     var maxReportsStoredOnDevice: Int = DEFAULT_MAX_REPORTS_STORED_ON_DEVICE
         set(maxReportsStoredOnDevice) {
-            if (maxReportsStoredOnDevice <= DEFAULT_MAX_REPORTS_STORED_ON_DEVICE) {
+            if (maxReportsStoredOnDevice in 1..DEFAULT_MAX_REPORTS_STORED_ON_DEVICE) {
                 field = maxReportsStoredOnDevice
             } else {
                 w(
                     (
-                        "It's not possible to exceed the value " +
+                        "The number of reports stored on the device must be between 1 and " +
                             DEFAULT_MAX_REPORTS_STORED_ON_DEVICE +
-                            " for the number of reports stored on the device. The setting has not" +
-                            " been applied."
+                            ". The setting has not been applied."
                     ),
                 )
             }
