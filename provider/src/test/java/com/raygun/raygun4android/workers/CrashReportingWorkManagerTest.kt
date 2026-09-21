@@ -1,9 +1,13 @@
 package com.raygun.raygun4android.workers
 
 import androidx.work.Configuration
+import androidx.work.Data
+import androidx.work.ListenableWorker
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
+import androidx.work.impl.WorkManagerImpl
 import androidx.work.testing.SynchronousExecutor
+import androidx.work.testing.TestWorkerBuilder
 import androidx.work.testing.WorkManagerTestInitHelper
 import com.raygun.raygun4android.CrashReporting
 import com.raygun.raygun4android.OkHttpClientBuilder
@@ -22,6 +26,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.RuntimeEnvironment
+import java.io.File
 
 @RunWith(RobolectricTestRunner::class)
 class CrashReportingWorkManagerTest {
@@ -123,6 +128,79 @@ class CrashReportingWorkManagerTest {
 
         assertEquals(1, queuedWork.size)
         assertEquals(WorkInfo.State.ENQUEUED, queuedWork.single().state)
+    }
+
+    @Test
+    fun `work enqueued by an earlier SDK version delivers its filesDir payload`() {
+        val legacyFile =
+            File(application.filesDir, "legacy.raygun4").apply { writeText("{\"legacy\":true}") }
+        val inputData =
+            Data
+                .Builder()
+                .putString(CrashReportingWorkerHelper.TEMP_FILE_INPUT, legacyFile.name)
+                .putString(CrashReportingWorkerHelper.API_KEY_INPUT, "api-key")
+                .build()
+        val worker =
+            TestWorkerBuilder
+                .from(
+                    application,
+                    CrashReportingWorker::class.java,
+                    SynchronousExecutor(),
+                ).setInputData(inputData)
+                .build()
+
+        assertEquals(ListenableWorker.Result.success(), worker.doWork())
+        assertFalse(legacyFile.exists())
+    }
+
+    @Test
+    @Suppress("RestrictedApi")
+    fun `report is retained when WorkManager is not initialized`() {
+        WorkManagerImpl.setDelegate(null)
+        val cachedFile = requireNotNull(CrashReportCache.store(application, "{\"retained\":true}"))
+
+        assertFalse(
+            CrashReportingWorkerHelper.enqueueCachedCrashReport(
+                application,
+                cachedFile,
+                "api-key",
+            ),
+        )
+        assertTrue(cachedFile.exists())
+    }
+
+    @Test
+    fun `cancelled work is replaced by the next scheduling pass`() {
+        val file = requireNotNull(CrashReportCache.store(application, "{\"cancelled\":true}"))
+        val workManager = WorkManager.getInstance(application)
+        val workName = CrashReportingWorkerHelper.cachedWorkName(file)
+        assertTrue(
+            CrashReportingWorkerHelper.enqueueCachedCrashReport(application, file, "api-key"),
+        )
+        workManager.cancelUniqueWork(workName).result.get()
+        assertEquals(
+            WorkInfo.State.CANCELLED,
+            workManager
+                .getWorkInfosForUniqueWork(workName)
+                .get()
+                .single()
+                .state,
+        )
+        assertTrue(file.exists())
+
+        assertTrue(
+            CrashReportingWorkerHelper.enqueueCachedCrashReport(application, file, "api-key"),
+        )
+
+        val queuedWork = workManager.getWorkInfosForUniqueWork(workName).get().single()
+        assertEquals(WorkInfo.State.ENQUEUED, queuedWork.state)
+        requireNotNull(WorkManagerTestInitHelper.getTestDriver(application))
+            .setAllConstraintsMet(queuedWork.id)
+        assertEquals(
+            WorkInfo.State.SUCCEEDED,
+            workManager.getWorkInfoById(queuedWork.id).get()!!.state,
+        )
+        assertFalse(file.exists())
     }
 
     companion object {

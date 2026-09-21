@@ -38,7 +38,6 @@ Thumbs.db
 .idea/androidTestResultsUserPreferences.xml
 .gradle
 build/
-/provider/raygun-crash-reports/
 .navigation
 captures/
 output.json 

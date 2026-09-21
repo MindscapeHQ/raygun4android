@@ -5,8 +5,11 @@ import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
+import org.junit.rules.TemporaryFolder
 import org.junit.runner.RunWith
+import org.mockito.Mockito.lenient
 import org.mockito.Mockito.mock
 import org.mockito.junit.MockitoJUnitRunner
 import org.mockito.kotlin.whenever
@@ -14,6 +17,8 @@ import timber.log.Timber
 
 @RunWith(MockitoJUnitRunner::class)
 class RaygunClientTest {
+    @get:Rule val temporaryFolder = TemporaryFolder()
+
     @Before
     fun setup() {
         Timber.plant(TestTree())
@@ -29,7 +34,11 @@ class RaygunClientTest {
     @Test
     fun initializesWithApplicationAndApiKeyAndVersion() {
         val mockApplication = mock<Application>(Application::class.java)
+        val dataDirectory = temporaryFolder.root
         whenever(mockApplication.applicationContext).thenReturn(mockApplication)
+        lenient().`when`(mockApplication.noBackupFilesDir).thenReturn(dataDirectory)
+        lenient().`when`(mockApplication.cacheDir).thenReturn(dataDirectory)
+        lenient().`when`(mockApplication.filesDir).thenReturn(dataDirectory)
 
         val apiKey = "testApiKey"
 
