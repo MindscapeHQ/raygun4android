@@ -10,15 +10,12 @@ import androidx.work.WorkManager
 import com.raygun.raygun4android.logging.RaygunLogger.e
 import com.raygun.raygun4android.logging.RaygunLogger.i
 import java.io.File
-import java.util.concurrent.atomic.AtomicBoolean
 
 object CrashReportingWorkerHelper {
     internal const val TEMP_FILE_INPUT = "file"
     internal const val CACHED_FILE_INPUT = "cachedFile"
     internal const val API_KEY_INPUT = "apikey"
-    internal const val LEGACY_SERIALIZED_INPUT = "legacySerialized"
     private const val CACHED_WORK_PREFIX = "raygun-cached-crash-"
-    private val cachedReportRescanRequired = AtomicBoolean(false)
 
     fun enqueueCrashReport(
         context: Context,
@@ -35,12 +32,11 @@ object CrashReportingWorkerHelper {
         apiKey: String?,
     ): Boolean {
         if (apiKey.isNullOrBlank()) {
-            cachedReportRescanRequired.set(true)
             e("No API key was provided; cached crash report will be retained.")
             return false
         }
 
-        val workRequest = cachedCrashReportWorkRequest(context, file, apiKey)
+        val workRequest = cachedCrashReportWorkRequest(file, apiKey)
         return try {
             WorkManager
                 .getInstance(context)
@@ -52,16 +48,12 @@ object CrashReportingWorkerHelper {
             i("Work for CrashReportingWorker has been put into the queue.")
             true
         } catch (exception: IllegalStateException) {
-            cachedReportRescanRequired.set(true)
             e("WorkManager is not initialized; cached crash report will be retried later.")
             false
         }
     }
 
-    internal fun takeCachedReportRescanRequired(): Boolean = cachedReportRescanRequired.getAndSet(false)
-
     internal fun cachedCrashReportWorkRequest(
-        context: Context,
         file: File,
         apiKey: String?,
     ): OneTimeWorkRequest {
@@ -70,7 +62,6 @@ object CrashReportingWorkerHelper {
                 .Builder()
                 .putString(CACHED_FILE_INPUT, file.absolutePath)
                 .putString(API_KEY_INPUT, apiKey)
-                .putBoolean(LEGACY_SERIALIZED_INPUT, isLegacyCacheFile(context, file))
                 .build()
         val constraints =
             Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build()
@@ -83,9 +74,4 @@ object CrashReportingWorkerHelper {
     }
 
     internal fun cachedWorkName(file: File): String = CACHED_WORK_PREFIX + file.absolutePath
-
-    private fun isLegacyCacheFile(
-        context: Context,
-        file: File,
-    ): Boolean = file.parentFile?.absolutePath == context.cacheDir.absolutePath
 }

@@ -31,7 +31,6 @@ class CrashReportingWorkManagerTest {
     @Before
     fun setUp() {
         CrashReportCache.clear(application)
-        CrashReportingWorkerHelper.takeCachedReportRescanRequired()
         val configuration = Configuration.Builder().setExecutor(SynchronousExecutor()).build()
         WorkManagerTestInitHelper.initializeTestWorkManager(application, configuration)
         RaygunSettings.okHttpClientBuilder =
@@ -56,17 +55,16 @@ class CrashReportingWorkManagerTest {
     fun tearDown() {
         RaygunSettings.okHttpClientBuilder = null
         RaygunSettings.maxReportsStoredOnDevice = originalMaximum
-        CrashReportingWorkerHelper.takeCachedReportRescanRequired()
         CrashReportCache.clear(application)
     }
 
     @Test
-    fun `startup scheduling deduplicates and WorkManager delivers durable report`() {
+    fun `full spool keeps newest report and WorkManager delivers it once`() {
         RaygunSettings.maxReportsStoredOnDevice = 1
         CrashReportingWorkerHelper.enqueueCrashReport(application, "{\"first\":true}", null)
         CrashReportingWorkerHelper.enqueueCrashReport(application, "{\"second\":true}", "api-key")
         val file = CrashReportCache.files(application).single()
-        assertEquals("{\"first\":true}", CrashReportCache.readPersistent(file))
+        assertEquals("{\"second\":true}", CrashReportCache.readPersistent(file))
 
         assertTrue(
             CrashReportingWorkerHelper.enqueueCachedCrashReport(
@@ -99,7 +97,7 @@ class CrashReportingWorkManagerTest {
     }
 
     @Test
-    fun `next send rescans retained reports after a scheduling failure`() {
+    fun `next send rescans retained reports`() {
         RaygunClient.init(application, "api-key", "1.0.0")
         RaygunClient.enableCrashReporting(attachDefaultHandler = false)
         val retainedFile =

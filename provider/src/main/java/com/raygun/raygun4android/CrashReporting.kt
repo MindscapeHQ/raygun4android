@@ -15,7 +15,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import java.util.concurrent.CopyOnWriteArrayList
-import java.util.concurrent.TimeUnit
 
 typealias Tags = List<String>
 
@@ -109,10 +108,8 @@ object CrashReporting {
         customData: CustomData? = null,
     ) {
         if (RaygunClient.isCrashReportingEnabled) {
+            postCachedMessages()
             coroutineScope.launch {
-                if (CrashReportingWorkerHelper.takeCachedReportRescanRequired()) {
-                    postCachedMessages()
-                }
                 val jsonPayload = buildJsonPayload(throwable, tags, customData) ?: return@launch
                 enqueueWorkForCrashReporting(RaygunClient.apiKey, jsonPayload)
             }
@@ -155,16 +152,12 @@ object CrashReporting {
         timeoutMillis: Long = UNHANDLED_EXCEPTION_TIMEOUT_MILLIS,
     ): Boolean {
         var stored = false
-        val deadline = System.nanoTime() + TimeUnit.MILLISECONDS.toNanos(timeoutMillis)
         val persistenceThread =
             Thread(
                 {
                     try {
                         val jsonPayload =
                             runBlocking { buildJsonPayload(throwable, tags, null) } ?: return@Thread
-                        if (Thread.currentThread().isInterrupted || System.nanoTime() >= deadline) {
-                            return@Thread
-                        }
                         stored =
                             CrashReportCache.store(
                                 RaygunClient.getApplicationContext(),
@@ -176,19 +169,18 @@ object CrashReporting {
                 },
                 "RaygunCrashPersistence",
             )
+        persistenceThread.isDaemon = true
         persistenceThread.start()
 
         return try {
             persistenceThread.join(timeoutMillis)
             if (persistenceThread.isAlive) {
-                persistenceThread.interrupt()
                 RaygunLogger.w("Timed out while caching unhandled exception")
                 false
             } else {
                 stored
             }
         } catch (exception: InterruptedException) {
-            persistenceThread.interrupt()
             Thread.currentThread().interrupt()
             RaygunLogger.w("Interrupted while caching unhandled exception")
             false
@@ -237,7 +229,6 @@ object CrashReporting {
 
     @JvmStatic
     fun postCachedMessages() {
-        CrashReportingWorkerHelper.takeCachedReportRescanRequired()
         coroutineScope.launch {
             try {
                 for (file in CrashReportCache.files(RaygunClient.getApplicationContext())) {

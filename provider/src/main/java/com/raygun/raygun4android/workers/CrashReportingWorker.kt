@@ -17,10 +17,8 @@ import java.io.EOFException
 import java.io.File
 import java.io.FileInputStream
 import java.io.IOException
-import java.io.InputStreamReader
 import java.io.ObjectInputStream
 import java.io.ObjectStreamException
-import java.nio.charset.StandardCharsets
 
 class CrashReportingWorker(
     context: Context,
@@ -31,8 +29,6 @@ class CrashReportingWorker(
         val temporaryFile = inputData.getString(CrashReportingWorkerHelper.TEMP_FILE_INPUT)
         val cachedFile = inputData.getString(CrashReportingWorkerHelper.CACHED_FILE_INPUT)
         val apiKey = inputData.getString(CrashReportingWorkerHelper.API_KEY_INPUT)
-        val legacySerialized =
-            inputData.getBoolean(CrashReportingWorkerHelper.LEGACY_SERIALIZED_INPUT, false)
 
         if (temporaryFile.isNullOrEmpty() && cachedFile.isNullOrEmpty()) {
             e("No file provided in input data.")
@@ -48,7 +44,6 @@ class CrashReportingWorker(
 
         return processCrashReport(
             file = file,
-            isLegacySerialized = legacySerialized,
             apiKey = apiKey,
             postCrashReport = ::postCrashReporting,
         )
@@ -98,20 +93,6 @@ class CrashReportingWorker(
         return -1
     }
 
-    private fun readMessageFromTempFile(file: File): String? {
-        val message = StringBuilder()
-
-        file.inputStream().use { fis ->
-            InputStreamReader(fis, StandardCharsets.UTF_8).use { isr ->
-                isr.buffered().use { reader ->
-                    reader.forEachLine { line -> message.append(line).append("\n") }
-                }
-            }
-        }
-
-        return message.toString().trimEnd()
-    }
-
     private fun readMessageFromCache(file: File): String? =
         try {
             ObjectInputStream(FileInputStream(file)).use { input ->
@@ -132,7 +113,6 @@ class CrashReportingWorker(
 
     internal fun processCrashReport(
         file: File,
-        isLegacySerialized: Boolean,
         apiKey: String?,
         postCrashReport: (String, String) -> Int,
     ): Result {
@@ -143,10 +123,9 @@ class CrashReportingWorker(
 
         val message =
             try {
-                if (isLegacySerialized) {
+                // Reports cached by earlier SDK versions after a failed delivery are serialized
+                if (file.parentFile == applicationContext.cacheDir) {
                     readMessageFromCache(file)
-                } else if (file.parentFile == applicationContext.filesDir) {
-                    readMessageFromTempFile(file)
                 } else {
                     CrashReportCache.readPersistent(file)
                 }
@@ -157,7 +136,7 @@ class CrashReportingWorker(
 
         if (message == null) {
             e("No message was provided.")
-            CrashReportCache.markProcessed(applicationContext, file)
+            CrashReportCache.remove(file)
             return Result.failure()
         }
 
@@ -170,13 +149,8 @@ class CrashReportingWorker(
         responseCode(responseCode)
         val result = RaygunWorkerHelper.toWorkerResult(responseCode)
 
-        if (
-            responseCode in 200..299 ||
-            responseCode == RaygunSettings.RESPONSE_CODE_BAD_MESSAGE ||
-            responseCode == RaygunSettings.RESPONSE_CODE_INVALID_API_KEY ||
-            responseCode == RaygunSettings.RESPONSE_CODE_LARGE_PAYLOAD
-        ) {
-            CrashReportCache.markProcessed(applicationContext, file)
+        if (result != Result.retry()) {
+            CrashReportCache.remove(file)
         }
 
         return result

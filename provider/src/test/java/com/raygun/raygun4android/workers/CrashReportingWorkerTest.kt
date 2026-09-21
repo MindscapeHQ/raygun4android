@@ -31,7 +31,7 @@ class CrashReportingWorkerTest {
         val file = rawReport("payload to retry")
 
         val result =
-            worker.processCrashReport(file, false, "api-key") { apiKey, message ->
+            worker.processCrashReport(file, "api-key") { apiKey, message ->
                 assertEquals("api-key", apiKey)
                 assertEquals("payload to retry", message)
                 -1
@@ -45,7 +45,7 @@ class CrashReportingWorkerTest {
     fun `successful delivery removes raw payload`() {
         val file = rawReport("delivered payload")
 
-        val result = worker.processCrashReport(file, false, "api-key") { _, _ -> 202 }
+        val result = worker.processCrashReport(file, "api-key") { _, _ -> 202 }
 
         assertEquals(Result.success(), result)
         assertFalse(file.exists())
@@ -55,7 +55,7 @@ class CrashReportingWorkerTest {
     fun `permanent rejection removes payload`() {
         val file = rawReport("invalid payload")
 
-        val result = worker.processCrashReport(file, false, "api-key") { _, _ -> 400 }
+        val result = worker.processCrashReport(file, "api-key") { _, _ -> 400 }
 
         assertEquals(Result.failure(), result)
         assertFalse(file.exists())
@@ -67,7 +67,7 @@ class CrashReportingWorkerTest {
         var deliveredMessage: String? = null
 
         val result =
-            worker.processCrashReport(file, false, "api-key") { _, message ->
+            worker.processCrashReport(file, "api-key") { _, message ->
                 deliveredMessage = message
                 202
             }
@@ -81,7 +81,7 @@ class CrashReportingWorkerTest {
     fun `transient failure retains persistent cached payload`() {
         val file = persistentReport("recovered crash to retry")
 
-        val result = worker.processCrashReport(file, false, "api-key") { _, _ -> 503 }
+        val result = worker.processCrashReport(file, "api-key") { _, _ -> 503 }
 
         assertEquals(Result.retry(), result)
         assertTrue(file.exists())
@@ -93,7 +93,7 @@ class CrashReportingWorkerTest {
             File(CrashReportCache.persistentDirectory(application), "missing.raygun4")
 
         val result =
-            worker.processCrashReport(missingReport, false, "api-key") { _, _ ->
+            worker.processCrashReport(missingReport, "api-key") { _, _ ->
                 throw AssertionError("Missing payload must not be posted")
             }
 
@@ -106,7 +106,7 @@ class CrashReportingWorkerTest {
         val invalidReport = File(directory, "invalid.raygun4").apply { mkdir() }
 
         val result =
-            worker.processCrashReport(invalidReport, false, "api-key") { _, _ ->
+            worker.processCrashReport(invalidReport, "api-key") { _, _ ->
                 throw AssertionError("Non-file payload must not be posted")
             }
 
@@ -121,7 +121,7 @@ class CrashReportingWorkerTest {
 
         try {
             val result =
-                worker.processCrashReport(unreadableReport, false, "api-key") { _, _ ->
+                worker.processCrashReport(unreadableReport, "api-key") { _, _ ->
                     throw AssertionError("Unreadable payload must not be posted")
                 }
 
@@ -138,7 +138,7 @@ class CrashReportingWorkerTest {
         var deliveredMessage: String? = null
 
         val result =
-            worker.processCrashReport(file, true, "api-key") { _, message ->
+            worker.processCrashReport(file, "api-key") { _, message ->
                 deliveredMessage = message
                 202
             }
@@ -154,7 +154,7 @@ class CrashReportingWorkerTest {
         var postAttempted = false
 
         val result =
-            worker.processCrashReport(file, false, "") { _, _ ->
+            worker.processCrashReport(file, "") { _, _ ->
                 postAttempted = true
                 202
             }
@@ -166,11 +166,11 @@ class CrashReportingWorkerTest {
 
     @Test
     fun `corrupt cached payload fails without posting and is removed`() {
-        val file = rawReport("not a serialized message")
+        val file = legacyCacheReport("not a serialized message")
         var postAttempted = false
 
         val result =
-            worker.processCrashReport(file, true, "api-key") { _, _ ->
+            worker.processCrashReport(file, "api-key") { _, _ ->
                 postAttempted = true
                 202
             }
@@ -180,32 +180,6 @@ class CrashReportingWorkerTest {
         assertFalse(file.exists())
     }
 
-    @Test
-    fun `successful delivery does not leave a discoverable source when marking fails`() {
-        val file = persistentReport("delivered before cleanup failure")
-        val processedTarget = File(file.parentFile, ".${file.name}.processed")
-
-        try {
-            val result =
-                worker.processCrashReport(file, false, "api-key") { _, _ ->
-                    assertTrue(file.delete())
-                    assertTrue(file.mkdir())
-                    assertTrue(processedTarget.mkdir())
-                    File(processedTarget, "prevent-rename").writeText("occupied")
-                    202
-                }
-
-            assertEquals(Result.success(), result)
-            assertFalse(file.exists())
-            assertTrue(
-                CrashReportCache.files(application).none { it.absolutePath == file.absolutePath },
-            )
-        } finally {
-            file.deleteRecursively()
-            processedTarget.deleteRecursively()
-        }
-    }
-
     private fun rawReport(message: String): File =
         File.createTempFile("raygun-", ".raygun4", application.filesDir).apply {
             writeText(message)
@@ -213,6 +187,12 @@ class CrashReportingWorkerTest {
         }
 
     private fun persistentReport(message: String): File = requireNotNull(CrashReportCache.store(application, message))
+
+    private fun legacyCacheReport(message: String): File =
+        File.createTempFile("raygun-", ".raygun4", application.cacheDir).apply {
+            writeText(message)
+            deleteOnExit()
+        }
 
     private fun serializedReport(message: String): File =
         File.createTempFile("raygun-", ".raygun4", application.cacheDir).apply {

@@ -1,12 +1,10 @@
 package com.raygun.raygun4android.workers
 
 import com.raygun.raygun4android.RaygunSettings
-import com.raygun.raygun4android.SerializedMessage
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
-import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
@@ -14,8 +12,6 @@ import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.RuntimeEnvironment
 import java.io.File
-import java.io.FileOutputStream
-import java.io.ObjectOutputStream
 
 @RunWith(RobolectricTestRunner::class)
 class CrashReportCacheTest {
@@ -45,37 +41,49 @@ class CrashReportCacheTest {
     }
 
     @Test
-    fun `store respects maximum cached report count`() {
+    fun `store evicts the oldest report when the maximum is reached`() {
         RaygunSettings.maxReportsStoredOnDevice = 1
 
         assertNotNull(CrashReportCache.store(application, "first payload"))
-        assertNull(CrashReportCache.store(application, "second payload"))
-        assertEquals(1, cachedReports().size)
+        val newest = CrashReportCache.store(application, "second payload")
+
+        assertNotNull(newest)
+        assertEquals("second payload", CrashReportCache.readPersistent(cachedReports().single()))
     }
 
     @Test
     fun `store counts legacy reports toward maximum`() {
         RaygunSettings.maxReportsStoredOnDevice = 1
-        File(application.cacheDir, "legacy.raygun4").writeText("legacy")
+        val legacyFile = File(application.cacheDir, "legacy.raygun4").apply { writeText("legacy") }
 
-        assertNull(CrashReportCache.store(application, "new payload"))
-        assertEquals(1, cachedReports().size)
+        assertNotNull(CrashReportCache.store(application, "new payload"))
+        assertFalse(legacyFile.exists())
+        assertEquals("new payload", CrashReportCache.readPersistent(cachedReports().single()))
     }
 
     @Test
-    fun `discovery removes interrupted temporary and processed files`() {
-        val directory = CrashReportCache.persistentDirectory(application).apply { mkdirs() }
-        val temporaryFile =
-            File(directory, ".interrupted.tmp").apply {
-                writeText("partial")
-                setLastModified(0L)
-            }
-        val processedFile =
-            File(directory, ".delivered.raygun4.processed").apply { writeText("sent") }
+    fun `trim removes the oldest reports first`() {
+        val oldest =
+            CrashReportCache.store(application, "oldest")!!.apply { setLastModified(1_000L) }
+        val middle =
+            CrashReportCache.store(application, "middle")!!.apply { setLastModified(2_000L) }
+        val newest =
+            CrashReportCache.store(application, "newest")!!.apply { setLastModified(3_000L) }
 
-        assertTrue(CrashReportCache.files(application).isEmpty())
-        assertFalse(temporaryFile.exists())
-        assertFalse(processedFile.exists())
+        CrashReportCache.trim(application, 2)
+
+        assertFalse(oldest.exists())
+        assertTrue(middle.exists())
+        assertTrue(newest.exists())
+    }
+
+    @Test
+    fun `store leaves no temporary file behind`() {
+        assertNotNull(CrashReportCache.store(application, "payload"))
+
+        assertTrue(
+            application.cacheDir.listFiles { file -> file.name.endsWith(".tmp") }!!.isEmpty(),
+        )
     }
 
     @Test
@@ -84,7 +92,6 @@ class CrashReportCacheTest {
 
         val request =
             CrashReportingWorkerHelper.cachedCrashReportWorkRequest(
-                application,
                 cachedFile,
                 "test-api-key",
             )
@@ -101,35 +108,7 @@ class CrashReportCacheTest {
             null,
             request.workSpec.input.getString(CrashReportingWorkerHelper.TEMP_FILE_INPUT),
         )
-        assertFalse(
-            request.workSpec.input.getBoolean(
-                CrashReportingWorkerHelper.LEGACY_SERIALIZED_INPUT,
-                true,
-            ),
-        )
         assertTrue(cachedFile.exists())
-    }
-
-    @Test
-    fun `legacy cached request records serialized format`() {
-        val legacyFile = File(application.cacheDir, "legacy.raygun4")
-        ObjectOutputStream(FileOutputStream(legacyFile)).use { output ->
-            output.writeObject(SerializedMessage("legacy payload"))
-        }
-
-        val request =
-            CrashReportingWorkerHelper.cachedCrashReportWorkRequest(
-                application,
-                legacyFile,
-                "test-api-key",
-            )
-
-        assertTrue(
-            request.workSpec.input.getBoolean(
-                CrashReportingWorkerHelper.LEGACY_SERIALIZED_INPUT,
-                false,
-            ),
-        )
     }
 
     @Test

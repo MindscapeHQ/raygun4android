@@ -5,7 +5,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
 import android.os.IBinder
-import android.os.SystemClock
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.raygun.raygun4android.OkHttpClientBuilder
@@ -41,9 +40,6 @@ class CrashProcessPersistenceTest {
     @After
     fun tearDown() {
         RaygunClient.setOkHttpClientBuilder(null)
-        RaygunClient.setMaxReportsStoredOnDevice(
-            RaygunSettings.DEFAULT_MAX_REPORTS_STORED_ON_DEVICE,
-        )
         clearReports()
     }
 
@@ -90,35 +86,6 @@ class CrashProcessPersistenceTest {
         assertTrue(reportDelivered.await(REPORT_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS))
         assertTrue(deliveredPayload.get().contains(CrashProcessService.CRASH_MESSAGE))
         waitForReportsToBeRemoved()
-    }
-
-    @Test
-    fun concurrentWritesInSeparateProcessesRespectSharedCapacity() {
-        val writeAt = SystemClock.elapsedRealtime() + SIMULTANEOUS_WRITE_DELAY_MILLIS
-        val first =
-            CrashProcessBinding(
-                Intent(context, CapacityProcessService::class.java)
-                    .putExtra(CapacityProcessService.EXTRA_MAXIMUM_REPORTS, 1)
-                    .putExtra(CapacityProcessService.EXTRA_WRITE_AT_ELAPSED_REALTIME, writeAt),
-            )
-        val second =
-            CrashProcessBinding(
-                Intent(context, SecondCapacityProcessService::class.java)
-                    .putExtra(CapacityProcessService.EXTRA_MAXIMUM_REPORTS, 1)
-                    .putExtra(CapacityProcessService.EXTRA_WRITE_AT_ELAPSED_REALTIME, writeAt),
-            )
-
-        try {
-            first.bind()
-            second.bind()
-            first.awaitTermination()
-            second.awaitTermination()
-        } finally {
-            first.close()
-            second.close()
-        }
-
-        assertEquals(1, reports().size)
     }
 
     private fun reports(): Array<File> =
@@ -184,6 +151,5 @@ class CrashProcessPersistenceTest {
         private const val REPORT_TIMEOUT_MILLIS = 10_000L
         private const val PROCESS_TIMEOUT_MILLIS = 10_000L
         private const val POLL_INTERVAL_MILLIS = 50L
-        private const val SIMULTANEOUS_WRITE_DELAY_MILLIS = 2_000L
     }
 }
