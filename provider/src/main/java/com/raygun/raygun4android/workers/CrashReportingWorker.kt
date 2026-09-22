@@ -1,6 +1,5 @@
 package com.raygun.raygun4android.workers
 
-import android.annotation.SuppressLint
 import android.content.Context
 import androidx.work.Worker
 import androidx.work.WorkerParameters
@@ -9,24 +8,17 @@ import com.raygun.raygun4android.SerializedMessage
 import com.raygun.raygun4android.logging.RaygunLogger.d
 import com.raygun.raygun4android.logging.RaygunLogger.e
 import com.raygun.raygun4android.logging.RaygunLogger.responseCode
-import com.raygun.raygun4android.logging.RaygunLogger.w
-import com.raygun.raygun4android.network.ConnectivityUtils
-import com.raygun.raygun4android.utils.RaygunFileFilter
 import okhttp3.MediaType
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.Response
+import java.io.EOFException
 import java.io.File
-import java.io.FileNotFoundException
-import java.io.FileOutputStream
+import java.io.FileInputStream
 import java.io.IOException
-import java.io.InputStreamReader
-import java.io.ObjectOutputStream
-import java.nio.charset.StandardCharsets
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.UUID
+import java.io.ObjectInputStream
+import java.io.ObjectStreamException
 
 class CrashReportingWorker(
     context: Context,
@@ -34,80 +26,27 @@ class CrashReportingWorker(
 ) : Worker(context, workerParams) {
     override fun doWork(): Result {
         // Retrieve data from WorkManager
-        val file = inputData.getString("file")
-        val apiKey = inputData.getString("apikey")
+        val temporaryFile = inputData.getString(CrashReportingWorkerHelper.TEMP_FILE_INPUT)
+        val cachedFile = inputData.getString(CrashReportingWorkerHelper.CACHED_FILE_INPUT)
+        val apiKey = inputData.getString(CrashReportingWorkerHelper.API_KEY_INPUT)
 
-        if (file.isNullOrEmpty()) {
+        if (temporaryFile.isNullOrEmpty() && cachedFile.isNullOrEmpty()) {
             e("No file provided in input data.")
             return Result.failure()
         }
 
-        val message = readMessageFromTempFileAndDelete(file)
-
-        if (apiKey != null) {
-            if (ConnectivityUtils.isNetworkAvailable(applicationContext)) {
-                val responseCode = postCrashReporting(apiKey, message)
-                responseCode(responseCode)
-
-                return when {
-                    responseCode in 200..299 -> {
-                        Result.success()
-                    }
-
-                    responseCode == RaygunSettings.RESPONSE_CODE_BAD_MESSAGE ||
-                        responseCode == RaygunSettings.RESPONSE_CODE_INVALID_API_KEY ||
-                        responseCode == RaygunSettings.RESPONSE_CODE_LARGE_PAYLOAD -> {
-                        Result.failure()
-                    }
-
-                    else -> {
-                        saveMessage(message)
-                        Result.success()
-                    }
-                }
+        val file =
+            if (cachedFile != null) {
+                File(cachedFile)
             } else {
-                saveMessage(message)
-                return Result.success()
+                File(applicationContext.filesDir, temporaryFile!!)
             }
-        }
 
-        e("No message or API key was provided.")
-        return Result.failure()
-    }
-
-    private fun saveMessage(message: String) {
-        synchronized(this) {
-            val cachedFiles =
-                arrayListOf(
-                    applicationContext.cacheDir.listFiles(RaygunFileFilter()) ?: emptyList<File>(),
-                )
-
-            if (cachedFiles.size < RaygunSettings.maxReportsStoredOnDevice) {
-                @SuppressLint("SimpleDateFormat")
-                val timestamp =
-                    SimpleDateFormat("yyyyMMddHHmmss").format(Date(System.currentTimeMillis()))
-                val uuid = UUID.randomUUID().toString().replace("-", "")
-                val file =
-                    File(
-                        applicationContext.cacheDir,
-                        (timestamp + "-" + uuid + "." + RaygunSettings.DEFAULT_FILE_EXTENSION),
-                    )
-
-                try {
-                    ObjectOutputStream(FileOutputStream(file)).use { out ->
-                        val serializedMessage = SerializedMessage(message)
-                        out.writeObject(serializedMessage)
-                        out.close()
-                    }
-                } catch (e: FileNotFoundException) {
-                    e("Error creating file when caching message to filesystem: " + e.message)
-                } catch (e: IOException) {
-                    e("Error writing message to filesystem: " + e.message)
-                }
-            } else {
-                w("Maximum stored reports reached. Discarding message.")
-            }
-        }
+        return processCrashReport(
+            file = file,
+            apiKey = apiKey,
+            postCrashReport = ::postCrashReporting,
+        )
     }
 
     /**
@@ -154,25 +93,66 @@ class CrashReportingWorker(
         return -1
     }
 
-    private fun readMessageFromTempFileAndDelete(fileName: String): String {
-        val file = File(applicationContext.filesDir, fileName)
-        val message = StringBuilder()
-
+    private fun readMessageFromCache(file: File): String? =
         try {
-            file.inputStream().use { fis ->
-                InputStreamReader(fis, StandardCharsets.UTF_8).use { isr ->
-                    isr.buffered().use { reader ->
-                        reader.forEachLine { line -> message.append(line).append("\n") }
-                    }
-                }
+            ObjectInputStream(FileInputStream(file)).use { input ->
+                (input.readObject() as SerializedMessage).message
             }
-            if (!file.delete()) {
-                e("Failed to delete the file: $fileName")
-            }
-        } catch (e: IOException) {
-            e("Failed to read message from file: " + e.message)
+        } catch (exception: ObjectStreamException) {
+            e("Failed to read cached message: " + exception.message)
+            null
+        } catch (exception: EOFException) {
+            e("Failed to read cached message: " + exception.message)
+            null
+        } catch (exception: IOException) {
+            throw exception
+        } catch (exception: Exception) {
+            e("Failed to read cached message: " + exception.message)
+            null
         }
 
-        return message.toString().trimEnd()
+    internal fun processCrashReport(
+        file: File,
+        apiKey: String?,
+        postCrashReport: (String, String) -> Int,
+    ): Result {
+        if (!file.isFile) {
+            e("Crash report source is missing or is not a regular file.")
+            return Result.failure()
+        }
+
+        val message =
+            try {
+                // Reports cached by earlier SDK versions after a failed delivery are serialized
+                if (file.parentFile == applicationContext.cacheDir) {
+                    readMessageFromCache(file)
+                } else {
+                    CrashReportCache.readPersistent(file)
+                }
+            } catch (exception: IOException) {
+                e("Failed to read cached message; retaining for retry: " + exception.message)
+                return Result.retry()
+            }
+
+        if (message == null) {
+            e("No message was provided.")
+            CrashReportCache.remove(file)
+            return Result.failure()
+        }
+
+        if (apiKey.isNullOrBlank()) {
+            e("No API key was provided; retaining cached crash report.")
+            return Result.failure()
+        }
+
+        val responseCode = postCrashReport(apiKey, message)
+        responseCode(responseCode)
+        val result = RaygunWorkerHelper.toWorkerResult(responseCode)
+
+        if (result != Result.retry()) {
+            CrashReportCache.remove(file)
+        }
+
+        return result
     }
 }

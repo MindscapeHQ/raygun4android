@@ -16,7 +16,7 @@ import com.raygun.raygun4android.messages.crashreporting.RaygunBreadcrumbMessage
 import com.raygun.raygun4android.messages.shared.RaygunUserInfo
 import com.raygun.raygun4android.messages.shared.RaygunUserInfo.Companion.create
 import com.raygun.raygun4android.rum.RUM.Companion.instance
-import com.raygun.raygun4android.utils.RaygunFileUtils.clearCachedReports
+import com.raygun.raygun4android.workers.CrashReportCache
 import java.util.UUID
 
 /**
@@ -377,19 +377,19 @@ object RaygunClient {
      * The default and maximum value for this is 64. We do not recommend to change this setting
      * unless you have a very good reason and use case.
      *
-     * If you decrease the value of maxReportsStoredOnDevice, all currently cached reports will be
-     * deleted.
+     * If you decrease the value of maxReportsStoredOnDevice, the oldest cached reports beyond the
+     * new maximum are deleted. Values outside 1 to 64 are ignored.
      *
      * @param maxReportsStoredOnDevice An int with the new maximum number of crash reports
      */
     fun setMaxReportsStoredOnDevice(maxReportsStoredOnDevice: Int) {
         val currentMaxReportsStoredOnDevice = RaygunSettings.maxReportsStoredOnDevice
 
-        if (maxReportsStoredOnDevice < currentMaxReportsStoredOnDevice) {
-            clearCachedReports(getApplicationContext())
-        }
-
         RaygunSettings.maxReportsStoredOnDevice = maxReportsStoredOnDevice
+
+        if (RaygunSettings.maxReportsStoredOnDevice < currentMaxReportsStoredOnDevice) {
+            CrashReportCache.trim(getApplicationContext(), RaygunSettings.maxReportsStoredOnDevice)
+        }
     }
 
     /**

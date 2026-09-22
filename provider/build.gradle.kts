@@ -68,6 +68,7 @@ dependencies {
     implementation(libs.timber)
     implementation(libs.androidx.work.runtime)
 
+    testImplementation(libs.androidx.work.testing)
     testImplementation(libs.junit)
     testImplementation(libs.mockito.core)
     testImplementation(libs.mockito.kotlin)

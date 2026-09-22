@@ -1,18 +1,32 @@
 package com.raygun.raygun4android
 
-import android.content.Context
-import com.raygun.raygun4android.utils.RaygunFileFilter
 import com.raygun.raygun4android.utils.RaygunFileUtils
+import com.raygun.raygun4android.workers.CrashReportCache
+import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
+import org.junit.Before
 import org.junit.Test
-import org.mockito.kotlin.anyOrNull
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.times
-import org.mockito.kotlin.verify
-import org.mockito.kotlin.whenever
+import org.junit.runner.RunWith
+import org.robolectric.RobolectricTestRunner
+import org.robolectric.RuntimeEnvironment
 import java.io.File
 
+@RunWith(RobolectricTestRunner::class)
 class RaygunFileUtilsTest {
+    private val application = RuntimeEnvironment.getApplication()
+
+    @Before
+    fun setUp() {
+        CrashReportCache.files(application).forEach(File::delete)
+    }
+
+    @After
+    fun tearDown() {
+        CrashReportCache.files(application).forEach(File::delete)
+    }
+
     @Test
     fun getExtensionReturnsCorrectExtension() {
         val filename = "testfile.txt"
@@ -23,54 +37,36 @@ class RaygunFileUtilsTest {
     }
 
     @Test
-    fun clearCachedReportsDeletesNothing() {
-        val mockContext = mock<Context>()
-        val mockCacheDir = mock<File>()
+    fun clearCachedReportsLeavesUnrelatedFiles() {
+        val persistentTextFile =
+            File(CrashReportCache.persistentDirectory(application), "keep.txt").apply {
+                parentFile?.mkdirs()
+                writeText("keep")
+            }
+        val cacheTextFile =
+            File(application.cacheDir, "keep.txt").apply {
+                writeText("keep")
+            }
 
-        val mockFile1 = mock<File>()
-        whenever(mockFile1.name).thenReturn("file1.txt")
+        RaygunFileUtils.clearCachedReports(application)
 
-        val mockFile2 = mock<File>()
-        whenever(mockFile2.name).thenReturn("file2.txt")
-
-        val mockFile3 = mock<File>()
-        whenever(mockFile3.name).thenReturn("file3.txt")
-
-        val mockFiles = arrayOf(mockFile1, mockFile2, mockFile3)
-
-        whenever(mockContext.cacheDir).thenReturn(mockCacheDir)
-        whenever(mockCacheDir.listFiles(anyOrNull<RaygunFileFilter>())).thenReturn(mockFiles)
-
-        RaygunFileUtils.clearCachedReports(mockContext)
-
-        verify(mockFiles[0], times(0)).delete()
-        verify(mockFiles[1], times(0)).delete()
-        verify(mockFiles[2], times(0)).delete()
+        assertTrue(persistentTextFile.exists())
+        assertTrue(cacheTextFile.exists())
+        persistentTextFile.delete()
+        cacheTextFile.delete()
     }
 
     @Test
-    fun clearCachedReportsDeletesRaygunReports() {
-        val mockContext = mock<Context>()
-        val mockCacheDir = mock<File>()
+    fun clearCachedReportsDeletesPersistentAndLegacyReports() {
+        val persistentReport = CrashReportCache.store(application, "persistent report")!!
+        val legacyReport =
+            File(application.cacheDir, "legacy.raygun4").apply {
+                writeText("legacy report")
+            }
 
-        val mockFile1 = mock<File>()
-        whenever(mockFile1.name).thenReturn("file1.raygun4")
+        RaygunFileUtils.clearCachedReports(application)
 
-        val mockFile2 = mock<File>()
-        whenever(mockFile2.name).thenReturn("file2.txt")
-
-        val mockFile3 = mock<File>()
-        whenever(mockFile3.name).thenReturn("file3.raygun4")
-
-        val mockFiles = arrayOf(mockFile1, mockFile2, mockFile3)
-
-        whenever(mockContext.cacheDir).thenReturn(mockCacheDir)
-        whenever(mockCacheDir.listFiles(anyOrNull<RaygunFileFilter>())).thenReturn(mockFiles)
-
-        RaygunFileUtils.clearCachedReports(mockContext)
-
-        verify(mockFiles[0], times(1)).delete()
-        verify(mockFiles[1], times(0)).delete()
-        verify(mockFiles[2], times(1)).delete()
+        assertFalse(persistentReport.exists())
+        assertFalse(legacyReport.exists())
     }
 }
