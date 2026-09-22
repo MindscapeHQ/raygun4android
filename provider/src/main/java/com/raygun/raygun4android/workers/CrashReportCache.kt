@@ -42,6 +42,8 @@ internal object CrashReportCache {
                 output.write(message.toByteArray(Charsets.UTF_8))
             }
 
+            trim(context, RaygunSettings.maxReportsStoredOnDevice - 1)
+
             if (!temporaryFile.renameTo(cachedFile)) {
                 e("Error moving cached crash report into place")
                 temporaryFile.delete()
@@ -52,8 +54,6 @@ internal object CrashReportCache {
             temporaryFile.delete()
             return null
         }
-
-        trim(context, RaygunSettings.maxReportsStoredOnDevice)
 
         return cachedFile
     }
@@ -83,9 +83,7 @@ internal object CrashReportCache {
         context: Context,
         maximum: Int,
     ) {
-        val reports =
-            files(context)
-                .sortedWith(compareBy<File>(File::lastModified).thenBy(File::getAbsolutePath))
+        val reports = files(context).sortedBy(File::lastModified)
         val excess = reports.size - maximum.coerceAtLeast(0)
         if (excess > 0) {
             w("Maximum stored reports reached. Removing $excess oldest report(s).")
