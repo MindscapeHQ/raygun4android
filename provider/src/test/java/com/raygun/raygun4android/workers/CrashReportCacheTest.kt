@@ -1,14 +1,18 @@
 package com.raygun.raygun4android.workers
 
+import android.content.ContextWrapper
 import com.raygun.raygun4android.RaygunClient
 import com.raygun.raygun4android.RaygunSettings
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
+import org.junit.rules.TemporaryFolder
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.RuntimeEnvironment
@@ -16,6 +20,8 @@ import java.io.File
 
 @RunWith(RobolectricTestRunner::class)
 class CrashReportCacheTest {
+    @get:Rule val temporaryFolder = TemporaryFolder()
+
     private val application = RuntimeEnvironment.getApplication()
     private val originalMaximum = RaygunSettings.maxReportsStoredOnDevice
 
@@ -50,6 +56,29 @@ class CrashReportCacheTest {
 
         assertNotNull(newest)
         assertEquals("second payload", CrashReportCache.readPersistent(cachedReports().single()))
+    }
+
+    @Test
+    fun `failed replacement write preserves the existing report`() {
+        RaygunSettings.maxReportsStoredOnDevice = 1
+        val noBackupDirectory = temporaryFolder.newFolder("no-backup")
+        val unusableCacheDirectory = temporaryFolder.newFile("not-a-directory")
+        val context =
+            object : ContextWrapper(application) {
+                override fun getNoBackupFilesDir(): File = noBackupDirectory
+
+                override fun getCacheDir(): File = unusableCacheDirectory
+            }
+        val existingReport =
+            File(CrashReportCache.persistentDirectory(context), "existing.raygun4").apply {
+                parentFile?.mkdirs()
+                writeText("existing payload")
+            }
+
+        assertNull(CrashReportCache.store(context, "replacement payload"))
+
+        assertTrue(existingReport.exists())
+        assertEquals("existing payload", existingReport.readText())
     }
 
     @Test

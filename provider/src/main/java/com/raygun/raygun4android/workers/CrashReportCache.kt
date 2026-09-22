@@ -33,8 +33,6 @@ internal object CrashReportCache {
             return null
         }
 
-        trim(context, RaygunSettings.maxReportsStoredOnDevice - 1)
-
         val fileName = UUID.randomUUID().toString().replace("-", "")
         val temporaryFile = File(context.cacheDir, ".$fileName$TEMPORARY_SUFFIX")
         val cachedFile = File(directory, "$fileName.${RaygunSettings.DEFAULT_FILE_EXTENSION}")
@@ -43,6 +41,8 @@ internal object CrashReportCache {
             FileOutputStream(temporaryFile).use { output ->
                 output.write(message.toByteArray(Charsets.UTF_8))
             }
+
+            trim(context, RaygunSettings.maxReportsStoredOnDevice - 1)
 
             if (!temporaryFile.renameTo(cachedFile)) {
                 e("Error moving cached crash report into place")
