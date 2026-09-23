@@ -1,5 +1,16 @@
 ## Changelog
 
+### 6.2.3
+
+- fix: persist uncaught crash reports before process termination and retry delivery across app restarts (#323)
+- fix: retain pending reports until delivery reaches a terminal result and preserve them across transient send or storage failures (#323)
+- fix: evict the oldest cached report at capacity and trim the oldest reports when lowering the storage limit (#323)
+- fix: contain `onBeforeSend` and persistence failures so they do not crash the host application (#323)
+- fix: accept values from 1 to 64 for `setMaxReportsStoredOnDevice`; values outside this range are ignored (#323)
+- fix: align transitive OkHttp dependencies with the OkHttp 5.4.0 BOM (#325)
+
+**Compatibility note:** In 6.2.2 and earlier, setting `maxReportsStoredOnDevice` to `0` effectively disabled offline crash-report caching. Starting with 6.2.3, `0` is ignored and the current storage limit is retained. Set the limit to a value from 1 to 64.
+
 ### 6.2.2
 
 - chore(ci): bump actions/setup-java from 5.6.0 to 6.0.0 and migrate the CI JDK distribution from AdoptOpenJDK to Eclipse Temurin (#314)

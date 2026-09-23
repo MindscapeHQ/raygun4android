@@ -16,7 +16,7 @@ This means that the library is now fully compatible with Kotlin Coroutines and p
 We recommend using those if you are using Kotlin in your project.
 As well, the library is still compatible with pure Java Android applications.
 
-Raygun4Android 6.2.2 is the current stable release of the provider and supports Android 6+.
+Raygun4Android 6.2.3 is the current stable release of the provider and supports Android 6+.
 
 The `develop` branch reflects ongoing work on the version 6 line and only supports Android 6+.
 
