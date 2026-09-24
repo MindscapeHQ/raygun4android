@@ -1,6 +1,7 @@
 package com.raygun.raygun4android.workers
 
 import androidx.work.ListenableWorker.Result
+import com.raygun.raygun4android.RaygunSettings
 import com.raygun.raygun4android.SerializedMessage
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -31,7 +32,7 @@ class CrashReportingWorkerTest {
         val file = rawReport("payload to retry")
 
         val result =
-            worker.processCrashReport(file, "api-key") { apiKey, message ->
+            worker.processCrashReport(file, "api-key") { _, apiKey, message ->
                 assertEquals("api-key", apiKey)
                 assertEquals("payload to retry", message)
                 -1
@@ -45,7 +46,7 @@ class CrashReportingWorkerTest {
     fun `successful delivery removes raw payload`() {
         val file = rawReport("delivered payload")
 
-        val result = worker.processCrashReport(file, "api-key") { _, _ -> 202 }
+        val result = worker.processCrashReport(file, "api-key") { _, _, _ -> 202 }
 
         assertEquals(Result.success(), result)
         assertFalse(file.exists())
@@ -55,7 +56,7 @@ class CrashReportingWorkerTest {
     fun `permanent rejection removes payload`() {
         val file = rawReport("invalid payload")
 
-        val result = worker.processCrashReport(file, "api-key") { _, _ -> 400 }
+        val result = worker.processCrashReport(file, "api-key") { _, _, _ -> 400 }
 
         assertEquals(Result.failure(), result)
         assertFalse(file.exists())
@@ -67,7 +68,7 @@ class CrashReportingWorkerTest {
         var deliveredMessage: String? = null
 
         val result =
-            worker.processCrashReport(file, "api-key") { _, message ->
+            worker.processCrashReport(file, "api-key") { _, _, message ->
                 deliveredMessage = message
                 202
             }
@@ -81,7 +82,7 @@ class CrashReportingWorkerTest {
     fun `transient failure retains persistent cached payload`() {
         val file = persistentReport("recovered crash to retry")
 
-        val result = worker.processCrashReport(file, "api-key") { _, _ -> 503 }
+        val result = worker.processCrashReport(file, "api-key") { _, _, _ -> 503 }
 
         assertEquals(Result.retry(), result)
         assertTrue(file.exists())
@@ -93,7 +94,7 @@ class CrashReportingWorkerTest {
             File(CrashReportCache.persistentDirectory(application), "missing.raygun4")
 
         val result =
-            worker.processCrashReport(missingReport, "api-key") { _, _ ->
+            worker.processCrashReport(missingReport, "api-key") { _, _, _ ->
                 throw AssertionError("Missing payload must not be posted")
             }
 
@@ -106,7 +107,7 @@ class CrashReportingWorkerTest {
         val invalidReport = File(directory, "invalid.raygun4").apply { mkdir() }
 
         val result =
-            worker.processCrashReport(invalidReport, "api-key") { _, _ ->
+            worker.processCrashReport(invalidReport, "api-key") { _, _, _ ->
                 throw AssertionError("Non-file payload must not be posted")
             }
 
@@ -121,7 +122,7 @@ class CrashReportingWorkerTest {
 
         try {
             val result =
-                worker.processCrashReport(unreadableReport, "api-key") { _, _ ->
+                worker.processCrashReport(unreadableReport, "api-key") { _, _, _ ->
                     throw AssertionError("Unreadable payload must not be posted")
                 }
 
@@ -138,7 +139,7 @@ class CrashReportingWorkerTest {
         var deliveredMessage: String? = null
 
         val result =
-            worker.processCrashReport(file, "api-key") { _, message ->
+            worker.processCrashReport(file, "api-key") { _, _, message ->
                 deliveredMessage = message
                 202
             }
@@ -149,12 +150,61 @@ class CrashReportingWorkerTest {
     }
 
     @Test
+    fun `report is posted with the API key and endpoint it was stored with`() {
+        val file =
+            requireNotNull(
+                CrashReportCache.store(
+                    application,
+                    "stored crash",
+                    "stored-api-key",
+                    CUSTOM_ENDPOINT,
+                ),
+            )
+        var postedEndpoint: String? = null
+        var postedApiKey: String? = null
+
+        val result =
+            worker.processCrashReport(file, "current-api-key") { endpoint, apiKey, _ ->
+                postedEndpoint = endpoint
+                postedApiKey = apiKey
+                202
+            }
+
+        assertEquals(Result.success(), result)
+        assertEquals(CUSTOM_ENDPOINT, postedEndpoint)
+        assertEquals("stored-api-key", postedApiKey)
+    }
+
+    @Test
+    fun `report stored by an earlier SDK version uses the current API key and endpoint`() {
+        val file = rawReport("earlier crash")
+        var postedEndpoint: String? = null
+        var postedApiKey: String? = null
+        RaygunSettings.crashReportingEndpoint = CUSTOM_ENDPOINT
+
+        try {
+            val result =
+                worker.processCrashReport(file, "api-key") { endpoint, apiKey, _ ->
+                    postedEndpoint = endpoint
+                    postedApiKey = apiKey
+                    202
+                }
+
+            assertEquals(Result.success(), result)
+            assertEquals(CUSTOM_ENDPOINT, postedEndpoint)
+            assertEquals("api-key", postedApiKey)
+        } finally {
+            RaygunSettings.crashReportingEndpoint = RaygunSettings.DEFAULT_CRASHREPORTING_ENDPOINT
+        }
+    }
+
+    @Test
     fun `empty API key fails without posting and retains payload for later initialization`() {
         val file = rawReport("payload without API key")
         var postAttempted = false
 
         val result =
-            worker.processCrashReport(file, "") { _, _ ->
+            worker.processCrashReport(file, "") { _, _, _ ->
                 postAttempted = true
                 202
             }
@@ -170,7 +220,7 @@ class CrashReportingWorkerTest {
         var postAttempted = false
 
         val result =
-            worker.processCrashReport(file, "api-key") { _, _ ->
+            worker.processCrashReport(file, "api-key") { _, _, _ ->
                 postAttempted = true
                 202
             }
@@ -201,4 +251,8 @@ class CrashReportingWorkerTest {
             }
             deleteOnExit()
         }
+
+    companion object {
+        private const val CUSTOM_ENDPOINT = "https://crash.example.com/entries"
+    }
 }

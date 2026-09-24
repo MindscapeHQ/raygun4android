@@ -52,18 +52,19 @@ class CrashReportingWorker(
     /**
      * Raw post method that delivers a pre-built Crash Reporting payload to the Raygun API.
      *
+     * @param endpoint The Crash Reporting endpoint to deliver to
      * @param apiKey The API key of the app to deliver to
      * @param jsonPayload The JSON representation of a RaygunMessage to be delivered over HTTPS.
      * @return HTTP result code - 202 if successful, 403 if API key invalid, 400 if bad message
      *   (invalid properties), 429 if rate limited
      */
     private fun postCrashReporting(
+        endpoint: String,
         apiKey: String,
         jsonPayload: String,
     ): Int {
         try {
             if (RaygunWorkerHelper.validateApiKey(apiKey)) {
-                val endpoint = RaygunSettings.crashReportingEndpoint
                 val mediaType: MediaType? = "application/json; charset=utf-8".toMediaTypeOrNull()
                 val client = RaygunSettings.httpClient
                 val body = jsonPayload.toRequestBody(mediaType)
@@ -114,38 +115,42 @@ class CrashReportingWorker(
     internal fun processCrashReport(
         file: File,
         apiKey: String?,
-        postCrashReport: (String, String) -> Int,
+        postCrashReport: (String, String, String) -> Int,
     ): Result {
         if (!file.isFile) {
             e("Crash report source is missing or is not a regular file.")
             return Result.failure()
         }
 
-        val message =
+        val entry =
             try {
                 // Reports cached by earlier SDK versions after a failed delivery are serialized
                 if (file.parentFile == applicationContext.cacheDir) {
-                    readMessageFromCache(file)
+                    readMessageFromCache(file)?.let { CrashReportStoreEntry(null, null, it) }
                 } else {
-                    CrashReportCache.readPersistent(file).messagePayload
+                    CrashReportCache.readPersistent(file)
                 }
             } catch (exception: IOException) {
                 e("Failed to read cached message; retaining for retry: " + exception.message)
                 return Result.retry()
             }
 
-        if (message == null) {
+        if (entry == null) {
             e("No message was provided.")
             CrashReportCache.remove(file)
             return Result.failure()
         }
 
-        if (apiKey.isNullOrBlank()) {
+        // Reports stored by earlier SDK versions use the API key and endpoint of this process
+        val reportApiKey = entry.apiKey.takeUnless { it.isNullOrBlank() } ?: apiKey
+        val endpoint = entry.endpoint ?: RaygunSettings.crashReportingEndpoint
+
+        if (reportApiKey.isNullOrBlank()) {
             e("No API key was provided; retaining cached crash report.")
             return Result.failure()
         }
 
-        val responseCode = postCrashReport(apiKey, message)
+        val responseCode = postCrashReport(endpoint, reportApiKey, entry.messagePayload)
         responseCode(responseCode)
         val result = RaygunWorkerHelper.toWorkerResult(responseCode)
 

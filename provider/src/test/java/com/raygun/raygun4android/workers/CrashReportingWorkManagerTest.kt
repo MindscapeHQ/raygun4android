@@ -32,6 +32,7 @@ import java.io.File
 class CrashReportingWorkManagerTest {
     private val application = RuntimeEnvironment.getApplication()
     private val originalMaximum = RaygunSettings.maxReportsStoredOnDevice
+    private val requestedUrls = mutableListOf<String>()
 
     @Before
     fun setUp() {
@@ -44,6 +45,7 @@ class CrashReportingWorkManagerTest {
                     OkHttpClient
                         .Builder()
                         .addInterceptor { chain ->
+                            requestedUrls.add(chain.request().url.toString())
                             Response
                                 .Builder()
                                 .request(chain.request())
@@ -59,6 +61,7 @@ class CrashReportingWorkManagerTest {
     @After
     fun tearDown() {
         RaygunSettings.okHttpClientBuilder = null
+        RaygunSettings.crashReportingEndpoint = RaygunSettings.DEFAULT_CRASHREPORTING_ENDPOINT
         RaygunSettings.maxReportsStoredOnDevice = originalMaximum
         CrashReportCache.clear(application)
     }
@@ -99,6 +102,26 @@ class CrashReportingWorkManagerTest {
         val completedWork = workManager.getWorkInfosForUniqueWork(workName).get().single()
         assertEquals(WorkInfo.State.SUCCEEDED, completedWork.state)
         assertFalse(file.exists())
+    }
+
+    @Test
+    fun `report is delivered to the custom endpoint by a process that has not configured one`() {
+        RaygunSettings.crashReportingEndpoint = CUSTOM_ENDPOINT
+        CrashReportingWorkerHelper.enqueueCrashReport(application, "{\"custom\":true}", "api-key")
+        val file = CrashReportCache.files(application).single()
+        RaygunSettings.crashReportingEndpoint = RaygunSettings.DEFAULT_CRASHREPORTING_ENDPOINT
+
+        val workManager = WorkManager.getInstance(application)
+        val workName = CrashReportingWorkerHelper.cachedWorkName(file)
+        val queuedWork = workManager.getWorkInfosForUniqueWork(workName).get().single()
+        requireNotNull(WorkManagerTestInitHelper.getTestDriver(application))
+            .setAllConstraintsMet(queuedWork.id)
+
+        assertEquals(
+            WorkInfo.State.SUCCEEDED,
+            workManager.getWorkInfoById(queuedWork.id).get()!!.state,
+        )
+        assertEquals(listOf(CUSTOM_ENDPOINT), requestedUrls)
     }
 
     @Test
@@ -205,5 +228,6 @@ class CrashReportingWorkManagerTest {
 
     companion object {
         private const val RESCAN_TIMEOUT_MILLIS = 2_000L
+        private const val CUSTOM_ENDPOINT = "https://crash.example.com/entries"
     }
 }
