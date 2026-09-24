@@ -22,7 +22,7 @@ object CrashReportingWorkerHelper {
         message: String,
         apiKey: String?,
     ) {
-        val file = CrashReportCache.store(context, message) ?: return
+        val file = CrashReportCache.store(context, message, apiKey) ?: return
         enqueueCachedCrashReport(context, file, apiKey)
     }
 

@@ -1,6 +1,9 @@
 package com.raygun.raygun4android.workers
 
 import android.content.Context
+import com.google.gson.JsonObject
+import com.google.gson.JsonParseException
+import com.google.gson.JsonParser
 import com.raygun.raygun4android.RaygunSettings
 import com.raygun.raygun4android.logging.RaygunLogger.e
 import com.raygun.raygun4android.logging.RaygunLogger.w
@@ -18,14 +21,22 @@ import java.util.UUID
  * [RaygunSettings.maxReportsStoredOnDevice] reports, evicting the oldest first. The limit is soft:
  * concurrent writers, in one process or several, can each exceed it by one until the next write
  * trims the spool.
+ *
+ * Each report is stored with the API key and endpoint it was created for, so it is delivered there
+ * even when a process that has not configured the client runs the work.
  */
 internal object CrashReportCache {
     private const val DIRECTORY_NAME = "raygun-crash-reports"
     private const val TEMPORARY_SUFFIX = ".tmp"
+    private const val API_KEY_FIELD = "apiKey"
+    private const val ENDPOINT_FIELD = "endpoint"
+    private const val MESSAGE_PAYLOAD_FIELD = "messagePayload"
 
     fun store(
         context: Context,
         message: String,
+        apiKey: String? = null,
+        endpoint: String = RaygunSettings.crashReportingEndpoint,
     ): File? {
         val directory = persistentDirectory(context)
         if (!directory.mkdirs() && !directory.isDirectory) {
@@ -39,7 +50,8 @@ internal object CrashReportCache {
 
         try {
             FileOutputStream(temporaryFile).use { output ->
-                output.write(message.toByteArray(Charsets.UTF_8))
+                val entry = serialize(CrashReportStoreEntry(apiKey, endpoint, message))
+                output.write(entry.toByteArray(Charsets.UTF_8))
             }
 
             trim(context, RaygunSettings.maxReportsStoredOnDevice - 1)
@@ -65,7 +77,10 @@ internal object CrashReportCache {
         return persistentFiles + legacyCacheFiles
     }
 
-    fun readPersistent(file: File): String = file.readText(Charsets.UTF_8)
+    fun readPersistent(file: File): CrashReportStoreEntry {
+        val contents = file.readText(Charsets.UTF_8)
+        return deserialize(contents) ?: CrashReportStoreEntry(null, null, contents)
+    }
 
     fun remove(file: File) {
         if (!file.delete() && file.exists()) {
@@ -94,6 +109,44 @@ internal object CrashReportCache {
     fun clear(context: Context) {
         files(context).forEach(::remove)
     }
+
+    private fun serialize(entry: CrashReportStoreEntry): String =
+        JsonObject()
+            .apply {
+                addProperty(API_KEY_FIELD, entry.apiKey)
+                addProperty(ENDPOINT_FIELD, entry.endpoint)
+                addProperty(MESSAGE_PAYLOAD_FIELD, entry.messagePayload)
+            }.toString()
+
+    /**
+     * Reads a stored entry, or returns null for a report stored by an earlier SDK version, which
+     * holds only the payload
+     *
+     * @param contents The contents of the stored report
+     * @return CrashReportStoreEntry? - the entry, or null if the contents are not an entry
+     */
+    private fun deserialize(contents: String): CrashReportStoreEntry? {
+        val json =
+            try {
+                JsonParser.parseString(contents)
+            } catch (exception: JsonParseException) {
+                return null
+            }
+        if (!json.isJsonObject) {
+            return null
+        }
+
+        val entry = json.asJsonObject
+        val messagePayload = entry.getString(MESSAGE_PAYLOAD_FIELD) ?: return null
+        return CrashReportStoreEntry(
+            entry.getString(API_KEY_FIELD),
+            entry.getString(ENDPOINT_FIELD),
+            messagePayload,
+        )
+    }
+
+    private fun JsonObject.getString(name: String): String? =
+        get(name)?.takeIf { it.isJsonPrimitive && it.asJsonPrimitive.isString }?.asString
 
     internal fun persistentDirectory(context: Context): File = File(context.noBackupFilesDir, DIRECTORY_NAME)
 }

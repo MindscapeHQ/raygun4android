@@ -127,7 +127,7 @@ class CrashReportingWorker(
                 if (file.parentFile == applicationContext.cacheDir) {
                     readMessageFromCache(file)
                 } else {
-                    CrashReportCache.readPersistent(file)
+                    CrashReportCache.readPersistent(file).messagePayload
                 }
             } catch (exception: IOException) {
                 e("Failed to read cached message; retaining for retry: " + exception.message)

@@ -170,6 +170,7 @@ object CrashReporting {
                             CrashReportCache.store(
                                 RaygunClient.getApplicationContext(),
                                 jsonPayload,
+                                RaygunClient.apiKey,
                             ) != null
                     } catch (throwable: Throwable) {
                         RaygunLogger.e("Failed to cache unhandled exception: $throwable")

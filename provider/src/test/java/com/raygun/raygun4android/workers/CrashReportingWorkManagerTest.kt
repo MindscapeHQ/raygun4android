@@ -69,7 +69,7 @@ class CrashReportingWorkManagerTest {
         CrashReportingWorkerHelper.enqueueCrashReport(application, "{\"first\":true}", null)
         CrashReportingWorkerHelper.enqueueCrashReport(application, "{\"second\":true}", "api-key")
         val file = CrashReportCache.files(application).single()
-        assertEquals("{\"second\":true}", CrashReportCache.readPersistent(file))
+        assertEquals("{\"second\":true}", CrashReportCache.readPersistent(file).messagePayload)
 
         assertTrue(
             CrashReportingWorkerHelper.enqueueCachedCrashReport(
