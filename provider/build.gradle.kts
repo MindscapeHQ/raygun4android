@@ -1,4 +1,5 @@
 import org.gradle.api.tasks.bundling.Zip
+import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
 
 plugins {
     alias(libs.plugins.android.library)
@@ -50,6 +51,16 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
+    }
+}
+
+// Keep the published stdlib, API and metadata versions readable by Kotlin 2.1 consumers.
+// The Kotlin Gradle plugin version is otherwise used for all three.
+kotlin {
+    coreLibrariesVersion = "2.1.20"
+    compilerOptions {
+        apiVersion.set(KotlinVersion.KOTLIN_2_1)
+        languageVersion.set(KotlinVersion.KOTLIN_2_1)
     }
 }
 
