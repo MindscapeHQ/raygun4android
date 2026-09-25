@@ -52,7 +52,8 @@ class CrashReportingTest {
             Thread.UncaughtExceptionHandler { _, _ ->
                 val files = cachedReports()
                 assertEquals(1, files.size)
-                cachedMessageAtTermination = CrashReportCache.readPersistent(files.single())
+                cachedMessageAtTermination =
+                    CrashReportCache.readPersistent(files.single()).messagePayload
             }
         val handler = CrashReporting.RaygunUncaughtExceptionHandler(defaultHandler)
 
@@ -73,6 +74,26 @@ class CrashReportingTest {
                 .map { it.asString }
                 .contains(RaygunSettings.CRASH_REPORTING_UNHANDLED_EXCEPTION_TAG),
         )
+    }
+
+    @Test
+    fun `uncaught exception is stored with the API key and endpoint it was created for`() {
+        RaygunClient.setCustomCrashReportingEndpoint(CUSTOM_ENDPOINT)
+
+        try {
+            assertTrue(
+                CrashReporting.cacheUnhandledException(
+                    IllegalStateException("test crash"),
+                    listOf(RaygunSettings.CRASH_REPORTING_UNHANDLED_EXCEPTION_TAG),
+                ),
+            )
+
+            val entry = CrashReportCache.readPersistent(cachedReports().single())
+            assertEquals("test-api-key", entry.apiKey)
+            assertEquals(CUSTOM_ENDPOINT, entry.endpoint)
+        } finally {
+            RaygunSettings.crashReportingEndpoint = RaygunSettings.DEFAULT_CRASHREPORTING_ENDPOINT
+        }
     }
 
     @Test
@@ -143,4 +164,8 @@ class CrashReportingTest {
     }
 
     private fun cachedReports(): Array<File> = CrashReportCache.files(application)
+
+    companion object {
+        private const val CUSTOM_ENDPOINT = "https://crash.example.com/entries"
+    }
 }

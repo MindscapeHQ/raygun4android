@@ -44,7 +44,36 @@ class CrashReportCacheTest {
         val files = cachedReports()
         assertEquals(1, files.size)
         assertEquals(CrashReportCache.persistentDirectory(application), files.single().parentFile)
-        assertEquals("first payload", CrashReportCache.readPersistent(files.single()))
+        assertEquals(
+            "first payload",
+            CrashReportCache.readPersistent(files.single()).messagePayload,
+        )
+    }
+
+    @Test
+    fun `store records the API key and endpoint the report was created for`() {
+        val storedFile =
+            CrashReportCache.store(application, "payload", "api-key", CUSTOM_ENDPOINT)!!
+
+        assertEquals(
+            CrashReportStoreEntry("api-key", CUSTOM_ENDPOINT, "payload"),
+            CrashReportCache.readPersistent(storedFile),
+        )
+    }
+
+    @Test
+    fun `report stored by an earlier SDK version is read as its payload alone`() {
+        val payload = "{\"occurredOn\":\"2026-01-01T00:00:00Z\",\"details\":{}}"
+        val earlierReport =
+            File(CrashReportCache.persistentDirectory(application), "earlier.raygun4").apply {
+                parentFile?.mkdirs()
+                writeText(payload)
+            }
+
+        assertEquals(
+            CrashReportStoreEntry(null, null, payload),
+            CrashReportCache.readPersistent(earlierReport),
+        )
     }
 
     @Test
@@ -55,7 +84,10 @@ class CrashReportCacheTest {
         val newest = CrashReportCache.store(application, "second payload")
 
         assertNotNull(newest)
-        assertEquals("second payload", CrashReportCache.readPersistent(cachedReports().single()))
+        assertEquals(
+            "second payload",
+            CrashReportCache.readPersistent(cachedReports().single()).messagePayload,
+        )
     }
 
     @Test
@@ -88,7 +120,10 @@ class CrashReportCacheTest {
 
         assertNotNull(CrashReportCache.store(application, "new payload"))
         assertFalse(legacyFile.exists())
-        assertEquals("new payload", CrashReportCache.readPersistent(cachedReports().single()))
+        assertEquals(
+            "new payload",
+            CrashReportCache.readPersistent(cachedReports().single()).messagePayload,
+        )
     }
 
     @Test
@@ -194,4 +229,8 @@ class CrashReportCacheTest {
     }
 
     private fun cachedReports() = CrashReportCache.files(application)
+
+    companion object {
+        private const val CUSTOM_ENDPOINT = "https://crash.example.com/entries"
+    }
 }
