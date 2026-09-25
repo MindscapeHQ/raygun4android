@@ -47,13 +47,19 @@ class RaygunFileUtilsTest {
             File(application.cacheDir, "keep.txt").apply {
                 writeText("keep")
             }
+        val unrelatedTemporaryFile =
+            File(application.cacheDir, "keep.tmp").apply {
+                writeText("keep")
+            }
 
         RaygunFileUtils.clearCachedReports(application)
 
         assertTrue(persistentTextFile.exists())
         assertTrue(cacheTextFile.exists())
+        assertTrue(unrelatedTemporaryFile.exists())
         persistentTextFile.delete()
         cacheTextFile.delete()
+        unrelatedTemporaryFile.delete()
     }
 
     @Test
@@ -63,10 +69,15 @@ class RaygunFileUtilsTest {
             File(application.cacheDir, "legacy.raygun4").apply {
                 writeText("legacy report")
             }
+        val temporaryReport =
+            File(application.cacheDir, ".${"0".repeat(32)}.tmp").apply {
+                writeText("temporary report")
+            }
 
         RaygunFileUtils.clearCachedReports(application)
 
         assertFalse(persistentReport.exists())
         assertFalse(legacyReport.exists())
+        assertFalse(temporaryReport.exists())
     }
 }
