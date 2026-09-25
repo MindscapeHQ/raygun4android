@@ -201,15 +201,18 @@ class CrashReportCacheTest {
         val unrelatedTemporaryFile =
             File(application.cacheDir, "unrelated.tmp").apply {
                 writeText("keep")
-                setLastModified(1L)
+                assertTrue(setLastModified(1L))
             }
         val malformedTemporaryFile =
             File(application.cacheDir, ".not-a-raygun-report.tmp").apply {
                 writeText("keep")
-                setLastModified(1L)
+                assertTrue(setLastModified(1L))
             }
         val matchingDirectory =
-            File(application.cacheDir, ".${"2".repeat(32)}.tmp").apply { mkdir() }
+            File(application.cacheDir, ".${"2".repeat(32)}.tmp").apply {
+                assertTrue(mkdir())
+                assertTrue(setLastModified(1L))
+            }
 
         try {
             CrashReportCache.files(application)
@@ -296,7 +299,7 @@ class CrashReportCacheTest {
     ): File =
         File(application.cacheDir, ".${identifier.toString().repeat(32)}.tmp").apply {
             writeText("temporary report")
-            setLastModified(lastModified)
+            assertTrue(setLastModified(lastModified))
         }
 
     private fun cachedReports() = CrashReportCache.files(application)

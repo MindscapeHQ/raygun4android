@@ -21,6 +21,8 @@ import java.util.UUID
  * [RaygunSettings.maxReportsStoredOnDevice] reports, evicting the oldest first. The limit is soft:
  * concurrent writers, in one process or several, can each exceed it by one until the next write
  * trims the spool. Temporary files left by a terminated process are removed after seven days.
+ * Cleanup is best effort because file timestamps use the wall clock; a large forward clock change
+ * can make an active temporary file appear stale. The long retention period minimizes that risk.
  *
  * Each report is stored with the API key and endpoint it was created for, so it is delivered there
  * even when a process that has not configured the client runs the work.
