@@ -122,7 +122,7 @@ spotless {
     }
     format("xml") {
         target("**/*.xml")
-        targetExclude(".idea/**/*.xml")
+        targetExclude(".idea/**/*.xml", "**/build/**/*.xml")
         leadingTabsToSpaces()
         trimTrailingWhitespace()
         endWithNewline()
