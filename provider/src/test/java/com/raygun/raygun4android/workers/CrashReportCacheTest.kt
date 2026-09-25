@@ -17,6 +17,7 @@ import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.RuntimeEnvironment
 import java.io.File
+import java.util.concurrent.TimeUnit
 
 @RunWith(RobolectricTestRunner::class)
 class CrashReportCacheTest {
@@ -179,6 +180,67 @@ class CrashReportCacheTest {
     }
 
     @Test
+    fun `discovery removes stale temporary report and preserves possible active report`() {
+        val staleTemporaryFile =
+            temporaryReport('0', System.currentTimeMillis() - EIGHT_DAYS_MILLIS)
+        val freshTemporaryFile = temporaryReport('1', System.currentTimeMillis())
+
+        try {
+            CrashReportCache.files(application)
+
+            assertFalse(staleTemporaryFile.exists())
+            assertTrue(freshTemporaryFile.exists())
+        } finally {
+            staleTemporaryFile.delete()
+            freshTemporaryFile.delete()
+        }
+    }
+
+    @Test
+    fun `temporary report cleanup leaves files it does not own`() {
+        val unrelatedTemporaryFile =
+            File(application.cacheDir, "unrelated.tmp").apply {
+                writeText("keep")
+                setLastModified(1L)
+            }
+        val malformedTemporaryFile =
+            File(application.cacheDir, ".not-a-raygun-report.tmp").apply {
+                writeText("keep")
+                setLastModified(1L)
+            }
+        val matchingDirectory =
+            File(application.cacheDir, ".${"2".repeat(32)}.tmp").apply { mkdir() }
+
+        try {
+            CrashReportCache.files(application)
+
+            assertTrue(unrelatedTemporaryFile.exists())
+            assertTrue(malformedTemporaryFile.exists())
+            assertTrue(matchingDirectory.exists())
+        } finally {
+            unrelatedTemporaryFile.delete()
+            malformedTemporaryFile.delete()
+            matchingDirectory.delete()
+        }
+    }
+
+    @Test
+    fun `temporary report cleanup preserves unknown and future timestamps`() {
+        val unknownTimestamp = temporaryReport('3', 0L)
+        val futureTimestamp = temporaryReport('4', System.currentTimeMillis() + EIGHT_DAYS_MILLIS)
+
+        try {
+            CrashReportCache.files(application)
+
+            assertTrue(unknownTimestamp.exists())
+            assertTrue(futureTimestamp.exists())
+        } finally {
+            unknownTimestamp.delete()
+            futureTimestamp.delete()
+        }
+    }
+
+    @Test
     fun `cached work request retains durable file until worker runs`() {
         val cachedFile = CrashReportCache.store(application, "cached payload")!!
 
@@ -228,9 +290,19 @@ class CrashReportCacheTest {
         assertTrue(cachedFile.exists())
     }
 
+    private fun temporaryReport(
+        identifier: Char,
+        lastModified: Long,
+    ): File =
+        File(application.cacheDir, ".${identifier.toString().repeat(32)}.tmp").apply {
+            writeText("temporary report")
+            setLastModified(lastModified)
+        }
+
     private fun cachedReports() = CrashReportCache.files(application)
 
     companion object {
         private const val CUSTOM_ENDPOINT = "https://crash.example.com/entries"
+        private val EIGHT_DAYS_MILLIS = TimeUnit.DAYS.toMillis(8)
     }
 }
