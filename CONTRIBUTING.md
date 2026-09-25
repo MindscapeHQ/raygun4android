@@ -73,6 +73,24 @@ Then validate the normal build path before opening a pull request:
 ./gradlew --no-daemon spotlessCheck provider:test app:assembleDebug provider:assembleDebug
 ````
 
+## Published Kotlin compatibility
+
+The Kotlin Gradle plugin used to build Raygun4Android is independent of the Kotlin language, API, metadata, and standard library versions exposed to consumers. The build toolchain can move forward without requiring applications that use the SDK to upgrade their Kotlin compiler.
+
+Raygun4Android 6.2.3 exposed why that separation matters. Updating the build to Kotlin Gradle plugin 2.4.10 also made the published artifact declare `kotlin-stdlib` 2.4.10 and emit Kotlin 2.4 metadata. Gradle selected that standard library in React Native 0.81 applications, but their Kotlin 2.1.20 compiler can only read metadata through 2.2. The applications then failed to compile.
+
+The `:provider` module therefore targets Kotlin language and API version 2.2 and publishes a `kotlin-stdlib` 2.2.21 dependency, while the project can use a newer Kotlin Gradle plugin. Kotlin/JVM explicitly allows a compiler from the previous language version, so Kotlin 2.1 consumers can read Kotlin 2.2 library metadata.
+
+Follow these rules when changing Kotlin, AGP, the publishing plugin, or provider dependencies:
+
+- Do not automatically raise `coreLibrariesVersion`, `apiVersion`, or `languageVersion` in `provider/build.gradle.kts` with the build toolchain.
+- Treat raising the published versions as a consumer compatibility and release decision. Verify the oldest supported Kotlin compiler before changing them.
+- Refresh dependency locks and verification metadata, then inspect the generated POM and Gradle module metadata rather than relying only on an in-project build.
+- Keep the `Kotlin 2.1 consumer` CI job green. It compiles a separate Android application with Kotlin 2.1.20 against the generated Maven publication, exercising both dependency and class metadata.
+- Do not hide compatibility failures with `-Xskip-metadata-version-check`, forced standard library versions, or consumer-side dependency exclusions.
+
+The consumer fixture is in `integration-tests/kotlin-2.1-consumer`. Its Gradle and Kotlin versions intentionally represent the oldest supported React Native toolchain and should only be raised as an explicit compatibility decision.
+
 ## How to contribute?
 Please fork the main repository from https://github.com/MindscapeHQ/raygun4android into your own GitHub account.
 

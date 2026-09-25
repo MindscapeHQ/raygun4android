@@ -10,7 +10,7 @@ buildscript {
         resolutionStrategy.activateDependencyLocking()
     }
     dependencies {
-        classpath(libs.kotlin.gradle) // pins KGP 2.3.0 (higher than AGP 9's bundled 2.2.10)
+        classpath(libs.kotlin.gradle) // Overrides AGP's bundled KGP for project compilation.
     }
 }
 
