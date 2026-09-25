@@ -1,4 +1,5 @@
 import org.gradle.api.tasks.bundling.Zip
+import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
 
 plugins {
     alias(libs.plugins.android.library)
@@ -50,6 +51,16 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
+    }
+}
+
+// Kotlin/JVM consumers can read metadata from the following language version, so Kotlin 2.2
+// remains compatible with the Kotlin 2.1 compiler used by React Native 0.81.
+kotlin {
+    coreLibrariesVersion = "2.2.21"
+    compilerOptions {
+        apiVersion.set(KotlinVersion.KOTLIN_2_2)
+        languageVersion.set(KotlinVersion.KOTLIN_2_2)
     }
 }
 

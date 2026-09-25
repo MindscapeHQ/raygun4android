@@ -10,7 +10,7 @@ buildscript {
         resolutionStrategy.activateDependencyLocking()
     }
     dependencies {
-        classpath(libs.kotlin.gradle) // pins KGP 2.3.0 (higher than AGP 9's bundled 2.2.10)
+        classpath(libs.kotlin.gradle) // Overrides AGP's bundled KGP for project compilation.
     }
 }
 
@@ -122,7 +122,7 @@ spotless {
     }
     format("xml") {
         target("**/*.xml")
-        targetExclude(".idea/**/*.xml")
+        targetExclude(".idea/**/*.xml", "**/build/**/*.xml")
         leadingTabsToSpaces()
         trimTrailingWhitespace()
         endWithNewline()
