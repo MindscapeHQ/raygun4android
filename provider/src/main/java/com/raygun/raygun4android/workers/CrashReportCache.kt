@@ -20,7 +20,9 @@ import java.util.UUID
  * report is either absent or complete and no directory-wide lock is needed. The spool holds at most
  * [RaygunSettings.maxReportsStoredOnDevice] reports, evicting the oldest first. The limit is soft:
  * concurrent writers, in one process or several, can each exceed it by one until the next write
- * trims the spool.
+ * trims the spool. Temporary files left by a terminated process are removed after seven days.
+ * Cleanup is best effort because file timestamps use the wall clock; a large forward clock change
+ * can make an active temporary file appear stale. The long retention period minimizes that risk.
  *
  * Each report is stored with the API key and endpoint it was created for, so it is delivered there
  * even when a process that has not configured the client runs the work.
@@ -28,9 +30,11 @@ import java.util.UUID
 internal object CrashReportCache {
     private const val DIRECTORY_NAME = "raygun-crash-reports"
     private const val TEMPORARY_SUFFIX = ".tmp"
+    private const val TEMPORARY_FILE_RETENTION_MILLIS = 7L * 24 * 60 * 60 * 1_000
     private const val API_KEY_FIELD = "apiKey"
     private const val ENDPOINT_FIELD = "endpoint"
     private const val MESSAGE_PAYLOAD_FIELD = "messagePayload"
+    private val temporaryFileName = Regex("^\\.[0-9a-f]{32}\\.tmp$")
 
     fun store(
         context: Context,
@@ -71,6 +75,7 @@ internal object CrashReportCache {
     }
 
     fun files(context: Context): Array<File> {
+        removeStaleTemporaryFiles(context)
         val persistentFiles =
             persistentDirectory(context).listFiles(RaygunFileFilter()) ?: emptyArray()
         val legacyCacheFiles = context.cacheDir.listFiles(RaygunFileFilter()) ?: emptyArray()
@@ -108,7 +113,22 @@ internal object CrashReportCache {
 
     fun clear(context: Context) {
         files(context).forEach(::remove)
+        temporaryFiles(context).forEach(::remove)
     }
+
+    private fun removeStaleTemporaryFiles(context: Context) {
+        val staleBefore = System.currentTimeMillis() - TEMPORARY_FILE_RETENTION_MILLIS
+        temporaryFiles(context)
+            .filter { file ->
+                val lastModified = file.lastModified()
+                lastModified > 0 && lastModified < staleBefore
+            }.forEach(::remove)
+    }
+
+    private fun temporaryFiles(context: Context): Array<File> =
+        context.cacheDir.listFiles { file ->
+            file.isFile && temporaryFileName.matches(file.name)
+        } ?: emptyArray()
 
     private fun serialize(entry: CrashReportStoreEntry): String =
         JsonObject()
