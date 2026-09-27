@@ -197,6 +197,19 @@ class CrashReportCacheTest {
     }
 
     @Test
+    fun `discovery preserves temporary report inside the retention period`() {
+        val recentTemporaryFile = temporaryReport('5', System.currentTimeMillis() - SIX_DAYS_MILLIS)
+
+        try {
+            CrashReportCache.files(application)
+
+            assertTrue(recentTemporaryFile.exists())
+        } finally {
+            recentTemporaryFile.delete()
+        }
+    }
+
+    @Test
     fun `temporary report cleanup leaves files it does not own`() {
         val unrelatedTemporaryFile =
             File(application.cacheDir, "unrelated.tmp").apply {
@@ -306,6 +319,7 @@ class CrashReportCacheTest {
 
     companion object {
         private const val CUSTOM_ENDPOINT = "https://crash.example.com/entries"
+        private val SIX_DAYS_MILLIS = TimeUnit.DAYS.toMillis(6)
         private val EIGHT_DAYS_MILLIS = TimeUnit.DAYS.toMillis(8)
     }
 }
