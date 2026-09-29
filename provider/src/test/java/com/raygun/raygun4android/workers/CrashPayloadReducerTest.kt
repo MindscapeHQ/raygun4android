@@ -79,6 +79,37 @@ class CrashPayloadReducerTest {
     }
 
     @Test
+    fun `large stack frame strings are reduced before custom data`() {
+        val report = report()
+        report
+            .details()
+            .add(
+                "userCustomData",
+                JsonObject().apply { addProperty("important", "keep me") },
+            )
+        val stack = report.error().getAsJsonArray("stackTrace")
+        repeat(50) { index -> stack.add(frame(index, "method-${"x".repeat(3_000)}")) }
+
+        val reduced = parse(CrashPayloadReducer.reduceToLimit(report.toString()))
+        val reducedStack = reduced.error().getAsJsonArray("stackTrace")
+
+        assertEquals(50, reducedStack.size())
+        assertEquals(
+            "keep me",
+            reduced.details()["userCustomData"].asJsonObject["important"].asString,
+        )
+        assertTrue(
+            reducedStack[0]
+                .asJsonObject["methodName"]
+                .asString
+                .toByteArray(Charsets.UTF_8)
+                .size <=
+                512,
+        )
+        assertWithinLimit(reduced.toString())
+    }
+
+    @Test
     fun `largest custom data entries are removed first`() {
         val report = report()
         report
@@ -155,6 +186,18 @@ class CrashPayloadReducerTest {
         report.addProperty("occurredOn", "2026-09-29T10:15:30Z")
         report.error().addProperty("message", "original message")
         report.error().getAsJsonArray("stackTrace").add(frame(42, "originalMethod"))
+        report.details().addProperty("groupingKey", "stable-group")
+        report.details().addProperty("version", "1.2.3")
+        report
+            .details()
+            .add(
+                "client",
+                JsonObject().apply {
+                    addProperty("name", "Raygun4Android")
+                    addProperty("version", "4.0.0")
+                    addProperty("clientUrl", "https://github.com/MindscapeHQ/raygun4android")
+                },
+            )
         report.details().addProperty("environment", "x".repeat(300 * 1024))
 
         val minimalJson = CrashPayloadReducer.reduceToLimit(report.toString())
@@ -166,7 +209,16 @@ class CrashPayloadReducerTest {
         assertEquals("original message", minimal.error()["message"].asString)
         assertEquals(42, minimalFrame["lineNumber"].asInt)
         assertEquals("originalMethod", minimalFrame["methodName"].asString)
-        assertEquals(setOf("error", "tags"), minimal.details().keySet())
+        assertEquals("stable-group", minimal.details()["groupingKey"].asString)
+        assertEquals("1.2.3", minimal.details()["version"].asString)
+        assertEquals(
+            "Raygun4Android",
+            minimal.details()["client"].asJsonObject["name"].asString,
+        )
+        assertEquals(
+            setOf("error", "groupingKey", "version", "client", "tags"),
+            minimal.details().keySet(),
+        )
         assertMarked(minimal)
         assertWithinLimit(minimalJson)
     }
@@ -178,6 +230,36 @@ class CrashPayloadReducerTest {
 
         assertEquals(0, frame["lineNumber"].asInt)
         assertEquals("payloadTruncated", frame["methodName"].asString)
+    }
+
+    @Test
+    fun `minimal fallback bounds retained grouping and client metadata`() {
+        val report = report()
+        report.details().addProperty("groupingKey", "😀".repeat(101))
+        report.details().addProperty("version", "v".repeat(1_000))
+        report
+            .details()
+            .add(
+                "client",
+                JsonObject().apply {
+                    addProperty("name", "n".repeat(1_000))
+                    addProperty("version", "v".repeat(1_000))
+                    addProperty("clientUrl", "u".repeat(5_000))
+                },
+            )
+
+        val minimalJson = requireNotNull(CrashPayloadReducer.minimalPayload(report.toString()))
+        val minimalDetails = parse(minimalJson).details()
+        val groupingKey = minimalDetails["groupingKey"].asString
+        val client = minimalDetails["client"].asJsonObject
+
+        assertEquals(100, groupingKey.codePointCount(0, groupingKey.length))
+        assertTrue(groupingKey.endsWith("…"))
+        assertTrue(minimalDetails["version"].asString.endsWith("…"))
+        assertTrue(client["name"].asString.endsWith("…"))
+        assertTrue(client["version"].asString.endsWith("…"))
+        assertTrue(client["clientUrl"].asString.endsWith("…"))
+        assertWithinLimit(minimalJson)
     }
 
     @Test

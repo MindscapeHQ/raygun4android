@@ -23,6 +23,11 @@ internal object CrashPayloadReducer {
     private const val MAX_FRAME_STRING_BYTES = 512
     private const val MAX_BREADCRUMB_STRING_BYTES = 1024
     private const val MAX_OCCURRED_ON_BYTES = 128
+    private const val MAX_GROUPING_KEY_CODE_POINTS = 100
+    private const val MAX_VERSION_BYTES = 256
+    private const val MAX_CLIENT_NAME_BYTES = 256
+    private const val MAX_CLIENT_VERSION_BYTES = 256
+    private const val MAX_CLIENT_URL_BYTES = 1024
     private const val MAX_INNER_ERROR_DEPTH = 64
     private const val TRUNCATED_TEXT = "…"
 
@@ -47,14 +52,7 @@ internal object CrashPayloadReducer {
             return it
         }
 
-        removeLargestCustomDataEntries(report, maxBytes)?.let {
-            return it
-        }
-        trimOldestBreadcrumbs(report, maxBytes)?.let {
-            return it
-        }
-
-        replaceTagsWithTruncationMarker(report)
+        truncateStackFrameStrings(report)
         serializedWithinLimit(report, maxBytes)?.let {
             return it
         }
@@ -65,6 +63,18 @@ internal object CrashPayloadReducer {
             AGGRESSIVE_KEEP_TOP_FRAMES,
             AGGRESSIVE_KEEP_BOTTOM_FRAMES,
         )
+        serializedWithinLimit(report, maxBytes)?.let {
+            return it
+        }
+
+        removeLargestCustomDataEntries(report, maxBytes)?.let {
+            return it
+        }
+        trimOldestBreadcrumbs(report, maxBytes)?.let {
+            return it
+        }
+
+        replaceTagsWithTruncationMarker(report)
         serializedWithinLimit(report, maxBytes)?.let {
             return it
         }
@@ -90,7 +100,8 @@ internal object CrashPayloadReducer {
         val occurredOn =
             report.string("occurredOn")?.let { truncateUtf8(it, MAX_OCCURRED_ON_BYTES) }
                 ?: return null
-        val sourceError = report.obj("details")?.obj("error") ?: return null
+        val sourceDetails = report.obj("details") ?: return null
+        val sourceError = sourceDetails.obj("error") ?: return null
 
         val error = JsonObject()
         error.addProperty(
@@ -108,6 +119,18 @@ internal object CrashPayloadReducer {
 
         val details = JsonObject()
         details.add("error", error)
+        sourceDetails.string("groupingKey")?.let { groupingKey ->
+            details.addProperty(
+                "groupingKey",
+                truncateCodePoints(groupingKey, MAX_GROUPING_KEY_CODE_POINTS),
+            )
+        }
+        sourceDetails.string("version")?.let { version ->
+            details.addProperty("version", truncateUtf8(version, MAX_VERSION_BYTES))
+        }
+        minimalClient(sourceDetails.obj("client"))?.let { client ->
+            details.add("client", client)
+        }
         details.add(
             "tags",
             JsonArray().apply {
@@ -120,6 +143,21 @@ internal object CrashPayloadReducer {
                 addProperty("occurredOn", occurredOn)
                 add("details", details)
             }.toString()
+    }
+
+    private fun minimalClient(sourceClient: JsonObject?): JsonObject? {
+        sourceClient ?: return null
+        val client = JsonObject()
+        sourceClient.string("name")?.let { name ->
+            client.addProperty("name", truncateUtf8(name, MAX_CLIENT_NAME_BYTES))
+        }
+        sourceClient.string("version")?.let { version ->
+            client.addProperty("version", truncateUtf8(version, MAX_CLIENT_VERSION_BYTES))
+        }
+        sourceClient.string("clientUrl")?.let { clientUrl ->
+            client.addProperty("clientUrl", truncateUtf8(clientUrl, MAX_CLIENT_URL_BYTES))
+        }
+        return client.takeIf { it.size() > 0 }
     }
 
     private fun minimalStackTrace(sourceError: JsonObject): JsonArray {
@@ -228,11 +266,12 @@ internal object CrashPayloadReducer {
         var currentBytes = report.toString().byteSize()
         var remainingEntries = customData.size()
         val keysByDescendingSize =
-            customData.entrySet().sortedByDescending { (key, value) ->
-                customDataEntrySize(key, value)
-            }
-        for ((key, value) in keysByDescendingSize) {
-            currentBytes -= customDataEntrySize(key, value)
+            customData
+                .entrySet()
+                .map { (key, value) -> Triple(key, value, customDataEntrySize(key, value)) }
+                .sortedByDescending { (_, _, size) -> size }
+        for ((key, _, entrySize) in keysByDescendingSize) {
+            currentBytes -= entrySize
             if (remainingEntries > 1) {
                 currentBytes--
             }
@@ -294,6 +333,11 @@ internal object CrashPayloadReducer {
         forEachError(report) { error ->
             error.truncateString("message", MAX_ERROR_MESSAGE_BYTES)
             error.truncateString("className", MAX_ERROR_CLASS_BYTES)
+        }
+    }
+
+    private fun truncateStackFrameStrings(report: JsonObject) {
+        forEachError(report) { error ->
             error.array("stackTrace")?.forEach { frame ->
                 if (frame.isJsonObject) {
                     frame.asJsonObject.truncateString("className", MAX_FRAME_STRING_BYTES)
@@ -302,6 +346,20 @@ internal object CrashPayloadReducer {
                 }
             }
         }
+    }
+
+    private fun truncateCodePoints(
+        value: String,
+        maxCodePoints: Int,
+    ): String {
+        val codePointCount = value.codePointCount(0, value.length)
+        if (codePointCount <= maxCodePoints) {
+            return value
+        }
+
+        val contentCodePoints = (maxCodePoints - 1).coerceAtLeast(0)
+        val endIndex = value.offsetByCodePoints(0, contentCodePoints)
+        return value.substring(0, endIndex) + TRUNCATED_TEXT
     }
 
     private fun truncateBreadcrumbStrings(report: JsonObject) {
