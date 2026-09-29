@@ -304,6 +304,24 @@ The following methods are available for sending manually; pick one depending on 
 
 The `send` function builds a RaygunMessage for you and then sends it.
 
+### Oversized crash reports
+
+The Crash Reporting API has a documented maximum payload size of 128 KB. When sending to the default Raygun endpoint, Raygun4Android uses a conservative 120 KiB UTF-8 limit to leave a margin for differences in how the server interprets KB. Reports that are already within this limit are sent byte-for-byte unchanged.
+
+Oversized reports are progressively reduced in the following order to retain the most useful diagnostic information for as long as possible:
+
+1. Add the `raygun:payload-truncated` tag.
+2. Trim the middle of long stack traces while preserving the top and bottom frames.
+3. Bound oversized strings in individual stack frames.
+4. Trim stack traces more aggressively if the report is still too large.
+5. Remove the largest top-level custom-data entries first.
+6. Remove the oldest breadcrumbs while retaining the newest.
+7. Replace the tags with the `raygun:payload-truncated` marker.
+8. Bound long error and breadcrumb strings.
+9. Fall back to a minimal valid report containing the occurrence time, bounded error identity, one line-numbered stack frame, and available grouping, app-version, and client metadata.
+
+Reduction happens during background delivery. The cached original report is not rewritten, and `onBeforeSend` is not invoked a second time. Custom endpoints receive the original payload because they may accept larger bodies; if any endpoint returns HTTP 413, the SDK retries once with the minimal report.
+
 ### Getting/setting/cancelling the error before it is sent
 
 This provider has an onBeforeSend API to support accessing or mutating the candidate error payload immediately before it is sent, or cancelling the send outright. This is provided as the public method `RaygunClient.setOnBeforeSend(RaygunOnBeforeSend)`, which takes an instance of a class that implements the `CrashReportingOnBeforeSend` interface. Your class needs a public `onBeforeSend` method that takes a `RaygunMessage` parameter, and returns the same.
