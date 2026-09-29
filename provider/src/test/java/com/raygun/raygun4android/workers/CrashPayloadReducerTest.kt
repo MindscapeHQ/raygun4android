@@ -110,6 +110,38 @@ class CrashPayloadReducerTest {
     }
 
     @Test
+    fun `repeated stack reductions report the cumulative number of removed frames`() {
+        val inner = errorWithFrames("InnerException", 200, 700)
+        val middle =
+            errorWithFrames("MiddleException", 200, 700).apply {
+                add("innerError", inner)
+            }
+        val report = report()
+        report
+            .details()
+            .add(
+                "error",
+                errorWithFrames("OuterException", 200, 700).apply {
+                    add("innerError", middle)
+                },
+            )
+
+        val reduced = parse(CrashPayloadReducer.reduceToLimit(report.toString()))
+        var error: JsonObject? = reduced.error()
+
+        repeat(3) {
+            val stack = requireNotNull(error).getAsJsonArray("stackTrace")
+            assertEquals(11, stack.size())
+            assertEquals(
+                "190 frames removed from middle of stack trace",
+                stack[5].asJsonObject["methodName"].asString,
+            )
+            error = error?.getAsJsonObject("innerError")
+        }
+        assertWithinLimit(reduced.toString())
+    }
+
+    @Test
     fun `largest custom data entries are removed first`() {
         val report = report()
         report
@@ -287,6 +319,23 @@ class CrashPayloadReducerTest {
             addProperty("message", "test message")
             addProperty("className", className)
             add("stackTrace", JsonArray())
+        }
+
+    private fun errorWithFrames(
+        className: String,
+        frameCount: Int,
+        methodNameBytes: Int,
+    ): JsonObject =
+        error(className).apply {
+            val stack = getAsJsonArray("stackTrace")
+            repeat(frameCount) { index ->
+                stack.add(
+                    frame(index, "method-${"x".repeat(methodNameBytes)}").apply {
+                        addProperty("className", "c".repeat(methodNameBytes))
+                        addProperty("fileName", "f".repeat(methodNameBytes))
+                    },
+                )
+            }
         }
 
     private fun frame(

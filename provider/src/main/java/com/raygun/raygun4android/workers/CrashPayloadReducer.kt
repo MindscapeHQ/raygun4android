@@ -30,6 +30,8 @@ internal object CrashPayloadReducer {
     private const val MAX_CLIENT_URL_BYTES = 1024
     private const val MAX_INNER_ERROR_DEPTH = 64
     private const val TRUNCATED_TEXT = "…"
+    private const val REMOVED_FRAMES_CLASS_NAME = "Raygun4Android"
+    private val removedFramesMessage = Regex("^(\\d+) frames removed from middle of stack trace$")
 
     /**
      * Returns [payload] unchanged when it is already within [maxBytes]. Otherwise, optional data is
@@ -232,7 +234,10 @@ internal object CrashPayloadReducer {
                 return@forEachError
             }
 
-            val removed = frames.size() - keepTop - keepBottom
+            var removed = 0L
+            for (index in keepTop until frames.size() - keepBottom) {
+                removed += representedFrameCount(frames[index])
+            }
             val trimmed = JsonArray()
             repeat(keepTop) { index -> trimmed.add(frames[index]) }
             trimmed.add(removedFramesMarker(removed))
@@ -243,10 +248,34 @@ internal object CrashPayloadReducer {
         }
     }
 
-    private fun removedFramesMarker(removed: Int): JsonObject =
+    private fun representedFrameCount(frame: JsonElement): Long {
+        if (!frame.isJsonObject) {
+            return 1
+        }
+
+        val marker = frame.asJsonObject
+        if (
+            marker.string("className") != REMOVED_FRAMES_CLASS_NAME ||
+            marker.string("fileName") != "" ||
+            marker.int("lineNumber") != 0
+        ) {
+            return 1
+        }
+
+        val message = marker.string("methodName") ?: return 1
+        val represented =
+            removedFramesMessage
+                .matchEntire(message)
+                ?.groupValues
+                ?.get(1)
+                ?.toLongOrNull()
+        return represented?.takeIf { it in 1..Int.MAX_VALUE.toLong() } ?: 1
+    }
+
+    private fun removedFramesMarker(removed: Long): JsonObject =
         JsonObject().apply {
             addProperty("lineNumber", 0)
-            addProperty("className", "Raygun4Android")
+            addProperty("className", REMOVED_FRAMES_CLASS_NAME)
             addProperty("fileName", "")
             addProperty("methodName", "$removed frames removed from middle of stack trace")
         }
