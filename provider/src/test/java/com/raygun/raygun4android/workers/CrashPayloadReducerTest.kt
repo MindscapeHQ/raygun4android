@@ -19,6 +19,27 @@ class CrashPayloadReducerTest {
     }
 
     @Test
+    fun `payload at exact byte limit is unchanged but one byte over is reduced`() {
+        val report = report()
+        report
+            .details()
+            .add(
+                "userCustomData",
+                JsonObject().apply { addProperty("removable", "x".repeat(1_000)) },
+            )
+        val payload = report.toString()
+        val payloadBytes = payload.toByteArray(Charsets.UTF_8).size
+
+        assertEquals(payload, CrashPayloadReducer.reduceToLimit(payload, payloadBytes))
+
+        val reduced = CrashPayloadReducer.reduceToLimit(payload, payloadBytes - 1)
+
+        assertNotEquals(payload, reduced)
+        assertMarked(parse(reduced))
+        assertTrue(reduced.toByteArray(Charsets.UTF_8).size <= payloadBytes - 1)
+    }
+
+    @Test
     fun `long stack traces are trimmed before custom data`() {
         val report = report()
         report
@@ -133,8 +154,16 @@ class CrashPayloadReducerTest {
             val stack = requireNotNull(error).getAsJsonArray("stackTrace")
             assertEquals(11, stack.size())
             assertEquals(
+                listOf(0, 1, 2, 3, 4),
+                stack.take(5).map { frame -> frame.asJsonObject["lineNumber"].asInt },
+            )
+            assertEquals(
                 "190 frames removed from middle of stack trace",
                 stack[5].asJsonObject["methodName"].asString,
+            )
+            assertEquals(
+                listOf(195, 196, 197, 198, 199),
+                stack.drop(6).map { frame -> frame.asJsonObject["lineNumber"].asInt },
             )
             error = error?.getAsJsonObject("innerError")
         }
@@ -194,6 +223,28 @@ class CrashPayloadReducerTest {
                 .asString
                 .startsWith("breadcrumb-79-"),
         )
+        assertWithinLimit(reduced.toString())
+    }
+
+    @Test
+    fun `oversized tags are replaced with one truncation marker`() {
+        val report = report()
+        report
+            .details()
+            .add(
+                "tags",
+                JsonArray().apply {
+                    add(CrashPayloadReducer.TRUNCATION_TAG)
+                    repeat(80) { index -> add("tag-$index-${"t".repeat(2_000)}") }
+                    add(CrashPayloadReducer.TRUNCATION_TAG)
+                },
+            )
+
+        val reduced = parse(CrashPayloadReducer.reduceToLimit(report.toString()))
+        val tags = reduced.details().getAsJsonArray("tags")
+
+        assertEquals(1, tags.size())
+        assertEquals(CrashPayloadReducer.TRUNCATION_TAG, tags[0].asString)
         assertWithinLimit(reduced.toString())
     }
 
@@ -265,6 +316,28 @@ class CrashPayloadReducerTest {
     }
 
     @Test
+    fun `minimal fallback uses first nested frame while preserving outer error identity`() {
+        val report = report("OuterException")
+        report.error().addProperty("message", "outer message")
+        report
+            .error()
+            .add(
+                "innerError",
+                error("InnerException").apply {
+                    getAsJsonArray("stackTrace").add(frame(73, "innerMethod"))
+                },
+            )
+
+        val minimal = parse(requireNotNull(CrashPayloadReducer.minimalPayload(report.toString())))
+        val minimalFrame = minimal.error().getAsJsonArray("stackTrace")[0].asJsonObject
+
+        assertEquals("OuterException", minimal.error()["className"].asString)
+        assertEquals("outer message", minimal.error()["message"].asString)
+        assertEquals(73, minimalFrame["lineNumber"].asInt)
+        assertEquals("innerMethod", minimalFrame["methodName"].asString)
+    }
+
+    @Test
     fun `minimal fallback bounds retained grouping and client metadata`() {
         val report = report()
         report.details().addProperty("groupingKey", "😀".repeat(101))
@@ -300,6 +373,21 @@ class CrashPayloadReducerTest {
 
         assertEquals(malformed, CrashPayloadReducer.reduceToLimit(malformed))
         assertNull(CrashPayloadReducer.minimalPayload(malformed))
+    }
+
+    @Test
+    fun `minimal fallback rejects json without required report structure`() {
+        val incompleteReports =
+            listOf(
+                "{}",
+                "{\"occurredOn\":\"2026-09-29T10:15:30Z\"}",
+                "{\"occurredOn\":\"2026-09-29T10:15:30Z\",\"details\":{}}",
+                "{\"details\":{\"error\":{}}}",
+            )
+
+        incompleteReports.forEach { payload ->
+            assertNull(payload, CrashPayloadReducer.minimalPayload(payload))
+        }
     }
 
     private fun report(className: String = "TestException"): JsonObject =
