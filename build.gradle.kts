@@ -61,7 +61,7 @@ dependencies {
     okHttpAlignmentTest(
         project(mapOf("path" to ":provider", "configuration" to "debugRuntimeElements")),
     )
-    okHttpAlignmentTest("com.squareup.okhttp3:okhttp-urlconnection:4.9.2") {
+    okHttpAlignmentTest("com.squareup.okhttp3:okhttp-urlconnection:5.5.0") {
         isTransitive = false
     }
 }
