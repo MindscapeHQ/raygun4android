@@ -1,5 +1,18 @@
 ## Changelog
 
+### 6.3.0
+
+- fix: deliver cached crash reports using the API key and custom endpoint captured when each report was created (#333)
+- fix: publish Kotlin 2.2 metadata and `kotlin-stdlib` 2.2.21 so applications using Kotlin 2.1 can consume the SDK (#332)
+- fix: remove Raygun-owned crash-report staging files after seven days and when explicitly clearing cached reports (#334)
+- chore(deps): bump actions/setup-java from 6.0.0 to 6.0.1 (#336)
+- chore(deps): bump Spotless from 8.10.1 to 8.10.3 (#337)
+- chore(deps): bump the sample app's ConstraintLayout dependency from 2.2.1 to 2.2.2 (#341)
+- chore(deps): bump the Kotlin Gradle plugin from 2.4.10 to 2.4.20 while retaining Kotlin 2.2 publication compatibility (#342)
+- chore(deps): bump Android Gradle Plugin from 9.3.2 to 9.4.1 (#339)
+
+**Compatibility note:** Cached reports written by 6.2.3 remain readable and use the current process API key and endpoint. Reports written by 6.3.0 store their API key and endpoint with the payload, but are not readable after downgrading to 6.2.3.
+
 ### 6.2.3
 
 - fix: persist uncaught crash reports before process termination and retry delivery across app restarts (#323)
