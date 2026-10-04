@@ -46,7 +46,9 @@ class RaygunNetworkUtilsTest {
 
         repeat(100) {
             val persisted =
-                runCatching { preferencesFile.readText().contains(uuid) }.getOrDefault(false)
+                runCatching {
+                    preferencesFile.readText().contains(uuid)
+                }.getOrDefault(false)
             if (persisted) {
                 return true
             }
