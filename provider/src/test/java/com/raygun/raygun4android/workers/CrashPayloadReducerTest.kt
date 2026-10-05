@@ -207,6 +207,7 @@ class CrashPayloadReducerTest {
                         add(
                             JsonObject().apply {
                                 addProperty("message", "breadcrumb-$index-${"b".repeat(2_000)}")
+                                addProperty("timestamp", index)
                             },
                         )
                     }
@@ -215,9 +216,19 @@ class CrashPayloadReducerTest {
 
         val reduced = parse(CrashPayloadReducer.reduceToLimit(report.toString()))
         val breadcrumbs = reduced.details().getAsJsonArray("breadcrumbs")
-        val firstRetained = breadcrumbs[0].asJsonObject["message"].asString
+        val marker = breadcrumbs[0].asJsonObject
+        val retainedCount = breadcrumbs.size() - 1
+        val removedCount = 80 - retainedCount
+        val firstRetained = breadcrumbs[1].asJsonObject["message"].asString
 
-        assertTrue(breadcrumbs.size() in 1..79)
+        assertTrue(retainedCount in 1..79)
+        assertEquals(
+            "$removedCount older breadcrumbs removed during payload reduction",
+            marker["message"].asString,
+        )
+        assertEquals("Raygun4Android", marker["category"].asString)
+        assertEquals("Manual", marker["type"].asString)
+        assertEquals(removedCount - 1, marker["timestamp"].asInt)
         assertNotEquals("breadcrumb-0-", firstRetained.take("breadcrumb-0-".length))
         assertTrue(
             breadcrumbs

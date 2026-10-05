@@ -29,6 +29,9 @@ internal object CrashPayloadReducer {
     private const val MAX_CLIENT_VERSION_BYTES = 256
     private const val MAX_CLIENT_URL_BYTES = 1024
     private const val MAX_INNER_ERROR_DEPTH = 64
+    private const val BREADCRUMB_MARKER_CATEGORY = "Raygun4Android"
+    private const val BREADCRUMB_MARKER_TYPE = "Manual"
+    private const val BREADCRUMB_INFO_LEVEL = 1
     private const val TRUNCATED_TEXT = "…"
     private val removedFramesMessage = Regex("^(\\d+) frames removed from middle of stack trace$")
 
@@ -325,13 +328,16 @@ internal object CrashPayloadReducer {
         }
 
         val breadcrumbs = breadcrumbElement.asJsonArray.toList()
+        if (breadcrumbs.isEmpty()) {
+            return null
+        }
         var minimum = 0
-        var maximum = breadcrumbs.size
+        var maximum = breadcrumbs.size - 1
         var bestPayload: String? = null
         var bestCount = -1
         while (minimum <= maximum) {
             val count = minimum + (maximum - minimum) / 2
-            details.add("breadcrumbs", breadcrumbs.takeLast(count).toJsonArray())
+            details.add("breadcrumbs", breadcrumbsWithRemovalMarker(breadcrumbs, count))
             val candidate = report.toString()
             if (candidate.byteSize() <= maxBytes) {
                 bestPayload = candidate
@@ -343,13 +349,49 @@ internal object CrashPayloadReducer {
         }
 
         if (bestCount >= 0) {
-            details.add("breadcrumbs", breadcrumbs.takeLast(bestCount).toJsonArray())
+            details.add("breadcrumbs", breadcrumbsWithRemovalMarker(breadcrumbs, bestCount))
             return bestPayload
         }
 
-        details.add("breadcrumbs", JsonArray())
+        details.add("breadcrumbs", breadcrumbsWithRemovalMarker(breadcrumbs, 0))
         return null
     }
+
+    private fun breadcrumbsWithRemovalMarker(
+        breadcrumbs: List<JsonElement>,
+        retainedCount: Int,
+    ): JsonArray {
+        val removedCount = breadcrumbs.size - retainedCount
+        return JsonArray().apply {
+            add(breadcrumbRemovalMarker(removedCount, breadcrumbs[removedCount - 1]))
+            breadcrumbs.takeLast(retainedCount).forEach(::add)
+        }
+    }
+
+    private fun breadcrumbRemovalMarker(
+        removedCount: Int,
+        lastRemovedBreadcrumb: JsonElement,
+    ): JsonObject =
+        JsonObject().apply {
+            addProperty(
+                "message",
+                "$removedCount older breadcrumbs removed during payload reduction",
+            )
+            addProperty("category", BREADCRUMB_MARKER_CATEGORY)
+            addProperty("level", BREADCRUMB_INFO_LEVEL)
+            addProperty("type", BREADCRUMB_MARKER_TYPE)
+            val timestamp =
+                lastRemovedBreadcrumb
+                    .takeIf(JsonElement::isJsonObject)
+                    ?.asJsonObject
+                    ?.get("timestamp")
+                    ?.takeIf { it.isJsonPrimitive && it.asJsonPrimitive.isNumber }
+            if (timestamp != null) {
+                add("timestamp", timestamp.deepCopy())
+            } else {
+                addProperty("timestamp", 0)
+            }
+        }
 
     private fun truncateErrorStrings(report: JsonObject) {
         forEachError(report) { error ->
@@ -489,8 +531,6 @@ internal object CrashPayloadReducer {
         } catch (exception: NumberFormatException) {
             null
         }
-
-    private fun List<JsonElement>.toJsonArray(): JsonArray = JsonArray().also { array -> forEach(array::add) }
 
     private fun String.byteSize(): Int = toByteArray(Charsets.UTF_8).size
 }
