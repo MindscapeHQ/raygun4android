@@ -30,7 +30,6 @@ internal object CrashPayloadReducer {
     private const val MAX_CLIENT_URL_BYTES = 1024
     private const val MAX_INNER_ERROR_DEPTH = 64
     private const val TRUNCATED_TEXT = "…"
-    private const val REMOVED_FRAMES_CLASS_NAME = "Raygun4Android"
     private val removedFramesMessage = Regex("^(\\d+) frames removed from middle of stack trace$")
 
     /**
@@ -254,15 +253,11 @@ internal object CrashPayloadReducer {
         }
 
         val marker = frame.asJsonObject
-        if (
-            marker.string("className") != REMOVED_FRAMES_CLASS_NAME ||
-            marker.string("fileName") != "" ||
-            marker.int("lineNumber") != 0
-        ) {
+        if (marker.int("lineNumber") != 0) {
             return 1
         }
 
-        val message = marker.string("methodName") ?: return 1
+        val message = marker.string("raw") ?: return 1
         val represented =
             removedFramesMessage
                 .matchEntire(message)
@@ -275,9 +270,7 @@ internal object CrashPayloadReducer {
     private fun removedFramesMarker(removed: Long): JsonObject =
         JsonObject().apply {
             addProperty("lineNumber", 0)
-            addProperty("className", REMOVED_FRAMES_CLASS_NAME)
-            addProperty("fileName", "")
-            addProperty("methodName", "$removed frames removed from middle of stack trace")
+            addProperty("raw", "$removed frames removed from middle of stack trace")
         }
 
     private fun removeLargestCustomDataEntries(
@@ -372,6 +365,7 @@ internal object CrashPayloadReducer {
                     frame.asJsonObject.truncateString("className", MAX_FRAME_STRING_BYTES)
                     frame.asJsonObject.truncateString("fileName", MAX_FRAME_STRING_BYTES)
                     frame.asJsonObject.truncateString("methodName", MAX_FRAME_STRING_BYTES)
+                    frame.asJsonObject.truncateString("raw", MAX_FRAME_STRING_BYTES)
                 }
             }
         }

@@ -57,9 +57,11 @@ class CrashPayloadReducerTest {
 
         assertEquals(41, reducedStack.size())
         assertEquals("m0-${"x".repeat(1_000)}", reducedStack[0].asJsonObject["methodName"].asString)
-        assertTrue(
-            reducedStack[20].asJsonObject["methodName"].asString.contains("100 frames removed"),
+        assertEquals(
+            "100 frames removed from middle of stack trace",
+            reducedStack[20].asJsonObject["raw"].asString,
         )
+        assertEquals(setOf("lineNumber", "raw"), reducedStack[20].asJsonObject.keySet())
         assertEquals(
             "m139-${"x".repeat(1_000)}",
             reducedStack[40].asJsonObject["methodName"].asString,
@@ -159,8 +161,9 @@ class CrashPayloadReducerTest {
             )
             assertEquals(
                 "190 frames removed from middle of stack trace",
-                stack[5].asJsonObject["methodName"].asString,
+                stack[5].asJsonObject["raw"].asString,
             )
+            assertEquals(setOf("lineNumber", "raw"), stack[5].asJsonObject.keySet())
             assertEquals(
                 listOf(195, 196, 197, 198, 199),
                 stack.drop(6).map { frame -> frame.asJsonObject["lineNumber"].asInt },
