@@ -191,7 +191,47 @@ class CrashPayloadReducerTest {
 
         assertFalse(customData.has("largest"))
         assertTrue(customData.has("smaller"))
+        assertEquals(
+            1,
+            customData[CrashPayloadReducer.CUSTOM_DATA_MARKER_KEY]
+                .asJsonObject["entriesRemoved"]
+                .asInt,
+        )
         assertMarked(reduced)
+        assertWithinLimit(reduced.toString())
+    }
+
+    @Test
+    fun `custom data marker uses an available namespaced key without overwriting customer data`() {
+        val report = report()
+        report
+            .details()
+            .add(
+                "userCustomData",
+                JsonObject().apply {
+                    addProperty(CrashPayloadReducer.CUSTOM_DATA_MARKER_KEY, "customer value")
+                    addProperty("${CrashPayloadReducer.CUSTOM_DATA_MARKER_KEY}.1", "another value")
+                    addProperty("large", "x".repeat(130 * 1024))
+                },
+            )
+
+        val reduced = parse(CrashPayloadReducer.reduceToLimit(report.toString()))
+        val customData = reduced.details()["userCustomData"].asJsonObject
+
+        assertEquals(
+            "customer value",
+            customData[CrashPayloadReducer.CUSTOM_DATA_MARKER_KEY].asString,
+        )
+        assertEquals(
+            "another value",
+            customData["${CrashPayloadReducer.CUSTOM_DATA_MARKER_KEY}.1"].asString,
+        )
+        assertEquals(
+            1,
+            customData["${CrashPayloadReducer.CUSTOM_DATA_MARKER_KEY}.2"]
+                .asJsonObject["entriesRemoved"]
+                .asInt,
+        )
         assertWithinLimit(reduced.toString())
     }
 

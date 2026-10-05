@@ -32,6 +32,7 @@ internal object CrashPayloadReducer {
     private const val BREADCRUMB_MARKER_CATEGORY = "Raygun4Android"
     private const val BREADCRUMB_MARKER_TYPE = "Manual"
     private const val BREADCRUMB_INFO_LEVEL = 1
+    internal const val CUSTOM_DATA_MARKER_KEY = "raygun.payloadReduction"
     private const val TRUNCATED_TEXT = "…"
     private val removedFramesMessage = Regex("^(\\d+) frames removed from middle of stack trace$")
 
@@ -283,33 +284,75 @@ internal object CrashPayloadReducer {
         val details = report.obj("details") ?: return null
         val customDataElement = details.get("userCustomData") ?: return null
         if (!customDataElement.isJsonObject) {
-            details.remove("userCustomData")
+            details.add(
+                "userCustomData",
+                JsonObject().apply {
+                    add(CUSTOM_DATA_MARKER_KEY, customDataRemovalMarker(valueRemoved = true))
+                },
+            )
             return serializedWithinLimit(report, maxBytes)
         }
 
         val customData = customDataElement.asJsonObject
-        var currentBytes = report.toString().byteSize()
-        var remainingEntries = customData.size()
+        if (customData.size() == 0) {
+            return null
+        }
+        val markerKey = availableCustomDataMarkerKey(customData)
+        val originalBytes = report.toString().byteSize()
+        val originalEntryCount = customData.size()
+        var removedEntryBytes = 0
+        var removedEntries = 0
         val keysByDescendingSize =
             customData
                 .entrySet()
                 .map { (key, value) -> Triple(key, value, customDataEntrySize(key, value)) }
                 .sortedByDescending { (_, _, size) -> size }
         for ((key, _, entrySize) in keysByDescendingSize) {
-            currentBytes -= entrySize
-            if (remainingEntries > 1) {
-                currentBytes--
-            }
-            remainingEntries--
             customData.remove(key)
-            if (currentBytes <= maxBytes) {
+            removedEntryBytes += entrySize
+            removedEntries++
+            val marker = customDataRemovalMarker(entriesRemoved = removedEntries)
+            val removedCommaBytes = removedEntries.coerceAtMost(originalEntryCount - 1)
+            val markerEntryBytes = customDataEntrySize(markerKey, marker)
+            val markerCommaBytes = if (customData.size() > 0) 1 else 0
+            val estimatedBytes =
+                originalBytes - removedEntryBytes - removedCommaBytes +
+                    markerEntryBytes +
+                    markerCommaBytes
+            if (estimatedBytes <= maxBytes) {
+                customData.add(markerKey, marker)
                 serializedWithinLimit(report, maxBytes)?.let {
                     return it
                 }
+                customData.remove(markerKey)
             }
         }
+        customData.add(markerKey, customDataRemovalMarker(entriesRemoved = removedEntries))
         return null
     }
+
+    private fun availableCustomDataMarkerKey(customData: JsonObject): String {
+        if (!customData.has(CUSTOM_DATA_MARKER_KEY)) {
+            return CUSTOM_DATA_MARKER_KEY
+        }
+
+        var suffix = 1
+        while (customData.has("$CUSTOM_DATA_MARKER_KEY.$suffix")) {
+            suffix++
+        }
+        return "$CUSTOM_DATA_MARKER_KEY.$suffix"
+    }
+
+    private fun customDataRemovalMarker(
+        entriesRemoved: Int? = null,
+        valueRemoved: Boolean = false,
+    ): JsonObject =
+        JsonObject().apply {
+            entriesRemoved?.let { addProperty("entriesRemoved", it) }
+            if (valueRemoved) {
+                addProperty("valueRemoved", true)
+            }
+        }
 
     private fun customDataEntrySize(
         key: String,
