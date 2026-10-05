@@ -356,8 +356,69 @@ class CrashPayloadReducerTest {
             setOf("error", "groupingKey", "version", "client", "tags"),
             minimal.details().keySet(),
         )
-        assertMarked(minimal)
+        assertEquals(
+            "TagsTruncated-1-tags-removed",
+            minimal.details().getAsJsonArray("tags")[0].asString,
+        )
         assertWithinLimit(minimalJson)
+    }
+
+    @Test
+    fun `minimal fallback marks each removed collection contextually`() {
+        val report = report()
+        repeat(4) { index ->
+            report.error().getAsJsonArray("stackTrace").add(frame(index, "method-$index"))
+        }
+        report
+            .details()
+            .add(
+                "userCustomData",
+                JsonObject().apply {
+                    addProperty("first", "one")
+                    addProperty("second", "two")
+                },
+            )
+        report
+            .details()
+            .add(
+                "breadcrumbs",
+                JsonArray().apply {
+                    repeat(3) { index ->
+                        add(
+                            JsonObject().apply {
+                                addProperty("message", "breadcrumb-$index")
+                                addProperty("timestamp", index)
+                            },
+                        )
+                    }
+                },
+            )
+        report.details().add("tags", JsonArray().apply { repeat(2) { index -> add("tag-$index") } })
+
+        val minimal = parse(requireNotNull(CrashPayloadReducer.minimalPayload(report.toString())))
+        val stack = minimal.error().getAsJsonArray("stackTrace")
+        val customData = minimal.details().getAsJsonObject("userCustomData")
+        val breadcrumbs = minimal.details().getAsJsonArray("breadcrumbs")
+
+        assertEquals(2, stack.size())
+        assertEquals(
+            "3 frames removed from middle of stack trace",
+            stack[1].asJsonObject["raw"].asString,
+        )
+        assertEquals(
+            2,
+            customData[CrashPayloadReducer.CUSTOM_DATA_MARKER_KEY]
+                .asJsonObject["entriesRemoved"]
+                .asInt,
+        )
+        assertEquals(
+            "3 older breadcrumbs removed during payload reduction",
+            breadcrumbs[0].asJsonObject["message"].asString,
+        )
+        assertEquals(
+            "TagsTruncated-2-tags-removed",
+            minimal.details().getAsJsonArray("tags")[0].asString,
+        )
     }
 
     @Test

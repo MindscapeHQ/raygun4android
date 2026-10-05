@@ -280,14 +280,14 @@ class CrashReportingWorkerTest {
         assertEquals(Result.success(), result)
         assertEquals(2, postedPayloads.size)
         assertEquals(originalPayload, postedPayloads[0])
-        assertTrue(hasTruncationMarker(postedPayloads[1]))
+        assertTrue(hasCustomDataReductionMarker(postedPayloads[1]))
         assertTrue(postedPayloads[1].length < originalPayload.length)
         assertFalse(file.exists())
     }
 
     @Test
     fun `transient failure after 413 retry retains original cached report`() {
-        val originalPayload = validPayload()
+        val originalPayload = validPayload(1_024)
         val file =
             requireNotNull(
                 CrashReportCache.store(application, originalPayload, "api-key", CUSTOM_ENDPOINT),
@@ -310,7 +310,12 @@ class CrashReportingWorkerTest {
     fun `second 413 stops retrying and removes permanently rejected report`() {
         val file =
             requireNotNull(
-                CrashReportCache.store(application, validPayload(), "api-key", CUSTOM_ENDPOINT),
+                CrashReportCache.store(
+                    application,
+                    validPayload(1_024),
+                    "api-key",
+                    CUSTOM_ENDPOINT,
+                ),
             )
         var postCount = 0
 
@@ -446,6 +451,14 @@ class CrashReportingWorkerTest {
             .asJsonObject["tags"]
             .asJsonArray
             .any { it.asString == CrashPayloadReducer.TRUNCATION_TAG }
+
+    private fun hasCustomDataReductionMarker(payload: String): Boolean =
+        JsonParser
+            .parseString(payload)
+            .asJsonObject["details"]
+            .asJsonObject["userCustomData"]
+            .asJsonObject
+            .has(CrashPayloadReducer.CUSTOM_DATA_MARKER_KEY)
 
     companion object {
         private const val CUSTOM_ENDPOINT = "https://crash.example.com/entries"

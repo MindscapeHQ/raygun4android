@@ -33,6 +33,7 @@ internal object CrashPayloadReducer {
     private const val BREADCRUMB_MARKER_TYPE = "Manual"
     private const val BREADCRUMB_INFO_LEVEL = 1
     internal const val CUSTOM_DATA_MARKER_KEY = "raygun.payloadReduction"
+    private const val TAGS_TRUNCATED_PREFIX = "TagsTruncated"
     private const val TRUNCATED_TEXT = "…"
     private val removedFramesMessage = Regex("^(\\d+) frames removed from middle of stack trace$")
 
@@ -136,12 +137,20 @@ internal object CrashPayloadReducer {
         minimalClient(sourceDetails.obj("client"))?.let { client ->
             details.add("client", client)
         }
-        details.add(
-            "tags",
-            JsonArray().apply {
-                add(TRUNCATION_TAG)
-            },
-        )
+        minimalCustomDataMarker(sourceDetails.get("userCustomData"))?.let { customData ->
+            details.add("userCustomData", customData)
+        }
+        minimalBreadcrumbMarker(sourceDetails.get("breadcrumbs"))?.let { breadcrumbs ->
+            details.add("breadcrumbs", breadcrumbs)
+        }
+        removedValueCount(sourceDetails.get("tags"))
+            .takeIf { it > 0 }
+            ?.let { removedTags ->
+                details.add(
+                    "tags",
+                    JsonArray().apply { add(tagsRemovalMarker(removedTags)) },
+                )
+            }
 
         return JsonObject()
             .apply {
@@ -189,8 +198,63 @@ internal object CrashPayloadReducer {
                 MAX_FRAME_STRING_BYTES,
             ),
         )
-        return JsonArray().apply { add(frame) }
+        sourceFrame?.string("raw")?.let { raw ->
+            frame.addProperty("raw", truncateUtf8(raw, MAX_FRAME_STRING_BYTES))
+        }
+        val originalFrameCount = stackFrameCount(sourceError)
+        return JsonArray().apply {
+            add(frame)
+            if (originalFrameCount > 1) {
+                add(removedFramesMarker(originalFrameCount - 1))
+            }
+        }
     }
+
+    private fun stackFrameCount(sourceError: JsonObject): Long {
+        var error: JsonObject? = sourceError
+        var depth = 0
+        var count = 0L
+        while (error != null && depth < MAX_INNER_ERROR_DEPTH) {
+            error.array("stackTrace")?.forEach { frame -> count += representedFrameCount(frame) }
+            error = error.obj("innerError")
+            depth++
+        }
+        return count
+    }
+
+    private fun minimalCustomDataMarker(sourceCustomData: JsonElement?): JsonObject? {
+        sourceCustomData ?: return null
+        val marker =
+            if (sourceCustomData.isJsonObject) {
+                val entriesRemoved = sourceCustomData.asJsonObject.size()
+                if (entriesRemoved == 0) {
+                    return null
+                }
+                customDataRemovalMarker(entriesRemoved = entriesRemoved)
+            } else {
+                customDataRemovalMarker(valueRemoved = true)
+            }
+        return JsonObject().apply { add(CUSTOM_DATA_MARKER_KEY, marker) }
+    }
+
+    private fun minimalBreadcrumbMarker(sourceBreadcrumbs: JsonElement?): JsonArray? {
+        val breadcrumbs =
+            sourceBreadcrumbs?.takeIf(JsonElement::isJsonArray)?.asJsonArray?.toList()
+                ?: return null
+        if (breadcrumbs.isEmpty()) {
+            return null
+        }
+        return breadcrumbsWithRemovalMarker(breadcrumbs, 0)
+    }
+
+    private fun removedValueCount(element: JsonElement?): Int =
+        when {
+            element == null || element.isJsonNull -> 0
+            element.isJsonArray -> element.asJsonArray.size()
+            else -> 1
+        }
+
+    private fun tagsRemovalMarker(removedCount: Int): String = "$TAGS_TRUNCATED_PREFIX-$removedCount-tags-removed"
 
     private fun firstFrame(sourceError: JsonObject): JsonObject? {
         var error: JsonObject? = sourceError
