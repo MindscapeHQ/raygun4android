@@ -226,7 +226,7 @@ class CrashReportingWorkerTest {
                         payload.toByteArray(Charsets.UTF_8).size <=
                             CrashPayloadReducer.MAX_PAYLOAD_BYTES,
                     )
-                    assertTrue(hasTruncationMarker(payload))
+                    assertTrue(hasCustomDataReductionMarker(payload))
                     202
                 }
 
@@ -347,7 +347,7 @@ class CrashReportingWorkerTest {
             requireNotNull(deliveredPayload).toByteArray(Charsets.UTF_8).size <=
                 CrashPayloadReducer.MAX_PAYLOAD_BYTES,
         )
-        assertTrue(hasTruncationMarker(requireNotNull(deliveredPayload)))
+        assertTrue(hasCustomDataReductionMarker(requireNotNull(deliveredPayload)))
         assertFalse(file.exists())
     }
 
@@ -443,14 +443,6 @@ class CrashReportingWorkerTest {
                     },
                 )
             }.toString()
-
-    private fun hasTruncationMarker(payload: String): Boolean =
-        JsonParser
-            .parseString(payload)
-            .asJsonObject["details"]
-            .asJsonObject["tags"]
-            .asJsonArray
-            .any { it.asString == CrashPayloadReducer.TRUNCATION_TAG }
 
     private fun hasCustomDataReductionMarker(payload: String): Boolean =
         JsonParser

@@ -11,7 +11,6 @@ internal object CrashPayloadReducer {
     // The API documents a 128KB maximum. This leaves a margin whether KB is enforced as 1,000 or
     // 1,024 bytes.
     internal const val MAX_PAYLOAD_BYTES = 120 * 1024
-    internal const val TRUNCATION_TAG = "raygun:payload-truncated"
 
     private const val MAX_STACK_FRAMES = 100
     private const val KEEP_TOP_FRAMES = 20
@@ -51,7 +50,6 @@ internal object CrashPayloadReducer {
 
         val report = parseObject(payload) ?: return payload
         val minimalSource = report.deepCopy()
-        addTruncationMarker(report)
 
         trimStackTraces(report, MAX_STACK_FRAMES, KEEP_TOP_FRAMES, KEEP_BOTTOM_FRAMES)
         serializedWithinLimit(report, maxBytes)?.let {
@@ -80,7 +78,7 @@ internal object CrashPayloadReducer {
             return it
         }
 
-        replaceTagsWithTruncationMarker(report)
+        replaceTagsWithRemovalMarker(report)
         serializedWithinLimit(report, maxBytes)?.let {
             return it
         }
@@ -270,23 +268,17 @@ internal object CrashPayloadReducer {
         return null
     }
 
-    private fun addTruncationMarker(report: JsonObject) {
+    private fun replaceTagsWithRemovalMarker(report: JsonObject) {
         val details = report.obj("details") ?: return
-        val tags = details.array("tags") ?: JsonArray().also { details.add("tags", it) }
-        if (tags.none { it.isJsonPrimitive && it.asString == TRUNCATION_TAG }) {
-            tags.add(TRUNCATION_TAG)
+        val originalTags = details.get("tags") ?: return
+        val removedCount = removedValueCount(originalTags)
+        val replacement = JsonArray().apply { add(tagsRemovalMarker(removedCount)) }
+        if (
+            removedCount > 0 &&
+            replacement.toString().byteSize() < originalTags.toString().byteSize()
+        ) {
+            details.add("tags", replacement)
         }
-    }
-
-    private fun replaceTagsWithTruncationMarker(report: JsonObject) {
-        report
-            .obj("details")
-            ?.add(
-                "tags",
-                JsonArray().apply {
-                    add(TRUNCATION_TAG)
-                },
-            )
     }
 
     private fun trimStackTraces(

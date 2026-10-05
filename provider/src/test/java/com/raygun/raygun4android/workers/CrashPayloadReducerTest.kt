@@ -35,7 +35,7 @@ class CrashPayloadReducerTest {
         val reduced = CrashPayloadReducer.reduceToLimit(payload, payloadBytes - 1)
 
         assertNotEquals(payload, reduced)
-        assertMarked(parse(reduced))
+        assertEquals("existing-tag", parse(reduced).details().getAsJsonArray("tags")[0].asString)
         assertTrue(reduced.toByteArray(Charsets.UTF_8).size <= payloadBytes - 1)
     }
 
@@ -71,7 +71,7 @@ class CrashPayloadReducerTest {
             reduced.details()["userCustomData"].asJsonObject["keep-me"].asString,
         )
         assertEquals("preserved", reduced.details()["unknownField"].asString)
-        assertMarked(reduced)
+        assertEquals("existing-tag", reduced.details().getAsJsonArray("tags")[0].asString)
         assertWithinLimit(reduced.toString())
     }
 
@@ -197,7 +197,7 @@ class CrashPayloadReducerTest {
                 .asJsonObject["entriesRemoved"]
                 .asInt,
         )
-        assertMarked(reduced)
+        assertEquals("existing-tag", reduced.details().getAsJsonArray("tags")[0].asString)
         assertWithinLimit(reduced.toString())
     }
 
@@ -288,9 +288,7 @@ class CrashPayloadReducerTest {
             .add(
                 "tags",
                 JsonArray().apply {
-                    add(CrashPayloadReducer.TRUNCATION_TAG)
                     repeat(80) { index -> add("tag-$index-${"t".repeat(2_000)}") }
-                    add(CrashPayloadReducer.TRUNCATION_TAG)
                 },
             )
 
@@ -298,7 +296,7 @@ class CrashPayloadReducerTest {
         val tags = reduced.details().getAsJsonArray("tags")
 
         assertEquals(1, tags.size())
-        assertEquals(CrashPayloadReducer.TRUNCATION_TAG, tags[0].asString)
+        assertEquals("TagsTruncated-80-tags-removed", tags[0].asString)
         assertWithinLimit(reduced.toString())
     }
 
@@ -313,7 +311,7 @@ class CrashPayloadReducerTest {
 
         assertTrue(message.endsWith("…"))
         assertFalse(message.contains('\uFFFD'))
-        assertMarked(reduced)
+        assertEquals("existing-tag", reduced.details().getAsJsonArray("tags")[0].asString)
         assertWithinLimit(reducedJson)
     }
 
@@ -557,14 +555,6 @@ class CrashPayloadReducerTest {
     private fun JsonObject.details(): JsonObject = getAsJsonObject("details")
 
     private fun JsonObject.error(): JsonObject = details().getAsJsonObject("error")
-
-    private fun assertMarked(report: JsonObject) {
-        assertTrue(
-            report.details().getAsJsonArray("tags").any {
-                it.asString == CrashPayloadReducer.TRUNCATION_TAG
-            },
-        )
-    }
 
     private fun assertWithinLimit(payload: String) {
         assertTrue(
