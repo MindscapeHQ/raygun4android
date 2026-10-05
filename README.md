@@ -310,15 +310,16 @@ The Crash Reporting API has a documented maximum payload size of 128 KB. When se
 
 Oversized reports are progressively reduced in the following order to retain the most useful diagnostic information for as long as possible:
 
-1. Add the `raygun:payload-truncated` tag.
-2. Trim the middle of long stack traces while preserving the top and bottom frames.
-3. Bound oversized strings in individual stack frames.
-4. Trim stack traces more aggressively if the report is still too large.
-5. Remove the largest top-level custom-data entries first.
-6. Remove the oldest breadcrumbs while retaining the newest.
-7. Replace the tags with the `raygun:payload-truncated` marker.
-8. Bound long error and breadcrumb strings.
-9. Fall back to a minimal valid report containing the occurrence time, bounded error identity, one line-numbered stack frame, and available grouping, app-version, and client metadata.
+1. Trim the middle of long stack traces while preserving the top and bottom frames. A synthetic `raw` frame states how many frames were removed.
+2. Bound oversized strings in individual stack frames, marking shortened strings with an ellipsis (`…`).
+3. Trim stack traces more aggressively if the report is still too large, updating the synthetic frame with the cumulative number removed.
+4. Remove the largest top-level custom-data entries first. A namespaced `raygun.payloadReduction` entry records the number removed; if a customer already uses that key, a numbered suffix is selected without overwriting the customer value.
+5. Remove the oldest breadcrumbs while retaining the newest. An informational breadcrumb at the removal boundary records how many older breadcrumbs were removed.
+6. If replacing the tags would reduce the payload size, replace them with a `TagsTruncated-N-tags-removed` tag containing the number removed.
+7. Bound long error and breadcrumb strings, marking shortened strings with an ellipsis (`…`).
+8. Fall back to a minimal valid report containing the occurrence time, bounded error identity, a line-numbered stack frame, available grouping, app-version, and client metadata, and contextual markers for omitted stack frames, custom data, breadcrumbs, and tags.
+
+There is no global truncation tag: customer tags are preserved unless reducing the tags themselves is necessary. Each reduced section describes its own data loss instead.
 
 Reduction happens during background delivery. The cached original report is not rewritten, and `onBeforeSend` is not invoked a second time. Custom endpoints receive the original payload because they may accept larger bodies; if any endpoint returns HTTP 413, the SDK retries once with the minimal report.
 
