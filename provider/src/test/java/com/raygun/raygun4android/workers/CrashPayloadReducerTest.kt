@@ -236,6 +236,23 @@ class CrashPayloadReducerTest {
     }
 
     @Test
+    fun `non-object custom data is replaced with a contextual marker`() {
+        val report = report()
+        report.details().addProperty("userCustomData", "x".repeat(5_000))
+
+        val reduced = parse(CrashPayloadReducer.reduceToLimit(report.toString(), 1_000))
+        val customData = reduced.details().getAsJsonObject("userCustomData")
+
+        assertTrue(
+            customData[CrashPayloadReducer.CUSTOM_DATA_MARKER_KEY]
+                .asJsonObject["valueRemoved"]
+                .asBoolean,
+        )
+        assertEquals("existing-tag", reduced.details().getAsJsonArray("tags")[0].asString)
+        assertTrue(reduced.toString().toByteArray(Charsets.UTF_8).size <= 1_000)
+    }
+
+    @Test
     fun `oldest breadcrumbs are removed and newest are retained`() {
         val report = report()
         report
@@ -281,6 +298,28 @@ class CrashPayloadReducerTest {
     }
 
     @Test
+    fun `breadcrumb marker uses a safe timestamp when the removed breadcrumb has none`() {
+        val report = report()
+        report
+            .details()
+            .add(
+                "breadcrumbs",
+                JsonArray().apply {
+                    add(JsonObject().apply { addProperty("message", "b".repeat(5_000)) })
+                },
+            )
+
+        val reduced = parse(CrashPayloadReducer.reduceToLimit(report.toString(), 1_000))
+        val marker = reduced.details().getAsJsonArray("breadcrumbs")[0].asJsonObject
+
+        assertEquals(
+            "1 older breadcrumbs removed during payload reduction",
+            marker["message"].asString,
+        )
+        assertEquals(0, marker["timestamp"].asLong)
+    }
+
+    @Test
     fun `oversized tags are replaced with one truncation marker`() {
         val report = report()
         report
@@ -298,6 +337,79 @@ class CrashPayloadReducerTest {
         assertEquals(1, tags.size())
         assertEquals("TagsTruncated-80-tags-removed", tags[0].asString)
         assertWithinLimit(reduced.toString())
+    }
+
+    @Test
+    fun `short customer tags remain when their replacement would be larger`() {
+        val report = report()
+        report.details().add("tags", JsonArray().apply { add("x") })
+        report.error().addProperty("message", "m".repeat(5_000))
+
+        val reducedJson = CrashPayloadReducer.reduceToLimit(report.toString(), 3_000)
+        val reduced = parse(reducedJson)
+
+        assertEquals(listOf("x"), reduced.details().getAsJsonArray("tags").map { it.asString })
+        assertTrue(reduced.error()["message"].asString.endsWith("…"))
+        assertTrue(reducedJson.toByteArray(Charsets.UTF_8).size <= 3_000)
+    }
+
+    @Test
+    fun `multiple reduction stages retain contextual markers together`() {
+        val report = report()
+        report.error().add("stackTrace", errorWithFrames("TestException", 200, 700)["stackTrace"])
+        report
+            .details()
+            .add(
+                "userCustomData",
+                JsonObject().apply {
+                    addProperty("smaller", "s".repeat(40 * 1024))
+                    addProperty("largest", "l".repeat(90 * 1024))
+                },
+            )
+        report
+            .details()
+            .add(
+                "breadcrumbs",
+                JsonArray().apply {
+                    repeat(80) { index ->
+                        add(
+                            JsonObject().apply {
+                                addProperty("message", "breadcrumb-$index-${"b".repeat(2_000)}")
+                                addProperty("timestamp", index)
+                            },
+                        )
+                    }
+                },
+            )
+
+        val reducedJson = CrashPayloadReducer.reduceToLimit(report.toString())
+        val reduced = parse(reducedJson)
+        val stack = reduced.error().getAsJsonArray("stackTrace")
+        val customData = reduced.details().getAsJsonObject("userCustomData")
+        val breadcrumbs = reduced.details().getAsJsonArray("breadcrumbs")
+
+        assertEquals(
+            "190 frames removed from middle of stack trace",
+            stack[5].asJsonObject["raw"].asString,
+        )
+        assertEquals(
+            2,
+            customData[CrashPayloadReducer.CUSTOM_DATA_MARKER_KEY]
+                .asJsonObject["entriesRemoved"]
+                .asInt,
+        )
+        assertTrue(
+            breadcrumbs[0].asJsonObject["message"].asString.contains("older breadcrumbs removed"),
+        )
+        assertTrue(
+            breadcrumbs
+                .last()
+                .asJsonObject["message"]
+                .asString
+                .startsWith("breadcrumb-79-"),
+        )
+        assertEquals("existing-tag", reduced.details().getAsJsonArray("tags")[0].asString)
+        assertWithinLimit(reducedJson)
     }
 
     @Test
