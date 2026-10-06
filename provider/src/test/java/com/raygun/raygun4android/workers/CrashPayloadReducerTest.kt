@@ -260,7 +260,7 @@ class CrashPayloadReducerTest {
             .add(
                 "breadcrumbs",
                 JsonArray().apply {
-                    repeat(80) { index ->
+                    repeat(160) { index ->
                         add(
                             JsonObject().apply {
                                 addProperty("message", "breadcrumb-$index-${"b".repeat(2_000)}")
@@ -275,10 +275,10 @@ class CrashPayloadReducerTest {
         val breadcrumbs = reduced.details().getAsJsonArray("breadcrumbs")
         val marker = breadcrumbs[0].asJsonObject
         val retainedCount = breadcrumbs.size() - 1
-        val removedCount = 80 - retainedCount
+        val removedCount = 160 - retainedCount
         val firstRetained = breadcrumbs[1].asJsonObject["message"].asString
 
-        assertTrue(retainedCount in 1..79)
+        assertTrue(retainedCount in 1..159)
         assertEquals(
             "$removedCount older breadcrumbs removed during payload reduction",
             marker["message"].asString,
@@ -292,9 +292,44 @@ class CrashPayloadReducerTest {
                 .last()
                 .asJsonObject["message"]
                 .asString
-                .startsWith("breadcrumb-79-"),
+                .startsWith("breadcrumb-159-"),
         )
         assertWithinLimit(reduced.toString())
+    }
+
+    @Test
+    fun `breadcrumb strings are truncated before any breadcrumbs are removed`() {
+        val report = report()
+        report
+            .details()
+            .add(
+                "breadcrumbs",
+                JsonArray().apply {
+                    repeat(80) { index ->
+                        add(
+                            JsonObject().apply {
+                                addProperty("message", "breadcrumb-$index-${"b".repeat(2_000)}")
+                                addProperty("timestamp", index)
+                            },
+                        )
+                    }
+                },
+            )
+
+        val reducedJson = CrashPayloadReducer.reduceToLimit(report.toString())
+        val breadcrumbs = parse(reducedJson).details().getAsJsonArray("breadcrumbs")
+
+        assertEquals(80, breadcrumbs.size())
+        assertTrue(breadcrumbs[0].asJsonObject["message"].asString.startsWith("breadcrumb-0-"))
+        assertTrue(breadcrumbs[0].asJsonObject["message"].asString.endsWith("…"))
+        assertTrue(
+            breadcrumbs
+                .last()
+                .asJsonObject["message"]
+                .asString
+                .startsWith("breadcrumb-79-"),
+        )
+        assertWithinLimit(reducedJson)
     }
 
     @Test
@@ -354,6 +389,24 @@ class CrashPayloadReducerTest {
     }
 
     @Test
+    fun `error strings are truncated before customer tags are removed`() {
+        val report = report()
+        val originalTags = List(20) { index -> "tag-$index-${"t".repeat(1_000)}" }
+        report.details().add("tags", JsonArray().apply { originalTags.forEach(::add) })
+        report.error().addProperty("message", "m".repeat(130 * 1024))
+
+        val reducedJson = CrashPayloadReducer.reduceToLimit(report.toString())
+        val reduced = parse(reducedJson)
+
+        assertEquals(
+            originalTags,
+            reduced.details().getAsJsonArray("tags").map { it.asString },
+        )
+        assertTrue(reduced.error()["message"].asString.endsWith("…"))
+        assertWithinLimit(reducedJson)
+    }
+
+    @Test
     fun `multiple reduction stages retain contextual markers together`() {
         val report = report()
         report.error().add("stackTrace", errorWithFrames("TestException", 200, 700)["stackTrace"])
@@ -371,7 +424,7 @@ class CrashPayloadReducerTest {
             .add(
                 "breadcrumbs",
                 JsonArray().apply {
-                    repeat(80) { index ->
+                    repeat(160) { index ->
                         add(
                             JsonObject().apply {
                                 addProperty("message", "breadcrumb-$index-${"b".repeat(2_000)}")
@@ -406,7 +459,7 @@ class CrashPayloadReducerTest {
                 .last()
                 .asJsonObject["message"]
                 .asString
-                .startsWith("breadcrumb-79-"),
+                .startsWith("breadcrumb-159-"),
         )
         assertEquals("existing-tag", reduced.details().getAsJsonArray("tags")[0].asString)
         assertWithinLimit(reducedJson)

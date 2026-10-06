@@ -74,12 +74,13 @@ internal object CrashPayloadReducer {
         removeLargestCustomDataEntries(report, maxBytes)?.let {
             return it
         }
-        trimOldestBreadcrumbs(report, maxBytes)?.let {
+
+        truncateBreadcrumbStrings(report)
+        serializedWithinLimit(report, maxBytes)?.let {
             return it
         }
 
-        replaceTagsWithRemovalMarker(report)
-        serializedWithinLimit(report, maxBytes)?.let {
+        trimOldestBreadcrumbs(report, maxBytes)?.let {
             return it
         }
 
@@ -88,7 +89,7 @@ internal object CrashPayloadReducer {
             return it
         }
 
-        truncateBreadcrumbStrings(report)
+        replaceTagsWithRemovalMarker(report)
         serializedWithinLimit(report, maxBytes)?.let {
             return it
         }
