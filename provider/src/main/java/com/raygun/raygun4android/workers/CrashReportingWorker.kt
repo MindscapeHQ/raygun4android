@@ -168,7 +168,11 @@ class CrashReportingWorker(
         responseCode(deliveryResponseCode)
         if (deliveryResponseCode == RaygunSettings.RESPONSE_CODE_LARGE_PAYLOAD) {
             val fallbackPayload = CrashPayloadReducer.minimalPayload(originalPayload)
-            if (fallbackPayload != null && fallbackPayload != payload) {
+            if (
+                fallbackPayload != null &&
+                fallbackPayload.toByteArray(Charsets.UTF_8).size <
+                payload.toByteArray(Charsets.UTF_8).size
+            ) {
                 w("Crash report was rejected as too large; retrying once with a minimal payload.")
                 payload = fallbackPayload
                 deliveryResponseCode = postCrashReport(endpoint, reportApiKey, payload)

@@ -286,6 +286,41 @@ class CrashReportingWorkerTest {
     }
 
     @Test
+    fun `413 does not retry when minimal payload would be larger`() {
+        val originalPayload =
+            JsonParser
+                .parseString(validPayload())
+                .asJsonObject
+                .apply {
+                    getAsJsonObject("details")
+                        .add(
+                            "tags",
+                            JsonArray().apply { add("x") },
+                        )
+                }.toString()
+        val fallbackPayload = requireNotNull(CrashPayloadReducer.minimalPayload(originalPayload))
+        assertTrue(
+            fallbackPayload.toByteArray(Charsets.UTF_8).size >
+                originalPayload.toByteArray(Charsets.UTF_8).size,
+        )
+        val file =
+            requireNotNull(
+                CrashReportCache.store(application, originalPayload, "api-key", CUSTOM_ENDPOINT),
+            )
+        var postCount = 0
+
+        val result =
+            worker.processCrashReport(file, "current-api-key") { _, _, _ ->
+                postCount++
+                413
+            }
+
+        assertEquals(Result.failure(), result)
+        assertEquals(1, postCount)
+        assertFalse(file.exists())
+    }
+
+    @Test
     fun `transient failure after 413 retry retains original cached report`() {
         val originalPayload = validPayload(1_024)
         val file =
