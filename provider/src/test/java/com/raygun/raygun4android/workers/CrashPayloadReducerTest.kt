@@ -187,7 +187,7 @@ class CrashPayloadReducerTest {
         val customData = reduced.details()["userCustomData"].asJsonObject
 
         assertEquals(
-            "Value omitted because the crash report payload was too large",
+            "[Removed: payload too large]",
             customData["largest"].asString,
         )
         assertEquals("s".repeat(40 * 1024), customData["smaller"].asString)

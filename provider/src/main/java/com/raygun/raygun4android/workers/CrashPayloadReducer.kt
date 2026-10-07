@@ -355,10 +355,7 @@ internal object CrashPayloadReducer {
             return null
         }
         val markerKey = availableCustomDataMarkerKey(customData)
-        val omittedValue =
-            com.google.gson.JsonPrimitive(
-                "Value omitted because the crash report payload was too large",
-            )
+        val omittedValue = com.google.gson.JsonPrimitive("[Removed: payload too large]")
         val omittedValueBytes = omittedValue.toString().byteSize()
         var replacementBytes = report.toString().byteSize()
         var valuesRemoved = 0
