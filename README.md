@@ -322,6 +322,8 @@ Oversized reports are progressively reduced in the following order to retain the
 
 There is no global truncation tag: customer tags are preserved unless reducing the tags themselves is necessary. Each reduced section describes its own data loss instead.
 
+`raygun.payloadReduction` is a literal key in `userCustomData`, with a JSON object as its value. The dot does not create a nested `raygun` object. This name is a provider convention, not a reserved namespace; customers can use the same key, so consumers must not blindly delete it or every `raygun.*` key. Removing the provider's summary entry does not remove omission text under retained customer keys.
+
 Reduction happens during background delivery. The cached original report is not rewritten, and `onBeforeSend` is not invoked a second time. Custom endpoints receive the original payload because they may accept larger bodies; if any endpoint returns HTTP 413, the SDK retries once with the minimal report.
 
 ### Getting/setting/cancelling the error before it is sent
