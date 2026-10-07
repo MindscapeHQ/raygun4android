@@ -1,6 +1,9 @@
 package com.raygun.raygun4android.workers
 
 import androidx.work.ListenableWorker.Result
+import com.google.gson.JsonArray
+import com.google.gson.JsonObject
+import com.google.gson.JsonParser
 import com.raygun.raygun4android.RaygunSettings
 import com.raygun.raygun4android.SerializedMessage
 import org.junit.Assert.assertEquals
@@ -199,6 +202,233 @@ class CrashReportingWorkerTest {
     }
 
     @Test
+    fun `oversized payload for stored Raygun endpoint is reduced before first post`() {
+        val originalPayload = validPayload(130 * 1024)
+        val file =
+            requireNotNull(
+                CrashReportCache.store(
+                    application,
+                    originalPayload,
+                    "stored-api-key",
+                    RaygunSettings.DEFAULT_CRASHREPORTING_ENDPOINT,
+                ),
+            )
+        RaygunSettings.crashReportingEndpoint = CUSTOM_ENDPOINT
+        var postCount = 0
+
+        try {
+            val result =
+                worker.processCrashReport(file, "current-api-key") { endpoint, apiKey, payload ->
+                    postCount++
+                    assertEquals(RaygunSettings.DEFAULT_CRASHREPORTING_ENDPOINT, endpoint)
+                    assertEquals("stored-api-key", apiKey)
+                    assertTrue(
+                        payload.toByteArray(Charsets.UTF_8).size <=
+                            CrashPayloadReducer.MAX_PAYLOAD_BYTES,
+                    )
+                    assertTrue(hasCustomDataReductionMarker(payload))
+                    202
+                }
+
+            assertEquals(Result.success(), result)
+            assertEquals(1, postCount)
+            assertFalse(file.exists())
+        } finally {
+            RaygunSettings.crashReportingEndpoint = RaygunSettings.DEFAULT_CRASHREPORTING_ENDPOINT
+        }
+    }
+
+    @Test
+    fun `oversized payload for custom endpoint is posted unchanged when accepted`() {
+        val originalPayload = validPayload(130 * 1024)
+        val file =
+            requireNotNull(
+                CrashReportCache.store(
+                    application,
+                    originalPayload,
+                    "api-key",
+                    CUSTOM_ENDPOINT,
+                ),
+            )
+
+        val result =
+            worker.processCrashReport(file, "current-api-key") { endpoint, _, payload ->
+                assertEquals(CUSTOM_ENDPOINT, endpoint)
+                assertEquals(originalPayload, payload)
+                202
+            }
+
+        assertEquals(Result.success(), result)
+        assertFalse(file.exists())
+    }
+
+    @Test
+    fun `413 retries once with minimal payload and success removes cached report`() {
+        val originalPayload = validPayload(1_024)
+        val file =
+            requireNotNull(
+                CrashReportCache.store(application, originalPayload, "api-key", CUSTOM_ENDPOINT),
+            )
+        val postedPayloads = mutableListOf<String>()
+
+        val result =
+            worker.processCrashReport(file, "current-api-key") { _, _, payload ->
+                postedPayloads += payload
+                if (postedPayloads.size == 1) 413 else 202
+            }
+
+        assertEquals(Result.success(), result)
+        assertEquals(2, postedPayloads.size)
+        assertEquals(originalPayload, postedPayloads[0])
+        assertTrue(hasCustomDataReductionMarker(postedPayloads[1]))
+        assertTrue(postedPayloads[1].length < originalPayload.length)
+        assertFalse(file.exists())
+    }
+
+    @Test
+    fun `413 does not retry when minimal payload would be larger`() {
+        val originalPayload =
+            JsonParser
+                .parseString(validPayload())
+                .asJsonObject
+                .apply {
+                    getAsJsonObject("details")
+                        .add(
+                            "tags",
+                            JsonArray().apply { add("x") },
+                        )
+                }.toString()
+        val fallbackPayload = requireNotNull(CrashPayloadReducer.minimalPayload(originalPayload))
+        assertTrue(
+            fallbackPayload.toByteArray(Charsets.UTF_8).size >
+                originalPayload.toByteArray(Charsets.UTF_8).size,
+        )
+        val file =
+            requireNotNull(
+                CrashReportCache.store(application, originalPayload, "api-key", CUSTOM_ENDPOINT),
+            )
+        var postCount = 0
+
+        val result =
+            worker.processCrashReport(file, "current-api-key") { _, _, _ ->
+                postCount++
+                413
+            }
+
+        assertEquals(Result.failure(), result)
+        assertEquals(1, postCount)
+        assertFalse(file.exists())
+    }
+
+    @Test
+    fun `413 does not retry when minimal payload is identical`() {
+        val originalPayload = validPayload()
+        assertEquals(originalPayload, CrashPayloadReducer.minimalPayload(originalPayload))
+        val file =
+            requireNotNull(
+                CrashReportCache.store(application, originalPayload, "api-key", CUSTOM_ENDPOINT),
+            )
+        var postCount = 0
+
+        val result =
+            worker.processCrashReport(file, "current-api-key") { _, _, _ ->
+                postCount++
+                413
+            }
+
+        assertEquals(Result.failure(), result)
+        assertEquals(1, postCount)
+        assertFalse(file.exists())
+    }
+
+    @Test
+    fun `413 does not retry when no valid minimal payload can be built`() {
+        val malformedPayload = "not-json"
+        val file =
+            requireNotNull(
+                CrashReportCache.store(application, malformedPayload, "api-key", CUSTOM_ENDPOINT),
+            )
+        var postCount = 0
+
+        val result =
+            worker.processCrashReport(file, "current-api-key") { _, _, payload ->
+                postCount++
+                assertEquals(malformedPayload, payload)
+                413
+            }
+
+        assertEquals(Result.failure(), result)
+        assertEquals(1, postCount)
+        assertFalse(file.exists())
+    }
+
+    @Test
+    fun `transient failure after 413 retry retains original cached report`() {
+        val originalPayload = validPayload(1_024)
+        val file =
+            requireNotNull(
+                CrashReportCache.store(application, originalPayload, "api-key", CUSTOM_ENDPOINT),
+            )
+        var postCount = 0
+
+        val result =
+            worker.processCrashReport(file, "current-api-key") { _, _, _ ->
+                postCount++
+                if (postCount == 1) 413 else 503
+            }
+
+        assertEquals(Result.retry(), result)
+        assertEquals(2, postCount)
+        assertTrue(file.exists())
+        assertEquals(originalPayload, CrashReportCache.readPersistent(file).messagePayload)
+    }
+
+    @Test
+    fun `second 413 stops retrying and removes permanently rejected report`() {
+        val file =
+            requireNotNull(
+                CrashReportCache.store(
+                    application,
+                    validPayload(1_024),
+                    "api-key",
+                    CUSTOM_ENDPOINT,
+                ),
+            )
+        var postCount = 0
+
+        val result =
+            worker.processCrashReport(file, "current-api-key") { _, _, _ ->
+                postCount++
+                413
+            }
+
+        assertEquals(Result.failure(), result)
+        assertEquals(2, postCount)
+        assertFalse(file.exists())
+    }
+
+    @Test
+    fun `oversized legacy serialized payload is reduced before delivery`() {
+        val file = serializedReport(validPayload(130 * 1024))
+        var deliveredPayload: String? = null
+
+        val result =
+            worker.processCrashReport(file, "api-key") { endpoint, _, payload ->
+                assertEquals(RaygunSettings.DEFAULT_CRASHREPORTING_ENDPOINT, endpoint)
+                deliveredPayload = payload
+                202
+            }
+
+        assertEquals(Result.success(), result)
+        assertTrue(
+            requireNotNull(deliveredPayload).toByteArray(Charsets.UTF_8).size <=
+                CrashPayloadReducer.MAX_PAYLOAD_BYTES,
+        )
+        assertTrue(hasCustomDataReductionMarker(requireNotNull(deliveredPayload)))
+        assertFalse(file.exists())
+    }
+
+    @Test
     fun `empty API key fails without posting and retains payload for later initialization`() {
         val file = rawReport("payload without API key")
         var postAttempted = false
@@ -251,6 +481,53 @@ class CrashReportingWorkerTest {
             }
             deleteOnExit()
         }
+
+    private fun validPayload(customDataBytes: Int = 0): String =
+        JsonObject()
+            .apply {
+                addProperty("occurredOn", "2026-09-29T10:15:30Z")
+                add(
+                    "details",
+                    JsonObject().apply {
+                        add(
+                            "error",
+                            JsonObject().apply {
+                                addProperty("message", "test message with enough detail")
+                                addProperty("className", "TestException")
+                                add(
+                                    "stackTrace",
+                                    JsonArray().apply {
+                                        add(
+                                            JsonObject().apply {
+                                                addProperty("lineNumber", 42)
+                                                addProperty("className", "Example")
+                                                addProperty("fileName", "Example.kt")
+                                                addProperty("methodName", "crash")
+                                            },
+                                        )
+                                    },
+                                )
+                            },
+                        )
+                        if (customDataBytes > 0) {
+                            add(
+                                "userCustomData",
+                                JsonObject().apply {
+                                    addProperty("large-value", "x".repeat(customDataBytes))
+                                },
+                            )
+                        }
+                    },
+                )
+            }.toString()
+
+    private fun hasCustomDataReductionMarker(payload: String): Boolean =
+        JsonParser
+            .parseString(payload)
+            .asJsonObject["details"]
+            .asJsonObject["userCustomData"]
+            .asJsonObject
+            .has(CrashPayloadReducer.CUSTOM_DATA_MARKER_KEY)
 
     companion object {
         private const val CUSTOM_ENDPOINT = "https://crash.example.com/entries"

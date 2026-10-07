@@ -8,6 +8,7 @@ import com.raygun.raygun4android.SerializedMessage
 import com.raygun.raygun4android.logging.RaygunLogger.d
 import com.raygun.raygun4android.logging.RaygunLogger.e
 import com.raygun.raygun4android.logging.RaygunLogger.responseCode
+import com.raygun.raygun4android.logging.RaygunLogger.w
 import okhttp3.MediaType
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.Request
@@ -150,9 +151,36 @@ class CrashReportingWorker(
             return Result.failure()
         }
 
-        val responseCode = postCrashReport(endpoint, reportApiKey, entry.messagePayload)
-        responseCode(responseCode)
-        val result = RaygunWorkerHelper.toWorkerResult(responseCode)
+        val originalPayload = entry.messagePayload
+        var payload =
+            if (endpoint == RaygunSettings.DEFAULT_CRASHREPORTING_ENDPOINT) {
+                CrashPayloadReducer.reduceToLimit(originalPayload)
+            } else {
+                originalPayload
+            }
+        if (payload != originalPayload) {
+            w(
+                "Crash report payload exceeded the SDK's safe size threshold and was reduced for delivery.",
+            )
+        }
+
+        var deliveryResponseCode = postCrashReport(endpoint, reportApiKey, payload)
+        responseCode(deliveryResponseCode)
+        if (deliveryResponseCode == RaygunSettings.RESPONSE_CODE_LARGE_PAYLOAD) {
+            val fallbackPayload = CrashPayloadReducer.minimalPayload(originalPayload)
+            if (
+                fallbackPayload != null &&
+                fallbackPayload.toByteArray(Charsets.UTF_8).size <
+                payload.toByteArray(Charsets.UTF_8).size
+            ) {
+                w("Crash report was rejected as too large; retrying once with a minimal payload.")
+                payload = fallbackPayload
+                deliveryResponseCode = postCrashReport(endpoint, reportApiKey, payload)
+                responseCode(deliveryResponseCode)
+            }
+        }
+
+        val result = RaygunWorkerHelper.toWorkerResult(deliveryResponseCode)
 
         if (result != Result.retry()) {
             CrashReportCache.remove(file)

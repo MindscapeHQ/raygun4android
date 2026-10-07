@@ -304,6 +304,28 @@ The following methods are available for sending manually; pick one depending on 
 
 The `send` function builds a RaygunMessage for you and then sends it.
 
+### Oversized crash reports
+
+The Crash Reporting API has a documented maximum payload size of 128 KB. When sending to the default Raygun endpoint, Raygun4Android uses a conservative 120 KiB UTF-8 limit to leave a margin for differences in how the server interprets KB. Reports that are already within this limit are sent byte-for-byte unchanged.
+
+Oversized reports are progressively reduced in the following order to retain the most useful diagnostic information for as long as possible:
+
+1. Trim the middle of long stack traces while preserving the top and bottom frames. A synthetic `raw` frame states how many frames were removed.
+2. Bound long breadcrumb strings, marking shortened strings with an ellipsis (`…`).
+3. Remove the oldest breadcrumbs while retaining the newest. An informational breadcrumb at the removal boundary records how many older breadcrumbs were removed.
+4. Replace the largest custom-data values with omission text while retaining their keys. If the report still does not fit, remove the largest whole entries. A namespaced `raygun.payloadReduction` entry records `valuesRemoved` and, when needed, `entriesRemoved`; a numbered suffix avoids collisions with customer keys. Values are replaced only when the omission text is smaller.
+5. Bound oversized strings in individual stack frames, marking shortened strings with an ellipsis (`…`).
+6. Trim stack traces more aggressively if the report is still too large, updating the synthetic frame with the cumulative number removed.
+7. Bound long error strings, marking shortened strings with an ellipsis (`…`).
+8. If replacing the tags would reduce the payload size, replace them with a `TagsTruncated-N-tags-removed` tag containing the number removed.
+9. Fall back to a minimal valid report containing the occurrence time, bounded error identity, a line-numbered stack frame, available grouping, app-version, and client metadata, and contextual markers for omitted stack frames, custom data, breadcrumbs, and tags.
+
+There is no global truncation tag: customer tags are preserved unless reducing the tags themselves is necessary. Each reduced section describes its own data loss instead.
+
+`raygun.payloadReduction` is a literal key in `userCustomData`, with a JSON object as its value. The dot does not create a nested `raygun` object. This name is a provider convention, not a reserved namespace; customers can use the same key, so consumers must not blindly delete it or every `raygun.*` key. Removing the provider's summary entry does not remove omission text under retained customer keys.
+
+Reduction happens during background delivery. The cached original report is not rewritten, and `onBeforeSend` is not invoked a second time. Custom endpoints receive the original payload because they may accept larger bodies; if any endpoint returns HTTP 413, the SDK retries once with the minimal report.
+
 ### Getting/setting/cancelling the error before it is sent
 
 This provider has an onBeforeSend API to support accessing or mutating the candidate error payload immediately before it is sent, or cancelling the send outright. This is provided as the public method `RaygunClient.setOnBeforeSend(RaygunOnBeforeSend)`, which takes an instance of a class that implements the `CrashReportingOnBeforeSend` interface. Your class needs a public `onBeforeSend` method that takes a `RaygunMessage` parameter, and returns the same.
