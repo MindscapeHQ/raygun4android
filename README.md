@@ -311,11 +311,11 @@ The Crash Reporting API has a documented maximum payload size of 128 KB. When se
 Oversized reports are progressively reduced in the following order to retain the most useful diagnostic information for as long as possible:
 
 1. Trim the middle of long stack traces while preserving the top and bottom frames. A synthetic `raw` frame states how many frames were removed.
-2. Bound oversized strings in individual stack frames, marking shortened strings with an ellipsis (`…`).
-3. Trim stack traces more aggressively if the report is still too large, updating the synthetic frame with the cumulative number removed.
-4. Remove the largest top-level custom-data entries first. A namespaced `raygun.payloadReduction` entry records the number removed; if a customer already uses that key, a numbered suffix is selected without overwriting the customer value.
-5. Bound long breadcrumb strings, marking shortened strings with an ellipsis (`…`).
-6. Remove the oldest breadcrumbs while retaining the newest. An informational breadcrumb at the removal boundary records how many older breadcrumbs were removed.
+2. Bound long breadcrumb strings, marking shortened strings with an ellipsis (`…`).
+3. Remove the oldest breadcrumbs while retaining the newest. An informational breadcrumb at the removal boundary records how many older breadcrumbs were removed.
+4. Replace the largest custom-data values with omission text while retaining their keys. If the report still does not fit, remove the largest whole entries. A namespaced `raygun.payloadReduction` entry records `valuesRemoved` and, when needed, `entriesRemoved`; a numbered suffix avoids collisions with customer keys. Values are replaced only when the omission text is smaller.
+5. Bound oversized strings in individual stack frames, marking shortened strings with an ellipsis (`…`).
+6. Trim stack traces more aggressively if the report is still too large, updating the synthetic frame with the cumulative number removed.
 7. Bound long error strings, marking shortened strings with an ellipsis (`…`).
 8. If replacing the tags would reduce the payload size, replace them with a `TagsTruncated-N-tags-removed` tag containing the number removed.
 9. Fall back to a minimal valid report containing the occurrence time, bounded error identity, a line-numbered stack frame, available grouping, app-version, and client metadata, and contextual markers for omitted stack frames, custom data, breadcrumbs, and tags.

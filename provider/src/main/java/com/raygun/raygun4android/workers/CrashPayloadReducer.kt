@@ -56,6 +56,19 @@ internal object CrashPayloadReducer {
             return it
         }
 
+        truncateBreadcrumbStrings(report)
+        serializedWithinLimit(report, maxBytes)?.let {
+            return it
+        }
+
+        trimOldestBreadcrumbs(report, maxBytes)?.let {
+            return it
+        }
+
+        removeLargestCustomDataEntries(report, maxBytes)?.let {
+            return it
+        }
+
         truncateStackFrameStrings(report)
         serializedWithinLimit(report, maxBytes)?.let {
             return it
@@ -68,19 +81,6 @@ internal object CrashPayloadReducer {
             AGGRESSIVE_KEEP_BOTTOM_FRAMES,
         )
         serializedWithinLimit(report, maxBytes)?.let {
-            return it
-        }
-
-        removeLargestCustomDataEntries(report, maxBytes)?.let {
-            return it
-        }
-
-        truncateBreadcrumbStrings(report)
-        serializedWithinLimit(report, maxBytes)?.let {
-            return it
-        }
-
-        trimOldestBreadcrumbs(report, maxBytes)?.let {
             return it
         }
 
@@ -355,6 +355,34 @@ internal object CrashPayloadReducer {
             return null
         }
         val markerKey = availableCustomDataMarkerKey(customData)
+        val omittedValue =
+            com.google.gson.JsonPrimitive(
+                "Value omitted because the crash report payload was too large",
+            )
+        val omittedValueBytes = omittedValue.toString().byteSize()
+        var replacementBytes = report.toString().byteSize()
+        var valuesRemoved = 0
+        val valuesByDescendingSize =
+            customData
+                .entrySet()
+                .map { (key, value) -> key to value.toString().byteSize() }
+                .sortedByDescending { (_, size) -> size }
+        for ((key, size) in valuesByDescendingSize) {
+            if (size <= omittedValueBytes) {
+                continue
+            }
+            customData.add(key, omittedValue)
+            replacementBytes -= size - omittedValueBytes
+            valuesRemoved++
+            val marker = customDataRemovalMarker(valuesRemoved = valuesRemoved)
+            if (replacementBytes + customDataEntrySize(markerKey, marker) + 1 <= maxBytes) {
+                customData.add(markerKey, marker)
+                serializedWithinLimit(report, maxBytes)?.let {
+                    return it
+                }
+                customData.remove(markerKey)
+            }
+        }
         val originalBytes = report.toString().byteSize()
         val originalEntryCount = customData.size()
         var removedEntryBytes = 0
@@ -368,7 +396,11 @@ internal object CrashPayloadReducer {
             customData.remove(key)
             removedEntryBytes += entrySize
             removedEntries++
-            val marker = customDataRemovalMarker(entriesRemoved = removedEntries)
+            val marker =
+                customDataRemovalMarker(
+                    entriesRemoved = removedEntries,
+                    valuesRemoved = valuesRemoved,
+                )
             val removedCommaBytes = removedEntries.coerceAtMost(originalEntryCount - 1)
             val markerEntryBytes = customDataEntrySize(markerKey, marker)
             val markerCommaBytes = if (customData.size() > 0) 1 else 0
@@ -384,7 +416,10 @@ internal object CrashPayloadReducer {
                 customData.remove(markerKey)
             }
         }
-        customData.add(markerKey, customDataRemovalMarker(entriesRemoved = removedEntries))
+        customData.add(
+            markerKey,
+            customDataRemovalMarker(entriesRemoved = removedEntries, valuesRemoved = valuesRemoved),
+        )
         return null
     }
 
@@ -403,9 +438,13 @@ internal object CrashPayloadReducer {
     private fun customDataRemovalMarker(
         entriesRemoved: Int? = null,
         valueRemoved: Boolean = false,
+        valuesRemoved: Int = 0,
     ): JsonObject =
         JsonObject().apply {
             entriesRemoved?.let { addProperty("entriesRemoved", it) }
+            if (valuesRemoved > 0) {
+                addProperty("valuesRemoved", valuesRemoved)
+            }
             if (valueRemoved) {
                 addProperty("valueRemoved", true)
             }

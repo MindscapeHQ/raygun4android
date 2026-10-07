@@ -102,7 +102,7 @@ class CrashPayloadReducerTest {
     }
 
     @Test
-    fun `large stack frame strings are reduced before custom data`() {
+    fun `custom data is reduced before large stack frame strings`() {
         val report = report()
         report
             .details()
@@ -117,10 +117,7 @@ class CrashPayloadReducerTest {
         val reducedStack = reduced.error().getAsJsonArray("stackTrace")
 
         assertEquals(50, reducedStack.size())
-        assertEquals(
-            "keep me",
-            reduced.details()["userCustomData"].asJsonObject["important"].asString,
-        )
+        assertFalse(reduced.details()["userCustomData"].asJsonObject.has("important"))
         assertTrue(
             reducedStack[0]
                 .asJsonObject["methodName"]
@@ -174,7 +171,7 @@ class CrashPayloadReducerTest {
     }
 
     @Test
-    fun `largest custom data entries are removed first`() {
+    fun `largest custom data values are replaced first while retaining keys`() {
         val report = report()
         report
             .details()
@@ -189,12 +186,15 @@ class CrashPayloadReducerTest {
         val reduced = parse(CrashPayloadReducer.reduceToLimit(report.toString()))
         val customData = reduced.details()["userCustomData"].asJsonObject
 
-        assertFalse(customData.has("largest"))
-        assertTrue(customData.has("smaller"))
+        assertEquals(
+            "Value omitted because the crash report payload was too large",
+            customData["largest"].asString,
+        )
+        assertEquals("s".repeat(40 * 1024), customData["smaller"].asString)
         assertEquals(
             1,
             customData[CrashPayloadReducer.CUSTOM_DATA_MARKER_KEY]
-                .asJsonObject["entriesRemoved"]
+                .asJsonObject["valuesRemoved"]
                 .asInt,
         )
         assertEquals("existing-tag", reduced.details().getAsJsonArray("tags")[0].asString)
@@ -229,8 +229,84 @@ class CrashPayloadReducerTest {
         assertEquals(
             1,
             customData["${CrashPayloadReducer.CUSTOM_DATA_MARKER_KEY}.2"]
+                .asJsonObject["valuesRemoved"]
+                .asInt,
+        )
+        assertWithinLimit(reduced.toString())
+    }
+
+    @Test
+    fun `oversized custom data keys require whole entry removal`() {
+        val report = report()
+        val longKey = "k".repeat(130 * 1024)
+        report
+            .details()
+            .add(
+                "userCustomData",
+                JsonObject().apply {
+                    addProperty(longKey, "small")
+                    addProperty("keep", "v")
+                },
+            )
+
+        val reduced = parse(CrashPayloadReducer.reduceToLimit(report.toString()))
+        val customData = reduced.details().getAsJsonObject("userCustomData")
+
+        assertFalse(customData.has(longKey))
+        assertEquals("v", customData["keep"].asString)
+        assertEquals(
+            1,
+            customData[CrashPayloadReducer.CUSTOM_DATA_MARKER_KEY]
                 .asJsonObject["entriesRemoved"]
                 .asInt,
+        )
+        assertWithinLimit(reduced.toString())
+    }
+
+    @Test
+    fun `breadcrumbs are sacrificed before custom data and stack frame strings`() {
+        val report = report()
+        val originalStack =
+            JsonArray().apply {
+                repeat(50) { index -> add(frame(index, "m".repeat(700))) }
+            }
+        report.error().add("stackTrace", originalStack)
+        report
+            .details()
+            .add(
+                "userCustomData",
+                JsonObject().apply { addProperty("context", "x".repeat(10_000)) },
+            )
+        report
+            .details()
+            .add(
+                "breadcrumbs",
+                JsonArray().apply {
+                    repeat(160) { index ->
+                        add(
+                            JsonObject().apply {
+                                addProperty("message", "b".repeat(2_000))
+                                addProperty("timestamp", index)
+                            },
+                        )
+                    }
+                },
+            )
+
+        val reduced = parse(CrashPayloadReducer.reduceToLimit(report.toString()))
+
+        assertEquals(originalStack, reduced.error()["stackTrace"])
+        assertEquals(
+            "x".repeat(10_000),
+            reduced.details().getAsJsonObject("userCustomData")["context"].asString,
+        )
+        assertTrue(
+            reduced
+                .details()
+                .getAsJsonArray("breadcrumbs")[0]
+                .asJsonObject["message"]
+                .asString
+                .contains("older breadcrumbs removed"),
         )
         assertWithinLimit(reduced.toString())
     }
@@ -442,25 +518,19 @@ class CrashPayloadReducerTest {
         val breadcrumbs = reduced.details().getAsJsonArray("breadcrumbs")
 
         assertEquals(
-            "190 frames removed from middle of stack trace",
-            stack[5].asJsonObject["raw"].asString,
+            "160 frames removed from middle of stack trace",
+            stack[20].asJsonObject["raw"].asString,
         )
         assertEquals(
             2,
             customData[CrashPayloadReducer.CUSTOM_DATA_MARKER_KEY]
-                .asJsonObject["entriesRemoved"]
+                .asJsonObject["valuesRemoved"]
                 .asInt,
         )
         assertTrue(
             breadcrumbs[0].asJsonObject["message"].asString.contains("older breadcrumbs removed"),
         )
-        assertTrue(
-            breadcrumbs
-                .last()
-                .asJsonObject["message"]
-                .asString
-                .startsWith("breadcrumb-159-"),
-        )
+        assertEquals(1, breadcrumbs.size())
         assertEquals("existing-tag", reduced.details().getAsJsonArray("tags")[0].asString)
         assertWithinLimit(reducedJson)
     }
