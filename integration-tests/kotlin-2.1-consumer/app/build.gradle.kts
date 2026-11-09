@@ -5,7 +5,7 @@ plugins {
 
 android {
     namespace = "com.raygun.raygun4android.compatibility"
-    compileSdk = 36
+    compileSdk = 37
 
     defaultConfig {
         minSdk = 23
@@ -25,4 +25,6 @@ dependencies {
     implementation(
         "com.raygun:raygun4android:${providers.gradleProperty("raygunVersion").get()}",
     )
+    // The published Raygun BOM must align this deliberately old consumer dependency.
+    implementation("com.squareup.okhttp3:okhttp-urlconnection:4.9.2")
 }

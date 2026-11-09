@@ -34,6 +34,7 @@ jobs:
       with:
         distribution: ${{ env.JAVA_DISTRIBUTION }}
         java-version: ${{ env.JAVA_VERSION }}
+    - run: sdkmanager "platforms;android-37.0" "build-tools;37.0.0"
     - run: ./gradlew app:lint
 
   provider-lint:
@@ -45,6 +46,7 @@ jobs:
       with:
         distribution: ${{ env.JAVA_DISTRIBUTION }}
         java-version: ${{ env.JAVA_VERSION }}
+    - run: sdkmanager "platforms;android-37.0" "build-tools;37.0.0"
     - run: ./gradlew provider:lint
 
   app-assemble-debug:
@@ -56,6 +58,7 @@ jobs:
       with:
         distribution: ${{ env.JAVA_DISTRIBUTION }}
         java-version: ${{ env.JAVA_VERSION }}
+    - run: sdkmanager "platforms;android-37.0" "build-tools;37.0.0"
     - run: ./gradlew app:assembleDebug
 
   provider-assemble-debug:
@@ -67,6 +70,7 @@ jobs:
       with:
         distribution: ${{ env.JAVA_DISTRIBUTION }}
         java-version: ${{ env.JAVA_VERSION }}
+    - run: sdkmanager "platforms;android-37.0" "build-tools;37.0.0"
     - run: ./gradlew provider:assembleDebug
 
   provider-test:
@@ -78,6 +82,7 @@ jobs:
       with:
         distribution: ${{ env.JAVA_DISTRIBUTION }}
         java-version: ${{ env.JAVA_VERSION }}
+    - run: sdkmanager "platforms;android-37.0" "build-tools;37.0.0"
     - run: ./gradlew provider:test verifyOkHttpDependencyAlignment
 
   kotlin-compatibility:
@@ -89,6 +94,7 @@ jobs:
       with:
         distribution: ${{ env.JAVA_DISTRIBUTION }}
         java-version: ${{ env.JAVA_VERSION }}
+    - run: sdkmanager "platforms;android-37.0" "build-tools;37.0.0"
     - name: Generate the published artifact
       shell: bash
       run: |
@@ -109,24 +115,29 @@ jobs:
         echo "RAYGUN_TEST_VERSION=$version" >> "$GITHUB_ENV"
     - uses: gradle/actions/setup-gradle@v6
       with:
-        gradle-version: "8.14.3"
+        gradle-version: "9.3.1"
     - name: Compile with Kotlin 2.1
       run: >-
         gradle --no-daemon
         -p integration-tests/kotlin-2.1-consumer
         -PraygunRepository="$RAYGUN_TEST_REPOSITORY"
         -PraygunVersion="$RAYGUN_TEST_VERSION"
-        :app:compileDebugKotlin
+        :app:assembleDebug
 
   app-connected-test:
-    name: "app:connectedTest"
+    name: "app:connectedTest (API ${{ matrix.api-level }})"
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        api-level: [23, 35, "37.0"]
     steps:
     - uses: actions/checkout@v7
     - uses: actions/setup-java@v6.1.0
       with:
         distribution: ${{ env.JAVA_DISTRIBUTION }}
         java-version: ${{ env.JAVA_VERSION }}
+    - run: sdkmanager "platforms;android-37.0" "build-tools;37.0.0"
     # From https://github.com/marketplace/actions/android-emulator-runner
     - name: Enable KVM
       run: |
@@ -136,7 +147,7 @@ jobs:
     - name: run tests
       uses: reactivecircus/android-emulator-runner@v2
       with:
-        api-level: 35
+        api-level: ${{ matrix.api-level }}
         target: google_apis
         arch: x86_64
         script: ./gradlew connectedCheck
