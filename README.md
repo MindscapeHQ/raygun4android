@@ -18,6 +18,8 @@ As well, the library is still compatible with pure Java Android applications.
 
 Raygun4Android 6.3.0 is the current stable release of the provider and supports Android 6+.
 
+See the [changelog](CHANGELOG.md) for release notes.
+
 The `develop` branch reflects ongoing work on the version 6 line and only supports Android 6+.
 
 If you want the *very old* stable version 3.0.6 please check out the change set labelled with `v3.0.6` and go from there.

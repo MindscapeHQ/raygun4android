@@ -1,5 +1,17 @@
 ## Changelog
 
+### 6.3.1
+
+- fix: reduce oversized crash reports before delivery to the default Raygun endpoint, preserving diagnostic information where possible and marking omitted data contextually (#335)
+- fix: retry HTTP 413 responses once with a smaller minimal report when available, retaining the cached original after transient delivery failures (#335)
+- chore(ci): bump actions/setup-java from 6.0.1 to 6.1.0 (#344)
+- chore(deps): bump Gradle from 9.7.1 to 9.8.2 and Android Gradle Plugin from 9.4.1 to 9.5.0 (#350)
+- chore(deps): bump Mockito Core from 5.23.0 to 5.24.0 and Mockito Kotlin from 6.3.0 to 6.4.0, and refresh dependency locks and verification metadata (#350)
+
+**Delivery note:** Reports within the SDK's 120 KiB UTF-8 threshold remain unchanged. Oversized reports may have diagnostic data shortened or omitted during background delivery; the cached original is not rewritten and `onBeforeSend` is not invoked again. Custom endpoints receive the original payload unless they return HTTP 413.
+
+**Compatibility note:** Compile SDK 36, minimum Android API 23, Java 17, published Kotlin language/API 2.2 and `kotlin-stdlib` 2.2.21, and OkHttp 5.4.0 remain unchanged. This release does not include the certificate mitigation in OkHttp 5.5.1. Version 6.3.1 is the final planned 6.x maintenance release; the compile SDK 37 and OkHttp migration is planned separately for 7.0.0 (#351).
+
 ### 6.3.0
 
 - fix: deliver cached crash reports using the API key and custom endpoint captured when each report was created (#333)
