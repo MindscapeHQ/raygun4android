@@ -18,7 +18,7 @@ As well, the library is still compatible with pure Java Android applications.
 
 Raygun4Android 6.3.0 is the current stable release of the provider and supports Android 6+.
 
-Version 6.3.1 is being prepared as the final planned 6.x maintenance release. It retains compile SDK 36 compatibility; the compile SDK 37 and OkHttp migration is planned separately for 7.0.0. See the [changelog](CHANGELOG.md#631) for the pending changes.
+See the [changelog](CHANGELOG.md) for release notes.
 
 The `develop` branch reflects ongoing work on the version 6 line and only supports Android 6+.
 
