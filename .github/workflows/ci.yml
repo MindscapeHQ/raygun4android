@@ -119,16 +119,18 @@ jobs:
 
         echo "RAYGUN_TEST_REPOSITORY=$repository" >> "$GITHUB_ENV"
         echo "RAYGUN_TEST_VERSION=$version" >> "$GITHUB_ENV"
+        echo "RAYGUN_TEST_OKHTTP_VERSION=$(sed -n 's/^okhttp = "\([^"]*\)"/\1/p' gradle/libs.versions.toml)" >> "$GITHUB_ENV"
     - uses: gradle/actions/setup-gradle@v6
       with:
         gradle-version: "9.3.1"
-    - name: Compile with Kotlin 2.1
+    - name: Compile with Kotlin 2.1 and verify OkHttp alignment
       run: >-
         gradle --no-daemon
         -p integration-tests/kotlin-2.1-consumer
         -PraygunRepository="$RAYGUN_TEST_REPOSITORY"
         -PraygunVersion="$RAYGUN_TEST_VERSION"
-        :app:assembleDebug
+        -PraygunOkHttpVersion="$RAYGUN_TEST_OKHTTP_VERSION"
+        :app:assembleDebug :app:verifyOkHttpDependencyAlignment
 
   app-connected-test:
     name: "app:connectedTest (API ${{ matrix.api-level }})"
