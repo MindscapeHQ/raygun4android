@@ -20,14 +20,53 @@ Raygun4Android 6.3.1 is the current stable release of the provider and supports 
 
 See the [changelog](CHANGELOG.md) for release notes.
 
-The `develop` branch reflects ongoing work on the version 6 line and only supports Android 6+.
+The `develop` branch contains development for version 7 and supports Android 6+.
 
 If you want the *very old* stable version 3.0.6 please check out the change set labelled with `v3.0.6` and go from there.
 
 ### Requirements
 
-- minSdkVersion 23+
-- compileSdkVersion 36
+- Android 6+ (`minSdkVersion 23`).
+- Version 7: `compileSdkVersion 37` or later and JDK 17 or later.
+- Version 6.3.1: `compileSdkVersion 36` or later.
+
+For SDK 37, [Android's supported tooling matrix](https://developer.android.com/build/releases/about-agp#api-level-support) starts at Android Gradle Plugin (AGP) 9.1.1. The CI-validated consumer baseline is AGP 9.1.1, Gradle 9.3.1, and JDK 17. These AGP and Gradle versions describe the supported tooling baseline, not version checks enforced by Raygun's AAR. Older AGP versions can build with SDK 37 warnings and application-specific workarounds, but are outside Android's supported SDK 37 tooling matrix and this project's CI coverage.
+
+### Migrating to version 7
+
+Install Android SDK Platform 37.0 and raise your app's `compileSdk` to 37. This is a build-time requirement from OkHttp 5.5.1, not a requirement for Android 17 devices. You do not need to raise your app's `minSdk` or `targetSdk` for this update. The sample app retains `targetSdk 36`.
+
+The provider retains Kotlin language/API 2.2 and `kotlin-stdlib` 2.2.21. A published-artifact consumer is tested with Kotlin 2.1.20, AGP 9.1.1, Gradle 9.3.1, and JDK 17. If you move to AGP 9 and keep using the external Kotlin 2.1 Android plugin, disable AGP 9's built-in Kotlin and new DSL:
+
+```properties
+android.builtInKotlin=false
+android.newDsl=false
+```
+
+These flags are transitional consumer settings, not required by projects already using AGP's built-in Kotlin. See the [AGP migration guidance](https://developer.android.com/build/migrate-to-built-in-kotlin) before changing your Kotlin setup.
+
+AGP 9 also requests Kotlin Gradle plugin 2.2.10, even with built-in Kotlin disabled. To retain the actual 2.1.20 compiler, add strict **build-plugin** dependencies to the top-level `build.gradle.kts`:
+
+```kotlin
+buildscript {
+    dependencies {
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin") {
+            version { strictly("2.1.20") }
+        }
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin-api") {
+            version { strictly("2.1.20") }
+        }
+    }
+}
+```
+
+This follows Android's [lower-KGP-version migration guidance](https://developer.android.com/build/releases/past-releases/agp-9-0-0-release-notes#downgrade-to-a-lower-kgp-version). It pins the compiler, not your app's Kotlin standard library or Raygun's transitive dependencies. The opt-out and older compiler may not work with future AGP releases; the combination tested here uses AGP 9.1.1.
+
+When moving a React Native 0.81 app to AGP 9, also enable `android.buildFeatures.resValues` and replace `proguard-android.txt` with `proguard-android-optimize.txt` in the app's ProGuard configuration. A fresh React Native 0.81.5 app builds with these changes and Kotlin 2.1.20; applications with additional native modules need their own compatibility checks.
+
+OkHttp and its exported BOM move together to 5.5.1, including its compromised-certificate mitigation. Existing custom `OkHttpClientBuilder` implementations and lookup-only DNS implementations remain supported. Encrypted Client Hello is opt-in; the SDK does not enable it or install an API-29-only DNS resolver on older devices.
+
+Keep OkHttp modules aligned. An ordinary older `okhttp-urlconnection` dependency is upgraded by the exported BOM; strict pins, forced versions, and dependency locks may need updating in your app. Version 6.3.1 remains available for apps that cannot yet migrate to SDK 37, but does not include the OkHttp 5.5.1 certificate mitigation.
 
 ### Internal dependencies
 

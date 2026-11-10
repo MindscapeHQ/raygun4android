@@ -25,7 +25,7 @@ val POM_DEVELOPER_2_ID: String by project
 val POM_DEVELOPER_2_NAME: String by project
 
 android {
-    compileSdk = 36
+    compileSdk = 37
     namespace = "com.raygun.raygun4android"
 
     defaultConfig {
@@ -75,7 +75,7 @@ dependencies {
     implementation(libs.androidx.appcompat)
     implementation(libs.gson)
     api(platform(libs.okhttp.bom))
-    implementation(libs.okhttp)
+    api(libs.okhttp)
     implementation(libs.timber)
     implementation(libs.androidx.work.runtime)
 

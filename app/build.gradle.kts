@@ -120,7 +120,7 @@ val keystoreFile = file("testkeystore.jks")
 
 android {
     namespace = "com.raygun.raygun4android.sample"
-    compileSdk = 36
+    compileSdk = 37
 
     val releaseSigning =
         if (keystoreFile.exists()) {

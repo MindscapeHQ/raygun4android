@@ -1,5 +1,14 @@
 ## Changelog
 
+### 7.0.0 (unreleased)
+
+- breaking: require compile SDK 37 for consuming applications; the supported, CI-validated SDK 37 consumer baseline is AGP 9.1.1, Gradle 9.3.1, and JDK 17
+- chore(deps): update OkHttp and its exported BOM from 5.4.0 to 5.5.1, including the compromised eMudhra certificate mitigation, and Okio from 3.17.0 to 3.18.1
+- fix: expose OkHttp as a published API dependency so custom HTTP client builders compile without an additional OkHttp dependency
+- test: retain Kotlin 2.1.20 published-consumer coverage with SDK 37 tooling, including custom HTTP client, DNS, and cookie-jar compilation, and exercise device tests on API 23, 35, and 37
+
+**Compatibility note:** Minimum Android API 23, sample-app target SDK 36, Java 17, and published Kotlin language/API 2.2 with `kotlin-stdlib` 2.2.21 remain unchanged. SDK 37 is a compilation requirement, not a device requirement. Apps moving to AGP 9 while retaining the external Kotlin Android plugin need AGP 9's transitional opt-out settings; see the [migration instructions](README.md#migrating-to-version-7). Older AGP versions are outside Android's supported SDK 37 tooling matrix and this project's CI coverage. OkHttp modules must remain aligned, including any forced or strictly pinned dependencies in consuming apps.
+
 ### 6.3.1
 
 - fix: reduce oversized crash reports before delivery to the default Raygun endpoint, preserving diagnostic information where possible and marking omitted data contextually (#335)
