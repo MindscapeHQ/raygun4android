@@ -27,14 +27,16 @@ If you want the *very old* stable version 3.0.6 please check out the change set 
 ### Requirements
 
 - Android 6+ (`minSdkVersion 23`).
-- Version 7: `compileSdkVersion 37` or later, Android Gradle Plugin 9.1.1 or later, Gradle 9.3.1 or later, and JDK 17 or later.
+- Version 7: `compileSdkVersion 37` or later and JDK 17 or later.
 - Version 6.3.1: `compileSdkVersion 36` or later.
+
+For SDK 37, [Android's supported tooling matrix](https://developer.android.com/build/releases/about-agp#api-level-support) starts at Android Gradle Plugin (AGP) 9.1.1. The CI-validated consumer baseline is AGP 9.1.1, Gradle 9.3.1, and JDK 17. These AGP and Gradle versions describe the supported tooling baseline, not version checks enforced by Raygun's AAR. Older AGP versions can build with SDK 37 warnings and application-specific workarounds, but are outside Android's supported SDK 37 tooling matrix and this project's CI coverage.
 
 ### Migrating to version 7
 
 Install Android SDK Platform 37.0 and raise your app's `compileSdk` to 37. This is a build-time requirement from OkHttp 5.5.1, not a requirement for Android 17 devices. You do not need to raise your app's `minSdk` or `targetSdk` for this update. The sample app retains `targetSdk 36`.
 
-The provider retains Kotlin language/API 2.2 and `kotlin-stdlib` 2.2.21. A published-artifact consumer is tested with Kotlin 2.1.20, AGP 9.1.1, Gradle 9.3.1, and JDK 17. To keep using the external Kotlin 2.1 Android plugin, disable AGP 9's built-in Kotlin and new DSL:
+The provider retains Kotlin language/API 2.2 and `kotlin-stdlib` 2.2.21. A published-artifact consumer is tested with Kotlin 2.1.20, AGP 9.1.1, Gradle 9.3.1, and JDK 17. If you move to AGP 9 and keep using the external Kotlin 2.1 Android plugin, disable AGP 9's built-in Kotlin and new DSL:
 
 ```properties
 android.builtInKotlin=false
@@ -60,7 +62,7 @@ buildscript {
 
 This follows Android's [lower-KGP-version migration guidance](https://developer.android.com/build/releases/past-releases/agp-9-0-0-release-notes#downgrade-to-a-lower-kgp-version). It pins the compiler, not your app's Kotlin standard library or Raygun's transitive dependencies. The opt-out and older compiler may not work with future AGP releases; the combination tested here uses AGP 9.1.1.
 
-For React Native 0.81, the build-tool upgrade also requires enabling `android.buildFeatures.resValues` and replacing `proguard-android.txt` with `proguard-android-optimize.txt` in the app's ProGuard configuration. A fresh React Native 0.81.5 app builds with these changes and Kotlin 2.1.20; applications with additional native modules need their own compatibility checks.
+When moving a React Native 0.81 app to AGP 9, also enable `android.buildFeatures.resValues` and replace `proguard-android.txt` with `proguard-android-optimize.txt` in the app's ProGuard configuration. A fresh React Native 0.81.5 app builds with these changes and Kotlin 2.1.20; applications with additional native modules need their own compatibility checks.
 
 OkHttp and its exported BOM move together to 5.5.1, including its compromised-certificate mitigation. Existing custom `OkHttpClientBuilder` implementations and lookup-only DNS implementations remain supported. Encrypted Client Hello is opt-in; the SDK does not enable it or install an API-29-only DNS resolver on older devices.
 

@@ -123,14 +123,14 @@ jobs:
     - uses: gradle/actions/setup-gradle@v6
       with:
         gradle-version: "9.3.1"
-    - name: Compile with Kotlin 2.1 and verify OkHttp alignment
+    - name: Verify Kotlin 2.1 compiler, compile, and check OkHttp alignment
       run: >-
         gradle --no-daemon
         -p integration-tests/kotlin-2.1-consumer
         -PraygunRepository="$RAYGUN_TEST_REPOSITORY"
         -PraygunVersion="$RAYGUN_TEST_VERSION"
         -PraygunOkHttpVersion="$RAYGUN_TEST_OKHTTP_VERSION"
-        :app:assembleDebug :app:verifyOkHttpDependencyAlignment
+        :app:verifyKotlinCompilerVersion :app:assembleDebug :app:verifyOkHttpDependencyAlignment
 
   app-connected-test:
     name: "app:connectedTest (API ${{ matrix.api-level }})"

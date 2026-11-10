@@ -4,7 +4,7 @@
 
 Building the project uses the Gradle 9.8.2 wrapper, Android Gradle Plugin (AGP) 9.5.0, JDK 17 or later, and Android SDK Platform 37.0. For IDE builds, use an Android Studio version that supports AGP 9.5.0; see the [Android Studio/AGP compatibility table](https://developer.android.com/build/releases/about-agp#android_gradle_plugin_and_android_studio_compatibility).
 
-Install the SDK packages with `sdkmanager "platforms;android-37.0" "build-tools;37.0.0"`. Development tooling is separate from the minimum tested consumer toolchain: AGP 9.1.1, Gradle 9.3.1, JDK 17, and compile SDK 37. Minimum device support remains API 23, and the sample app's target SDK remains 36.
+Install the SDK packages with `sdkmanager "platforms;android-37.0" "build-tools;37.0.0"`. Development tooling is separate from the supported, CI-validated SDK 37 consumer baseline: AGP 9.1.1, Gradle 9.3.1, and JDK 17. This baseline follows Android's supported SDK 37 tooling matrix; the AAR does not enforce these AGP or Gradle versions. Minimum device support remains API 23, and the sample app's target SDK remains 36.
 
 The project consists of two modules:
 
@@ -92,6 +92,10 @@ Follow these rules when changing Kotlin, AGP, the publishing plugin, or provider
 - Do not hide compatibility failures with `-Xskip-metadata-version-check`, forced standard library versions, or consumer-side dependency exclusions.
 
 The consumer fixture is in `integration-tests/kotlin-2.1-consumer`. It retains Kotlin 2.1.20 while using AGP 9.1.1, Gradle 9.3.1, and compile SDK 37 for the version 7 build baseline. It explicitly opts out of AGP 9's built-in Kotlin and new DSL and strictly selects the 2.1.20 build plugin and its API. Without both compiler-classpath constraints, AGP can silently upgrade the compiler to 2.2.10 even when the requested plugin version is 2.1.20. These constraints do not override the app's runtime dependencies. Do not remove them or the opt-out settings without deciding and testing a new consumer Kotlin baseline. The fixture also requests `okhttp-urlconnection:4.9.2` deliberately, verifying consumption of the exported OkHttp BOM; do not update that old request as a routine dependency bump.
+
+CI runs `verifyKotlinCompilerVersion` to assert that the fixture resolves `kotlin-compiler-embeddable:2.1.20`, rather than relying only on the plugin request. `verifyOkHttpDependencyAlignment` also checks that Raygun exposes OkHttp directly in its published API, so the URLConnection dependency cannot hide a missing API dependency.
+
+A local consumer smoke build with AGP 8.11.0, Gradle 8.14.3, Kotlin 2.1.20, and compile SDK 37 compiled without AGP 9 opt-outs or Kotlin plugin pins. APK assembly required excluding the duplicate `META-INF/versions/9/OSGI-INF/MANIFEST.MF` resource. The build retained AGP's unsupported-SDK warning; no SDK or metadata validation was bypassed. This result does not add AGP 8 to the supported SDK 37 tooling matrix or CI coverage.
 
 CI runs device tests on API 23, 35, and 37, in addition to compiling the published-artifact consumer. Passing the standalone consumer test is not a substitute for checking an application's React Native Gradle plugins and native modules when migrating its build tooling.
 
