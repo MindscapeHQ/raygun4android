@@ -1,6 +1,6 @@
 ## Changelog
 
-### 7.0.0 (unreleased)
+### 7.0.0-beta1
 
 - breaking: require compile SDK 37 for consuming applications; the supported, CI-validated SDK 37 consumer baseline is AGP 9.1.1, Gradle 9.3.1, and JDK 17
 - chore(deps): update OkHttp and its exported BOM from 5.4.0 to 5.5.1, including the compromised eMudhra certificate mitigation, and Okio from 3.17.0 to 3.18.1

@@ -22,6 +22,8 @@ signing.secretKeyRingFile={to be provided}
 
 All keys have to populated with the appropriate values and file paths to allow a successful publication on Maven Central. These values will be provided to people with the appropriate level of access by the Raygun team.
 
+`mavenCentralUsername` and `mavenCentralPassword` must come from a [Central Portal user token](https://central.sonatype.org/publish/generate-portal-token/), not your website login. The account must have publishing access to the `com.raygun` namespace. Reuse the Raygun release signing key where available; keep the private key and credentials out of version control and chat messages.
+
 ## Publish a build
 
 1. Edit `gradle.properties` in the root of the project and change the version name and code according to the guidelines in the file. If you add `-SNAPSHOT` to the version name, your release will be published to the snapshot server of Maven Central. It might be appropriate to also update the fields for `POM_DEVELOPER_ID` and `POM_DEVELOPER_NAME` in certain instances. Please check with the Raygun team if you feel the need to do so.
@@ -32,6 +34,27 @@ VERSION_CODE=40000000
 ```
 
 2. Copy the signing key ring into the /releasing directory of your project and refer to it from `signing.secretKeyRingFile` in the `gradle.properties` of your home directory. If you need to create a new signing key please see below.
+
+## Beta releases
+
+Maven Central publishes beta versions through the same process as final releases. For the first 7.0.0 beta, use:
+
+```properties
+VERSION_NAME=7.0.0-beta1
+VERSION_CODE=70000071
+```
+
+Do not append `-SNAPSHOT`: that would publish to the separate snapshot repository. A published beta is immutable. Use `7.0.0-beta2` and version code `70000072` for a subsequent beta instead of trying to replace beta 1.
+
+Run the build and published-consumer checks against the beta version before following [Steps for releasing the provider](#steps-for-releasing-the-provider). With the current configuration, `:provider:publishToMavenCentral` uploads a deployment for validation; the deployment is not public until you select **Publish** in the Central Portal.
+
+After publication, verify that the beta resolves from `mavenCentral()`. Consumers opt in with the exact version:
+
+```kotlin
+implementation("com.raygun:raygun4android:7.0.0-beta1")
+```
+
+Keep 6.3.1 documented as the stable release while 7.0.0 is in beta. Tag the published source commit as `v7.0.0-beta1` and mark its GitHub release as a **pre-release**, not the latest stable release.
 
 ## Creating new signing keys
 
@@ -59,7 +82,7 @@ $ gpg --list-keys --keyid-format 0xSHORT
 ```
 
 ## Steps for releasing the provider
-1. Build the provider for release and upload it to Nexus by running the following command in the terminal:
+1. Build the provider for release and upload it to the Central Portal by running the following command in the terminal:
 ```
 ./gradlew clean :provider:build :provider:publishToMavenCentral
 ```
